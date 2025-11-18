@@ -1,0 +1,8 @@
+# API Functions
+
+API client functions for interacting with Supabase:
+- complaints API
+- notifications API
+- votes API
+- announcements API
+- analytics API

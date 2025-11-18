@@ -1,0 +1,7 @@
+# Auth Components
+
+Authentication-related components:
+- LoginForm
+- RegisterForm
+- PasswordResetForm
+- ProtectedRoute

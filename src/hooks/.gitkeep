@@ -1,0 +1,12 @@
+# Hooks Directory
+
+This directory contains custom React hooks.
+
+## Common hooks:
+- `useAuth` - Authentication state and operations
+- `useComplaints` - Complaint data fetching and mutations
+- `useNotifications` - Real-time notifications
+- `useSupabase` - Supabase client access
+- `useUser` - Current user data
+- `useVotes` - Voting operations
+- `useAnnouncements` - Announcements data

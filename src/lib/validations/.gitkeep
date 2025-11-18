@@ -1,0 +1,6 @@
+# Validation Schemas
+
+Form validation schemas using Zod or similar:
+- complaint validation
+- user validation
+- vote validation

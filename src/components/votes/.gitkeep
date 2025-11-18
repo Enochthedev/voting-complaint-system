@@ -1,0 +1,7 @@
+# Vote Components
+
+Components for the voting system:
+- VoteForm
+- VoteList
+- VoteCard
+- VoteResults

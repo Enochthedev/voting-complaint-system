@@ -1,0 +1,9 @@
+# Complaint Components
+
+Components related to complaint management:
+- ComplaintForm
+- ComplaintList
+- ComplaintDetail
+- ComplaintCard
+- ComplaintFilters
+- ComplaintTimeline

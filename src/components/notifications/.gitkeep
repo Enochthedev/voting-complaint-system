@@ -1,0 +1,7 @@
+# Notification Components
+
+Components for the notification system:
+- NotificationBell
+- NotificationCenter
+- NotificationItem
+- NotificationToast

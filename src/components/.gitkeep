@@ -1,0 +1,13 @@
+# Components Directory
+
+This directory contains all React components organized by feature/domain.
+
+## Structure:
+- `/ui` - Reusable UI components (buttons, inputs, cards, etc.)
+- `/complaints` - Complaint-related components
+- `/notifications` - Notification components
+- `/votes` - Voting system components
+- `/announcements` - Announcement components
+- `/analytics` - Analytics and dashboard components
+- `/auth` - Authentication components
+- `/layout` - Layout components (header, sidebar, etc.)
