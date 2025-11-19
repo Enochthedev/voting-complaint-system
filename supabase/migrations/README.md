@@ -94,9 +94,20 @@ This directory contains SQL migration files for the Student Complaint Resolution
     - Creates votes and vote_responses tables
     - **Dependencies**: 001_create_users_table_extension.sql
 
-13. **013_create_announcements_table.sql**
+13. **013_create_vote_responses_table.sql**
+    - Creates vote_responses table
+    - **Dependencies**: 012_create_votes_table.sql
+
+14. **014_create_announcements_table.sql**
     - Creates announcements table
     - **Dependencies**: 001_create_users_table_extension.sql
+
+15. **015_add_additional_composite_indexes.sql**
+    - Adds additional composite indexes for common query patterns
+    - Adds composite index for complaint_attachments (complaint_id, created_at)
+    - Adds composite indexes for complaint_ratings (created_at, rating) and (student_id, created_at)
+    - **Status**: Ready to apply
+    - **Dependencies**: 004_create_complaint_attachments_table.sql, 007_create_complaint_ratings_table.sql
 
 ## How to Apply Migrations
 

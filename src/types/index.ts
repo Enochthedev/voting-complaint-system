@@ -7,6 +7,9 @@
 // Database types from Supabase
 export * from './database.types';
 
+// Authentication types
+export * from './auth.types';
+
 // Application-specific types will be added here as they're created
 // export * from './complaint.types';
 // export * from './user.types';

@@ -15,8 +15,15 @@ if (!supabaseAnonKey) {
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
+    // Persist session in local storage
     persistSession: true,
+    // Automatically refresh token when it expires
     autoRefreshToken: true,
+    // Detect session from URL (for OAuth callbacks)
     detectSessionInUrl: true,
+    // Storage key for session
+    storageKey: 'student-complaint-auth',
+    // Flow type for authentication
+    flowType: 'pkce',
   },
 });
