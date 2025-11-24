@@ -1,0 +1,1698 @@
+'use client';
+
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { Loading } from '@/components/ui/loading';
+import { Alert } from '@/components/ui/alert';
+import {
+  ArrowLeft,
+  Calendar,
+  FileText,
+  User,
+  AlertCircle,
+  Clock,
+  Download,
+  MessageSquare,
+  History,
+  CheckCircle,
+  XCircle,
+  Image as ImageIcon,
+  File,
+  FileImage,
+} from 'lucide-react';
+import type {
+  Complaint,
+  ComplaintTag,
+  ComplaintAttachment,
+  ComplaintHistory,
+  ComplaintComment,
+  ComplaintCategory,
+  ComplaintPriority,
+  ComplaintStatus,
+  User as UserType,
+  Feedback,
+} from '@/types/database.types';
+import { cn } from '@/lib/utils';
+import { FeedbackDisplay } from './feedback-display';
+import { CommentInput } from './comment-input';
+
+// Extended complaint type with relations
+interface ComplaintWithRelations extends Complaint {
+  complaint_tags?: ComplaintTag[];
+  complaint_attachments?: ComplaintAttachment[];
+  complaint_history?: (ComplaintHistory & { user?: UserType })[];
+  complaint_comments?: (ComplaintComment & { user?: UserType })[];
+  feedback?: (Feedback & { lecturer?: UserType })[];
+  assigned_lecturer?: UserType;
+}
+
+interface ComplaintDetailViewProps {
+  complaintId: string;
+  onBack?: () => void;
+}
+
+// Status badge configuration
+const STATUS_CONFIG: Record<
+  ComplaintStatus,
+  { label: string; className: string; icon: React.ReactNode }
+> = {
+  draft: {
+    label: 'Draft',
+    className: 'bg-gray-100 text-gray-800 border-gray-200',
+    icon: <FileText className="h-4 w-4" />,
+  },
+  new: {
+    label: 'New',
+    className: 'bg-blue-100 text-blue-800 border-blue-200',
+    icon: <AlertCircle className="h-4 w-4" />,
+  },
+  opened: {
+    label: 'Opened',
+    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    icon: <FileText className="h-4 w-4" />,
+  },
+  in_progress: {
+    label: 'In Progress',
+    className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    icon: <Clock className="h-4 w-4" />,
+  },
+  resolved: {
+    label: 'Resolved',
+    className: 'bg-green-100 text-green-800 border-green-200',
+    icon: <CheckCircle className="h-4 w-4" />,
+  },
+  closed: {
+    label: 'Closed',
+    className: 'bg-zinc-100 text-zinc-800 border-zinc-200',
+    icon: <XCircle className="h-4 w-4" />,
+  },
+  reopened: {
+    label: 'Reopened',
+    className: 'bg-orange-100 text-orange-800 border-orange-200',
+    icon: <AlertCircle className="h-4 w-4" />,
+  },
+};
+
+// Priority configuration
+const PRIORITY_CONFIG: Record<
+  ComplaintPriority,
+  { label: string; className: string; dotColor: string }
+> = {
+  low: {
+    label: 'Low',
+    className: 'text-blue-700',
+    dotColor: 'bg-blue-500',
+  },
+  medium: {
+    label: 'Medium',
+    className: 'text-yellow-700',
+    dotColor: 'bg-yellow-500',
+  },
+  high: {
+    label: 'High',
+    className: 'text-orange-700',
+    dotColor: 'bg-orange-500',
+  },
+  critical: {
+    label: 'Critical',
+    className: 'text-red-700',
+    dotColor: 'bg-red-500',
+  },
+};
+
+// Category labels
+const CATEGORY_LABELS: Record<ComplaintCategory, string> = {
+  academic: 'Academic',
+  facilities: 'Facilities',
+  harassment: 'Harassment',
+  course_content: 'Course Content',
+  administrative: 'Administrative',
+  other: 'Other',
+};
+
+/**
+ * Format date to readable format
+ */
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * Format relative time
+ */
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = diffInMs / (1000 * 60 * 60);
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+  if (diffInHours < 1) {
+    const minutes = Math.floor(diffInMs / (1000 * 60));
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+  } else if (diffInHours < 24) {
+    const hours = Math.floor(diffInHours);
+    return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  } else if (diffInDays < 7) {
+    const days = Math.floor(diffInDays);
+    return `${days} day${days !== 1 ? 's' : ''} ago`;
+  } else {
+    return formatDate(dateString);
+  }
+}
+
+/**
+ * Format file size
+ */
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+/**
+ * Mock data for UI development (following UI-first approach)
+ */
+function getMockComplaintData(id: string): ComplaintWithRelations {
+  return {
+    id,
+    student_id: 'student-123',
+    is_anonymous: false,
+    is_draft: false,
+    title: 'Broken Air Conditioning in Lecture Hall B',
+    description: `<p>The air conditioning system in Lecture Hall B has been malfunctioning for the past week. 
+    The temperature in the room becomes unbearably hot during afternoon classes, making it very difficult 
+    for students to concentrate.</p>
+    <p>This issue affects approximately 150 students who have classes in this hall. 
+    We request urgent attention to this matter as it's impacting our learning experience.</p>`,
+    category: 'facilities',
+    priority: 'high',
+    status: 'in_progress',
+    assigned_to: 'lecturer-456',
+    created_at: '2024-11-15T10:30:00Z',
+    updated_at: '2024-11-18T14:20:00Z',
+    opened_at: '2024-11-15T11:00:00Z',
+    opened_by: 'lecturer-456',
+    resolved_at: null,
+    escalated_at: null,
+    escalation_level: 0,
+    complaint_tags: [
+      { id: 'tag-1', complaint_id: id, tag_name: 'urgent', created_at: '2024-11-15T10:30:00Z' },
+      { id: 'tag-2', complaint_id: id, tag_name: 'facilities', created_at: '2024-11-15T10:30:00Z' },
+      { id: 'tag-3', complaint_id: id, tag_name: 'lecture-hall', created_at: '2024-11-15T10:30:00Z' },
+    ],
+    complaint_attachments: [
+      {
+        id: 'att-1',
+        complaint_id: id,
+        file_name: 'temperature-reading.jpg',
+        file_path: '/attachments/temperature-reading.jpg',
+        file_size: 245678,
+        file_type: 'image/jpeg',
+        uploaded_by: 'student-123',
+        created_at: '2024-11-15T10:30:00Z',
+      },
+      {
+        id: 'att-2',
+        complaint_id: id,
+        file_name: 'hall-photo.jpg',
+        file_path: '/attachments/hall-photo.jpg',
+        file_size: 512340,
+        file_type: 'image/jpeg',
+        uploaded_by: 'student-123',
+        created_at: '2024-11-15T10:30:00Z',
+      },
+      {
+        id: 'att-3',
+        complaint_id: id,
+        file_name: 'maintenance-report.pdf',
+        file_path: '/attachments/maintenance-report.pdf',
+        file_size: 1024567,
+        file_type: 'application/pdf',
+        uploaded_by: 'student-123',
+        created_at: '2024-11-15T10:31:00Z',
+      },
+    ],
+    complaint_history: [
+      {
+        id: 'hist-1',
+        complaint_id: id,
+        action: 'created',
+        old_value: null,
+        new_value: 'new',
+        performed_by: 'student-123',
+        details: null,
+        created_at: '2024-11-15T10:30:00Z',
+        user: {
+          id: 'student-123',
+          email: 'john.doe@university.edu',
+          role: 'student',
+          full_name: 'John Doe',
+          created_at: '2024-09-01T00:00:00Z',
+          updated_at: '2024-09-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'hist-2',
+        complaint_id: id,
+        action: 'status_changed',
+        old_value: 'new',
+        new_value: 'opened',
+        performed_by: 'lecturer-456',
+        details: null,
+        created_at: '2024-11-15T11:00:00Z',
+        user: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'hist-3',
+        complaint_id: id,
+        action: 'assigned',
+        old_value: null,
+        new_value: 'lecturer-456',
+        performed_by: 'lecturer-456',
+        details: null,
+        created_at: '2024-11-15T11:00:00Z',
+        user: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'hist-4',
+        complaint_id: id,
+        action: 'status_changed',
+        old_value: 'opened',
+        new_value: 'in_progress',
+        performed_by: 'lecturer-456',
+        details: null,
+        created_at: '2024-11-18T14:20:00Z',
+        user: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+    ],
+    complaint_comments: [
+      {
+        id: 'comment-1',
+        complaint_id: id,
+        user_id: 'lecturer-456',
+        comment: 'Thank you for reporting this issue. I have contacted the facilities management team and they will inspect the AC unit tomorrow.',
+        is_internal: false,
+        created_at: '2024-11-15T11:05:00Z',
+        updated_at: '2024-11-15T11:05:00Z',
+        user: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'comment-2',
+        complaint_id: id,
+        user_id: 'student-123',
+        comment: 'Thank you for the quick response! Looking forward to the resolution.',
+        is_internal: false,
+        created_at: '2024-11-15T14:30:00Z',
+        updated_at: '2024-11-15T14:30:00Z',
+        user: {
+          id: 'student-123',
+          email: 'john.doe@university.edu',
+          role: 'student',
+          full_name: 'John Doe',
+          created_at: '2024-09-01T00:00:00Z',
+          updated_at: '2024-09-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'comment-3',
+        complaint_id: id,
+        user_id: 'lecturer-456',
+        comment: 'Update: The facilities team has ordered replacement parts. They expect to complete the repair by Friday.',
+        is_internal: false,
+        created_at: '2024-11-18T14:20:00Z',
+        updated_at: '2024-11-18T14:20:00Z',
+        user: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+    ],
+    assigned_lecturer: {
+      id: 'lecturer-456',
+      email: 'dr.smith@university.edu',
+      role: 'lecturer',
+      full_name: 'Dr. Sarah Smith',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+    feedback: [
+      {
+        id: 'feedback-1',
+        complaint_id: id,
+        lecturer_id: 'lecturer-456',
+        content: `<p>Thank you for bringing this issue to our attention. I have personally inspected Lecture Hall B and confirmed that the air conditioning system is indeed malfunctioning.</p>
+        <p>I have escalated this to the facilities management team with high priority. They have scheduled an emergency inspection for tomorrow morning at 8:00 AM.</p>
+        <p><strong>Next Steps:</strong></p>
+        <ul>
+          <li>Facilities team will diagnose the issue tomorrow</li>
+          <li>Replacement parts have been ordered and should arrive by Wednesday</li>
+          <li>Installation is scheduled for Thursday morning</li>
+          <li>We expect the system to be fully operational by Friday</li>
+        </ul>
+        <p>In the meantime, we have arranged for portable cooling units to be placed in the hall for your afternoon classes.</p>`,
+        created_at: '2024-11-15T15:30:00Z',
+        updated_at: '2024-11-15T15:30:00Z',
+        lecturer: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+      {
+        id: 'feedback-2',
+        complaint_id: id,
+        lecturer_id: 'lecturer-456',
+        content: `<p><strong>Update:</strong> The facilities team has completed their inspection and identified the issue. The compressor unit needs to be replaced.</p>
+        <p>The replacement parts arrived earlier than expected, and the installation is now scheduled for tomorrow (Wednesday) instead of Thursday. This means the AC should be working by Wednesday afternoon.</p>
+        <p>Thank you for your patience as we work to resolve this issue.</p>`,
+        created_at: '2024-11-18T09:15:00Z',
+        updated_at: '2024-11-18T09:15:00Z',
+        lecturer: {
+          id: 'lecturer-456',
+          email: 'dr.smith@university.edu',
+          role: 'lecturer',
+          full_name: 'Dr. Sarah Smith',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        },
+      },
+    ],
+  };
+}
+
+/**
+ * Complaint Header Component
+ */
+function ComplaintHeader({ complaint }: { complaint: ComplaintWithRelations }) {
+  const statusConfig = STATUS_CONFIG[complaint.status];
+  const priorityConfig = PRIORITY_CONFIG[complaint.priority];
+  const categoryLabel = CATEGORY_LABELS[complaint.category];
+
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+      {/* Title and Status */}
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <h1 className="flex-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          {complaint.title}
+        </h1>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold',
+            statusConfig.className
+          )}
+        >
+          {statusConfig.icon}
+          {statusConfig.label}
+        </span>
+      </div>
+
+      {/* Metadata Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Priority */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Priority:</span>
+          <div className="flex items-center gap-1.5">
+            <span className={cn('h-2 w-2 rounded-full', priorityConfig.dotColor)} />
+            <span className={cn('text-sm font-medium', priorityConfig.className)}>
+              {priorityConfig.label}
+            </span>
+          </div>
+        </div>
+
+        {/* Category */}
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Category:</span>
+          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {categoryLabel}
+          </span>
+        </div>
+
+        {/* Created Date */}
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Created:</span>
+          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {formatRelativeTime(complaint.created_at)}
+          </span>
+        </div>
+
+        {/* Assigned To */}
+        {complaint.assigned_lecturer && (
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">Assigned to:</span>
+            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+              {complaint.assigned_lecturer.full_name}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Tags */}
+      {complaint.complaint_tags && complaint.complaint_tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {complaint.complaint_tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="inline-flex items-center rounded-md bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+            >
+              {tag.tag_name}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Anonymous Indicator */}
+      {complaint.is_anonymous && (
+        <div className="mt-4">
+          <Alert variant="info">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm">This complaint was submitted anonymously</span>
+          </Alert>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Complaint Description Component
+ */
+function ComplaintDescription({ description }: { description: string }) {
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        Description
+      </h2>
+      <div
+        className="prose prose-sm max-w-none dark:prose-invert"
+        dangerouslySetInnerHTML={{ __html: description }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Get file icon based on file type
+ */
+function getFileIcon(fileType: string) {
+  if (fileType.startsWith('image/')) {
+    return <FileImage className="h-8 w-8 flex-shrink-0 text-blue-500" />;
+  } else if (fileType === 'application/pdf') {
+    return <FileText className="h-8 w-8 flex-shrink-0 text-red-500" />;
+  } else if (
+    fileType === 'application/msword' ||
+    fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    return <File className="h-8 w-8 flex-shrink-0 text-blue-600" />;
+  } else {
+    return <File className="h-8 w-8 flex-shrink-0 text-zinc-400" />;
+  }
+}
+
+/**
+ * Get file type label
+ */
+function getFileTypeLabel(fileType: string): string {
+  if (fileType.startsWith('image/')) {
+    return 'Image';
+  } else if (fileType === 'application/pdf') {
+    return 'PDF';
+  } else if (
+    fileType === 'application/msword' ||
+    fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    return 'Document';
+  } else {
+    return 'File';
+  }
+}
+
+/**
+ * Attachments Component
+ */
+function AttachmentsSection({ attachments }: { attachments: ComplaintAttachment[] }) {
+  if (!attachments || attachments.length === 0) {
+    return null;
+  }
+
+  const handleDownload = (attachment: ComplaintAttachment) => {
+    // Mock download - in real implementation, this would download from Supabase Storage
+    console.log('Downloading:', attachment.file_name);
+    
+    // In Phase 12, this will be replaced with actual Supabase Storage download:
+    // const { data, error } = await supabase.storage
+    //   .from('complaint-attachments')
+    //   .download(attachment.file_path);
+    // if (data) {
+    //   const url = URL.createObjectURL(data);
+    //   const a = document.createElement('a');
+    //   a.href = url;
+    //   a.download = attachment.file_name;
+    //   a.click();
+    //   URL.revokeObjectURL(url);
+    // }
+    
+    alert(`Download functionality will be implemented in Phase 12: ${attachment.file_name}`);
+  };
+
+  const handlePreview = (attachment: ComplaintAttachment) => {
+    // Mock preview - in real implementation, this would open a preview modal
+    console.log('Previewing:', attachment.file_name);
+    alert(`Preview functionality will be implemented in Phase 12: ${attachment.file_name}`);
+  };
+
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <FileText className="h-5 w-5" />
+        Attachments ({attachments.length})
+      </h2>
+      
+      <div className="space-y-3">
+        {attachments.map((attachment) => {
+          const isImage = attachment.file_type.startsWith('image/');
+          
+          return (
+            <div
+              key={attachment.id}
+              className="group flex items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            >
+              {/* File Icon */}
+              <div className="flex-shrink-0">
+                {getFileIcon(attachment.file_type)}
+              </div>
+
+              {/* File Info */}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                  {attachment.file_name}
+                </p>
+                <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  <span>{getFileTypeLabel(attachment.file_type)}</span>
+                  <span>•</span>
+                  <span>{formatFileSize(attachment.file_size)}</span>
+                  <span>•</span>
+                  <span>Uploaded {formatRelativeTime(attachment.created_at)}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-shrink-0 items-center gap-2">
+                {isImage && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handlePreview(attachment)}
+                    className="opacity-0 transition-opacity group-hover:opacity-100"
+                    title="Preview image"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDownload(attachment)}
+                  title="Download file"
+                  className="hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Download All Button (if multiple attachments) */}
+      {attachments.length > 1 && (
+        <div className="mt-4 flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              console.log('Downloading all attachments');
+              alert('Download all functionality will be implemented in Phase 12');
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download All ({attachments.length})
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Timeline/History Component
+ */
+function TimelineSection({ history }: { history: (ComplaintHistory & { user?: UserType })[] }) {
+  if (!history || history.length === 0) {
+    return null;
+  }
+
+  const getActionLabel = (action: string, oldValue: string | null, newValue: string | null) => {
+    switch (action) {
+      case 'created':
+        return 'Created complaint';
+      case 'status_changed':
+        return `Changed status from "${oldValue}" to "${newValue}"`;
+      case 'assigned':
+        return 'Assigned complaint';
+      case 'reassigned':
+        return 'Reassigned complaint';
+      case 'feedback_added':
+        return 'Added feedback';
+      case 'comment_added':
+        return 'Added comment';
+      case 'reopened':
+        return 'Reopened complaint';
+      case 'escalated':
+        return 'Escalated complaint';
+      case 'rated':
+        return 'Rated complaint';
+      default:
+        return action;
+    }
+  };
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'created':
+        return <FileText className="h-4 w-4" />;
+      case 'status_changed':
+        return <Clock className="h-4 w-4" />;
+      case 'assigned':
+      case 'reassigned':
+        return <User className="h-4 w-4" />;
+      case 'comment_added':
+        return <MessageSquare className="h-4 w-4" />;
+      case 'reopened':
+        return <AlertCircle className="h-4 w-4" />;
+      case 'escalated':
+        return <AlertCircle className="h-4 w-4" />;
+      default:
+        return <History className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        Timeline
+      </h2>
+      <div className="space-y-4">
+        {history.map((item, index) => (
+          <div key={item.id} className="flex gap-3">
+            {/* Timeline line */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                {getActionIcon(item.action)}
+              </div>
+              {index < history.length - 1 && (
+                <div className="w-0.5 flex-1 bg-zinc-200 dark:bg-zinc-700" />
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 pb-4">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                {getActionLabel(item.action, item.old_value, item.new_value)}
+              </p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                {item.user?.full_name || 'Unknown user'} • {formatRelativeTime(item.created_at)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Comments/Discussion Component
+ */
+function CommentsSection({
+  comments,
+  userRole,
+  onAddComment,
+}: {
+  comments: (ComplaintComment & { user?: UserType })[];
+  userRole: 'student' | 'lecturer' | 'admin';
+  onAddComment?: (comment: string, isInternal: boolean) => Promise<void>;
+}) {
+  const [localComments, setLocalComments] = React.useState(comments);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  // Update local comments when prop changes
+  React.useEffect(() => {
+    setLocalComments(comments);
+  }, [comments]);
+
+  const handleSubmit = async (comment: string, isInternal: boolean) => {
+    setIsSubmitting(true);
+    
+    try {
+      if (onAddComment) {
+        await onAddComment(comment, isInternal);
+      } else {
+        // Mock submission for UI development (Phase 12 will implement real API)
+        console.log('Adding comment:', comment, 'Internal:', isInternal);
+        
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        
+        // Create mock comment for immediate UI feedback
+        const mockUser: UserType = {
+          id: userRole === 'lecturer' ? 'lecturer-456' : 'student-123',
+          email: userRole === 'lecturer' ? 'dr.smith@university.edu' : 'john.doe@university.edu',
+          role: userRole,
+          full_name: userRole === 'lecturer' ? 'Dr. Sarah Smith' : 'John Doe',
+          created_at: '2024-08-01T00:00:00Z',
+          updated_at: '2024-08-01T00:00:00Z',
+        };
+
+        const newComment: ComplaintComment & { user?: UserType } = {
+          id: `comment-${Date.now()}`,
+          complaint_id: 'mock-complaint-id',
+          user_id: mockUser.id,
+          comment: comment,
+          is_internal: isInternal,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          user: mockUser,
+        };
+
+        // Add to local state for immediate UI update
+        setLocalComments((prev) => [...prev, newComment]);
+        
+        // In Phase 12, this will be replaced with actual Supabase call:
+        // const { data, error } = await supabase
+        //   .from('complaint_comments')
+        //   .insert({
+        //     complaint_id: complaintId,
+        //     user_id: currentUser.id,
+        //     comment: comment,
+        //     is_internal: isInternal,
+        //   })
+        //   .select('*, user:users(*)')
+        //   .single();
+        //
+        // if (error) throw error;
+        //
+        // // Update local state with the new comment from database
+        // setLocalComments((prev) => [...prev, data]);
+        //
+        // // Log in history
+        // await supabase.from('complaint_history').insert({
+        //   complaint_id: complaintId,
+        //   action: 'comment_added',
+        //   performed_by: cu.id,
+        //l }
+    // });
+ 
+s
+   d()
+        // - Creates notification for complaint owner (if not internal)
+   able)
+      }
+    } catc) {
+     
+      throw error; // Re-e error
+    } finally {
+      setIsSubmitting(f
+    }
+  };
+
+  return (
+    <">
+      <h2 className="mb-4">
+        Discussion ({localComments?.length )
+      </h2>
+
+      {/* Comments List */}
+      {localComments && localComments.len ? (
+      -y-4">
+     
+            <div
+              key={comment.id}
+              className0"
+            >
+              <div className="mb-2 flex ieen">
+                <div className="flex itemp-2">
+      >
+     '}
+                  </div>
+                  <div>
+                    
+                      {comment.user?.fn user'}
+                    </p>
+                    <p className="text-xs
+      
+     >
+                  </div>
+                </div>
+                {commenl && (
+                  <span className="rou
+                    Internal
+                  </span>
+      }
+    /div>
+ /p>
+/div>
+   
+        </div>
+    ) : (
+        <p className="mb">
+          Noent!
+        </p
+      )}
+
+      {/* A
+      <div>
+        <h3 className="mb-3 text-sm ">
+          Add Comment
+        </h3>
+        <CommentInput
+          onSubmit={handleSubmit}
+    min'}
+          placeholder="Share your thoughts or provide an update..."
+          minLength={1}
+          maxLength={2000}
+          isLoading={isSubmitting}
+        />
+      </div>
+    </div>
+  );
+}e === 'ad' || userRollecturerole === 'serRe={ualTogglernIntow sh     inc-300text-znc-700 dark:ld text-zi-semibofontponent */}ntInput com new Commerm - UsingComment Fodd >o comm tfirstyet. Be the s comment t-zinc-4000 dark:tex-zinc-50textsm -6 text-       ))}        <      .comment}<">{commentt-zinc-300:texrk0 da-zinc-70xttesm xt-ame="telassN        <p c        <          )       ">yellow-200dark:text--900 rk:bg-yelloww-800 da text-yelloediums font-my-0.5 text-x0 px-2 pow-10 bg-yellnded-fullternat.is_in     </p          ated_at)}ent.creveTime(commatRelati     {form           zinc-400">ark:text-t-zinc-500 d texnow || 'Unkl_nameul0">c-5zinext--900 dark:ttext-zincium -medontsm fe="text-assNam<p clAt(0) || 'Uame?.charer?.full_nt.usmmen    {co           "300xt-zinc-700 dark:teg-zinc-00 dark:btext-zinc-7-medium ont0 text-sm fl bg-zinc-20ulded-fr rounustify-centeenter jw-8 items-cx h-8 ame="flelassN c      <div      er ga-centsustify-betws-center jemtc-90zin700 dark:bg-er-zinc-dark:bordp-4 -zinc-50 c-200 bgder-zin border bor"rounded-lg=> (ent) =map((commComments.al     {locace"mb-6 sp className=  <divgth > 0|| 0}t-zinc-50tex0 dark:inc-90bold text-zmi font-selgxt- te:bg-zinc-950rk800 daborder-zinc-e p-6 dark:bg-whit00 order-zinc-2r b borde-lgdedme="roun classNadivalse);le thput handmmentIn Coto letthrow rror);ent:', eng commrror addi('Esole.error con(errorh r (if applicned lectureon for assigicaties notifeat     // - Crdde_comment_ay_on notiftriggere: database  // Se    se trigger databaatically byomhandled auts on ieatiification cr// Note: Not             //  
+
+/**
+ * Mock lecturers data for assignment dropdown (UI-first approach)
+ */
+function getMockLecturers(): UserType[] {
+  return [
+    {
+      id: 'lecturer-456',
+      email: 'dr.smith@university.edu',
+      role: 'lecturer',
+      full_name: 'Dr. Sarah Smith',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+    {
+      id: 'lecturer-789',
+      email: 'prof.johnson@university.edu',
+      role: 'lecturer',
+      full_name: 'Prof. Michael Johnson',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+    {
+      id: 'lecturer-101',
+      email: 'dr.williams@university.edu',
+      role: 'lecturer',
+      full_name: 'Dr. Emily Williams',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+    {
+      id: 'admin-202',
+      email: 'admin.brown@university.edu',
+      role: 'admin',
+      full_name: 'Admin Robert Brown',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+    {
+      id: 'lecturer-303',
+      email: 'dr.davis@university.edu',
+      role: 'lecturer',
+      full_name: 'Dr. Jennifer Davis',
+      created_at: '2024-08-01T00:00:00Z',
+      updated_at: '2024-08-01T00:00:00Z',
+    },
+  ];
+}
+
+/**
+ * Action Buttons Component (Role-based)
+ */
+function ActionButtons({
+  complaint,
+  userRole,
+  onScrollToComments,
+  onStatusChange,
+  onAssign,
+}: {
+  complaint: ComplaintWithRelations;
+  userRole: 'student' | 'lecturer' | 'admin';
+  onScrollToComments?: () => void;
+  onStatusChange?: (newStatus: ComplaintStatus) => Promise<void>;
+  onAssign?: (lecturerId: string) => Promise<void>;
+}) {
+  const [isChangingStatus, setIsChangingStatus] = React.useState(false);
+  const [showStatusModal, setShowStatusModal] = React.useState(false);
+  const [selectedStatus, setSelectedStatus] = React.useState<ComplaintStatus | null>(null);
+  const [statusChangeNote, setStatusChangeNote] = React.useState('');
+  const [showAssignModal, setShowAssignModal] = React.useState(false);
+  const [selectedLecturer, setSelectedLecturer] = React.useState<string>('');
+  const [isAssigning, setIsAssigning] = React.useState(false);
+  const [availableLecturers] = React.useState<UserType[]>(getMockLecturers());
+
+  const handleStatusChange = async (newStatus: ComplaintStatus) => {
+    if (newStatus === complaint.status) {
+      return; // No change needed
+    }
+
+    setSelectedStatus(newStatus);
+    setShowStatusModal(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!selectedStatus) return;
+
+    setIsChangingStatus(true);
+    try {
+      // Mock status change - real implementation in Phase 12
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log('Changing status to:', selectedStatus, 'Note:', statusChangeNote);
+      
+      // In Phase 12, this will call the actual API:
+      // await supabase.from('complaints').update({ 
+      //   status: selectedStatus,
+      //   updated_at: new Date().toISOString()
+      // }).eq('id', complaint.id);
+      // 
+      // await supabase.from('complaint_history').insert({
+      //   complaint_id: complaint.id,
+      //   action: 'status_changed',
+      //   old_value: complaint.status,
+      //   new_value: selectedStatus,
+      //   performed_by: currentUser.id,
+      //   details: { note: statusChangeNote }
+      // });
+
+      if (onStatusChange) {
+        await onStatusChange(selectedStatus);
+      }
+
+      alert(`Status changed to: ${selectedStatus}${statusChangeNote ? '\nNote: ' + statusChangeNote : ''}`);
+      
+      // Reset modal state
+      setShowStatusModal(false);
+      setSelectedStatus(null);
+      setStatusChangeNote('');
+    } catch (error) {
+      console.error('Error changing status:', error);
+      alert('Failed to change status. Please try again.');
+    } finally {
+      setIsChangingStatus(false);
+    }
+  };
+
+  const cancelStatusChange = () => {
+    setShowStatusModal(false);
+    setSelectedStatus(null);
+    setStatusChangeNote('');
+  };
+
+  const handleReopen = async () => {
+    await handleStatusChange('reopened');
+  };
+
+  const handleAssign = () => {
+    setShowAssignModal(true);
+    // Pre-select current assignment if exists
+    if (complaint.assigned_to) {
+      setSelectedLecturer(complaint.assigned_to);
+    }
+  };
+
+  const confirmAssignment = async () => {
+    if (!selectedLecturer) {
+      alert('Please select a lecturer to assign');
+      return;
+    }
+
+    setIsAssigning(true);
+    try {
+      // Mock assignment - real implementation in Phase 12
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      const selectedLecturerData = availableLecturers.find(l => l.id === selectedLecturer);
+      console.log('Assigning complaint to:', selectedLecturerData?.full_name);
+      
+      // In Phase 12, this will call the actual API:
+      // const isReassignment = complaint.assigned_to !== null;
+      // 
+      // await supabase.from('complaints').update({ 
+      //   assigned_to: selectedLecturer,
+      //   updated_at: new Date().toISOString()
+      // }).eq('id', complaint.id);
+      // 
+      // // Log history
+      // await supabase.from('complaint_history').insert({
+      //   complaint_id: complaint.id,
+      //   action: isReassignment ? 'reassigned' : 'assigned',
+      //   old_value: complaint.assigned_to,
+      //   new_value: selectedLecturer,
+      //   performed_by: currentUser.id
+      // });
+      //
+      // // Create notification for assigned lecturer
+      // await supabase.from('notifications').insert({
+      //   user_id: selectedLecturer,
+      //   type: 'complaint_assigned',
+      //   title: 'Complaint Assigned to You',
+      //   message: `You have been assigned complaint: ${complaint.title}`,
+      //   related_id: complaint.id
+      // });
+
+      if (onAssign) {
+        await onAssign(selectedLecturer);
+      }
+
+      alert(`Complaint assigned to: ${selectedLecturerData?.full_name || 'Unknown'}`);
+      
+      // Reset modal state
+      setShowAssignModal(false);
+      setSelectedLecturer('');
+    } catch (error) {
+      console.error('Error assigning complaint:', error);
+      alert('Failed to assign complaint. Please try again.');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const cancelAssignment = () => {
+    setShowAssignModal(false);
+    setSelectedLecturer('');
+  };
+
+  const handleAddInternalNote = () => {
+    alert('Internal note functionality will be implemented in Phase 12');
+  };
+
+  const handleRateResolution = () => {
+    alert('Rating functionality will be implemented in Phase 12');
+  };
+
+  const handleAddComment = () => {
+    // Scroll to comments section
+    if (onScrollToComments) {
+      onScrollToComments();
+    }
+  };
+
+  // Get available status transitions based on current status
+  const getAvailableStatuses = (): ComplaintStatus[] => {
+    switch (complaint.status) {
+      case 'new':
+        return ['opened', 'in_progress', 'resolved', 'closed'];
+      case 'opened':
+        return ['in_progress', 'resolved', 'closed'];
+      case 'in_progress':
+        return ['resolved', 'closed'];
+      case 'reopened':
+        return ['in_progress', 'resolved', 'closed'];
+      case 'resolved':
+        return ['closed', 'reopened'];
+      case 'closed':
+        return ['reopened'];
+      default:
+        return [];
+    }
+  };
+
+  const availableStatuses = getAvailableStatuses();
+
+  // Student actions
+  if (userRole === 'student') {
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <h3 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          Actions
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={handleAddComment} variant="default">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Add Comment
+          </Button>
+          {complaint.status === 'resolved' && (
+            <>
+              <Button onClick={handleReopen} disabled={isChangingStatus} variant="outline">
+                <AlertCircle className="mr-2 h-4 w-4" />
+                Reopen Complaint
+              </Button>
+              <Button onClick={handleRateResolution} variant="outline">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Rate Resolution
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Lecturer/Admin actions
+  return (
+    <>
+      <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <h3 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          Actions
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          {availableStatuses.length > 0 && (
+            <div className="relative">
+              <select
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value) {
+                    handleStatusChange(value as ComplaintStatus);
+                    // Reset select to placeholder
+                    e.target.value = '';
+                  }
+                }}
+                disabled={isChangingStatus}
+                className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                value=""
+              >
+                <option value="" disabled>
+                  Change Status
+                </option>
+                {availableStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {STATUS_CONFIG[status].label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <Button variant="outline" onClick={handleAssign}>
+            <User className="mr-2 h-4 w-4" />
+            Assign
+          </Button>
+          <Button variant="outline" onClick={handleAddInternalNote}>
+            <FileText className="mr-2 h-4 w-4" />
+            Add Internal Note
+          </Button>
+        </div>
+      </div>
+
+      {/* Status Change Confirmation Modal */}
+      {showStatusModal && selectedStatus && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Confirm Status Change
+            </h3>
+            
+            <div className="mb-4 space-y-2">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Change complaint status from{' '}
+                <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  {STATUS_CONFIG[complaint.status].label}
+                </span>{' '}
+                to{' '}
+                <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  {STATUS_CONFIG[selectedStatus].label}
+                </span>
+                ?
+              </p>
+              
+              <div className="mt-4">
+                <label 
+                  htmlFor="status-note" 
+                  className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Add a note (optional)
+                </label>
+                <textarea
+                  id="status-note"
+                  value={statusChangeNote}
+                  onChange={(e) => setStatusChangeNote(e.target.value)}
+                  placeholder="Explain the reason for this status change..."
+                  rows={3}
+                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={cancelStatusChange}
+                disabled={isChangingStatus}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmStatusChange}
+                disabled={isChangingStatus}
+              >
+                {isChangingStatus ? 'Changing...' : 'Confirm Change'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Assign Complaint
+            </h3>
+            
+            <div className="mb-4 space-y-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                {complaint.assigned_to 
+                  ? 'Reassign this complaint to a different lecturer or admin'
+                  : 'Assign this complaint to a lecturer or admin'}
+              </p>
+
+              {/* Current Assignment Info */}
+              {complaint.assigned_to && complaint.assigned_lecturer && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-900">
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    Currently assigned to:
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    {complaint.assigned_lecturer.full_name}
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {complaint.assigned_lecturer.email}
+                  </p>
+                </div>
+              )}
+              
+              <div>
+                <label 
+                  htmlFor="lecturer-select" 
+                  className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Select Lecturer/Admin
+                </label>
+                <select
+                  id="lecturer-select"
+                  value={selectedLecturer}
+                  onChange={(e) => setSelectedLecturer(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+                  disabled={isAssigning}
+                >
+                  <option value="">-- Select a person --</option>
+                  {availableLecturers.map((lecturer) => (
+                    <option key={lecturer.id} value={lecturer.id}>
+                      {lecturer.full_name} ({lecturer.role}) - {lecturer.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Show selected lecturer info */}
+              {selectedLecturer && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950">
+                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    Will be assigned to:
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-blue-900 dark:text-blue-50">
+                    {availableLecturers.find(l => l.id === selectedLecturer)?.full_name}
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                    {availableLecturers.find(l => l.id === selectedLecturer)?.email}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={cancelAssignment}
+                disabled={isAssigning}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmAssignment}
+                disabled={isAssigning || !selectedLecturer}
+              >
+                {isAssigning ? 'Assigning...' : complaint.assigned_to ? 'Reassign' : 'Assign'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Main Complaint Detail View Component
+ */
+export function ComplaintDetailView({ complaintId, onBack }: ComplaintDetailViewProps) {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [complaint, setComplaint] = React.useState<ComplaintWithRelations | null>(null);
+  const commentsRef = React.useRef<HTMLDivElement>(null);
+
+  // Mock user role - in real implementation, get from auth context
+  // For testing purposes, you can change this to 'lecturer' or 'admin' to see lecturer actions
+  const userRole: 'student' | 'lecturer' | 'admin' = 'lecturer';
+
+  // Function to scroll to comments section
+  const scrollToComments = () => {
+    if (commentsRef.current) {
+      commentsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Focus on the comment textarea after scrolling
+      setTimeout(() => {
+        const textarea = commentsRef.current?.querySelector('textarea');
+        if (textarea) {
+          textarea.focus();
+        }
+      }, 500);
+    }
+  };
+
+  // Handle status change
+  const handleStatusChange = async (newStatus: ComplaintStatus) => {
+    if (!complaint) return;
+
+    try {
+      // Update local state immediately for better UX
+      const oldStatus = complaint.status;
+      
+      setComplaint((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+          // Add to history
+          complaint_history: [
+            ...(prev.complaint_history || []),
+            {
+              id: `hist-${Date.now()}`,
+              complaint_id: prev.id,
+              action: 'status_changed',
+              old_value: oldStatus,
+              new_value: newStatus,
+              performed_by: 'lecturer-456', // Mock user ID
+              details: null,
+              created_at: new Date().toISOString(),
+              user: {
+                id: 'lecturer-456',
+                email: 'dr.smith@university.edu',
+                role: 'lecturer',
+                full_name: 'Dr. Sarah Smith',
+                created_at: '2024-08-01T00:00:00Z',
+                updated_at: '2024-08-01T00:00:00Z',
+              },
+            },
+          ],
+        };
+      });
+
+      // In Phase 12, this will be replaced with actual API call:
+      // const { error } = await supabase
+      //   .from('complaints')
+      //   .update({ 
+      //     status: newStatus,
+      //     updated_at: new Date().toISOString()
+      //   })
+      //   .eq('id', complaintId);
+      //
+      // if (error) throw error;
+      //
+      // // Log history
+      // await supabase.from('complaint_history').insert({
+      //   complaint_id: complaintId,
+      //   action: 'status_changed',
+      //   old_value: oldStatus,
+      //   new_value: newStatus,
+      //   performed_by: currentUser.id
+      // });
+      //
+      // // Create notification for student
+      // if (complaint.student_id) {
+      //   await supabase.from('notifications').insert({
+      //     user_id: complaint.student_id,
+      //     type: 'status_changed',
+      //     title: 'Complaint Status Updated',
+      //     message: `Your complaint status has been changed to ${newStatus}`,
+      //     related_id: complaintId
+      //   });
+      // }
+
+    } catch (err) {
+      console.error('Error updating status:', err);
+      // Revert on error
+      const mockData = getMockComplaintData(complaintId);
+      setComplaint(mockData);
+      throw err;
+    }
+  };
+
+  // Handle assignment
+  const handleAssignment = async (lecturerId: string) => {
+    if (!complaint) return;
+
+    try {
+      // Get lecturer data
+      const lecturers = getMockLecturers();
+      const assignedLecturer = lecturers.find(l => l.id === lecturerId);
+      
+      if (!assignedLecturer) {
+        throw new Error('Lecturer not found');
+      }
+
+      // Update local state immediately for better UX
+      const oldAssignment = complaint.assigned_to;
+      const isReassignment = oldAssignment !== null;
+      
+      setComplaint((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          assigned_to: lecturerId,
+          assigned_lecturer: assignedLecturer,
+          updated_at: new Date().toISOString(),
+          // Add to history
+          complaint_history: [
+            ...(prev.complaint_history || []),
+            {
+              id: `hist-${Date.now()}`,
+              complaint_id: prev.id,
+              action: isReassignment ? 'reassigned' : 'assigned',
+              old_value: oldAssignment,
+              new_value: lecturerId,
+              performed_by: 'lecturer-456', // Mock user ID
+              details: null,
+              created_at: new Date().toISOString(),
+              user: {
+                id: 'lecturer-456',
+                email: 'dr.smith@university.edu',
+                role: 'lecturer',
+                full_name: 'Dr. Sarah Smith',
+                created_at: '2024-08-01T00:00:00Z',
+                updated_at: '2024-08-01T00:00:00Z',
+              },
+            },
+          ],
+        };
+      });
+
+      // In Phase 12, this will be replaced with actual API call:
+      // const { error } = await supabase
+      //   .from('complaints')
+      //   .update({ 
+      //     assigned_to: lecturerId,
+      //     updated_at: new Date().toISOString()
+      //   })
+      //   .eq('id', complaintId);
+      //
+      // if (error) throw error;
+      //
+      // // Log history
+      // await supabase.from('complaint_history').insert({
+      //   complaint_id: complaintId,
+      //   action: isReassignment ? 'reassigned' : 'assigned',
+      //   old_value: oldAssignment,
+      //   new_value: lecturerId,
+      //   performed_by: currentUser.id
+      // });
+      //
+      // // Create notification for assigned lecturer
+      // await supabase.from('notifications').insert({
+      //   user_id: lecturerId,
+      //   type: 'complaint_assigned',
+      //   title: 'Complaint Assigned to You',
+      //   message: `You have been assigned complaint: ${complaint.title}`,
+      //   related_id: complaintId
+      // });
+
+    } catch (err) {
+      console.error('Error assigning complaint:', err);
+      // Revert on error
+      const mockData = getMockComplaintData(complaintId);
+      setComplaint(mockData);
+      throw err;
+    }
+  };
+
+  React.useEffect(() => {
+    // Mock data loading - real implementation in Phase 12
+    const loadComplaint = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const mockData = getMockComplaintData(complaintId);
+        setComplaint(mockData);
+      } catch (err) {
+        setError('Failed to load complaint details');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadComplaint();
+  }, [complaintId]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loading size="lg" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !complaint) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center dark:border-red-900 dark:bg-red-950">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500 dark:text-red-400" />
+        <h3 className="mb-2 text-lg font-semibold text-red-900 dark:text-red-50">
+          Error loading complaint
+        </h3>
+        <p className="mb-4 text-sm text-red-700 dark:text-red-300">
+          {error || 'Complaint not found'}
+        </p>
+        {onBack && (
+          <Button variant="outline" onClick={onBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Complaints
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Back Button */}
+      {onBack && (
+        <Button variant="ghost" onClick={onBack} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Complaints
+        </Button>
+      )}
+
+      {/* Header */}
+      <ComplaintHeader complaint={complaint} />
+
+      {/* Action Buttons */}
+      <ActionButtons 
+        complaint={complaint} 
+        userRole={userRole} 
+        onScrollToComments={scrollToComments}
+        onStatusChange={handleStatusChange}
+        onAssign={handleAssignment}
+      />
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Main Content (Left Column - 2/3) */}
+        <div className="space-y-6 lg:col-span-2">
+          <ComplaintDescription description={complaint.description} />
+          <AttachmentsSection attachments={complaint.complaint_attachments || []} />
+          <FeedbackDisplay
+            complaintId={complaint.id}
+            feedback={complaint.feedback || []}
+            userRole={userRole}
+            currentUserId={userRole === 'lecturer' ? 'lecturer-456' : 'student-123'}
+          />
+          <div ref={commentsRef}>
+            <CommentsSection
+              comments={complaint.complaint_comments || []}
+              userRole={userRole}
+              onAddComment={async (comment, isInternal) => {
+                console.log('Add comment:', comment, 'Internal:', isInternal);
+                // In Phase 12, this will call the actual API
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Sidebar (Right Column - 1/3) */}
+        <div className="space-y-6">
+          <TimelineSection history={complaint.complaint_history || []} />
+        </div>
+      </div>
+    </div>
+  );
+}

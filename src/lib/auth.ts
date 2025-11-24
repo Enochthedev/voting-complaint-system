@@ -6,9 +6,28 @@
  * sign out, password reset, and role-based access control.
  */
 
-import { supabase } from './supabase';
+import { createBrowserClient } from '@supabase/ssr';
 import type { User, AuthError } from '@supabase/supabase-js';
 import type { UserRole } from './constants';
+
+// Create a singleton Supabase client for client-side operations
+let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
+
+function getSupabaseBrowserClient() {
+  if (supabaseClient) {
+    return supabaseClient;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  return supabaseClient;
+}
 
 /**
  * Authentication response type
@@ -30,27 +49,35 @@ export interface AuthResponse {
 export async function signUp(
   email: string,
   password: string,
-  fullName: string,
-  role: UserRole
+  fullName: string
 ): Promise<AuthResponse> {
   try {
+    const supabase = getSupabaseBrowserClient();
+    console.log('Attempting sign up for:', email);
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
-          role: role,
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        emailRedirectTo: typeof window !== 'undefined'
+          ? `${window.location.origin}/auth/callback`
+          : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       },
     });
 
     if (error) {
-      console.error('Sign up error:', error);
+      console.error('Sign up error details:', {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+      });
       return { user: null, error };
     }
 
+    console.log('Sign up successful, check email for verification');
     return { user: data.user, error: null };
   } catch (error) {
     console.error('Unexpected sign up error:', error);
@@ -73,16 +100,31 @@ export async function signIn(
   password: string
 ): Promise<AuthResponse> {
   try {
+    const supabase = getSupabaseBrowserClient();
+    console.log('Attempting sign in for:', email);
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      console.error('Sign in error:', error);
+      console.error('Sign in error details:', {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        name: error.name,
+      });
       return { user: null, error };
     }
 
+    if (!data.session) {
+      const noSessionError = new Error('No session returned after sign in') as AuthError;
+      console.error('No session error');
+      return { user: null, error: noSessionError };
+    }
+
+    console.log('Sign in successful for user:', data.user?.id);
     return { user: data.user, error: null };
   } catch (error) {
     console.error('Unexpected sign in error:', error);
@@ -100,6 +142,7 @@ export async function signIn(
  */
 export async function signOut(): Promise<AuthError | null> {
   try {
+    const supabase = getSupabaseBrowserClient();
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -107,6 +150,7 @@ export async function signOut(): Promise<AuthError | null> {
       return error;
     }
 
+    console.log('Sign out successful');
     return null;
   } catch (error) {
     console.error('Unexpected sign out error:', error);
@@ -121,6 +165,7 @@ export async function signOut(): Promise<AuthError | null> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
+    const supabase = getSupabaseBrowserClient();
     const {
       data: { user },
       error,
@@ -145,6 +190,7 @@ export async function getCurrentUser(): Promise<User | null> {
  */
 export async function getSession() {
   try {
+    const supabase = getSupabaseBrowserClient();
     const {
       data: { session },
       error,
@@ -233,8 +279,11 @@ export async function isLecturerOrAdmin(): Promise<boolean> {
  */
 export async function resetPassword(email: string): Promise<AuthError | null> {
   try {
+    const supabase = getSupabaseBrowserClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
+      redirectTo: typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback?type=recovery`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
     });
 
     if (error) {
@@ -242,6 +291,7 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
       return error;
     }
 
+    console.log('Password reset email sent');
     return null;
   } catch (error) {
     console.error('Unexpected password reset error:', error);
@@ -259,6 +309,7 @@ export async function updatePassword(
   newPassword: string
 ): Promise<AuthError | null> {
   try {
+    const supabase = getSupabaseBrowserClient();
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
@@ -268,6 +319,7 @@ export async function updatePassword(
       return error;
     }
 
+    console.log('Password updated successfully');
     return null;
   } catch (error) {
     console.error('Unexpected password update error:', error);
@@ -285,6 +337,7 @@ export async function updateUserMetadata(
   metadata: Record<string, any>
 ): Promise<AuthError | null> {
   try {
+    const supabase = getSupabaseBrowserClient();
     const { error } = await supabase.auth.updateUser({
       data: metadata,
     });
@@ -294,6 +347,7 @@ export async function updateUserMetadata(
       return error;
     }
 
+    console.log('User metadata updated successfully');
     return null;
   } catch (error) {
     console.error('Unexpected metadata update error:', error);
@@ -310,6 +364,7 @@ export async function updateUserMetadata(
 export function onAuthStateChange(
   callback: (user: User | null) => void
 ): () => void {
+  const supabase = getSupabaseBrowserClient();
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
