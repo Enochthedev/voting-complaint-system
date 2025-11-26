@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ComplaintForm } from '@/components/complaints/complaint-form';
@@ -40,7 +41,7 @@ const mockDrafts: Record<string, ComplaintFormData> = {
   },
 };
 
-export default function NewComplaintPage() {
+function NewComplaintPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -161,5 +162,23 @@ export default function NewComplaintPage() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+
+export default function NewComplaintPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout userRole="student" userName="Loading..." userEmail="">
+          <div className="container mx-auto max-w-4xl px-4 py-8">
+            <Skeleton className="h-12 w-[300px] mb-4" />
+            <Skeleton className="h-96" />
+          </div>
+        </AppLayout>
+      }
+    >
+      <NewComplaintPageContent />
+    </Suspense>
   );
 }
