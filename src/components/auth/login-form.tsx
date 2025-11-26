@@ -140,7 +140,7 @@ export function LoginForm() {
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
           <a
-            href="/auth/forgot-password"
+            href="/forgot-password"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             Forgot password?
@@ -185,7 +185,7 @@ export function LoginForm() {
 
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Don&apos;t have an account? </span>
-        <a href="/auth/register" className="font-medium text-foreground hover:underline">
+        <a href="/register" className="font-medium text-foreground hover:underline">
           Sign up
         </a>
       </div>

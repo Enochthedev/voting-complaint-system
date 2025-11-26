@@ -10,5 +10,5 @@ export default async function Home() {
   }
 
   // If not logged in, redirect to login
-  redirect('/auth/login');
+  redirect('/login');
 }

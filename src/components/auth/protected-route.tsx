@@ -22,13 +22,13 @@ interface ProtectedRouteProps {
  *
  * @param children - Components to render if authorized
  * @param allowedRoles - Optional array of roles that can access this route
- * @param redirectTo - Optional custom redirect path (defaults to /auth/login)
+ * @param redirectTo - Optional custom redirect path (defaults to /login)
  * @param loadingComponent - Optional custom loading component
  */
 export function ProtectedRoute({
   children,
   allowedRoles,
-  redirectTo = '/auth/login',
+  redirectTo = '/login',
   loadingComponent,
 }: ProtectedRouteProps) {
   const router = useRouter();

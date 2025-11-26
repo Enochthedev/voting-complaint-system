@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
         console.error('Error exchanging code for session:', error);
         // Redirect to login with error
         return NextResponse.redirect(
-          new URL('/auth/login?error=auth_callback_failed', requestUrl.origin)
+          new URL('/login?error=auth_callback_failed', requestUrl.origin)
         );
       }
 
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         const isPasswordReset = requestUrl.searchParams.get('type') === 'recovery';
 
         if (isPasswordReset) {
-          return NextResponse.redirect(new URL('/auth/reset-password', requestUrl.origin));
+          return NextResponse.redirect(new URL('/reset-password', requestUrl.origin));
         }
 
         return NextResponse.redirect(new URL(next, requestUrl.origin));
@@ -39,11 +39,11 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       console.error('Unexpected error in auth callback:', error);
       return NextResponse.redirect(
-        new URL('/auth/login?error=unexpected_error', requestUrl.origin)
+        new URL('/login?error=unexpected_error', requestUrl.origin)
       );
     }
   }
 
   // No code provided, redirect to login
-  return NextResponse.redirect(new URL('/auth/login?error=no_code', requestUrl.origin));
+  return NextResponse.redirect(new URL('/login?error=no_code', requestUrl.origin));
 }

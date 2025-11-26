@@ -72,7 +72,7 @@ export function ResetPasswordForm() {
       }
 
       // Success - redirect to login with success message
-      router.push('/auth/login?reset=success');
+      router.push('/login?reset=success');
     } catch (error) {
       console.error('Password update error:', error);
       setErrors({
@@ -184,7 +184,7 @@ export function ResetPasswordForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <a href="/auth/login" className="font-medium text-foreground hover:underline">
+        <a href="/login" className="font-medium text-foreground hover:underline">
           Back to login
         </a>
       </div>

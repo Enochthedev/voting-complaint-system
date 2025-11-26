@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { LoginForm } from '@/components/auth/login-form';
+import { LoginForm } from '@/components/login-form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 

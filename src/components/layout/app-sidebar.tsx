@@ -48,7 +48,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
     // Clear mock user and redirect to login
     if (typeof window !== 'undefined') {
       localStorage.removeItem('mockUser');
-      router.push('/auth/login');
+      router.push('/login');
     }
   };
 

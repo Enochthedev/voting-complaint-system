@@ -104,7 +104,7 @@ export function ForgotPasswordForm() {
           </Button>
 
           <div className="text-center">
-            <a href="/auth/login" className="text-sm font-medium text-foreground hover:underline">
+            <a href="/login" className="text-sm font-medium text-foreground hover:underline">
               Back to login
             </a>
           </div>
@@ -154,7 +154,7 @@ export function ForgotPasswordForm() {
 
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Remember your password? </span>
-        <a href="/auth/login" className="font-medium text-foreground hover:underline">
+        <a href="/login" className="font-medium text-foreground hover:underline">
           Sign in
         </a>
       </div>

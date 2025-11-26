@@ -53,8 +53,8 @@ export async function signUp(
         },
         emailRedirectTo:
           typeof window !== 'undefined'
-            ? `${window.location.origin}/auth/callback`
-            : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+            ? `${window.location.origin}/callback`
+            : `${process.env.NEXT_PUBLIC_APP_URL}/callback`,
       },
     });
 
@@ -286,8 +286,8 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
     const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo:
         typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback?type=recovery`
-          : `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
+          ? `${window.location.origin}/callback?type=recovery`
+          : `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
     });
 
     if (error) {

@@ -155,7 +155,7 @@ export function RegisterForm() {
           </AlertDescription>
         </Alert>
 
-        <Button onClick={() => router.push('/auth/login')} className="w-full">
+        <Button onClick={() => router.push('/login')} className="w-full">
           Go to Sign In
         </Button>
       </div>
@@ -278,7 +278,7 @@ export function RegisterForm() {
 
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Already have an account? </span>
-        <a href="/auth/login" className="font-medium text-foreground hover:underline">
+        <a href="/login" className="font-medium text-foreground hover:underline">
           Sign in
         </a>
       </div>
