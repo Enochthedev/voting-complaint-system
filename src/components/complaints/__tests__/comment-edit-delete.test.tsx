@@ -1,9 +1,9 @@
 /**
  * Comment Edit and Delete Tests
- * 
+ *
  * Tests for comment editing and deletion functionality in the complaint detail view.
  * Following UI-first development approach with mock data.
- * 
+ *
  * NOTE: These tests are written but not executed during implementation.
  * They will be run once the test environment is properly configured.
  */
@@ -278,7 +278,7 @@ describe('Comment Edit and Delete Functionality', () => {
 
 /**
  * Property-Based Tests
- * 
+ *
  * These tests verify universal properties that should hold across all inputs.
  */
 describe('Comment Edit/Delete Properties', () => {
@@ -333,21 +333,21 @@ describe('Comment Edit/Delete Properties', () => {
 
 /**
  * Mock Implementation Notes for Phase 12:
- * 
+ *
  * When implementing real API calls in Phase 12, replace mock functions with:
- * 
+ *
  * 1. Edit Comment:
  *    await supabase
  *      .from('complaint_comments')
  *      .update({ comment: newText, is_internal: isInternal, updated_at: new Date() })
  *      .eq('id', commentId);
- * 
+ *
  * 2. Delete Comment:
  *    await supabase
  *      .from('complaint_comments')
  *      .delete()
  *      .eq('id', commentId);
- * 
+ *
  * 3. History Logging:
  *    await supabase.from('complaint_history').insert({
  *      complaint_id: complaintId,

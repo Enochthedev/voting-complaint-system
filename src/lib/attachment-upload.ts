@@ -1,6 +1,6 @@
 /**
  * Attachment Upload Utilities
- * 
+ *
  * Handles uploading files to Supabase Storage and storing metadata
  * in the complaint_attachments table.
  */
@@ -24,7 +24,7 @@ export interface UploadResult {
 
 /**
  * Upload a file to Supabase Storage and store metadata in database
- * 
+ *
  * @param file - The file to upload
  * @param complaintId - The ID of the complaint this attachment belongs to
  * @param userId - The ID of the user uploading the file
@@ -79,11 +79,9 @@ export async function uploadAttachment(
 
     if (dbError) {
       console.error('Database insert error:', dbError);
-      
+
       // Clean up uploaded file if database insert fails
-      await supabase.storage
-        .from('complaint-attachments')
-        .remove([filePath]);
+      await supabase.storage.from('complaint-attachments').remove([filePath]);
 
       return {
         success: false,
@@ -106,7 +104,7 @@ export async function uploadAttachment(
 
 /**
  * Upload multiple files and store their metadata
- * 
+ *
  * @param files - Array of files to upload
  * @param complaintId - The ID of the complaint
  * @param userId - The ID of the user uploading
@@ -137,7 +135,7 @@ export async function uploadMultipleAttachments(
 
 /**
  * Get a signed URL for downloading an attachment
- * 
+ *
  * @param filePath - The storage path of the file
  * @param expiresIn - URL expiration time in seconds (default: 1 hour)
  * @returns Signed URL or null if error
@@ -165,7 +163,7 @@ export async function getAttachmentUrl(
 
 /**
  * Delete an attachment from storage and database
- * 
+ *
  * @param attachmentId - The ID of the attachment to delete
  * @param filePath - The storage path of the file
  * @returns Success status
@@ -215,7 +213,7 @@ export async function deleteAttachment(
 
 /**
  * Get all attachments for a complaint
- * 
+ *
  * @param complaintId - The ID of the complaint
  * @returns Array of attachments or null if error
  */
@@ -243,17 +241,13 @@ export async function getComplaintAttachments(
 
 /**
  * Download an attachment file
- * 
+ *
  * @param filePath - The storage path of the file
  * @returns Blob data or null if error
  */
-export async function downloadAttachment(
-  filePath: string
-): Promise<Blob | null> {
+export async function downloadAttachment(filePath: string): Promise<Blob | null> {
   try {
-    const { data, error } = await supabase.storage
-      .from('complaint-attachments')
-      .download(filePath);
+    const { data, error } = await supabase.storage.from('complaint-attachments').download(filePath);
 
     if (error) {
       console.error('Error downloading file:', error);

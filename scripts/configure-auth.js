@@ -2,10 +2,10 @@
 
 /**
  * Supabase Authentication Configuration Script
- * 
+ *
  * This script helps configure and verify Supabase authentication settings
  * for the Student Complaint Resolution System.
- * 
+ *
  * Usage: node scripts/configure-auth.js
  */
 
@@ -78,7 +78,7 @@ async function main() {
 
   try {
     const { data, error } = await supabase.from('users').select('count').limit(1);
-    
+
     if (error) {
       log(`✗ Connection test failed: ${error.message}`, 'red');
       log('  Make sure your Supabase project is running and accessible', 'yellow');
@@ -103,12 +103,10 @@ async function main() {
       log('  Run migrations to create the users table', 'yellow');
     } else {
       log('✓ Users table exists and is accessible', 'green');
-      
+
       // Check if there are any users
-      const { count } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-      
+      const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+
       log(`  Total users in database: ${count || 0}`, 'cyan');
     }
   } catch (error) {

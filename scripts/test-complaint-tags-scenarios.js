@@ -25,7 +25,7 @@ async function testComplaintTagsScenarios() {
     // Scenario 1: Verify table structure
     console.log('Scenario 1: Verify table structure and RLS');
     console.log('-------------------------------------------');
-    
+
     const { data: tableData, error: tableError } = await supabase
       .from('complaint_tags')
       .select('*')
@@ -59,8 +59,8 @@ async function testComplaintTagsScenarios() {
     console.log('  - Can view tags on their own complaints');
     console.log('  - Can add tags to their own complaints');
     console.log('  - Can delete tags from their own complaints');
-    console.log('  - Cannot access tags on other students\' complaints');
-    
+    console.log("  - Cannot access tags on other students' complaints");
+
     console.log('\n✓ Lecturer/Admin access pattern:');
     console.log('  - Can view tags on all complaints');
     console.log('  - Can add tags to any complaint');
@@ -71,7 +71,7 @@ async function testComplaintTagsScenarios() {
     console.log('\nScenario 5: Anonymous complaint tag handling');
     console.log('-------------------------------------------');
     console.log('✓ Anonymous complaints can have tags');
-    console.log('  - Tags don\'t expose student identity');
+    console.log("  - Tags don't expose student identity");
     console.log('  - Only lecturers can view/manage tags on anonymous complaints');
     console.log('  - Student who created anonymous complaint cannot access via student_id');
 
@@ -81,11 +81,11 @@ async function testComplaintTagsScenarios() {
     console.log('✓ Use Case 1: Student categorizes their complaint');
     console.log('  - Student adds tags like "urgent", "facilities", "library"');
     console.log('  - Tags help with personal organization and filtering');
-    
+
     console.log('\n✓ Use Case 2: Lecturer organizes complaints');
     console.log('  - Lecturer adds tags like "reviewed", "escalated", "resolved"');
     console.log('  - Tags help with workflow management and reporting');
-    
+
     console.log('\n✓ Use Case 3: Filtering and search');
     console.log('  - Users can filter complaints by tag names');
     console.log('  - Composite index optimizes tag-based queries');
@@ -98,7 +98,7 @@ async function testComplaintTagsScenarios() {
     console.log('  - complaint_id: NOT NULL (must reference a complaint)');
     console.log('  - tag_name: NOT NULL (cannot have empty tags)');
     console.log('  - created_at: Automatically set to current timestamp');
-    
+
     console.log('\n✓ Referential integrity:');
     console.log('  - Cannot add tag to non-existent complaint');
     console.log('  - Foreign key constraint prevents invalid references');
@@ -111,15 +111,14 @@ async function testComplaintTagsScenarios() {
     console.log('   • Anonymous complaint handling validated');
     console.log('   • Common use cases documented');
     console.log('   • Data integrity checks passed');
-    
+
     console.log('\n✅ The complaint_tags table is production-ready!');
     console.log('   • Secure: RLS policies enforce proper access control');
     console.log('   • Reliable: Constraints ensure data integrity');
     console.log('   • Performant: Indexes optimize common queries');
     console.log('   • Maintainable: Clear policies and documentation');
-    
-    console.log('\n✅ Task 2.2 (complaint_tags RLS) completed successfully!\n');
 
+    console.log('\n✅ Task 2.2 (complaint_tags RLS) completed successfully!\n');
   } catch (error) {
     console.error('\n❌ Scenario testing error:', error.message);
     process.exit(1);

@@ -26,7 +26,10 @@ async function applyMigration() {
 
   try {
     // Read the migration file
-    const migrationPath = path.join(__dirname, '../supabase/migrations/023_fix_complaint_ratings_rls.sql');
+    const migrationPath = path.join(
+      __dirname,
+      '../supabase/migrations/023_fix_complaint_ratings_rls.sql'
+    );
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
     console.log('📄 Migration file loaded');
@@ -35,8 +38,8 @@ async function applyMigration() {
     // Split the SQL into individual statements
     const statements = migrationSQL
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && !s.startsWith('--'));
 
     let successCount = 0;
     let errorCount = 0;
@@ -49,21 +52,23 @@ async function applyMigration() {
 
       try {
         const { error } = await supabase.rpc('exec', { query: statement + ';' });
-        
+
         if (error) {
           // Try direct execution if RPC fails
           const response = await fetch(`${supabaseUrl}/rest/v1/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'apikey': supabaseServiceKey,
-              'Authorization': `Bearer ${supabaseServiceKey}`,
+              apikey: supabaseServiceKey,
+              Authorization: `Bearer ${supabaseServiceKey}`,
             },
-            body: JSON.stringify({ query: statement + ';' })
+            body: JSON.stringify({ query: statement + ';' }),
           });
 
           if (!response.ok) {
-            console.error(`⚠️  Warning: Could not execute statement: ${statement.substring(0, 50)}...`);
+            console.error(
+              `⚠️  Warning: Could not execute statement: ${statement.substring(0, 50)}...`
+            );
             errorCount++;
           } else {
             successCount++;
@@ -79,12 +84,14 @@ async function applyMigration() {
 
     console.log(`\n✅ Migration applied: ${successCount} statements executed`);
     if (errorCount > 0) {
-      console.log(`⚠️  ${errorCount} statements had warnings (this is often normal for DROP IF EXISTS)`);
+      console.log(
+        `⚠️  ${errorCount} statements had warnings (this is often normal for DROP IF EXISTS)`
+      );
     }
 
     // Verify the policies were created
     console.log('\n🔍 Verifying RLS policies...\n');
-    
+
     const verifySQL = `
       SELECT policyname, cmd
       FROM pg_policies
@@ -99,7 +106,6 @@ async function applyMigration() {
     console.log('   2. Run tests: node scripts/test-complaint-ratings-rls.js');
 
     return true;
-
   } catch (error) {
     console.error('❌ Error applying migration:', error.message);
     console.log('\n📋 Manual application required:');
@@ -110,8 +116,7 @@ async function applyMigration() {
   }
 }
 
-applyMigration().catch(error => {
+applyMigration().catch((error) => {
   console.error('💥 Fatal error:', error);
   process.exit(1);
 });
-

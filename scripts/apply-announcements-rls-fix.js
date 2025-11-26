@@ -2,7 +2,7 @@
 
 /**
  * Apply Announcements RLS Fix Migration
- * 
+ *
  * This script applies the fix for announcements table RLS policies
  * to use JWT claims instead of querying the users table.
  */
@@ -30,7 +30,13 @@ async function applyMigration() {
 
   try {
     // Read the migration file
-    const migrationPath = path.join(__dirname, '..', 'supabase', 'migrations', '026_fix_announcements_rls.sql');
+    const migrationPath = path.join(
+      __dirname,
+      '..',
+      'supabase',
+      'migrations',
+      '026_fix_announcements_rls.sql'
+    );
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
     console.log('📄 Migration file: 026_fix_announcements_rls.sql');
@@ -39,39 +45,39 @@ async function applyMigration() {
     // Split the SQL into individual statements
     const statements = migrationSQL
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && !s.startsWith('--'));
 
     console.log(`📝 Executing ${statements.length} SQL statements...\n`);
 
     // Execute each statement
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i] + ';';
-      
+
       // Skip comments
       if (statement.trim().startsWith('--')) {
         continue;
       }
 
       console.log(`${i + 1}. Executing statement...`);
-      
+
       const { error } = await supabase.rpc('exec_sql', {
-        sql: statement
+        sql: statement,
       });
 
       if (error) {
         // Try direct execution if exec_sql doesn't exist
         console.log('   Using alternative execution method...');
-        
+
         // For Supabase, we need to use the REST API directly
         const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
           },
-          body: JSON.stringify({ query: statement })
+          body: JSON.stringify({ query: statement }),
         });
 
         if (!response.ok) {
@@ -94,7 +100,6 @@ async function applyMigration() {
     console.log('1. Run: node scripts/test-announcements-rls.js');
     console.log('2. Verify all tests pass');
     console.log('');
-
   } catch (error) {
     console.error('❌ Error applying migration:', error.message);
     console.error('');

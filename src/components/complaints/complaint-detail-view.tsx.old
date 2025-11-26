@@ -1,0 +1,21 @@
+/**
+ * Complaint Detail View
+ * 
+ * This file has been refactored into smaller, focused components.
+ * See: src/components/complaints/complaint-detail/
+ * 
+ * Component Structure:
+ * - index.tsx - Main orchestrator component
+ * - ComplaintHeader.tsx - Title, status, metadata
+ * - ComplaintDescription.tsx - Rich text description
+ * - AttachmentsSection.tsx - File attachments display
+ * - TimelineSection.tsx - History timeline
+ * - CommentsSection.tsx - Discussion thread
+ * - ActionButtons.tsx - Role-based actions
+ * - StatusChangeModal.tsx - Status change confirmation
+ * - AssignmentModal.tsx - Assignment selection
+ * - types.ts - Shared types and constants
+ * - utils.ts - Utility functions and mock data
+ */
+
+export { ComplaintDetailView } from './complaint-detail';

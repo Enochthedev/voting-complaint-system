@@ -32,12 +32,13 @@ async function testSearchTrigger() {
     console.log('Step 1: Inserting test complaint...');
     const testComplaint = {
       title: 'Test: Broken projector in classroom 101',
-      description: 'The projector in room 101 is not working properly. Students cannot see the presentation slides.',
+      description:
+        'The projector in room 101 is not working properly. Students cannot see the presentation slides.',
       category: 'facilities',
       priority: 'high',
       status: 'new',
       is_anonymous: true,
-      is_draft: false
+      is_draft: false,
     };
 
     const { data: insertedComplaint, error: insertError } = await supabase
@@ -54,11 +55,14 @@ async function testSearchTrigger() {
     console.log('✅ Test complaint inserted successfully');
     console.log('   ID:', insertedComplaint.id);
     console.log('   Title:', insertedComplaint.title);
-    console.log('   Search Vector:', insertedComplaint.search_vector ? '✅ Generated' : '❌ Not generated');
+    console.log(
+      '   Search Vector:',
+      insertedComplaint.search_vector ? '✅ Generated' : '❌ Not generated'
+    );
 
     // Step 2: Test search functionality
     console.log('\nStep 2: Testing search functionality...');
-    
+
     // Test 2a: Search for "projector"
     console.log('\n   Test 2a: Searching for "projector"...');
     const { data: searchResults1, error: searchError1 } = await supabase
@@ -66,13 +70,13 @@ async function testSearchTrigger() {
       .select('id, title, description')
       .textSearch('search_vector', 'projector', {
         type: 'websearch',
-        config: 'english'
+        config: 'english',
       });
 
     if (searchError1) {
       console.error('   ❌ Search error:', searchError1.message);
     } else {
-      const found = searchResults1.some(c => c.id === insertedComplaint.id);
+      const found = searchResults1.some((c) => c.id === insertedComplaint.id);
       console.log(`   ${found ? '✅' : '❌'} Found ${searchResults1.length} result(s)`);
       if (found) {
         console.log('   ✅ Test complaint found in search results');
@@ -86,13 +90,13 @@ async function testSearchTrigger() {
       .select('id, title, description')
       .textSearch('search_vector', 'broken & projector', {
         type: 'websearch',
-        config: 'english'
+        config: 'english',
       });
 
     if (searchError2) {
       console.error('   ❌ Search error:', searchError2.message);
     } else {
-      const found = searchResults2.some(c => c.id === insertedComplaint.id);
+      const found = searchResults2.some((c) => c.id === insertedComplaint.id);
       console.log(`   ${found ? '✅' : '❌'} Found ${searchResults2.length} result(s)`);
       if (found) {
         console.log('   ✅ Test complaint found in multi-word search');
@@ -106,13 +110,13 @@ async function testSearchTrigger() {
       .select('id, title, description')
       .textSearch('search_vector', 'classroom', {
         type: 'websearch',
-        config: 'english'
+        config: 'english',
       });
 
     if (searchError3) {
       console.error('   ❌ Search error:', searchError3.message);
     } else {
-      const found = searchResults3.some(c => c.id === insertedComplaint.id);
+      const found = searchResults3.some((c) => c.id === insertedComplaint.id);
       console.log(`   ${found ? '✅' : '❌'} Found ${searchResults3.length} result(s)`);
       if (found) {
         console.log('   ✅ Test complaint found when searching title content');
@@ -124,7 +128,7 @@ async function testSearchTrigger() {
     const { data: updatedComplaint, error: updateError } = await supabase
       .from('complaints')
       .update({
-        description: 'Updated: The projector and screen in room 101 need immediate repair.'
+        description: 'Updated: The projector and screen in room 101 need immediate repair.',
       })
       .eq('id', insertedComplaint.id)
       .select('id, title, description, search_vector')
@@ -134,7 +138,10 @@ async function testSearchTrigger() {
       console.error('❌ Error updating complaint:', updateError.message);
     } else {
       console.log('✅ Complaint updated successfully');
-      console.log('   Search Vector:', updatedComplaint.search_vector ? '✅ Regenerated' : '❌ Not regenerated');
+      console.log(
+        '   Search Vector:',
+        updatedComplaint.search_vector ? '✅ Regenerated' : '❌ Not regenerated'
+      );
 
       // Test search with new content
       console.log('\n   Testing search with updated content ("screen")...');
@@ -143,13 +150,13 @@ async function testSearchTrigger() {
         .select('id, title, description')
         .textSearch('search_vector', 'screen', {
           type: 'websearch',
-          config: 'english'
+          config: 'english',
         });
 
       if (searchError4) {
         console.error('   ❌ Search error:', searchError4.message);
       } else {
-        const found = searchResults4.some(c => c.id === insertedComplaint.id);
+        const found = searchResults4.some((c) => c.id === insertedComplaint.id);
         console.log(`   ${found ? '✅' : '❌'} Found ${searchResults4.length} result(s)`);
         if (found) {
           console.log('   ✅ Updated content is searchable');
@@ -179,7 +186,6 @@ async function testSearchTrigger() {
     console.log('✅ Full-text search is functional');
     console.log('✅ Weighted search (title > description) is working');
     console.log('\n✅ Task 1.4.2: Create trigger function to update search vector - COMPLETE');
-
   } catch (error) {
     console.error('\n❌ Unexpected error:', error.message);
     console.error(error);

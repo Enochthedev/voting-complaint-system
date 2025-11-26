@@ -37,9 +37,8 @@ async function displayInstructions() {
     console.log('='.repeat(80));
     console.log('\n✅ Migration file: supabase/migrations/024_fix_feedback_rls.sql');
     console.log('📖 Test script: scripts/test-feedback-rls.js\n');
-    
-    return true;
 
+    return true;
   } catch (error) {
     console.error('❌ Failed to read migration file:', error.message);
     return false;
@@ -48,14 +47,14 @@ async function displayInstructions() {
 
 // Display instructions
 displayInstructions()
-  .then(success => {
+  .then((success) => {
     if (success) {
       process.exit(0);
     } else {
       process.exit(1);
     }
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Error:', error);
     process.exit(1);
   });

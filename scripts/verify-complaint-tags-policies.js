@@ -19,8 +19,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function verifyComplaintTagsPolicies() {
@@ -46,17 +46,17 @@ async function verifyComplaintTagsPolicies() {
 
     // 3. List all policies
     console.log('\n3. Listing RLS policies on complaint_tags table...');
-    
+
     const expectedPolicies = [
       { name: 'Users view tags on accessible complaints', type: 'SELECT' },
       { name: 'Students add tags to own complaints', type: 'INSERT' },
       { name: 'Lecturers add tags to complaints', type: 'INSERT' },
       { name: 'Students delete tags from own complaints', type: 'DELETE' },
-      { name: 'Lecturers delete tags from complaints', type: 'DELETE' }
+      { name: 'Lecturers delete tags from complaints', type: 'DELETE' },
     ];
 
     console.log('   Expected RLS Policies:');
-    expectedPolicies.forEach(policy => {
+    expectedPolicies.forEach((policy) => {
       console.log(`     ✓ ${policy.type}: ${policy.name}`);
     });
 
@@ -90,26 +90,25 @@ async function verifyComplaintTagsPolicies() {
     console.log('   • complaint_tags table exists');
     console.log('   • All required columns present (id, complaint_id, tag_name, created_at)');
     console.log('   • Proper data types and constraints');
-    
+
     console.log('\n✅ Row Level Security:');
     console.log('   • RLS is enabled on the table');
     console.log('   • 5 RLS policies configured:');
     console.log('     - 1 SELECT policy (view tags on accessible complaints)');
     console.log('     - 2 INSERT policies (students own, lecturers all)');
     console.log('     - 2 DELETE policies (students own, lecturers all)');
-    
+
     console.log('\n✅ Data Integrity:');
     console.log('   • Unique constraint prevents duplicate tags');
     console.log('   • Foreign key ensures referential integrity');
     console.log('   • Cascade delete maintains consistency');
-    
+
     console.log('\n✅ Performance:');
     console.log('   • 3 indexes for optimized queries');
     console.log('   • Composite index for tag-based filtering');
-    
+
     console.log('\n✅ All RLS policies for complaint_tags table are properly configured!');
     console.log('\nTask 2.2 (complaint_tags RLS) completed successfully! ✓\n');
-
   } catch (error) {
     console.error('\n❌ Verification error:', error.message);
     process.exit(1);

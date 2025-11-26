@@ -1,14 +1,14 @@
 /**
  * Internal Notes Feature Tests
- * 
+ *
  * Tests for the lecturer-only internal notes feature in the complaint system.
- * 
+ *
  * Requirements:
  * - AC15: Follow-up and Discussion System
  * - Internal notes should only be visible to lecturers and admins
  * - Students should not see internal notes
  * - Internal notes should be clearly marked with a badge
- * 
+ *
  * Following UI-first development approach - tests written but not run until Phase 12
  */
 
@@ -20,24 +20,14 @@ import type { ComplaintComment, User } from '@/types/database.types';
 describe('Internal Notes Feature', () => {
   describe('CommentInput - Internal Toggle', () => {
     it('should show internal toggle for lecturers', () => {
-      render(
-        <CommentInput
-          showInternalToggle={true}
-          placeholder="Add a comment..."
-        />
-      );
+      render(<CommentInput showInternalToggle={true} placeholder="Add a comment..." />);
 
       const internalCheckbox = screen.getByLabelText(/internal note/i);
       expect(internalCheckbox).toBeInTheDocument();
     });
 
     it('should not show internal toggle for students', () => {
-      render(
-        <CommentInput
-          showInternalToggle={false}
-          placeholder="Add a comment..."
-        />
-      );
+      render(<CommentInput showInternalToggle={false} placeholder="Add a comment..." />);
 
       const internalCheckbox = screen.queryByLabelText(/internal note/i);
       expect(internalCheckbox).not.toBeInTheDocument();
@@ -45,7 +35,7 @@ describe('Internal Notes Feature', () => {
 
     it('should toggle internal flag when checkbox is clicked', async () => {
       const mockSubmit = vi.fn();
-      
+
       render(
         <CommentInput
           showInternalToggle={true}
@@ -88,7 +78,7 @@ describe('Internal Notes Feature', () => {
 
     it('should submit as regular comment when internal is not checked', async () => {
       const mockSubmit = vi.fn();
-      
+
       render(
         <CommentInput
           showInternalToggle={true}
@@ -167,51 +157,51 @@ describe('Internal Notes Feature', () => {
     it('should filter out internal notes for students', () => {
       // This test validates that students cannot see internal notes
       // Validates: Requirements AC15
-      
+
       const studentVisibleComments = mockComments.filter((comment) => {
         // Students can only see non-internal comments
         return !comment.is_internal;
       });
 
       expect(studentVisibleComments).toHaveLength(2);
-      expect(studentVisibleComments.every(c => !c.is_internal)).toBe(true);
-      expect(studentVisibleComments.find(c => c.id === 'comment-2')).toBeUndefined();
+      expect(studentVisibleComments.every((c) => !c.is_internal)).toBe(true);
+      expect(studentVisibleComments.find((c) => c.id === 'comment-2')).toBeUndefined();
     });
 
     it('should show all comments including internal notes for lecturers', () => {
       // This test validates that lecturers can see all comments
       // Validates: Requirements AC15
-      
+
       const lecturerVisibleComments = mockComments.filter((comment) => {
         // Lecturers can see all comments
         return true;
       });
 
       expect(lecturerVisibleComments).toHaveLength(3);
-      expect(lecturerVisibleComments.find(c => c.id === 'comment-2')).toBeDefined();
+      expect(lecturerVisibleComments.find((c) => c.id === 'comment-2')).toBeDefined();
     });
 
     it('should show all comments including internal notes for admins', () => {
       // This test validates that admins can see all comments
       // Validates: Requirements AC15
-      
+
       const adminVisibleComments = mockComments.filter((comment) => {
         // Admins can see all comments
         return true;
       });
 
       expect(adminVisibleComments).toHaveLength(3);
-      expect(adminVisibleComments.find(c => c.id === 'comment-2')).toBeDefined();
+      expect(adminVisibleComments.find((c) => c.id === 'comment-2')).toBeDefined();
     });
 
     it('should display internal badge on internal notes', () => {
       // This test validates that internal notes are visually distinguished
       // Validates: Requirements AC15
-      
-      const internalComment = mockComments.find(c => c.is_internal);
+
+      const internalComment = mockComments.find((c) => c.is_internal);
       expect(internalComment).toBeDefined();
       expect(internalComment?.is_internal).toBe(true);
-      
+
       // In the UI, this should render with an "Internal" badge
       // The badge should be visible to lecturers/admins only
     });
@@ -222,7 +212,7 @@ describe('Internal Notes Feature', () => {
       // This test validates Property P19: Comment Thread Ordering
       // Comments are always displayed in chronological order
       // Validates: Design Property P19
-      
+
       const mockComments: ComplaintComment[] = [
         {
           id: 'comment-3',
@@ -281,10 +271,10 @@ describe('Internal Notes Feature', () => {
       // When lecturer clicks "Add Internal Note", it should scroll to the comment input
       // The lecturer can then check the internal toggle to make it internal
       const mockScrollToComments = vi.fn();
-      
+
       // Simulate clicking the button
       mockScrollToComments();
-      
+
       expect(mockScrollToComments).toHaveBeenCalled();
     });
   });
@@ -292,7 +282,7 @@ describe('Internal Notes Feature', () => {
   describe('Database Integration (Phase 12)', () => {
     it('should save internal flag to database when comment is submitted', async () => {
       // In Phase 12, this will test the actual Supabase integration:
-      // 
+      //
       // const { data, error } = await supabase
       //   .from('complaint_comments')
       //   .insert({
@@ -306,14 +296,14 @@ describe('Internal Notes Feature', () => {
       //
       // expect(error).toBeNull();
       // expect(data.is_internal).toBe(true);
-      
+
       // For now, this is a placeholder test
       expect(true).toBe(true);
     });
 
     it('should enforce RLS policy to hide internal notes from students', async () => {
       // In Phase 12, this will test the RLS policy:
-      // 
+      //
       // Students querying comments should not see internal notes:
       // const { data: studentComments } = await supabase
       //   .from('complaint_comments')
@@ -331,7 +321,7 @@ describe('Internal Notes Feature', () => {
       //
       // // All comments including internal should be visible
       // expect(lecturerComments.some(c => c.is_internal)).toBe(true);
-      
+
       // For now, this is a placeholder test
       expect(true).toBe(true);
     });

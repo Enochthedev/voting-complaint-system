@@ -1,9 +1,9 @@
 /**
  * Complaint Form with Integrated Attachment Upload
- * 
+ *
  * This is an enhanced version of the complaint form that integrates
  * attachment upload with database metadata storage.
- * 
+ *
  * For UI development phase, this uses mock upload functions.
  * In Phase 12, switch imports to use real attachment-upload.ts
  */
@@ -231,16 +231,11 @@ export function ComplaintFormWithUpload({
           type="checkbox"
           id="isAnonymous"
           checked={formData.isAnonymous}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, isAnonymous: e.target.checked }))
-          }
+          onChange={(e) => setFormData((prev) => ({ ...prev, isAnonymous: e.target.checked }))}
           className="mt-1 h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-2 focus:ring-zinc-950 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-zinc-300"
         />
         <div className="flex-1">
-          <label
-            htmlFor="isAnonymous"
-            className="text-sm font-medium leading-none cursor-pointer"
-          >
+          <label htmlFor="isAnonymous" className="text-sm font-medium leading-none cursor-pointer">
             Submit anonymously
           </label>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -297,9 +292,7 @@ export function ComplaintFormWithUpload({
           }}
           disabled={isLoading || isSavingDraft}
           className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300 ${
-            errors.category
-              ? 'border-red-500 focus-visible:ring-red-500'
-              : 'border-zinc-200'
+            errors.category ? 'border-red-500 focus-visible:ring-red-500' : 'border-zinc-200'
           }`}
         >
           <option value="">Select a category</option>
@@ -309,9 +302,7 @@ export function ComplaintFormWithUpload({
             </option>
           ))}
         </select>
-        {errors.category && (
-          <p className="text-sm text-red-500">{errors.category}</p>
-        )}
+        {errors.category && <p className="text-sm text-red-500">{errors.category}</p>}
       </div>
 
       {/* Priority Field */}
@@ -341,9 +332,7 @@ export function ComplaintFormWithUpload({
             </button>
           ))}
         </div>
-        {errors.priority && (
-          <p className="text-sm text-red-500">{errors.priority}</p>
-        )}
+        {errors.priority && <p className="text-sm text-red-500">{errors.priority}</p>}
       </div>
 
       {/* Description Field */}
@@ -364,9 +353,7 @@ export function ComplaintFormWithUpload({
           maxLength={MAX_DESCRIPTION_LENGTH}
           error={!!errors.description}
         />
-        {errors.description && (
-          <p className="text-sm text-red-500">{errors.description}</p>
-        )}
+        {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
       </div>
 
       {/* File Attachments with Upload Progress */}
@@ -416,10 +403,7 @@ export function ComplaintFormWithUpload({
             'Save as Draft'
           )}
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading || isSavingDraft || isUploading}
-        >
+        <Button type="submit" disabled={isLoading || isSavingDraft || isUploading}>
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

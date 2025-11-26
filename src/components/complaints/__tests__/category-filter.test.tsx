@@ -1,6 +1,6 @@
 /**
  * Category Filter Tests
- * 
+ *
  * Tests for the category filtering functionality in the FilterPanel component.
  */
 
@@ -99,9 +99,7 @@ describe('Category Filter', () => {
     if (categories.length === 0) {
       return complaints;
     }
-    return complaints.filter((complaint) =>
-      categories.includes(complaint.category)
-    );
+    return complaints.filter((complaint) => categories.includes(complaint.category));
   }
 
   it('should return all complaints when no category filter is applied', () => {
@@ -154,11 +152,9 @@ describe('Category Filter', () => {
 
     const filtered = filterComplaintsByCategory(mockComplaints, filters.category);
     expect(filtered).toHaveLength(3);
-    expect(
-      filtered.every(
-        (c) => c.category === 'academic' || c.category === 'facilities'
-      )
-    ).toBe(true);
+    expect(filtered.every((c) => c.category === 'academic' || c.category === 'facilities')).toBe(
+      true
+    );
   });
 
   it('should return empty array when filtering by non-existent category', () => {
@@ -208,12 +204,8 @@ describe('Category Filter', () => {
 
   it('should correctly combine category filter with other filters', () => {
     // This test demonstrates that category filtering works alongside other filters
-    const academicComplaints = mockComplaints.filter(
-      (c) => c.category === 'academic'
-    );
-    const highPriorityAcademic = academicComplaints.filter(
-      (c) => c.priority === 'critical'
-    );
+    const academicComplaints = mockComplaints.filter((c) => c.category === 'academic');
+    const highPriorityAcademic = academicComplaints.filter((c) => c.priority === 'critical');
 
     expect(academicComplaints).toHaveLength(2);
     expect(highPriorityAcademic).toHaveLength(1);

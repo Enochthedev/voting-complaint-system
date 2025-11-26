@@ -1,6 +1,6 @@
 /**
  * File Preview Visual Test Component
- * 
+ *
  * This component demonstrates the file preview functionality
  * for both image and non-image files in the FileUpload component.
  */
@@ -11,11 +11,7 @@ import * as React from 'react';
 import { FileUpload } from '../file-upload';
 
 // Helper to create mock File objects
-function createMockFile(
-  name: string,
-  size: number,
-  type: string
-): File {
+function createMockFile(name: string, size: number, type: string): File {
   const blob = new Blob(['x'.repeat(size)], { type });
   return new File([blob], name, { type });
 }
@@ -26,10 +22,14 @@ export function FilePreviewVisualTest() {
     createMockFile('vacation-photo.jpg', 2 * 1024 * 1024, 'image/jpeg'),
     createMockFile('screenshot.png', 1.5 * 1024 * 1024, 'image/png'),
     createMockFile('animation.gif', 500 * 1024, 'image/gif'),
-    
+
     // Document files - should show file icons
     createMockFile('report.pdf', 3 * 1024 * 1024, 'application/pdf'),
-    createMockFile('essay.docx', 1 * 1024 * 1024, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+    createMockFile(
+      'essay.docx',
+      1 * 1024 * 1024,
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ),
   ]);
 
   const handleFilesSelected = (newFiles: File[]) => {
@@ -37,7 +37,7 @@ export function FilePreviewVisualTest() {
   };
 
   const handleFileRemove = (fileToRemove: File) => {
-    setFiles(files.filter(f => f !== fileToRemove));
+    setFiles(files.filter((f) => f !== fileToRemove));
   };
 
   return (
@@ -81,7 +81,7 @@ export function FilePreviewVisualTest() {
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <pre className="text-xs overflow-auto">
             {JSON.stringify(
-              files.map(f => ({
+              files.map((f) => ({
                 name: f.name,
                 size: f.size,
                 type: f.type,
@@ -99,10 +99,15 @@ export function FilePreviewVisualTest() {
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
             <p>
-              <strong>Image Preview:</strong> Uses <code className="bg-zinc-200 dark:bg-zinc-800 px-1 rounded">URL.createObjectURL(file)</code> to generate temporary URLs for image thumbnails
+              <strong>Image Preview:</strong> Uses{' '}
+              <code className="bg-zinc-200 dark:bg-zinc-800 px-1 rounded">
+                URL.createObjectURL(file)
+              </code>{' '}
+              to generate temporary URLs for image thumbnails
             </p>
             <p>
-              <strong>Memory Management:</strong> Automatically revokes object URLs after image loads to prevent memory leaks
+              <strong>Memory Management:</strong> Automatically revokes object URLs after image
+              loads to prevent memory leaks
             </p>
             <p>
               <strong>File Icons:</strong> Uses Lucide React icons for non-image files

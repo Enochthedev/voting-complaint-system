@@ -1,0 +1,20 @@
+/**
+ * Complaint Form
+ * 
+ * This file has been refactored into smaller, focused components.
+ * See: src/components/complaints/complaint-form/
+ * 
+ * Component Structure:
+ * - index.tsx - Main form orchestrator
+ * - FormHeader.tsx - Form title and description
+ * - BasicInfoFields.tsx - Title, category, priority, anonymous toggle
+ * - DescriptionField.tsx - Rich text editor for description
+ * - TagsField.tsx - Tag input with autocomplete
+ * - AttachmentsField.tsx - File upload component
+ * - FormActions.tsx - Submit, save draft, cancel buttons
+ * - validation.ts - Form validation logic
+ * - types.ts - Shared types and constants
+ */
+
+export { ComplaintForm } from './complaint-form';
+export type { ComplaintFormData, FormErrors } from './complaint-form/types';

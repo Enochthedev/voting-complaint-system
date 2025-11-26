@@ -1,6 +1,6 @@
 /**
  * Tag Filter Tests
- * 
+ *
  * Tests for the tag filtering functionality in the FilterPanel component.
  * Validates that tags can be selected, deselected, and properly filter complaints.
  */
@@ -94,9 +94,7 @@ describe('Tag Filter Functionality', () => {
     }
 
     return complaints.filter((complaint) =>
-      complaint.complaint_tags?.some((tag) =>
-        selectedTags.includes(tag.tag_name)
-      )
+      complaint.complaint_tags?.some((tag) => selectedTags.includes(tag.tag_name))
     );
   }
 
@@ -117,21 +115,21 @@ describe('Tag Filter Functionality', () => {
 
   it('should extract all unique tags from complaints', () => {
     const availableTags = extractAvailableTags(mockComplaints);
-    
+
     expect(availableTags).toEqual(['library', 'parking', 'urgent', 'wifi']);
     expect(availableTags.length).toBe(4);
   });
 
   it('should return all complaints when no tags are selected', () => {
     const filtered = applyTagFilter(mockComplaints, []);
-    
+
     expect(filtered).toHaveLength(3);
     expect(filtered).toEqual(mockComplaints);
   });
 
   it('should filter complaints by a single tag', () => {
     const filtered = applyTagFilter(mockComplaints, ['wifi']);
-    
+
     expect(filtered).toHaveLength(1);
     expect(filtered[0].id).toBe('1');
     expect(filtered[0].title).toBe('WiFi Issue');
@@ -139,21 +137,21 @@ describe('Tag Filter Functionality', () => {
 
   it('should filter complaints by multiple tags (OR logic)', () => {
     const filtered = applyTagFilter(mockComplaints, ['wifi', 'library']);
-    
+
     expect(filtered).toHaveLength(2);
-    expect(filtered.map(c => c.id)).toEqual(['1', '2']);
+    expect(filtered.map((c) => c.id)).toEqual(['1', '2']);
   });
 
   it('should filter complaints with shared tags', () => {
     const filtered = applyTagFilter(mockComplaints, ['urgent']);
-    
+
     expect(filtered).toHaveLength(2);
-    expect(filtered.map(c => c.id)).toEqual(['1', '3']);
+    expect(filtered.map((c) => c.id)).toEqual(['1', '3']);
   });
 
   it('should return empty array when filtering by non-existent tag', () => {
     const filtered = applyTagFilter(mockComplaints, ['non-existent-tag']);
-    
+
     expect(filtered).toHaveLength(0);
   });
 
@@ -182,7 +180,7 @@ describe('Tag Filter Functionality', () => {
     ];
 
     const filtered = applyTagFilter(complaintsWithNoTags, ['wifi']);
-    
+
     expect(filtered).toHaveLength(0);
   });
 
@@ -200,14 +198,14 @@ describe('Tag Filter Functionality', () => {
     };
 
     const filtered = applyTagFilter(mockComplaints, filterState.tags);
-    
+
     expect(filtered).toHaveLength(2);
-    expect(filtered.map(c => c.id)).toEqual(['1', '3']);
+    expect(filtered.map((c) => c.id)).toEqual(['1', '3']);
   });
 
   it('should maintain tag order when extracting from complaints', () => {
     const availableTags = extractAvailableTags(mockComplaints);
-    
+
     // Tags should be sorted alphabetically
     expect(availableTags[0]).toBe('library');
     expect(availableTags[1]).toBe('parking');
@@ -239,20 +237,20 @@ describe('Tag Filter Functionality', () => {
     // Complaint 3 has tags: parking, urgent
     // Filtering by 'urgent' should return both
     const filtered = applyTagFilter(mockComplaints, ['urgent']);
-    
+
     expect(filtered).toHaveLength(2);
-    expect(filtered.every(c => 
-      c.complaint_tags?.some(tag => tag.tag_name === 'urgent')
-    )).toBe(true);
+    expect(filtered.every((c) => c.complaint_tags?.some((tag) => tag.tag_name === 'urgent'))).toBe(
+      true
+    );
   });
 
   it('should combine tag filter with other filters', () => {
     // First apply tag filter
     let filtered = applyTagFilter(mockComplaints, ['urgent']);
-    
+
     // Then apply priority filter
-    filtered = filtered.filter(c => c.priority === 'high');
-    
+    filtered = filtered.filter((c) => c.priority === 'high');
+
     expect(filtered).toHaveLength(1);
     expect(filtered[0].id).toBe('1');
   });

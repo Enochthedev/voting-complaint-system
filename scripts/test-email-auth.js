@@ -2,10 +2,10 @@
 
 /**
  * Email/Password Authentication Test Script
- * 
+ *
  * This script tests the email/password authentication functionality
  * to verify that sign up, sign in, and sign out work correctly.
- * 
+ *
  * Usage: node scripts/test-email-auth.js
  */
 
@@ -75,13 +75,13 @@ async function main() {
 
     if (error) {
       log(`✗ Sign up failed: ${error.message}`, 'red');
-      
+
       // Check if it's because email confirmation is required
       if (error.message.includes('email') || error.message.includes('confirmation')) {
         log('  Note: Email confirmation may be enabled in Supabase settings', 'yellow');
         log('  For testing, you can disable it in: Authentication > Providers > Email', 'yellow');
       }
-      
+
       process.exit(1);
     }
 
@@ -107,7 +107,6 @@ async function main() {
     if (data.user.user_metadata?.full_name !== testFullName) {
       log('⚠ Warning: Full name not set correctly in user metadata', 'yellow');
     }
-
   } catch (error) {
     log(`✗ Sign up failed with exception: ${error.message}`, 'red');
     process.exit(1);
@@ -123,13 +122,16 @@ async function main() {
 
     if (error) {
       log(`✗ Sign in failed: ${error.message}`, 'red');
-      
+
       if (error.message.includes('Email not confirmed')) {
         log('  Email confirmation is required', 'yellow');
-        log('  To disable for testing: Supabase Dashboard > Authentication > Providers > Email', 'yellow');
+        log(
+          '  To disable for testing: Supabase Dashboard > Authentication > Providers > Email',
+          'yellow'
+        );
         log('  Uncheck "Confirm email"', 'yellow');
       }
-      
+
       process.exit(1);
     }
 
@@ -143,7 +145,6 @@ async function main() {
     log(`  Email: ${data.user.email}`, 'cyan');
     log(`  Session: ${data.session ? 'Active' : 'None'}`, 'cyan');
     log(`  Access Token: ${data.session.access_token.substring(0, 20)}...`, 'cyan');
-
   } catch (error) {
     log(`✗ Sign in failed with exception: ${error.message}`, 'red');
     process.exit(1);
@@ -168,7 +169,6 @@ async function main() {
     log(`  User ID: ${data.user.id}`, 'cyan');
     log(`  Email: ${data.user.email}`, 'cyan');
     log(`  Role: ${data.user.user_metadata?.role || 'not set'}`, 'cyan');
-
   } catch (error) {
     log(`✗ Get user failed with exception: ${error.message}`, 'red');
     process.exit(1);
@@ -185,7 +185,6 @@ async function main() {
     }
 
     log('✓ Sign out successful', 'green');
-
   } catch (error) {
     log(`✗ Sign out failed with exception: ${error.message}`, 'red');
     process.exit(1);
@@ -202,7 +201,6 @@ async function main() {
     } else {
       log('✓ User successfully signed out (no active session)', 'green');
     }
-
   } catch (error) {
     log('✓ User successfully signed out (session cleared)', 'green');
   }
@@ -222,7 +220,6 @@ async function main() {
       log('✗ Invalid credentials were accepted (security issue!)', 'red');
       process.exit(1);
     }
-
   } catch (error) {
     log('✓ Invalid credentials correctly rejected', 'green');
   }

@@ -91,7 +91,6 @@ async function verifyPolicies() {
     console.log('');
 
     return true;
-
   } catch (error) {
     console.error('❌ Error verifying policies:', error.message);
     return false;
@@ -99,11 +98,10 @@ async function verifyPolicies() {
 }
 
 verifyPolicies()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('❌ Fatal error:', error);
     process.exit(1);
   });
-

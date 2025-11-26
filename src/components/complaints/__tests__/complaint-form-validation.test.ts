@@ -1,85 +1,119 @@
 /**
  * Complaint Form Validation Tests
- * 
+ *
  * Tests the validation logic for the complaint submission form
  * Validates: Requirements AC2, AC9
  */
 
 import { describe, it, expect } from 'vitest';
+import { validateForm, getTextContent } from '../complaint-form/validation';
+import type { ComplaintFormData } from '../complaint-form/types';
 
 // Helper to simulate HTML content from rich text editor
 const createHtmlContent = (text: string): string => {
   return `<p>${text}</p>`;
 };
 
-// Helper to strip HTML tags (mimics form's getTextContent)
-const getTextContent = (html: string): string => {
-  // Simple regex-based HTML stripping for testing
-  return html.replace(/<[^>]*>/g, '').trim();
-};
+// Helper to create form data
+const createFormData = (overrides: Partial<ComplaintFormData> = {}): ComplaintFormData => ({
+  title: '',
+  description: '',
+  category: '',
+  priority: '',
+  isAnonymous: false,
+  tags: [],
+  files: [],
+  ...overrides,
+});
 
 describe('Complaint Form Validation', () => {
   describe('Title Validation', () => {
     it('should reject empty title for submission', () => {
-      const title = '';
-      const isValid = title.trim().length > 0;
-      expect(isValid).toBe(false);
+      const formData = createFormData({ title: '' });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeDefined();
     });
 
     it('should accept valid title', () => {
-      const title = 'Broken AC in Lecture Hall';
-      const isValid = title.trim().length > 0 && title.length <= 200;
-      expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'Broken AC in Lecture Hall',
+        description: createHtmlContent('Valid description'),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeUndefined();
     });
 
     it('should reject title exceeding max length', () => {
-      const title = 'a'.repeat(201);
-      const isValid = title.length <= 200;
-      expect(isValid).toBe(false);
+      const formData = createFormData({ title: 'a'.repeat(201) });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeDefined();
+      expect(errors.title).toContain('200 characters');
     });
 
     it('should accept title at max length boundary', () => {
-      const title = 'a'.repeat(200);
-      const isValid = title.trim().length > 0 && title.length <= 200;
-      expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'a'.repeat(200),
+        description: createHtmlContent('Valid description'),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeUndefined();
     });
 
     it('should reject whitespace-only title', () => {
-      const title = '   ';
-      const isValid = title.trim().length > 0;
-      expect(isValid).toBe(false);
+      const formData = createFormData({ title: '   ' });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeDefined();
     });
   });
 
   describe('Description Validation', () => {
     it('should reject empty description for submission', () => {
-      const description = createHtmlContent('');
-      const textContent = getTextContent(description);
-      const isValid = textContent.length > 0;
-      expect(isValid).toBe(false);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent(''),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.description).toBeDefined();
     });
 
     it('should accept valid description', () => {
-      const description = createHtmlContent('The AC unit in room 301 has been broken for a week.');
-      const textContent = getTextContent(description);
-      const isValid = textContent.length > 0 && textContent.length <= 5000;
-      expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent('The AC unit in room 301 has been broken for a week.'),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.description).toBeUndefined();
     });
 
     it('should reject description exceeding max length', () => {
       const longText = 'a'.repeat(5001);
-      const description = createHtmlContent(longText);
-      const textContent = getTextContent(description);
-      const isValid = textContent.length <= 5000;
-      expect(isValid).toBe(false);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent(longText),
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.description).toBeDefined();
+      expect(errors.description).toContain('5000 characters');
     });
 
     it('should accept description at max length boundary', () => {
       const longText = 'a'.repeat(5000);
-      const description = createHtmlContent(longText);
-      const textContent = getTextContent(description);
-      const isValid = textContent.length > 0 && textContent.length <= 5000;
-      expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent(longText),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.description).toBeUndefined();
     });
 
     it('should strip HTML tags when validating length', () => {
@@ -90,166 +124,130 @@ describe('Complaint Form Validation', () => {
     });
 
     it('should reject HTML-only content with no text', () => {
-      const description = '<p></p><br/><div></div>';
-      const textContent = getTextContent(description);
-      const isValid = textContent.length > 0;
-      expect(isValid).toBe(false);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: '<p></p><br/><div></div>',
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.description).toBeDefined();
     });
   });
 
   describe('Category Validation', () => {
-    const validCategories = [
-      'academic',
-      'facilities',
-      'harassment',
-      'course_content',
-      'administrative',
-      'other',
-    ];
-
     it('should reject empty category for submission', () => {
-      const category = '';
-      const isValid = category.length > 0;
-      expect(isValid).toBe(false);
-    });
-
-    it('should accept all valid categories', () => {
-      validCategories.forEach((category) => {
-        const isValid = validCategories.includes(category);
-        expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent('Valid description'),
+        category: '',
+        priority: 'high',
       });
+      const errors = validateForm(formData, false);
+      expect(errors.category).toBeDefined();
     });
 
-    it('should reject invalid category', () => {
-      const category = 'invalid_category';
-      const isValid = validCategories.includes(category);
-      expect(isValid).toBe(false);
+    it('should accept valid category', () => {
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent('Valid description'),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.category).toBeUndefined();
     });
   });
 
   describe('Priority Validation', () => {
-    const validPriorities = ['low', 'medium', 'high', 'critical'];
-
     it('should reject empty priority for submission', () => {
-      const priority = '';
-      const isValid = priority.length > 0;
-      expect(isValid).toBe(false);
-    });
-
-    it('should accept all valid priorities', () => {
-      validPriorities.forEach((priority) => {
-        const isValid = validPriorities.includes(priority);
-        expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent('Valid description'),
+        category: 'facilities',
+        priority: '',
       });
+      const errors = validateForm(formData, false);
+      expect(errors.priority).toBeDefined();
     });
 
-    it('should reject invalid priority', () => {
-      const priority = 'urgent';
-      const isValid = validPriorities.includes(priority);
-      expect(isValid).toBe(false);
+    it('should accept valid priority', () => {
+      const formData = createFormData({
+        title: 'Valid title',
+        description: createHtmlContent('Valid description'),
+        category: 'facilities',
+        priority: 'high',
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.priority).toBeUndefined();
     });
   });
 
   describe('Draft Mode Validation', () => {
     it('should allow empty fields for draft', () => {
-      const isDraft = true;
-      const title = '';
-      const description = '';
-      const category = '';
-      const priority = '';
-
-      // For drafts, empty fields are allowed
-      const isValid = isDraft ? true : (
-        title.trim().length > 0 &&
-        description.trim().length > 0 &&
-        category.length > 0 &&
-        priority.length > 0
-      );
-
-      expect(isValid).toBe(true);
+      const formData = createFormData({
+        title: '',
+        description: '',
+        category: '',
+        priority: '',
+      });
+      const errors = validateForm(formData, true);
+      expect(Object.keys(errors).length).toBe(0);
     });
 
     it('should still validate length limits for draft', () => {
-      const isDraft = true;
-      const title = 'a'.repeat(201);
-      
-      // Even for drafts, if content exists, it must not exceed limits
-      const isValid = title.length <= 200;
-      expect(isValid).toBe(false);
+      const formData = createFormData({
+        title: 'a'.repeat(201),
+      });
+      const errors = validateForm(formData, true);
+      expect(errors.title).toBeDefined();
+      expect(errors.title).toContain('200 characters');
     });
 
     it('should allow partial completion for draft', () => {
-      const isDraft = true;
-      const title = 'Partial complaint';
-      const description = '';
-      const category = '';
-      const priority = '';
-
-      // For drafts, partial completion is allowed
-      const hasValidLength = title.length <= 200;
-      expect(hasValidLength).toBe(true);
+      const formData = createFormData({
+        title: 'Partial complaint',
+        description: '',
+        category: '',
+        priority: '',
+      });
+      const errors = validateForm(formData, true);
+      expect(Object.keys(errors).length).toBe(0);
     });
   });
 
   describe('Complete Form Validation', () => {
     it('should validate complete valid form for submission', () => {
-      const formData = {
+      const formData = createFormData({
         title: 'Broken AC in Lecture Hall',
         description: createHtmlContent('The AC has been broken for a week'),
         category: 'facilities',
         priority: 'high',
-      };
-
-      const descriptionText = getTextContent(formData.description);
-      const isValid =
-        formData.title.trim().length > 0 &&
-        formData.title.length <= 200 &&
-        descriptionText.length > 0 &&
-        descriptionText.length <= 5000 &&
-        formData.category.length > 0 &&
-        formData.priority.length > 0;
-
-      expect(isValid).toBe(true);
+      });
+      const errors = validateForm(formData, false);
+      expect(Object.keys(errors).length).toBe(0);
     });
 
     it('should reject form with missing required fields', () => {
-      const formData = {
+      const formData = createFormData({
         title: 'Broken AC',
         description: createHtmlContent('Description'),
         category: '',
         priority: 'high',
-      };
-
-      const descriptionText = getTextContent(formData.description);
-      const isValid =
-        formData.title.trim().length > 0 &&
-        formData.title.length <= 200 &&
-        descriptionText.length > 0 &&
-        descriptionText.length <= 5000 &&
-        formData.category.length > 0 &&
-        formData.priority.length > 0;
-
-      expect(isValid).toBe(false);
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.category).toBeDefined();
     });
 
     it('should reject form with any field exceeding limits', () => {
-      const formData = {
+      const formData = createFormData({
         title: 'a'.repeat(201),
         description: createHtmlContent('Valid description'),
         category: 'facilities',
         priority: 'high',
-      };
-
-      const descriptionText = getTextContent(formData.description);
-      const isValid =
-        formData.title.trim().length > 0 &&
-        formData.title.length <= 200 &&
-        descriptionText.length > 0 &&
-        descriptionText.length <= 5000 &&
-        formData.category.length > 0 &&
-        formData.priority.length > 0;
-
-      expect(isValid).toBe(false);
+      });
+      const errors = validateForm(formData, false);
+      expect(errors.title).toBeDefined();
     });
   });
 
@@ -266,7 +264,7 @@ describe('Complaint Form Validation', () => {
 
       // Anonymous flag doesn't affect validation
       expect(formData.isAnonymous).toBe(true);
-      
+
       const descriptionText = getTextContent(formData.description);
       const isValid =
         formData.title.trim().length > 0 &&

@@ -21,13 +21,13 @@ const supabase = createClient(supabaseUrl, serviceRoleKey);
 async function checkMigrationStatus() {
   console.log('🔍 COMPREHENSIVE MIGRATION & RLS STATUS CHECK\n');
   console.log('='.repeat(70));
-  
+
   const results = {
     tables: {},
     rlsEnabled: {},
     totalTables: 0,
     existingTables: 0,
-    rlsEnabledCount: 0
+    rlsEnabledCount: 0,
   };
 
   // Define all expected tables
@@ -45,21 +45,18 @@ async function checkMigrationStatus() {
     { name: 'notifications', migration: '011', hasRLS: true },
     { name: 'votes', migration: '012', hasRLS: true },
     { name: 'vote_responses', migration: '013', hasRLS: true },
-    { name: 'announcements', migration: '014', hasRLS: true }
+    { name: 'announcements', migration: '014', hasRLS: true },
   ];
 
   console.log('\n📊 TABLE EXISTENCE CHECK\n');
-  
+
   for (const table of expectedTables) {
     results.totalTables++;
-    const { data, error } = await supabase
-      .from(table.name)
-      .select('*')
-      .limit(1);
-    
+    const { data, error } = await supabase.from(table.name).select('*').limit(1);
+
     const exists = !error || error.code === 'PGRST116'; // PGRST116 = empty result
     results.tables[table.name] = exists;
-    
+
     if (exists) {
       results.existingTables++;
       console.log(`✅ ${table.name.padEnd(25)} Migration ${table.migration} - EXISTS`);
@@ -80,15 +77,12 @@ async function checkMigrationStatus() {
     { table: 'vote_responses', policy: 'Students view own responses' },
     { table: 'announcements', policy: 'All users view announcements' },
     { table: 'complaint_templates', policy: 'All users view active templates' },
-    { table: 'escalation_rules', policy: 'Lecturers view escalation rules' }
+    { table: 'escalation_rules', policy: 'Lecturers view escalation rules' },
   ];
 
   for (const check of rlsChecks) {
-    const { error } = await supabase
-      .from(check.table)
-      .select('*')
-      .limit(1);
-    
+    const { error } = await supabase.from(check.table).select('*').limit(1);
+
     if (!error || error.code === 'PGRST116') {
       console.log(`✅ ${check.table.padEnd(25)} RLS policies present`);
       results.rlsEnabledCount++;
@@ -99,18 +93,18 @@ async function checkMigrationStatus() {
 
   console.log('\n' + '='.repeat(70));
   console.log('\n📈 SUMMARY\n');
-  
+
   console.log(`Tables:`);
   console.log(`  Total Expected: ${results.totalTables}`);
   console.log(`  Found: ${results.existingTables}`);
   console.log(`  Missing: ${results.totalTables - results.existingTables}`);
-  
+
   console.log(`\nRLS Policies:`);
   console.log(`  Checked: ${rlsChecks.length}`);
   console.log(`  Verified: ${results.rlsEnabledCount}`);
-  
+
   console.log('\n' + '='.repeat(70));
-  
+
   if (results.existingTables === results.totalTables) {
     console.log('\n✅ ALL MIGRATIONS APPLIED SUCCESSFULLY!\n');
     console.log('All 14 tables exist in the database.');
@@ -131,10 +125,10 @@ async function checkMigrationStatus() {
 
 // Run the check
 checkMigrationStatus()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Error during status check:', error.message);
     process.exit(1);
   });

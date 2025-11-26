@@ -29,27 +29,27 @@ if (!supabaseUrl || !supabaseServiceKey) {
 // Create admin client
 const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
   db: { schema: 'public' },
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 async function executeSQLFile(filePath, description) {
   console.log(`\n📝 ${description}...`);
-  
+
   try {
     const sql = readFileSync(filePath, 'utf8');
-    
+
     // Execute the SQL using the Supabase client
     // We'll use a workaround by executing via the REST API
     const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseServiceKey,
-        'Authorization': `Bearer ${supabaseServiceKey}`
+        apikey: supabaseServiceKey,
+        Authorization: `Bearer ${supabaseServiceKey}`,
       },
-      body: JSON.stringify({ query: sql })
+      body: JSON.stringify({ query: sql }),
     });
-    
+
     if (!response.ok) {
       // If RPC doesn't exist, we'll need to apply manually
       console.log('⚠️  Direct SQL execution not available via API');
@@ -61,7 +61,7 @@ async function executeSQLFile(filePath, description) {
       console.log('3. Click "Run"');
       return false;
     }
-    
+
     console.log(`✅ ${description} completed`);
     return true;
   } catch (error) {
@@ -74,30 +74,36 @@ async function executeSQLFile(filePath, description) {
 
 async function main() {
   console.log('🚀 Applying RLS Policy Fixes\n');
-  console.log('=' .repeat(60));
-  
+  console.log('='.repeat(60));
+
   const migrations = [
     {
       file: join(__dirname, '..', 'supabase', 'migrations', '020_fix_users_table_rls.sql'),
-      description: 'Fixing users table RLS policies'
+      description: 'Fixing users table RLS policies',
     },
     {
-      file: join(__dirname, '..', 'supabase', 'migrations', '019_fix_complaint_attachments_rls.sql'),
-      description: 'Fixing complaint_attachments RLS policies'
-    }
+      file: join(
+        __dirname,
+        '..',
+        'supabase',
+        'migrations',
+        '019_fix_complaint_attachments_rls.sql'
+      ),
+      description: 'Fixing complaint_attachments RLS policies',
+    },
   ];
-  
+
   let allSuccess = true;
-  
+
   for (const migration of migrations) {
     const success = await executeSQLFile(migration.file, migration.description);
     if (!success) {
       allSuccess = false;
     }
   }
-  
+
   console.log('\n' + '='.repeat(60));
-  
+
   if (allSuccess) {
     console.log('\n✅ All migrations applied successfully!');
     console.log('\n📋 Next steps:');
@@ -111,7 +117,7 @@ async function main() {
     console.log('3. Apply each migration file listed above');
     console.log('4. Then run: node scripts/test-complaint-attachments-rls.js');
   }
-  
+
   console.log('\n📖 For detailed documentation, see:');
   console.log('   docs/TASK_2.2_COMPLAINT_ATTACHMENTS_RLS_COMPLETION.md');
 }

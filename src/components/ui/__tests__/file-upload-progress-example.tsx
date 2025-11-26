@@ -16,10 +16,7 @@ export function FileUploadProgressExample() {
    * Simulates file upload with progress updates
    * In production, this would be replaced with actual Supabase upload
    */
-  const simulateUpload = (
-    file: File,
-    index: number
-  ): Promise<void> => {
+  const simulateUpload = (file: File, index: number): Promise<void> => {
     return new Promise((resolve, reject) => {
       let progress = 0;
 
@@ -34,9 +31,7 @@ export function FileUploadProgressExample() {
           // Update to completed status
           setUploadProgress((prev) =>
             prev.map((p, idx) =>
-              idx === index
-                ? { ...p, progress: 100, status: 'completed' as const }
-                : p
+              idx === index ? { ...p, progress: 100, status: 'completed' as const } : p
             )
           );
 
@@ -67,9 +62,7 @@ export function FileUploadProgressExample() {
         } else {
           // Update progress
           setUploadProgress((prev) =>
-            prev.map((p, idx) =>
-              idx === index ? { ...p, progress: Math.min(progress, 100) } : p
-            )
+            prev.map((p, idx) => (idx === index ? { ...p, progress: Math.min(progress, 100) } : p))
           );
         }
       }, 300); // Update every 300ms
@@ -105,9 +98,7 @@ export function FileUploadProgressExample() {
       // Reset to uploading state
       setUploadProgress((prev) =>
         prev.map((p, idx) =>
-          idx === index
-            ? { ...p, progress: 0, status: 'uploading' as const, error: undefined }
-            : p
+          idx === index ? { ...p, progress: 0, status: 'uploading' as const, error: undefined } : p
         )
       );
 
@@ -123,8 +114,8 @@ export function FileUploadProgressExample() {
       <div>
         <h2 className="text-2xl font-bold mb-2">File Upload with Progress</h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          This example demonstrates the file upload component with progress tracking.
-          Upload progress is simulated for UI development purposes.
+          This example demonstrates the file upload component with progress tracking. Upload
+          progress is simulated for UI development purposes.
         </p>
       </div>
 
@@ -140,13 +131,13 @@ export function FileUploadProgressExample() {
         <h3 className="text-sm font-semibold mb-2">Debug Information</h3>
         <div className="space-y-1 text-xs font-mono">
           <p>Completed Files: {files.length}</p>
-          <p>Uploading Files: {uploadProgress.filter(p => p.status === 'uploading').length}</p>
-          <p>Failed Uploads: {uploadProgress.filter(p => p.status === 'error').length}</p>
+          <p>Uploading Files: {uploadProgress.filter((p) => p.status === 'uploading').length}</p>
+          <p>Failed Uploads: {uploadProgress.filter((p) => p.status === 'error').length}</p>
         </div>
       </div>
 
       {/* Retry Failed Uploads */}
-      {uploadProgress.some(p => p.status === 'error') && (
+      {uploadProgress.some((p) => p.status === 'error') && (
         <div className="flex gap-2">
           <button
             onClick={() => {

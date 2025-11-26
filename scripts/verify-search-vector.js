@@ -1,7 +1,7 @@
 /**
  * Verification script for search_vector column
  * This script verifies that Task 1.4 sub-task "Add search_vector column" is complete
- * 
+ *
  * Run with: node scripts/verify-search-vector.js
  */
 
@@ -33,13 +33,13 @@ async function verifySearchVector() {
         WHERE table_schema = 'public'
           AND table_name = 'complaints'
           AND column_name = 'search_vector';
-      `
+      `,
     });
 
     if (error) {
       // If RPC doesn't exist, try a different approach
       console.log('Note: Using alternative verification method...\n');
-      
+
       // Try to query the complaints table to see if search_vector exists
       const { data: testData, error: testError } = await supabase
         .from('complaints')
@@ -59,7 +59,7 @@ async function verifySearchVector() {
           console.log('Error:', testError.message);
           console.log('\nPlease verify manually in Supabase Dashboard → SQL Editor:');
           console.log('  SELECT column_name FROM information_schema.columns');
-          console.log('  WHERE table_name = \'complaints\' AND column_name = \'search_vector\';\n');
+          console.log("  WHERE table_name = 'complaints' AND column_name = 'search_vector';\n");
           return false;
         }
       }
@@ -70,16 +70,16 @@ async function verifySearchVector() {
       console.log('  - Column: search_vector');
       console.log('  - Type: tsvector');
       console.log('  - Purpose: Full-text search indexing\n');
-      
+
       console.log('Related components (defined in migration 002):');
       console.log('  ✓ Trigger function: update_complaint_search_vector()');
       console.log('  ✓ Trigger: update_complaints_search_vector');
       console.log('  ✓ GIN Index: idx_complaints_search_vector\n');
-      
+
       console.log('To verify all full-text search components:');
       console.log('  1. Open Supabase Dashboard → SQL Editor');
       console.log('  2. Run: supabase/verify-fulltext-search.sql\n');
-      
+
       return true;
     }
 
@@ -91,20 +91,19 @@ async function verifySearchVector() {
       console.log('❌ FAILED: search_vector column not found\n');
       return false;
     }
-
   } catch (err) {
     console.error('❌ Error during verification:', err.message);
     console.log('\nManual verification steps:');
     console.log('  1. Open Supabase Dashboard → SQL Editor');
     console.log('  2. Run: SELECT column_name FROM information_schema.columns');
-    console.log('     WHERE table_name = \'complaints\' AND column_name = \'search_vector\';\n');
+    console.log("     WHERE table_name = 'complaints' AND column_name = 'search_vector';\n");
     return false;
   }
 }
 
 // Run verification
 verifySearchVector()
-  .then(success => {
+  .then((success) => {
     if (success) {
       console.log('✅ Task 1.4 sub-task "Add search_vector column" is COMPLETE\n');
       process.exit(0);
@@ -113,7 +112,7 @@ verifySearchVector()
       process.exit(1);
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Fatal error:', err);
     process.exit(1);
   });

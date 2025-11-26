@@ -2,7 +2,7 @@
 
 /**
  * Test script for feedback table RLS policies
- * 
+ *
  * This script tests:
  * 1. Students can view feedback on their own complaints
  * 2. Students cannot view feedback on other students' complaints
@@ -51,8 +51,8 @@ async function setup() {
     email_confirm: true,
     user_metadata: {
       role: 'student',
-      full_name: 'Test Student 1'
-    }
+      full_name: 'Test Student 1',
+    },
   });
 
   if (s1Error) throw s1Error;
@@ -64,8 +64,8 @@ async function setup() {
     email_confirm: true,
     user_metadata: {
       role: 'student',
-      full_name: 'Test Student 2'
-    }
+      full_name: 'Test Student 2',
+    },
   });
 
   if (s2Error) throw s2Error;
@@ -77,8 +77,8 @@ async function setup() {
     email_confirm: true,
     user_metadata: {
       role: 'lecturer',
-      full_name: 'Test Lecturer'
-    }
+      full_name: 'Test Lecturer',
+    },
   });
 
   if (lError) throw lError;
@@ -86,9 +86,24 @@ async function setup() {
 
   // Insert users into users table
   await adminClient.from('users').insert([
-    { id: testStudent1.id, email: testStudent1.email, role: 'student', full_name: 'Test Student 1' },
-    { id: testStudent2.id, email: testStudent2.email, role: 'student', full_name: 'Test Student 2' },
-    { id: testLecturer.id, email: testLecturer.email, role: 'lecturer', full_name: 'Test Lecturer' }
+    {
+      id: testStudent1.id,
+      email: testStudent1.email,
+      role: 'student',
+      full_name: 'Test Student 1',
+    },
+    {
+      id: testStudent2.id,
+      email: testStudent2.email,
+      role: 'student',
+      full_name: 'Test Student 2',
+    },
+    {
+      id: testLecturer.id,
+      email: testLecturer.email,
+      role: 'lecturer',
+      full_name: 'Test Lecturer',
+    },
   ]);
 
   // Create test complaints
@@ -102,7 +117,7 @@ async function setup() {
       description: 'Test description 1',
       category: 'academic',
       priority: 'medium',
-      status: 'new'
+      status: 'new',
     })
     .select()
     .single();
@@ -120,7 +135,7 @@ async function setup() {
       description: 'Test description 2',
       category: 'facilities',
       priority: 'high',
-      status: 'new'
+      status: 'new',
     })
     .select()
     .single();
@@ -134,7 +149,7 @@ async function setup() {
     .insert({
       complaint_id: testComplaint1.id,
       lecturer_id: testLecturer.id,
-      content: 'Test feedback for complaint 1'
+      content: 'Test feedback for complaint 1',
     })
     .select()
     .single();
@@ -178,13 +193,13 @@ async function testStudentViewOwnFeedback() {
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testStudent1.email
+    email: testStudent1.email,
   });
 
   const studentClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await studentClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
   const { data, error } = await studentClient
@@ -207,17 +222,17 @@ async function testStudentViewOwnFeedback() {
 }
 
 async function testStudentCannotViewOthersFeedback() {
-  console.log('Test 2: Student cannot view feedback on other students\' complaints');
+  console.log("Test 2: Student cannot view feedback on other students' complaints");
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testStudent1.email
+    email: testStudent1.email,
   });
 
   const studentClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await studentClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
   const { data, error } = await studentClient
@@ -231,7 +246,7 @@ async function testStudentCannotViewOthersFeedback() {
   }
 
   if (data && data.length === 0) {
-    console.log('✅ PASSED: Student cannot view feedback on other students\' complaints\n');
+    console.log("✅ PASSED: Student cannot view feedback on other students' complaints\n");
     return true;
   } else {
     console.log('❌ FAILED: Expected 0 feedback records, got', data?.length || 0, '\n');
@@ -244,18 +259,16 @@ async function testLecturerViewAllFeedback() {
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testLecturer.email
+    email: testLecturer.email,
   });
 
   const lecturerClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await lecturerClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
-  const { data, error } = await lecturerClient
-    .from('feedback')
-    .select('*');
+  const { data, error } = await lecturerClient.from('feedback').select('*');
 
   if (error) {
     console.log('❌ FAILED:', error.message);
@@ -276,13 +289,13 @@ async function testLecturerInsertFeedback() {
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testLecturer.email
+    email: testLecturer.email,
   });
 
   const lecturerClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await lecturerClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
   const { data, error } = await lecturerClient
@@ -290,7 +303,7 @@ async function testLecturerInsertFeedback() {
     .insert({
       complaint_id: testComplaint2.id,
       lecturer_id: testLecturer.id,
-      content: 'New feedback from lecturer'
+      content: 'New feedback from lecturer',
     })
     .select()
     .single();
@@ -314,13 +327,13 @@ async function testLecturerUpdateOwnFeedback() {
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testLecturer.email
+    email: testLecturer.email,
   });
 
   const lecturerClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await lecturerClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
   const { data, error } = await lecturerClient
@@ -353,26 +366,23 @@ async function testLecturerDeleteOwnFeedback() {
     .insert({
       complaint_id: testComplaint1.id,
       lecturer_id: testLecturer.id,
-      content: 'Feedback to be deleted'
+      content: 'Feedback to be deleted',
     })
     .select()
     .single();
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testLecturer.email
+    email: testLecturer.email,
   });
 
   const lecturerClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await lecturerClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
-  const { error } = await lecturerClient
-    .from('feedback')
-    .delete()
-    .eq('id', feedbackToDelete.id);
+  const { error } = await lecturerClient.from('feedback').delete().eq('id', feedbackToDelete.id);
 
   if (error) {
     console.log('❌ FAILED:', error.message);
@@ -399,13 +409,13 @@ async function testStudentCannotInsertFeedback() {
 
   const { data: session } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
-    email: testStudent1.email
+    email: testStudent1.email,
   });
 
   const studentClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   await studentClient.auth.setSession({
     access_token: session.properties.access_token,
-    refresh_token: session.properties.refresh_token
+    refresh_token: session.properties.refresh_token,
   });
 
   const { data, error } = await studentClient
@@ -413,7 +423,7 @@ async function testStudentCannotInsertFeedback() {
     .insert({
       complaint_id: testComplaint1.id,
       lecturer_id: testStudent1.id,
-      content: 'Student trying to insert feedback'
+      content: 'Student trying to insert feedback',
     })
     .select();
 
@@ -448,7 +458,7 @@ async function runTests() {
     console.log('='.repeat(60));
     console.log('Test Summary');
     console.log('='.repeat(60));
-    const passed = results.filter(r => r).length;
+    const passed = results.filter((r) => r).length;
     const total = results.length;
     console.log(`\n${passed}/${total} tests passed\n`);
 

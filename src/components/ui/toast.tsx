@@ -24,13 +24,11 @@ interface ToastContextType {
   warning: (message: string, title?: string) => void;
 }
 
-const ToastContext = React.createContext<ToastContextType | undefined>(
-  undefined
-);
+const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
 
 /**
  * Toast Provider Component
- * 
+ *
  * Provides toast notification functionality to the application.
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -47,7 +45,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToasts((prev) => [...prev, newToast]);
 
     // Auto-remove toast after duration
-    if (newToast.duration > 0) {
+    if (newToast.duration && newToast.duration > 0) {
       setTimeout(() => {
         removeToast(id);
       }, newToast.duration);
@@ -87,9 +85,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ToastContext.Provider
-      value={{ toasts, addToast, removeToast, success, error, info, warning }}
-    >
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, info, warning }}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
@@ -110,13 +106,7 @@ export function useToast() {
 /**
  * Toast Container Component
  */
-function ToastContainer({
-  toasts,
-  onRemove,
-}: {
-  toasts: Toast[];
-  onRemove: (id: string) => void;
-}) {
+function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) {
   return (
     <div className="pointer-events-none fixed inset-0 z-50 flex flex-col items-end justify-end gap-2 p-4 sm:p-6">
       {toasts.map((toast) => (
@@ -129,13 +119,7 @@ function ToastContainer({
 /**
  * Individual Toast Item Component
  */
-function ToastItem({
-  toast,
-  onRemove,
-}: {
-  toast: Toast;
-  onRemove: (id: string) => void;
-}) {
+function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) => void }) {
   const [isExiting, setIsExiting] = React.useState(false);
 
   const handleRemove = () => {
@@ -202,19 +186,13 @@ function ToastItem({
       className={cn(
         'pointer-events-auto w-full max-w-sm rounded-lg border p-4 shadow-lg transition-all duration-300',
         getStyles(),
-        isExiting
-          ? 'translate-x-full opacity-0'
-          : 'translate-x-0 opacity-100'
+        isExiting ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'
       )}
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">{getIcon()}</div>
         <div className="flex-1 space-y-1">
-          {toast.title && (
-            <p className={cn('font-semibold', getTitleStyles())}>
-              {toast.title}
-            </p>
-          )}
+          {toast.title && <p className={cn('font-semibold', getTitleStyles())}>{toast.title}</p>}
           <p className={cn('text-sm', getMessageStyles())}>{toast.message}</p>
         </div>
         <button

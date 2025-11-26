@@ -61,7 +61,6 @@ async function applyMigration() {
     console.log('='.repeat(80));
 
     return true;
-
   } catch (error) {
     console.error('❌ Failed to apply migration:', error.message);
     console.log('\n📋 Please apply manually via Supabase Dashboard');
@@ -72,10 +71,10 @@ async function applyMigration() {
 
 // Apply migration
 applyMigration()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Error:', error);
     process.exit(1);
   });

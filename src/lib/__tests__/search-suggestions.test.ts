@@ -1,6 +1,6 @@
 /**
  * Search Suggestions Tests
- * 
+ *
  * Tests for the search autocomplete/suggestions functionality.
  * Validates that suggestions are returned correctly based on query input.
  */
@@ -23,25 +23,25 @@ describe('Search Suggestions', () => {
     it('should return suggestions for "air" query', async () => {
       const suggestions = await mockGetSearchSuggestions('air', 5);
       expect(suggestions.length).toBeGreaterThan(0);
-      expect(suggestions.some(s => s.toLowerCase().includes('air'))).toBe(true);
+      expect(suggestions.some((s) => s.toLowerCase().includes('air'))).toBe(true);
     });
 
     it('should return suggestions for "wifi" query', async () => {
       const suggestions = await mockGetSearchSuggestions('wifi', 5);
       expect(suggestions.length).toBeGreaterThan(0);
-      expect(suggestions.some(s => s.toLowerCase().includes('wifi'))).toBe(true);
+      expect(suggestions.some((s) => s.toLowerCase().includes('wifi'))).toBe(true);
     });
 
     it('should return suggestions for "parking" query', async () => {
       const suggestions = await mockGetSearchSuggestions('parking', 5);
       expect(suggestions.length).toBeGreaterThan(0);
-      expect(suggestions.some(s => s.toLowerCase().includes('parking'))).toBe(true);
+      expect(suggestions.some((s) => s.toLowerCase().includes('parking'))).toBe(true);
     });
 
     it('should return suggestions for "grading" query', async () => {
       const suggestions = await mockGetSearchSuggestions('grading', 5);
       expect(suggestions.length).toBeGreaterThan(0);
-      expect(suggestions.some(s => s.toLowerCase().includes('grad'))).toBe(true);
+      expect(suggestions.some((s) => s.toLowerCase().includes('grad'))).toBe(true);
     });
 
     it('should limit suggestions to specified limit', async () => {
@@ -68,7 +68,7 @@ describe('Search Suggestions', () => {
       const lowerCaseSuggestions = await mockGetSearchSuggestions('wifi', 5);
       const upperCaseSuggestions = await mockGetSearchSuggestions('WIFI', 5);
       const mixedCaseSuggestions = await mockGetSearchSuggestions('WiFi', 5);
-      
+
       expect(lowerCaseSuggestions.length).toBeGreaterThan(0);
       expect(upperCaseSuggestions.length).toBeGreaterThan(0);
       expect(mixedCaseSuggestions.length).toBeGreaterThan(0);
@@ -76,7 +76,7 @@ describe('Search Suggestions', () => {
 
     it('should include common search terms in suggestions', async () => {
       const suggestions = await mockGetSearchSuggestions('cafe', 5);
-      expect(suggestions.some(s => s.toLowerCase().includes('cafeteria'))).toBe(true);
+      expect(suggestions.some((s) => s.toLowerCase().includes('cafeteria'))).toBe(true);
     });
 
     it('should include tag matches in suggestions', async () => {

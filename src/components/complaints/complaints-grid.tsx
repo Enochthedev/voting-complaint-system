@@ -3,94 +3,115 @@ import { ComplaintList } from '@/components/complaints';
 import type { Complaint, User } from '@/types/database.types';
 
 export interface ComplaintsGridProps {
-    /**
-     * The role of the current user
-     */
-    userRole: 'student' | 'lecturer' | 'admin';
+  /**
+   * The role of the current user
+   */
+  userRole: 'student' | 'lecturer' | 'admin';
 
-    /**
-     * Complaints to display
-     */
-    complaints: (Complaint & { assigned_lecturer?: User | null })[];
+  /**
+   * Complaints to display
+   */
+  complaints: (Complaint & { assigned_lecturer?: User | null })[];
 
-    /**
-     * Whether data is loading
-     */
-    isLoading: boolean;
+  /**
+   * Whether data is loading
+   */
+  isLoading: boolean;
 
-    /**
-     * Current page number
-     */
-    currentPage: number;
+  /**
+   * Current page number
+   */
+  currentPage: number;
 
-    /**
-     * Total number of pages
-     */
-    totalPages: number;
+  /**
+   * Total number of pages
+   */
+  totalPages: number;
 
-    /**
-     * Whether search mode is active
-     */
-    useSearch: boolean;
+  /**
+   * Whether search mode is active
+   */
+  useSearch: boolean;
 
-    /**
-     * Current search query (only when useSearch is true)
-     */
-    searchQuery?: string;
+  /**
+   * Current search query (only when useSearch is true)
+   */
+  searchQuery?: string;
 
-    /**
-     * Callback when a complaint is clicked
-     */
-    onComplaintClick: (complaintId: string) => void;
+  /**
+   * Callback when a complaint is clicked
+   */
+  onComplaintClick: (complaintId: string) => void;
 
-    /**
-     * Callback when page changes
-     */
-    onPageChange: (page: number) => void;
+  /**
+   * Callback when page changes
+   */
+  onPageChange: (page: number) => void;
 
-    /**
-     * Callback when search is cleared
-     */
-    onClearSearch: () => void;
+  /**
+   * Callback when search is cleared
+   */
+  onClearSearch: () => void;
+
+  /**
+   * Whether selection mode is enabled
+   */
+  selectionMode?: boolean;
+
+  /**
+   * Set of selected complaint IDs
+   */
+  selectedIds?: Set<string>;
+
+  /**
+   * Callback when selection changes
+   */
+  onSelectionChange?: (selectedIds: Set<string>) => void;
 }
 
 /**
  * ComplaintsGrid Component
- * 
+ *
  * Displays the main complaint list with pagination.
  * Handles both normal filtered view and search results view.
  */
 export function ComplaintsGrid({
-    userRole,
-    complaints,
-    isLoading,
-    currentPage,
-    totalPages,
-    useSearch,
-    searchQuery,
-    onComplaintClick,
-    onPageChange,
-    onClearSearch,
+  userRole,
+  complaints,
+  isLoading,
+  currentPage,
+  totalPages,
+  useSearch,
+  searchQuery,
+  onComplaintClick,
+  onPageChange,
+  onClearSearch,
+  selectionMode,
+  selectedIds,
+  onSelectionChange,
 }: ComplaintsGridProps) {
-    return (
-        <ComplaintList
-            complaints={complaints}
-            isLoading={isLoading}
-            onComplaintClick={onComplaintClick}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-            showPagination={true}
-            searchQuery={useSearch ? searchQuery : undefined}
-            isSearchResult={useSearch}
-            onClearSearch={onClearSearch}
-            emptyMessage={
-                useSearch
-                    ? `No complaints found matching "${searchQuery}"`
-                    : userRole === 'student'
-                        ? 'No complaints to display. Submit your first complaint to get started.'
-                        : 'No complaints have been submitted yet.'
-            }
-        />
-    );
+  return (
+    <ComplaintList
+      complaints={complaints}
+      isLoading={isLoading}
+      onComplaintClick={onComplaintClick}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      showPagination={true}
+      searchQuery={useSearch ? searchQuery : undefined}
+      isSearchResult={useSearch}
+      onClearSearch={onClearSearch}
+      selectionMode={selectionMode}
+      selectedIds={selectedIds}
+      onSelectionChange={onSelectionChange}
+      emptyMessage={
+        useSearch
+          ? `No complaints found matching "${searchQuery}"`
+          : userRole === 'student'
+            ? 'No complaints to display. Submit your first complaint to get started.'
+            : 'No complaints have been submitted yet.'
+      }
+    />
+  );
 }

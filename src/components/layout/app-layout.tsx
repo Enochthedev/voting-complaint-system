@@ -11,7 +11,6 @@ interface AppLayoutProps {
   userEmail?: string;
   headerTitle?: string;
   showSearch?: boolean;
-  notificationCount?: number;
 }
 
 export function AppLayout({
@@ -21,24 +20,13 @@ export function AppLayout({
   userEmail = 'guest@example.com',
   headerTitle,
   showSearch = true,
-  notificationCount = 0,
 }: AppLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <AppSidebar
-        userRole={userRole}
-        userName={userName}
-        userEmail={userEmail}
-      />
+      <AppSidebar userRole={userRole} userName={userName} userEmail={userEmail} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <AppHeader
-          title={headerTitle}
-          showSearch={showSearch}
-          notificationCount={notificationCount}
-        />
-        <main className="flex-1 overflow-y-auto bg-background p-6">
-          {children}
-        </main>
+        <AppHeader title={headerTitle} showSearch={showSearch} />
+        <main className="flex-1 overflow-y-auto bg-background p-6">{children}</main>
       </div>
     </div>
   );

@@ -2,10 +2,10 @@
 
 /**
  * Configure JWT Claims Hook
- * 
+ *
  * This script configures Supabase to use the custom_access_token_hook
  * to add the user's role to their JWT claims.
- * 
+ *
  * Prerequisites:
  * - Supabase CLI installed
  * - Migration 018_add_role_to_jwt_claims.sql applied
@@ -20,7 +20,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Error: Missing required environment variables');
-  console.error('   Please ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local');
+  console.error(
+    '   Please ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local'
+  );
   process.exit(1);
 }
 
@@ -64,9 +66,10 @@ async function configureJWTClaims() {
     console.log('3. Restart your local Supabase instance\n');
 
     console.log('✅ Configuration instructions provided');
-    console.log('⚠️  Note: After configuring the hook, users will need to sign out and sign in again');
+    console.log(
+      '⚠️  Note: After configuring the hook, users will need to sign out and sign in again'
+    );
     console.log('   for the role to be included in their JWT tokens.\n');
-
   } catch (error) {
     console.error('❌ Unexpected error:', error.message);
     process.exit(1);

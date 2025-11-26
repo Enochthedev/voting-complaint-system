@@ -1,6 +1,6 @@
 /**
  * Status Filter Tests
- * 
+ *
  * Tests for the status filter functionality in the FilterPanel component.
  * Validates that status filtering works correctly for complaints.
  */
@@ -98,9 +98,7 @@ function filterComplaintsByStatus(
   if (statusFilters.length === 0) {
     return complaints;
   }
-  return complaints.filter((complaint) =>
-    statusFilters.includes(complaint.status)
-  );
+  return complaints.filter((complaint) => statusFilters.includes(complaint.status));
 }
 
 describe('Status Filter', () => {
@@ -156,11 +154,7 @@ describe('Status Filter', () => {
   });
 
   it('should preserve complaint order when filtering', () => {
-    const filtered = filterComplaintsByStatus(mockComplaints, [
-      'new',
-      'opened',
-      'in_progress',
-    ]);
+    const filtered = filterComplaintsByStatus(mockComplaints, ['new', 'opened', 'in_progress']);
     expect(filtered).toHaveLength(3);
     expect(filtered[0].id).toBe('1'); // new
     expect(filtered[1].id).toBe('2'); // opened
@@ -170,9 +164,9 @@ describe('Status Filter', () => {
   it('should not mutate original complaints array', () => {
     const originalLength = mockComplaints.length;
     const originalFirst = mockComplaints[0];
-    
+
     filterComplaintsByStatus(mockComplaints, ['resolved']);
-    
+
     expect(mockComplaints).toHaveLength(originalLength);
     expect(mockComplaints[0]).toBe(originalFirst);
   });

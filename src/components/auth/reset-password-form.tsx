@@ -50,7 +50,7 @@ export function ResetPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Clear previous errors
     setErrors({});
 
@@ -118,7 +118,9 @@ export function ResetPasswordForm() {
             value={password}
             onChange={handlePasswordChange}
             disabled={isLoading}
-            className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+            className={
+              errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'
+            }
             autoComplete="new-password"
             autoFocus
           />
@@ -129,16 +131,10 @@ export function ResetPasswordForm() {
             disabled={isLoading}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
         <p className="text-sm text-muted-foreground">
           Password must be at least 8 characters with uppercase, lowercase, and numbers
         </p>
@@ -154,7 +150,11 @@ export function ResetPasswordForm() {
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
             disabled={isLoading}
-            className={errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+            className={
+              errors.confirmPassword
+                ? 'border-destructive focus-visible:ring-destructive pr-10'
+                : 'pr-10'
+            }
             autoComplete="new-password"
           />
           <button
@@ -164,11 +164,7 @@ export function ResetPasswordForm() {
             disabled={isLoading}
             aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
           >
-            {showConfirmPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.confirmPassword && (
@@ -176,11 +172,7 @@ export function ResetPasswordForm() {
         )}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -192,10 +184,7 @@ export function ResetPasswordForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <a
-          href="/auth/login"
-          className="font-medium text-foreground hover:underline"
-        >
+        <a href="/auth/login" className="font-medium text-foreground hover:underline">
           Back to login
         </a>
       </div>

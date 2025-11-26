@@ -1,6 +1,6 @@
 /**
  * File Validation Utilities
- * 
+ *
  * Provides validation functions for file uploads in the complaint system.
  * Validates file size, type, and count according to system constraints.
  */
@@ -44,10 +44,7 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
 /**
  * Validates multiple files against size, type, and count constraints
  */
-export function validateFiles(
-  files: File[],
-  existingFileCount: number = 0
-): FileValidationResult {
+export function validateFiles(files: File[], existingFileCount: number = 0): FileValidationResult {
   const result: FileValidationResult = {
     valid: [],
     invalid: [],
@@ -147,7 +144,7 @@ export function validateFileCount(
   additionalCount: number
 ): { valid: boolean; error?: string } {
   const totalCount = currentCount + additionalCount;
-  
+
   if (totalCount > MAX_FILES_PER_COMPLAINT) {
     return {
       valid: false,
@@ -169,10 +166,6 @@ export function getAllowedFileTypesString(): string {
  * Gets allowed file extensions as a user-friendly string
  */
 export function getAllowedExtensionsString(): string {
-  const extensions = [
-    '.jpg', '.jpeg', '.png', '.gif',
-    '.pdf',
-    '.doc', '.docx'
-  ];
+  const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx'];
   return extensions.join(', ');
 }

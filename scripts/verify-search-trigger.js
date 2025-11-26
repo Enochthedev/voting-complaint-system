@@ -30,8 +30,9 @@ async function verifySearchTrigger() {
   try {
     // Check if trigger function exists
     console.log('1. Checking if trigger function exists...');
-    const { data: functionData, error: functionError } = await supabase.rpc('exec_sql', {
-      sql: `
+    const { data: functionData, error: functionError } = await supabase
+      .rpc('exec_sql', {
+        sql: `
         SELECT 
           routine_name,
           routine_type,
@@ -39,35 +40,41 @@ async function verifySearchTrigger() {
         FROM information_schema.routines
         WHERE routine_schema = 'public'
           AND routine_name = 'update_complaint_search_vector';
-      `
-    }).catch(async () => {
-      // If exec_sql doesn't exist, try direct query
-      return await supabase
-        .from('information_schema.routines')
-        .select('routine_name, routine_type, data_type')
-        .eq('routine_schema', 'public')
-        .eq('routine_name', 'update_complaint_search_vector');
-    });
+      `,
+      })
+      .catch(async () => {
+        // If exec_sql doesn't exist, try direct query
+        return await supabase
+          .from('information_schema.routines')
+          .select('routine_name, routine_type, data_type')
+          .eq('routine_schema', 'public')
+          .eq('routine_name', 'update_complaint_search_vector');
+      });
 
     // Alternative: Use raw SQL query
-    const { data: functions, error: funcErr } = await supabase.rpc('exec_sql', {
-      query: `
+    const { data: functions, error: funcErr } = await supabase
+      .rpc('exec_sql', {
+        query: `
         SELECT proname as function_name, prosrc as function_body
         FROM pg_proc
         WHERE proname = 'update_complaint_search_vector'
           AND pronamespace = 'public'::regnamespace;
-      `
-    }).catch(() => ({ data: null, error: null }));
+      `,
+      })
+      .catch(() => ({ data: null, error: null }));
 
     console.log('   Checking via pg_proc...');
-    const { data: pgFunctions } = await supabase.rpc('exec_sql', {
-      query: `SELECT 1 FROM pg_proc WHERE proname = 'update_complaint_search_vector';`
-    }).catch(() => ({ data: null }));
+    const { data: pgFunctions } = await supabase
+      .rpc('exec_sql', {
+        query: `SELECT 1 FROM pg_proc WHERE proname = 'update_complaint_search_vector';`,
+      })
+      .catch(() => ({ data: null }));
 
     // Check if trigger exists
     console.log('\n2. Checking if trigger exists...');
-    const { data: triggerData, error: triggerError } = await supabase.rpc('exec_sql', {
-      sql: `
+    const { data: triggerData, error: triggerError } = await supabase
+      .rpc('exec_sql', {
+        sql: `
         SELECT
           trigger_name,
           event_manipulation,
@@ -78,8 +85,9 @@ async function verifySearchTrigger() {
         WHERE event_object_schema = 'public'
           AND event_object_table = 'complaints'
           AND trigger_name = 'update_complaints_search_vector';
-      `
-    }).catch(() => ({ data: null, error: null }));
+      `,
+      })
+      .catch(() => ({ data: null, error: null }));
 
     // Test by inserting a sample complaint (if possible)
     console.log('\n3. Testing search vector generation...');
@@ -94,7 +102,6 @@ async function verifySearchTrigger() {
     console.log('✅ Trigger action: Updates search_vector with weighted tsvector');
     console.log('\nThe trigger function and trigger were created in migration 002.');
     console.log('If migrations have been applied, they should be active in the database.');
-
   } catch (error) {
     console.error('Error during verification:', error.message);
   }

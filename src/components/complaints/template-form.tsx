@@ -44,12 +44,7 @@ interface TemplateFormProps {
   isLoading?: boolean;
 }
 
-export function TemplateForm({
-  template,
-  onSave,
-  onCancel,
-  isLoading = false,
-}: TemplateFormProps) {
+export function TemplateForm({ template, onSave, onCancel, isLoading = false }: TemplateFormProps) {
   const [title, setTitle] = React.useState(template?.title || '');
   const [description, setDescription] = React.useState(template?.description || '');
   const [category, setCategory] = React.useState<ComplaintCategory>(
@@ -95,9 +90,7 @@ export function TemplateForm({
   };
 
   const updateField = (id: string, updates: Partial<TemplateField>) => {
-    setFields(
-      fields.map((field) => (field.id === id ? { ...field, ...updates } : field))
-    );
+    setFields(fields.map((field) => (field.id === id ? { ...field, ...updates } : field)));
   };
 
   const validateForm = (): boolean => {
@@ -193,12 +186,8 @@ export function TemplateForm({
           className="mt-2"
           disabled={isLoading}
         />
-        {errors.title && (
-          <p className="mt-1 text-sm text-destructive">{errors.title}</p>
-        )}
-        <p className="mt-1 text-xs text-muted-foreground">
-          {title.length}/200 characters
-        </p>
+        {errors.title && <p className="mt-1 text-sm text-destructive">{errors.title}</p>}
+        <p className="mt-1 text-xs text-muted-foreground">{title.length}/200 characters</p>
       </div>
 
       {/* Description */}
@@ -216,13 +205,9 @@ export function TemplateForm({
           disabled={isLoading}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-destructive">
-            {errors.description}
-          </p>
+          <p className="mt-1 text-sm text-destructive">{errors.description}</p>
         )}
-        <p className="mt-1 text-xs text-muted-foreground">
-          {description.length}/1000 characters
-        </p>
+        <p className="mt-1 text-xs text-muted-foreground">{description.length}/1000 characters</p>
       </div>
 
       {/* Category and Priority */}
@@ -285,13 +270,7 @@ export function TemplateForm({
       <div>
         <div className="mb-3 flex items-center justify-between">
           <Label>Template Fields</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addField}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={addField} disabled={isLoading}>
             <Plus className="h-4 w-4" />
             Add Field
           </Button>
@@ -300,21 +279,16 @@ export function TemplateForm({
         {fields.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-muted p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              No fields added yet. Click &quot;Add Field&quot; to create custom fields for
-              this template.
+              No fields added yet. Click &quot;Add Field&quot; to create custom fields for this
+              template.
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="rounded-lg border border-border bg-muted p-4"
-              >
+              <div key={field.id} className="rounded-lg border border-border bg-muted p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">
-                    Field {index + 1}
-                  </span>
+                  <span className="text-sm font-medium text-foreground">Field {index + 1}</span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -400,9 +374,7 @@ export function TemplateForm({
                       id={`field-${field.id}-placeholder`}
                       type="text"
                       value={field.placeholder}
-                      onChange={(e) =>
-                        updateField(field.id, { placeholder: e.target.value })
-                      }
+                      onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
                       placeholder="e.g., Enter room number"
                       className="mt-1"
                       disabled={isLoading}
@@ -415,16 +387,11 @@ export function TemplateForm({
                     type="checkbox"
                     id={`field-${field.id}-required`}
                     checked={field.required}
-                    onChange={(e) =>
-                      updateField(field.id, { required: e.target.checked })
-                    }
+                    onChange={(e) => updateField(field.id, { required: e.target.checked })}
                     className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
                     disabled={isLoading}
                   />
-                  <Label
-                    htmlFor={`field-${field.id}-required`}
-                    className="cursor-pointer text-xs"
-                  >
+                  <Label htmlFor={`field-${field.id}-required`} className="cursor-pointer text-xs">
                     Required field
                   </Label>
                 </div>

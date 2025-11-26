@@ -2,10 +2,10 @@
 
 /**
  * Fix Users Table Authentication
- * 
+ *
  * This script fixes the users table trigger to properly handle new user creation
  * by ensuring the trigger function has the correct permissions to bypass RLS.
- * 
+ *
  * Usage: node scripts/fix-users-table-auth.js
  */
 
@@ -59,8 +59,14 @@ async function main() {
   logSection('1. Applying Fix Migration');
 
   // Read the fix migration file
-  const migrationPath = path.join(__dirname, '..', 'supabase', 'migrations', '001_fix_users_table_trigger.sql');
-  
+  const migrationPath = path.join(
+    __dirname,
+    '..',
+    'supabase',
+    'migrations',
+    '001_fix_users_table_trigger.sql'
+  );
+
   if (!fs.existsSync(migrationPath)) {
     log('✗ Migration file not found', 'red');
     log(`  Expected: ${migrationPath}`, 'yellow');
@@ -76,12 +82,12 @@ async function main() {
     if (error) {
       // Try direct execution if RPC doesn't work
       log('  Trying direct SQL execution...', 'yellow');
-      
+
       // Split by semicolon and execute each statement
       const statements = migrationSQL
         .split(';')
-        .map(s => s.trim())
-        .filter(s => s.length > 0 && !s.startsWith('--'));
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0 && !s.startsWith('--'));
 
       for (const statement of statements) {
         const { error: execError } = await supabase.rpc('exec_sql', { sql: statement });
@@ -92,7 +98,6 @@ async function main() {
     }
 
     log('✓ Migration applied successfully', 'green');
-
   } catch (error) {
     log(`⚠ Could not apply migration automatically: ${error.message}`, 'yellow');
     log('\nPlease apply the migration manually:', 'cyan');
@@ -150,7 +155,6 @@ async function main() {
     // Clean up test user
     await supabase.auth.admin.deleteUser(data.user.id);
     log('✓ Test user cleaned up', 'green');
-
   } catch (error) {
     log(`✗ Test failed: ${error.message}`, 'red');
     process.exit(1);

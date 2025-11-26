@@ -2,10 +2,10 @@
 
 /**
  * Test Authentication Functions
- * 
+ *
  * This script tests the authentication helper functions to ensure
  * they work correctly with the Supabase backend.
- * 
+ *
  * Usage: node scripts/test-auth-functions.js
  */
 
@@ -52,13 +52,13 @@ async function main() {
   const invalidEmails = ['invalid', 'test@', '@example.com', 'test @example.com'];
 
   log('Valid emails:', 'cyan');
-  validEmails.forEach(email => {
+  validEmails.forEach((email) => {
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     log(`  ${email}: ${isValid ? '✓' : '✗'}`, isValid ? 'green' : 'red');
   });
 
   log('\nInvalid emails:', 'cyan');
-  invalidEmails.forEach(email => {
+  invalidEmails.forEach((email) => {
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     log(`  ${email}: ${!isValid ? '✓' : '✗'}`, !isValid ? 'green' : 'red');
   });
@@ -80,9 +80,11 @@ async function main() {
     const hasLower = /[a-z]/.test(pwd);
     const hasNumber = /[0-9]/.test(pwd);
     const isValid = hasLength && hasUpper && hasLower && hasNumber;
-    
-    log(`  ${pwd}: ${isValid === valid ? '✓' : '✗'} (${reason})`, 
-        isValid === valid ? 'green' : 'red');
+
+    log(
+      `  ${pwd}: ${isValid === valid ? '✓' : '✗'} (${reason})`,
+      isValid === valid ? 'green' : 'red'
+    );
   });
 
   // Test 3: User Roles
@@ -90,7 +92,7 @@ async function main() {
 
   const roles = ['student', 'lecturer', 'admin'];
   log('Available roles:', 'cyan');
-  roles.forEach(role => {
+  roles.forEach((role) => {
     log(`  ✓ ${role}`, 'green');
   });
 
@@ -131,7 +133,7 @@ async function main() {
 
   try {
     const { data, error } = await supabase.from('users').select('count').limit(1);
-    
+
     if (error) {
       log(`✗ Connection failed: ${error.message}`, 'red');
     } else {

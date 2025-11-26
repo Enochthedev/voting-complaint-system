@@ -1,0 +1,47 @@
+{
+  "version": "5",
+  "remote": {
+    "https://esm.sh/@supabase/supabase-js@2.39.3": "832d7714491bd1c8a9008a332b35cb099f24b451ad79e755ecf4d71985fd6610"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@dicebear/collection@^9.2.4",
+        "npm:@dicebear/core@^9.2.4",
+        "npm:@radix-ui/react-dialog@^1.1.15",
+        "npm:@radix-ui/react-slot@^1.2.4",
+        "npm:@radix-ui/react-tabs@^1.1.13",
+        "npm:@supabase/ssr@0.7",
+        "npm:@supabase/supabase-js@^2.83.0",
+        "npm:@tailwindcss/postcss@4",
+        "npm:@tiptap/extension-character-count@^3.11.0",
+        "npm:@tiptap/extension-placeholder@^3.11.0",
+        "npm:@tiptap/react@^3.11.0",
+        "npm:@tiptap/starter-kit@^3.11.0",
+        "npm:@types/jszip@^3.4.0",
+        "npm:@types/node@20",
+        "npm:@types/react-dom@19",
+        "npm:@types/react@19",
+        "npm:babel-plugin-react-compiler@1.0.0",
+        "npm:class-variance-authority@~0.7.1",
+        "npm:clsx@^2.1.1",
+        "npm:dotenv@^17.2.3",
+        "npm:eslint-config-next@16.0.3",
+        "npm:eslint-config-prettier@^10.1.8",
+        "npm:eslint-plugin-prettier@^5.5.4",
+        "npm:eslint@9",
+        "npm:jspdf-autotable@^5.0.2",
+        "npm:jspdf@^3.0.4",
+        "npm:jszip@^3.10.1",
+        "npm:lucide-react@0.554",
+        "npm:next@16.0.3",
+        "npm:prettier@^3.6.2",
+        "npm:react-dom@19.2.0",
+        "npm:react@19.2.0",
+        "npm:tailwind-merge@^3.4.0",
+        "npm:tailwindcss@4",
+        "npm:typescript@5"
+      ]
+    }
+  }
+}

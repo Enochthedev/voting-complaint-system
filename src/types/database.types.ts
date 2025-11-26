@@ -29,7 +29,8 @@ export type HistoryAction =
   | 'comment_added'
   | 'reopened'
   | 'escalated'
-  | 'rated';
+  | 'rated'
+  | 'tags_added';
 
 export type NotificationType =
   | 'complaint_opened'

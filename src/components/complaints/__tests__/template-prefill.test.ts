@@ -1,21 +1,26 @@
 /**
  * Template Pre-fill Functionality Tests
- * 
+ *
  * Tests for Task 4.3: Pre-fill form fields from template
- * 
+ *
  * This test suite verifies that when a user selects a complaint template,
  * all relevant form fields are automatically pre-filled with appropriate values.
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ComplaintTemplate, ComplaintCategory, ComplaintPriority } from '@/types/database.types';
+import type {
+  ComplaintTemplate,
+  ComplaintCategory,
+  ComplaintPriority,
+} from '@/types/database.types';
 
 describe('Template Pre-fill Functionality', () => {
   // Mock template data
   const mockTemplate: ComplaintTemplate = {
     id: '1',
     title: 'Broken Equipment in Lab',
-    description: 'Template for reporting broken or malfunctioning equipment in laboratory facilities',
+    description:
+      'Template for reporting broken or malfunctioning equipment in laboratory facilities',
     category: 'facilities' as ComplaintCategory,
     suggested_priority: 'high' as ComplaintPriority,
     fields: {
@@ -69,13 +74,15 @@ describe('Template Pre-fill Functionality', () => {
       // The description should start with the template description
       const description = buildDescriptionFromTemplate(mockTemplate);
       expect(description).toContain(mockTemplate.description);
-      expect(description).toContain('<strong>Template for reporting broken or malfunctioning equipment in laboratory facilities</strong>');
+      expect(description).toContain(
+        '<strong>Template for reporting broken or malfunctioning equipment in laboratory facilities</strong>'
+      );
     });
 
     it('should include all template fields in description', () => {
       // The description should include all fields defined in the template
       const description = buildDescriptionFromTemplate(mockTemplate);
-      
+
       expect(description).toContain('Equipment Name');
       expect(description).toContain('Lab Room');
       expect(description).toContain('Issue Description');
@@ -84,7 +91,7 @@ describe('Template Pre-fill Functionality', () => {
     it('should mark required fields in description', () => {
       // Required fields should be marked as (Required)
       const description = buildDescriptionFromTemplate(mockTemplate);
-      
+
       expect(description).toContain('Equipment Name (Required)');
       expect(description).toContain('Lab Room (Required)');
       expect(description).toContain('Issue Description (Required)');
@@ -93,7 +100,7 @@ describe('Template Pre-fill Functionality', () => {
     it('should include field placeholders in description', () => {
       // Field placeholders should be included to guide the user
       const description = buildDescriptionFromTemplate(mockTemplate);
-      
+
       expect(description).toContain('e.g., Microscope, Computer');
       expect(description).toContain('e.g., Lab 301');
       expect(description).toContain('Describe the problem');
@@ -123,14 +130,14 @@ describe('Template Pre-fill Functionality', () => {
     it('should suggest tags based on template category', () => {
       // Tags should be suggested based on the template category
       const tags = getSuggestedTagsForTemplate(mockTemplate);
-      
+
       expect(tags).toContain('facilities');
     });
 
     it('should suggest tags based on template title keywords', () => {
       // Tags should be suggested based on keywords in the template title
       const tags = getSuggestedTagsForTemplate(mockTemplate);
-      
+
       // "Broken Equipment in Lab" should suggest 'equipment' tag
       expect(tags).toContain('equipment');
     });
@@ -139,7 +146,7 @@ describe('Template Pre-fill Functionality', () => {
       // The tag list should not contain duplicates
       const tags = getSuggestedTagsForTemplate(mockTemplate);
       const uniqueTags = [...new Set(tags)];
-      
+
       expect(tags.length).toBe(uniqueTags.length);
     });
 
@@ -244,30 +251,30 @@ describe('Template Pre-fill Functionality', () => {
 
 function buildDescriptionFromTemplate(template: ComplaintTemplate): string {
   let description = `<p><strong>${template.description}</strong></p><br/>`;
-  
+
   if (template.fields && typeof template.fields === 'object') {
     description += '<p><strong>Please provide the following information:</strong></p><br/>';
-    
+
     Object.entries(template.fields).forEach(([fieldName, fieldConfig]: [string, any]) => {
       const label = fieldConfig.label || fieldName;
       const placeholder = fieldConfig.placeholder || '';
       const required = fieldConfig.required ? ' (Required)' : ' (Optional)';
-      
+
       description += `<p><strong>${label}${required}:</strong></p>`;
       description += `<p><em>${placeholder || 'Enter information here...'}</em></p><br/>`;
     });
   }
-  
+
   return description;
 }
 
 function getSuggestedTagsForTemplate(template: ComplaintTemplate): string[] {
   const tags: string[] = [];
-  
+
   // Add category-based tag
   const categoryTag = template.category.replace('_', '-');
   tags.push(categoryTag);
-  
+
   // Add tags based on template title keywords
   const titleLower = template.title.toLowerCase();
   if (titleLower.includes('equipment') || titleLower.includes('lab')) {
@@ -288,7 +295,7 @@ function getSuggestedTagsForTemplate(template: ComplaintTemplate): string[] {
   if (titleLower.includes('parking')) {
     tags.push('parking');
   }
-  
+
   // Remove duplicates and return
   return [...new Set(tags)];
 }

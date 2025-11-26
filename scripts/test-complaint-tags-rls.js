@@ -25,14 +25,16 @@ async function testComplaintTagsRLS() {
   try {
     // 1. Check if RLS is enabled
     console.log('1. Checking if RLS is enabled on complaint_tags table...');
-    const { data: rlsStatus, error: rlsError } = await supabase.rpc('exec_sql', {
-      sql: `
+    const { data: rlsStatus, error: rlsError } = await supabase
+      .rpc('exec_sql', {
+        sql: `
         SELECT relrowsecurity as rls_enabled
         FROM pg_class
         WHERE relname = 'complaint_tags'
         AND relnamespace = 'public'::regnamespace;
-      `
-    }).single();
+      `,
+      })
+      .single();
 
     if (rlsError) {
       console.log('   ℹ️  RLS status is enforced at the database level');
@@ -50,48 +52,45 @@ async function testComplaintTagsRLS() {
 
     if (policiesError) {
       console.log('   ℹ️  Using direct query to check policies...');
-      
+
       // Alternative: Check if the table exists and has policies
-      const { data: tableExists } = await supabase
-        .from('complaint_tags')
-        .select('id')
-        .limit(0);
-      
+      const { data: tableExists } = await supabase.from('complaint_tags').select('id').limit(0);
+
       if (tableExists !== null) {
         console.log('   ✓ complaint_tags table exists and is accessible');
       }
     } else if (policies && policies.length > 0) {
       console.log(`   Found ${policies.length} RLS policies:\n`);
-      
-      const selectPolicies = policies.filter(p => p.cmd === 'SELECT');
-      const insertPolicies = policies.filter(p => p.cmd === 'INSERT');
-      const deletePolicies = policies.filter(p => p.cmd === 'DELETE');
-      
+
+      const selectPolicies = policies.filter((p) => p.cmd === 'SELECT');
+      const insertPolicies = policies.filter((p) => p.cmd === 'INSERT');
+      const deletePolicies = policies.filter((p) => p.cmd === 'DELETE');
+
       if (selectPolicies.length > 0) {
         console.log('   SELECT Policies:');
-        selectPolicies.forEach(p => console.log(`     ✓ ${p.policyname}`));
+        selectPolicies.forEach((p) => console.log(`     ✓ ${p.policyname}`));
       }
-      
+
       if (insertPolicies.length > 0) {
         console.log('\n   INSERT Policies:');
-        insertPolicies.forEach(p => console.log(`     ✓ ${p.policyname}`));
+        insertPolicies.forEach((p) => console.log(`     ✓ ${p.policyname}`));
       }
-      
+
       if (deletePolicies.length > 0) {
         console.log('\n   DELETE Policies:');
-        deletePolicies.forEach(p => console.log(`     ✓ ${p.policyname}`));
+        deletePolicies.forEach((p) => console.log(`     ✓ ${p.policyname}`));
       }
     }
 
     // 3. Verify required policy coverage
     console.log('\n3. Verifying required policy coverage...');
-    
+
     const requiredPolicies = [
       'Users view tags on accessible complaints',
       'Students add tags to own complaints',
       'Lecturers add tags to complaints',
       'Students delete tags from own complaints',
-      'Lecturers delete tags from complaints'
+      'Lecturers delete tags from complaints',
     ];
 
     console.log('   ✓ Students can view tags on their own complaints');
@@ -103,7 +102,7 @@ async function testComplaintTagsRLS() {
 
     // 4. Test data integrity constraints
     console.log('\n4. Testing data integrity constraints...');
-    
+
     // Check unique constraint
     const { data: constraints } = await supabase.rpc('exec_sql', {
       sql: `
@@ -112,7 +111,7 @@ async function testComplaintTagsRLS() {
         WHERE conrelid = 'public.complaint_tags'::regclass
         AND contype = 'u'
         AND conname = 'unique_complaint_tag';
-      `
+      `,
     });
 
     if (constraints || constraints === null) {
@@ -127,7 +126,7 @@ async function testComplaintTagsRLS() {
         WHERE conrelid = 'public.complaint_tags'::regclass
         AND contype = 'f'
         AND confrelid = 'public.complaints'::regclass;
-      `
+      `,
     });
 
     if (fkConstraints || fkConstraints === null) {
@@ -143,7 +142,7 @@ async function testComplaintTagsRLS() {
     console.log('  ✓ INSERT: Lecturers/Admins add tags to any complaint');
     console.log('  ✓ DELETE: Students delete tags from own complaints');
     console.log('  ✓ DELETE: Lecturers/Admins delete tags from any complaint');
-    
+
     console.log('\nData Integrity Constraints:');
     console.log('  ✓ Unique constraint prevents duplicate tags per complaint');
     console.log('  ✓ Foreign key ensures tags reference valid complaints');
@@ -151,7 +150,6 @@ async function testComplaintTagsRLS() {
 
     console.log('\n✅ All RLS policies for complaint_tags table are properly configured!\n');
     console.log('Test completed successfully!\n');
-
   } catch (error) {
     console.error('\n❌ Error during RLS policy testing:', error.message);
     process.exit(1);

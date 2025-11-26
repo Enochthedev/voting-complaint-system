@@ -36,7 +36,10 @@ console.log(`🔧 Executing migration for project: ${projectRef}\n`);
 async function executeMigration() {
   try {
     // Read the migration file
-    const migrationPath = join(__dirname, '../supabase/migrations/022_fix_complaint_comments_rls.sql');
+    const migrationPath = join(
+      __dirname,
+      '../supabase/migrations/022_fix_complaint_comments_rls.sql'
+    );
     const migrationSQL = readFileSync(migrationPath, 'utf8');
 
     console.log('📄 Migration file loaded');
@@ -47,11 +50,11 @@ async function executeMigration() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseServiceKey,
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-        'Prefer': 'return=minimal'
+        apikey: supabaseServiceKey,
+        Authorization: `Bearer ${supabaseServiceKey}`,
+        Prefer: 'return=minimal',
       },
-      body: JSON.stringify({ query: migrationSQL })
+      body: JSON.stringify({ query: migrationSQL }),
     });
 
     if (!response.ok) {
@@ -65,7 +68,6 @@ async function executeMigration() {
 
     console.log('✅ Migration executed successfully!');
     return true;
-
   } catch (error) {
     console.error('❌ Error:', error.message);
     console.log('\n📋 Please apply the migration manually via Supabase Dashboard');
@@ -75,7 +77,7 @@ async function executeMigration() {
 }
 
 executeMigration()
-  .then(success => {
+  .then((success) => {
     if (success) {
       console.log('\n📝 Next step: Run test script');
       console.log('   node scripts/test-complaint-comments-rls.js');
@@ -84,7 +86,7 @@ executeMigration()
       process.exit(1);
     }
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Execution failed:', error);
     process.exit(1);
   });

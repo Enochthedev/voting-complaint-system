@@ -2,7 +2,7 @@
 
 /**
  * Verify Announcements Table RLS Policies
- * 
+ *
  * This script verifies that all RLS policies for the announcements table
  * are correctly configured according to the design specifications.
  */
@@ -31,17 +31,16 @@ async function verifyAnnouncementsRLS() {
 
   try {
     // Check if RLS is enabled
-    const { data: tableInfo, error: tableError } = await supabase
-      .rpc('exec_sql', {
-        sql: `
+    const { data: tableInfo, error: tableError } = await supabase.rpc('exec_sql', {
+      sql: `
           SELECT 
             schemaname,
             tablename,
             rowsecurity as rls_enabled
           FROM pg_tables
           WHERE schemaname = 'public' AND tablename = 'announcements';
-        `
-      });
+        `,
+    });
 
     if (tableError) {
       console.log('❌ Error checking table:', tableError.message);
@@ -53,9 +52,8 @@ async function verifyAnnouncementsRLS() {
     }
 
     // Check policies
-    const { data: policies, error: policiesError } = await supabase
-      .rpc('exec_sql', {
-        sql: `
+    const { data: policies, error: policiesError } = await supabase.rpc('exec_sql', {
+      sql: `
           SELECT 
             policyname,
             cmd,
@@ -65,15 +63,15 @@ async function verifyAnnouncementsRLS() {
           FROM pg_policies
           WHERE schemaname = 'public' AND tablename = 'announcements'
           ORDER BY policyname;
-        `
-      });
+        `,
+    });
 
     if (policiesError) {
       console.log('❌ Error fetching policies:', policiesError.message);
       console.log('');
       console.log('Please run the following SQL query manually:');
       console.log('');
-      console.log('SELECT * FROM pg_policies WHERE tablename = \'announcements\';');
+      console.log("SELECT * FROM pg_policies WHERE tablename = 'announcements';");
       console.log('');
       return;
     }
@@ -91,12 +89,12 @@ async function verifyAnnouncementsRLS() {
     }
 
     console.log(`✅ Found ${policies.length} RLS policies:\n`);
-    
+
     const expectedPolicies = [
       { name: 'All users view announcements', cmd: 'SELECT' },
       { name: 'Lecturers create announcements', cmd: 'INSERT' },
       { name: 'Lecturers update own announcements', cmd: 'UPDATE' },
-      { name: 'Lecturers delete own announcements', cmd: 'DELETE' }
+      { name: 'Lecturers delete own announcements', cmd: 'DELETE' },
     ];
 
     policies.forEach((policy, index) => {
@@ -109,14 +107,15 @@ async function verifyAnnouncementsRLS() {
     // Verify expected policies exist
     console.log('Verification Summary:');
     console.log('-'.repeat(60));
-    
+
     let allPoliciesFound = true;
-    expectedPolicies.forEach(expected => {
-      const found = policies.some(p => 
-        p.policyname.toLowerCase().includes(expected.name.toLowerCase().split(' ')[0]) &&
-        p.cmd === expected.cmd
+    expectedPolicies.forEach((expected) => {
+      const found = policies.some(
+        (p) =>
+          p.policyname.toLowerCase().includes(expected.name.toLowerCase().split(' ')[0]) &&
+          p.cmd === expected.cmd
       );
-      
+
       if (found) {
         console.log(`✅ ${expected.name} (${expected.cmd})`);
       } else {
@@ -131,7 +130,6 @@ async function verifyAnnouncementsRLS() {
     } else {
       console.log('❌ Some required RLS policies are missing!');
     }
-
   } catch (error) {
     console.error('❌ Error:', error.message);
   }

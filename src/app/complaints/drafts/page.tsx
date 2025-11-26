@@ -27,9 +27,35 @@ const mockDrafts = [
   },
 ];
 
+import { AppLayout } from '@/components/layout/app-layout';
+import { useAuth } from '@/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
+
 export default function DraftsPage() {
   const router = useRouter();
+  const { user, isLoading: authLoading, error: authError } = useAuth();
   const [drafts, setDrafts] = React.useState(mockDrafts);
+
+  React.useEffect(() => {
+    if (!authLoading && !user && !authError) {
+      router.push('/login');
+    }
+  }, [user, authLoading, authError, router]);
+
+  if (authLoading || !user) {
+    return (
+      <AppLayout
+        userRole={(user?.role as any) || 'student'}
+        userName={user?.full_name || 'Loading...'}
+        userEmail={user?.email || ''}
+      >
+        <div className="space-y-6">
+          <Skeleton className="h-12 w-[300px]" />
+          <Skeleton className="h-96" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   const handleContinue = (draftId: string) => {
     // TODO: Navigate to edit page with draft data in Phase 12
@@ -76,7 +102,9 @@ export default function DraftsPage() {
     return labels[category] || category;
   };
 
-  const getPriorityVariant = (priority: string): 'secondary' | 'default' | 'destructive' | 'outline' => {
+  const getPriorityVariant = (
+    priority: string
+  ): 'secondary' | 'default' | 'destructive' | 'outline' => {
     const variants: Record<string, 'secondary' | 'default' | 'destructive' | 'outline'> = {
       low: 'secondary',
       medium: 'default',
@@ -87,7 +115,7 @@ export default function DraftsPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
+    <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Draft Complaints</h1>
         <p className="mt-2 text-muted-foreground">
@@ -100,8 +128,8 @@ export default function DraftsPage() {
           <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-semibold text-foreground">No drafts saved</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            You don&apos;t have any draft complaints. Start a new complaint and save it as
-            a draft to continue later.
+            You don&apos;t have any draft complaints. Start a new complaint and save it as a draft
+            to continue later.
           </p>
           <Button className="mt-6" onClick={() => router.push('/complaints/new')}>
             Create New Complaint
@@ -110,26 +138,17 @@ export default function DraftsPage() {
       ) : (
         <div className="space-y-4">
           {drafts.map((draft) => (
-            <Card
-              key={draft.id}
-              className="p-6 transition-shadow hover:shadow-md"
-            >
+            <Card key={draft.id} className="p-6 transition-shadow hover:shadow-md">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-semibold truncate text-foreground">{draft.title}</h3>
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                    <Badge variant="secondary">
-                      {getCategoryLabel(draft.category)}
-                    </Badge>
+                    <Badge variant="secondary">{getCategoryLabel(draft.category)}</Badge>
                     <Badge variant={getPriorityVariant(draft.priority)}>
                       {draft.priority.charAt(0).toUpperCase() + draft.priority.slice(1)}
                     </Badge>
                     {draft.tags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="outline"
-                        className="text-muted-foreground"
-                      >
+                      <Badge key={tag} variant="outline" className="text-muted-foreground">
                         #{tag}
                       </Badge>
                     ))}
@@ -140,11 +159,7 @@ export default function DraftsPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleContinue(draft.id)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => handleContinue(draft.id)}>
                     Continue
                   </Button>
                   <Button
@@ -167,6 +182,6 @@ export default function DraftsPage() {
           Back to Dashboard
         </Button>
       </div>
-    </div>
+    </AppLayout>
   );
 }

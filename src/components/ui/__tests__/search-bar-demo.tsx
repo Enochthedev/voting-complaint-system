@@ -5,7 +5,7 @@ import { SearchBar, SearchSuggestion } from '@/components/ui/search-bar';
 
 /**
  * Search Bar Demo Component
- * 
+ *
  * Demonstrates the SearchBar component with mock data and functionality.
  * This shows how the search bar will work once integrated with the backend.
  */
@@ -30,9 +30,7 @@ export function SearchBarDemo() {
     ];
 
     // Filter suggestions based on input
-    return allSuggestions.filter((s) =>
-      s.text.toLowerCase().includes(searchValue.toLowerCase())
-    );
+    return allSuggestions.filter((s) => s.text.toLowerCase().includes(searchValue.toLowerCase()));
   }, [searchValue]);
 
   // Mock search handler
@@ -61,12 +59,9 @@ export function SearchBarDemo() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h2 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          Search Bar Demo
-        </h2>
+        <h2 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-50">Search Bar Demo</h2>
         <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-          Try typing to see autocomplete suggestions. Press Enter or click a
-          suggestion to search.
+          Try typing to see autocomplete suggestions. Press Enter or click a suggestion to search.
         </p>
 
         {/* Search Bar */}

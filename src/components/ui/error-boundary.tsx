@@ -17,18 +17,15 @@ interface ErrorBoundaryState {
 
 /**
  * Error Boundary Component
- * 
+ *
  * Catches JavaScript errors anywhere in the child component tree,
  * logs those errors, and displays a fallback UI.
- * 
+ *
  * @param children - Child components to wrap
  * @param fallback - Optional custom fallback UI
  * @param onError - Optional error handler callback
  */
-export class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -40,7 +37,7 @@ export class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
-    
+
     // Call optional error handler
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -65,7 +62,7 @@ export class ErrorBoundary extends React.Component<
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
               <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
-            
+
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-red-900 dark:text-red-50">
                 Something went wrong
@@ -84,17 +81,10 @@ export class ErrorBoundary extends React.Component<
             )}
 
             <div className="flex gap-3">
-              <Button
-                onClick={this.handleReset}
-                variant="outline"
-                className="flex-1"
-              >
+              <Button onClick={this.handleReset} variant="outline" className="flex-1">
                 Try Again
               </Button>
-              <Button
-                onClick={() => window.location.reload()}
-                className="flex-1"
-              >
+              <Button onClick={() => window.location.reload()} className="flex-1">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Reload Page
               </Button>
@@ -110,7 +100,7 @@ export class ErrorBoundary extends React.Component<
 
 /**
  * Error Display Component
- * 
+ *
  * Displays error messages in a consistent format.
  */
 export function ErrorDisplay({
@@ -131,17 +121,10 @@ export function ErrorDisplay({
       <div className="flex items-start gap-3">
         <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
         <div className="flex-1 space-y-2">
-          <h3 className="font-semibold text-red-900 dark:text-red-50">
-            {title}
-          </h3>
+          <h3 className="font-semibold text-red-900 dark:text-red-50">{title}</h3>
           <p className="text-sm text-red-700 dark:text-red-200">{message}</p>
           {onRetry && (
-            <Button
-              onClick={onRetry}
-              variant="outline"
-              size="sm"
-              className="mt-3"
-            >
+            <Button onClick={onRetry} variant="outline" size="sm" className="mt-3">
               Try Again
             </Button>
           )}

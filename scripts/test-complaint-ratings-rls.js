@@ -2,7 +2,7 @@
 
 /**
  * Test script for complaint_ratings RLS policies
- * 
+ *
  * This script tests:
  * 1. Students can rate their own resolved complaints
  * 2. Students cannot rate complaints that aren't resolved
@@ -97,9 +97,24 @@ async function setup() {
 
   // Insert users into public.users table
   await adminClient.from('users').insert([
-    { id: testStudent1.id, email: testStudent1.email, role: 'student', full_name: 'Test Student 1' },
-    { id: testStudent2.id, email: testStudent2.email, role: 'student', full_name: 'Test Student 2' },
-    { id: testLecturer.id, email: testLecturer.email, role: 'lecturer', full_name: 'Test Lecturer' },
+    {
+      id: testStudent1.id,
+      email: testStudent1.email,
+      role: 'student',
+      full_name: 'Test Student 1',
+    },
+    {
+      id: testStudent2.id,
+      email: testStudent2.email,
+      role: 'student',
+      full_name: 'Test Student 2',
+    },
+    {
+      id: testLecturer.id,
+      email: testLecturer.email,
+      role: 'lecturer',
+      full_name: 'Test Lecturer',
+    },
   ]);
 
   // Get access tokens
@@ -172,7 +187,10 @@ async function cleanup() {
 
   // Delete test data (cascade will handle related records)
   await adminClient.from('complaints').delete().in('id', [testComplaint1.id, testComplaint2.id]);
-  await adminClient.from('users').delete().in('id', [testStudent1.id, testStudent2.id, testLecturer.id]);
+  await adminClient
+    .from('users')
+    .delete()
+    .in('id', [testStudent1.id, testStudent2.id, testLecturer.id]);
 
   // Delete auth users
   await adminClient.auth.admin.deleteUser(testStudent1.id);
@@ -246,7 +264,7 @@ async function runTests() {
   console.log('');
 
   // Test 3: Student cannot rate another student's complaint
-  console.log('Test 3: Student cannot rate another student\'s complaint');
+  console.log("Test 3: Student cannot rate another student's complaint");
   try {
     const student2Client = createUserClient(student2Token);
     const { data, error } = await student2Client
@@ -261,14 +279,14 @@ async function runTests() {
       .single();
 
     if (error) {
-      console.log('✅ PASSED: Student correctly prevented from rating another student\'s complaint');
+      console.log("✅ PASSED: Student correctly prevented from rating another student's complaint");
       passedTests++;
     } else {
-      console.error('❌ FAILED: Student should not be able to rate another student\'s complaint');
+      console.error("❌ FAILED: Student should not be able to rate another student's complaint");
       failedTests++;
     }
   } catch (error) {
-    console.log('✅ PASSED: Student correctly prevented from rating another student\'s complaint');
+    console.log("✅ PASSED: Student correctly prevented from rating another student's complaint");
     passedTests++;
   }
   console.log('');
@@ -299,7 +317,7 @@ async function runTests() {
   console.log('');
 
   // Test 5: Student cannot view other students' ratings
-  console.log('Test 5: Student cannot view other students\' ratings');
+  console.log("Test 5: Student cannot view other students' ratings");
   try {
     const student2Client = createUserClient(student2Token);
     const { data, error } = await student2Client
@@ -308,14 +326,14 @@ async function runTests() {
       .eq('student_id', testStudent1.id);
 
     if (error || (data && data.length === 0)) {
-      console.log('✅ PASSED: Student correctly prevented from viewing other students\' ratings');
+      console.log("✅ PASSED: Student correctly prevented from viewing other students' ratings");
       passedTests++;
     } else {
-      console.error('❌ FAILED: Student should not be able to view other students\' ratings');
+      console.error("❌ FAILED: Student should not be able to view other students' ratings");
       failedTests++;
     }
   } catch (error) {
-    console.log('✅ PASSED: Student correctly prevented from viewing other students\' ratings');
+    console.log("✅ PASSED: Student correctly prevented from viewing other students' ratings");
     passedTests++;
   }
   console.log('');
@@ -324,9 +342,7 @@ async function runTests() {
   console.log('Test 6: Lecturer can view all ratings');
   try {
     const lecturerClient = createUserClient(lecturerToken);
-    const { data, error } = await lecturerClient
-      .from('complaint_ratings')
-      .select('*');
+    const { data, error } = await lecturerClient.from('complaint_ratings').select('*');
 
     if (error) {
       console.error('❌ FAILED:', error.message);
@@ -348,7 +364,7 @@ async function runTests() {
   console.log('Test 7: Student can update their own rating');
   try {
     const student1Client = createUserClient(student1Token);
-    
+
     // First get the rating ID
     const { data: ratingData } = await student1Client
       .from('complaint_ratings')

@@ -1,9 +1,9 @@
 /**
  * Empty Search Results Handling Tests
- * 
+ *
  * Tests for verifying that empty search results are handled properly
  * with helpful feedback and suggestions for users.
- * 
+ *
  * Validates: AC13 (Search and Advanced Filtering)
  */
 
@@ -111,7 +111,7 @@ describe('Empty Search Results Handling', () => {
 
   describe('Search Query Display', () => {
     it('should display the search query in the empty message', () => {
-      const searchQuery = "broken wifi";
+      const searchQuery = 'broken wifi';
 
       render(
         <ComplaintList
@@ -126,7 +126,7 @@ describe('Empty Search Results Handling', () => {
     });
 
     it('should handle special characters in search query', () => {
-      const searchQuery = "test & special <chars>";
+      const searchQuery = 'test & special <chars>';
 
       render(
         <ComplaintList
@@ -154,11 +154,7 @@ describe('Empty Search Results Handling', () => {
       );
 
       const { container: regularContainer } = render(
-        <ComplaintList
-          complaints={[]}
-          isSearchResult={false}
-          emptyMessage="No complaints"
-        />
+        <ComplaintList complaints={[]} isSearchResult={false} emptyMessage="No complaints" />
       );
 
       // Search result should have suggestions section
@@ -212,13 +208,7 @@ describe('Empty Search Results Handling', () => {
     });
 
     it('should handle undefined search query', () => {
-      render(
-        <ComplaintList
-          complaints={[]}
-          isSearchResult={true}
-          emptyMessage="No results"
-        />
-      );
+      render(<ComplaintList complaints={[]} isSearchResult={true} emptyMessage="No results" />);
 
       // Should still show suggestions even without explicit query
       expect(screen.getByText('Try these suggestions:')).toBeInTheDocument();

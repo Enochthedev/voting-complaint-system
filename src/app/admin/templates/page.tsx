@@ -17,14 +17,19 @@ import {
   CheckCircle,
   Loader2,
 } from 'lucide-react';
-import type { ComplaintTemplate, ComplaintCategory, ComplaintPriority } from '@/types/database.types';
+import type {
+  ComplaintTemplate,
+  ComplaintCategory,
+  ComplaintPriority,
+} from '@/types/database.types';
 
 // Mock templates data for UI development
 const mockTemplates: ComplaintTemplate[] = [
   {
     id: '1',
     title: 'Broken Equipment in Lab',
-    description: 'Template for reporting broken or malfunctioning equipment in laboratory facilities',
+    description:
+      'Template for reporting broken or malfunctioning equipment in laboratory facilities',
     category: 'facilities',
     suggested_priority: 'high',
     fields: {
@@ -141,8 +146,7 @@ export default function TemplateManagementPage() {
         template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         template.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesCategory =
-        filterCategory === 'all' || template.category === filterCategory;
+      const matchesCategory = filterCategory === 'all' || template.category === filterCategory;
 
       const matchesStatus =
         filterStatus === 'all' ||
@@ -386,8 +390,8 @@ export default function TemplateManagementPage() {
                       </div>
                     </div>
                     <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
-                      Created: {new Date(template.created_at).toLocaleDateString()} • Last
-                      updated: {new Date(template.updated_at).toLocaleDateString()}
+                      Created: {new Date(template.created_at).toLocaleDateString()} • Last updated:{' '}
+                      {new Date(template.updated_at).toLocaleDateString()}
                     </div>
                   </div>
 
@@ -444,10 +448,7 @@ export default function TemplateManagementPage() {
                 <Button variant="outline" onClick={() => setDeletingTemplate(null)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDelete(deletingTemplate)}
-                >
+                <Button variant="destructive" onClick={() => handleDelete(deletingTemplate)}>
                   Delete
                 </Button>
               </div>

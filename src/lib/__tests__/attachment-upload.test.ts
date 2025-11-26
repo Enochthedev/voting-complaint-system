@@ -1,12 +1,12 @@
 /**
  * Attachment Upload Tests
- * 
+ *
  * Tests for attachment upload functionality including:
  * - File upload to Supabase Storage
  * - Metadata storage in database
  * - Error handling and cleanup
  * - URL generation and file deletion
- * 
+ *
  * Note: These tests will be executed once the test environment is configured.
  */
 
@@ -92,17 +92,11 @@ describe('uploadAttachment', () => {
   });
 
   it('should sanitize file names', async () => {
-    const fileWithSpecialChars = new File(
-      ['test'],
-      'test file (1) [copy].pdf',
-      { type: 'application/pdf' }
-    );
+    const fileWithSpecialChars = new File(['test'], 'test file (1) [copy].pdf', {
+      type: 'application/pdf',
+    });
 
-    const result = await uploadAttachment(
-      fileWithSpecialChars,
-      mockComplaintId,
-      mockUserId
-    );
+    const result = await uploadAttachment(fileWithSpecialChars, mockComplaintId, mockUserId);
 
     if (result.success && result.attachment) {
       // File path should have sanitized name
@@ -130,11 +124,7 @@ describe('uploadMultipleAttachments', () => {
   const mockUserId = 'user-456';
 
   it('should upload multiple files sequentially', async () => {
-    const results = await uploadMultipleAttachments(
-      mockFiles,
-      mockComplaintId,
-      mockUserId
-    );
+    const results = await uploadMultipleAttachments(mockFiles, mockComplaintId, mockUserId);
 
     expect(results).toHaveLength(3);
     results.forEach((result) => {
@@ -146,12 +136,7 @@ describe('uploadMultipleAttachments', () => {
   it('should call progress callback for each file', async () => {
     const progressCallback = vi.fn();
 
-    await uploadMultipleAttachments(
-      mockFiles,
-      mockComplaintId,
-      mockUserId,
-      progressCallback
-    );
+    await uploadMultipleAttachments(mockFiles, mockComplaintId, mockUserId, progressCallback);
 
     // Should be called for each file
     expect(progressCallback).toHaveBeenCalledTimes(mockFiles.length);
@@ -159,11 +144,7 @@ describe('uploadMultipleAttachments', () => {
 
   it('should continue uploading even if one file fails', async () => {
     // If one file fails, others should still be attempted
-    const results = await uploadMultipleAttachments(
-      mockFiles,
-      mockComplaintId,
-      mockUserId
-    );
+    const results = await uploadMultipleAttachments(mockFiles, mockComplaintId, mockUserId);
 
     expect(results).toHaveLength(mockFiles.length);
   });
@@ -340,11 +321,7 @@ describe('Error Handling and Edge Cases', () => {
 
   it('should handle empty file names', async () => {
     const fileWithEmptyName = new File(['test'], '', { type: 'application/pdf' });
-    const result = await uploadAttachment(
-      fileWithEmptyName,
-      'complaint-123',
-      'user-456'
-    );
+    const result = await uploadAttachment(fileWithEmptyName, 'complaint-123', 'user-456');
 
     // Should handle gracefully
     expect(result).toBeDefined();
@@ -352,17 +329,11 @@ describe('Error Handling and Edge Cases', () => {
 
   it('should handle special characters in file names', async () => {
     const specialChars = '!@#$%^&*()[]{}|\\/<>?:";\'';
-    const fileWithSpecialChars = new File(
-      ['test'],
-      `test${specialChars}.pdf`,
-      { type: 'application/pdf' }
-    );
+    const fileWithSpecialChars = new File(['test'], `test${specialChars}.pdf`, {
+      type: 'application/pdf',
+    });
 
-    const result = await uploadAttachment(
-      fileWithSpecialChars,
-      'complaint-123',
-      'user-456'
-    );
+    const result = await uploadAttachment(fileWithSpecialChars, 'complaint-123', 'user-456');
 
     if (result.success && result.attachment) {
       // Special characters should be sanitized
@@ -378,11 +349,7 @@ describe('Integration Tests', () => {
     });
 
     // Upload
-    const uploadResult = await uploadAttachment(
-      mockFile,
-      'complaint-123',
-      'user-456'
-    );
+    const uploadResult = await uploadAttachment(mockFile, 'complaint-123', 'user-456');
 
     if (uploadResult.success && uploadResult.attachment) {
       // Download
@@ -405,20 +372,14 @@ describe('Integration Tests', () => {
   it('should maintain data consistency between storage and database', async () => {
     const mockFile = new File(['test'], 'test.pdf', { type: 'application/pdf' });
 
-    const uploadResult = await uploadAttachment(
-      mockFile,
-      'complaint-123',
-      'user-456'
-    );
+    const uploadResult = await uploadAttachment(mockFile, 'complaint-123', 'user-456');
 
     if (uploadResult.success && uploadResult.attachment) {
       // Verify database record
       const attachments = await getComplaintAttachments('complaint-123');
       expect(attachments).toBeDefined();
 
-      const found = attachments?.find(
-        (a) => a.id === uploadResult.attachment?.id
-      );
+      const found = attachments?.find((a) => a.id === uploadResult.attachment?.id);
       expect(found).toBeDefined();
       expect(found?.file_name).toBe(mockFile.name);
       expect(found?.file_size).toBe(mockFile.size);

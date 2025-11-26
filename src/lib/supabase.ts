@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 // Validate environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -13,17 +13,5 @@ if (!supabaseAnonKey) {
 }
 
 // Create a single supabase client for interacting with your database
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    // Persist session in local storage
-    persistSession: true,
-    // Automatically refresh token when it expires
-    autoRefreshToken: true,
-    // Detect session from URL (for OAuth callbacks)
-    detectSessionInUrl: true,
-    // Storage key for session
-    storageKey: 'student-complaint-auth',
-    // Flow type for authentication
-    flowType: 'pkce',
-  },
-});
+// Using createBrowserClient from @supabase/ssr for proper cookie-based session management
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);

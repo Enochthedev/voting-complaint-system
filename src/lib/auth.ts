@@ -1,32 +1,21 @@
 /**
  * Authentication Helper Functions
- * 
+ *
  * This module provides comprehensive authentication utilities for the
  * Student Complaint Resolution System, including sign up, sign in,
  * sign out, password reset, and role-based access control.
  */
 
-import { createBrowserClient } from '@supabase/ssr';
 import type { User, AuthError } from '@supabase/supabase-js';
 import type { UserRole } from './constants';
+import { supabase } from './supabase';
 
-// Create a singleton Supabase client for client-side operations
-let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
-
-function getSupabaseBrowserClient() {
-  if (supabaseClient) {
-    return supabaseClient;
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-
-  supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
-  return supabaseClient;
+/**
+ * Get the Supabase client instance
+ * Export for use in other modules
+ */
+export function getSupabaseClient() {
+  return supabase;
 }
 
 /**
@@ -39,7 +28,7 @@ export interface AuthResponse {
 
 /**
  * Sign up a new user with email and password
- * 
+ *
  * @param email - User's email address
  * @param password - User's password
  * @param fullName - User's full name
@@ -52,19 +41,20 @@ export async function signUp(
   fullName: string
 ): Promise<AuthResponse> {
   try {
-    const supabase = getSupabaseBrowserClient();
+    const client = getSupabaseClient();
     console.log('Attempting sign up for:', email);
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: typeof window !== 'undefined'
-          ? `${window.location.origin}/auth/callback`
-          : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        emailRedirectTo:
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/auth/callback`
+            : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       },
     });
 
@@ -90,20 +80,17 @@ export async function signUp(
 
 /**
  * Sign in an existing user with email and password
- * 
+ *
  * @param email - User's email address
  * @param password - User's password
  * @returns Authentication response with user or error
  */
-export async function signIn(
-  email: string,
-  password: string
-): Promise<AuthResponse> {
+export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
-    const supabase = getSupabaseBrowserClient();
+    const client = getSupabaseClient();
     console.log('Attempting sign in for:', email);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await client.auth.signInWithPassword({
       email,
       password,
     });
@@ -137,13 +124,13 @@ export async function signIn(
 
 /**
  * Sign out the current user
- * 
+ *
  * @returns Error if sign out fails, null otherwise
  */
 export async function signOut(): Promise<AuthError | null> {
   try {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signOut();
+    const client = getSupabaseClient();
+    const { error } = await client.auth.signOut();
 
     if (error) {
       console.error('Sign out error:', error);
@@ -160,16 +147,16 @@ export async function signOut(): Promise<AuthError | null> {
 
 /**
  * Get the current authenticated user
- * 
+ *
  * @returns Current user or null if not authenticated
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const supabase = getSupabaseBrowserClient();
+    const client = getSupabaseClient();
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser();
+    } = await client.auth.getUser();
 
     if (error) {
       console.error('Error fetching user:', error);
@@ -185,16 +172,16 @@ export async function getCurrentUser(): Promise<User | null> {
 
 /**
  * Get the current user's session
- * 
+ *
  * @returns Current session or null if not authenticated
  */
 export async function getSession() {
   try {
-    const supabase = getSupabaseBrowserClient();
+    const client = getSupabaseClient();
     const {
       data: { session },
       error,
-    } = await supabase.auth.getSession();
+    } = await client.auth.getSession();
 
     if (error) {
       console.error('Error fetching session:', error);
@@ -209,23 +196,39 @@ export async function getSession() {
 }
 
 /**
- * Get the current user's role from metadata
- * 
+ * Get the current user's role from database
+ *
+ * This fetches the role from the public.users table, which is the
+ * single source of truth for user roles. Never trust client-side metadata.
+ *
  * @returns User's role or null if not authenticated
  */
 export async function getUserRole(): Promise<UserRole | null> {
   const user = await getCurrentUser();
 
-  if (!user || !user.user_metadata) {
+  if (!user) {
     return null;
   }
 
-  return (user.user_metadata.role as UserRole) || null;
+  try {
+    const client = getSupabaseClient();
+    const { data, error } = await client.from('users').select('role').eq('id', user.id).single();
+
+    if (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+
+    return (data?.role as UserRole) || null;
+  } catch (error) {
+    console.error('Unexpected error fetching user role:', error);
+    return null;
+  }
 }
 
 /**
  * Check if the current user has a specific role
- * 
+ *
  * @param role - Role to check
  * @returns True if user has the role, false otherwise
  */
@@ -236,7 +239,7 @@ export async function hasRole(role: UserRole): Promise<boolean> {
 
 /**
  * Check if the current user is a student
- * 
+ *
  * @returns True if user is a student, false otherwise
  */
 export async function isStudent(): Promise<boolean> {
@@ -245,7 +248,7 @@ export async function isStudent(): Promise<boolean> {
 
 /**
  * Check if the current user is a lecturer
- * 
+ *
  * @returns True if user is a lecturer, false otherwise
  */
 export async function isLecturer(): Promise<boolean> {
@@ -254,7 +257,7 @@ export async function isLecturer(): Promise<boolean> {
 
 /**
  * Check if the current user is an admin
- * 
+ *
  * @returns True if user is an admin, false otherwise
  */
 export async function isAdmin(): Promise<boolean> {
@@ -263,7 +266,7 @@ export async function isAdmin(): Promise<boolean> {
 
 /**
  * Check if the current user is a lecturer or admin
- * 
+ *
  * @returns True if user is a lecturer or admin, false otherwise
  */
 export async function isLecturerOrAdmin(): Promise<boolean> {
@@ -273,17 +276,18 @@ export async function isLecturerOrAdmin(): Promise<boolean> {
 
 /**
  * Send password reset email
- * 
+ *
  * @param email - User's email address
  * @returns Error if request fails, null otherwise
  */
 export async function resetPassword(email: string): Promise<AuthError | null> {
   try {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: typeof window !== 'undefined'
-        ? `${window.location.origin}/auth/callback?type=recovery`
-        : `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
+    const client = getSupabaseClient();
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo:
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/auth/callback?type=recovery`
+          : `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`,
     });
 
     if (error) {
@@ -301,16 +305,14 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
 
 /**
  * Update user password
- * 
+ *
  * @param newPassword - New password
  * @returns Error if update fails, null otherwise
  */
-export async function updatePassword(
-  newPassword: string
-): Promise<AuthError | null> {
+export async function updatePassword(newPassword: string): Promise<AuthError | null> {
   try {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.updateUser({
+    const client = getSupabaseClient();
+    const { error } = await client.auth.updateUser({
       password: newPassword,
     });
 
@@ -329,16 +331,14 @@ export async function updatePassword(
 
 /**
  * Update user metadata
- * 
+ *
  * @param metadata - Metadata to update
  * @returns Error if update fails, null otherwise
  */
-export async function updateUserMetadata(
-  metadata: Record<string, any>
-): Promise<AuthError | null> {
+export async function updateUserMetadata(metadata: Record<string, any>): Promise<AuthError | null> {
   try {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.updateUser({
+    const client = getSupabaseClient();
+    const { error } = await client.auth.updateUser({
       data: metadata,
     });
 
@@ -357,17 +357,15 @@ export async function updateUserMetadata(
 
 /**
  * Subscribe to authentication state changes
- * 
+ *
  * @param callback - Callback function to execute on auth state change
  * @returns Unsubscribe function
  */
-export function onAuthStateChange(
-  callback: (user: User | null) => void
-): () => void {
-  const supabase = getSupabaseBrowserClient();
+export function onAuthStateChange(callback: (user: User | null) => void): () => void {
+  const client = getSupabaseClient();
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
+  } = client.auth.onAuthStateChange((_event: any, session: any) => {
     callback(session?.user ?? null);
   });
 
@@ -378,7 +376,7 @@ export function onAuthStateChange(
 
 /**
  * Check if user is authenticated
- * 
+ *
  * @returns True if user is authenticated, false otherwise
  */
 export async function isAuthenticated(): Promise<boolean> {
@@ -388,7 +386,7 @@ export async function isAuthenticated(): Promise<boolean> {
 
 /**
  * Validate email format
- * 
+ *
  * @param email - Email to validate
  * @returns True if email is valid, false otherwise
  */
@@ -399,7 +397,7 @@ export function isValidEmail(email: string): boolean {
 
 /**
  * Validate password strength
- * 
+ *
  * @param password - Password to validate
  * @returns Object with validation result and message
  */
@@ -443,7 +441,7 @@ export function validatePassword(password: string): {
 
 /**
  * Get user's full name from metadata
- * 
+ *
  * @returns User's full name or null if not available
  */
 export async function getUserFullName(): Promise<string | null> {
@@ -458,7 +456,7 @@ export async function getUserFullName(): Promise<string | null> {
 
 /**
  * Get user's email
- * 
+ *
  * @returns User's email or null if not authenticated
  */
 export async function getUserEmail(): Promise<string | null> {

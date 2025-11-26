@@ -7,7 +7,7 @@ import type { Feedback, User } from '@/types/database.types';
 
 /**
  * Visual Demo Component for Feedback Form
- * 
+ *
  * This component demonstrates the feedback form functionality with mock data.
  * It shows different states and interactions for testing and development.
  */
@@ -32,7 +32,8 @@ export function FeedbackFormVisualDemo() {
       id: 'feedback-1',
       complaint_id: mockComplaintId,
       lecturer_id: 'lecturer-456',
-      content: '<p>Thank you for reporting this issue. I have reviewed your complaint and contacted the facilities management team.</p><p>They have confirmed that the AC unit in Lecture Hall B is scheduled for repair this Friday, November 22nd. The maintenance team will arrive at 8:00 AM and expects to complete the work by noon.</p><p>In the meantime, we have arranged for your classes to be temporarily moved to Lecture Hall C, which has a functioning AC system.</p>',
+      content:
+        '<p>Thank you for reporting this issue. I have reviewed your complaint and contacted the facilities management team.</p><p>They have confirmed that the AC unit in Lecture Hall B is scheduled for repair this Friday, November 22nd. The maintenance team will arrive at 8:00 AM and expects to complete the work by noon.</p><p>In the meantime, we have arranged for your classes to be temporarily moved to Lecture Hall C, which has a functioning AC system.</p>',
       created_at: '2024-11-18T10:30:00Z',
       updated_at: '2024-11-18T10:30:00Z',
       lecturer: mockLecturer,
@@ -41,7 +42,8 @@ export function FeedbackFormVisualDemo() {
       id: 'feedback-2',
       complaint_id: mockComplaintId,
       lecturer_id: 'lecturer-789',
-      content: '<p><strong>Update:</strong> The repair has been completed successfully!</p><p>The facilities team has tested the AC unit and confirmed it is now working properly. The temperature in Lecture Hall B should be comfortable for your next class.</p><p>Please let us know if you experience any further issues.</p>',
+      content:
+        '<p><strong>Update:</strong> The repair has been completed successfully!</p><p>The facilities team has tested the AC unit and confirmed it is now working properly. The temperature in Lecture Hall B should be comfortable for your next class.</p><p>Please let us know if you experience any further issues.</p>',
       created_at: '2024-11-22T14:15:00Z',
       updated_at: '2024-11-22T14:20:00Z',
       lecturer: {
@@ -59,7 +61,8 @@ export function FeedbackFormVisualDemo() {
     id: 'feedback-edit-demo',
     complaint_id: mockComplaintId,
     lecturer_id: mockCurrentUserId,
-    content: '<p>This is existing feedback that can be edited.</p><p>It was created recently, so it is still within the 24-hour edit window.</p>',
+    content:
+      '<p>This is existing feedback that can be edited.</p><p>It was created recently, so it is still within the 24-hour edit window.</p>',
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   };
@@ -129,7 +132,8 @@ export function FeedbackFormVisualDemo() {
                 Feedback Display Component
               </h2>
               <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-                Shows all feedback entries with lecturer information, timestamps, and edit capabilities.
+                Shows all feedback entries with lecturer information, timestamps, and edit
+                capabilities.
               </p>
               <FeedbackDisplay
                 complaintId={mockComplaintId}
@@ -233,8 +237,8 @@ export function FeedbackFormVisualDemo() {
           </h2>
           <p className="text-sm text-blue-800 dark:text-blue-200">
             This is a UI-first implementation using mock data. Real API integration with Supabase
-            will be implemented in Phase 12. All form submissions currently log to console and
-            show alerts for demonstration purposes.
+            will be implemented in Phase 12. All form submissions currently log to console and show
+            alerts for demonstration purposes.
           </p>
         </div>
       </div>

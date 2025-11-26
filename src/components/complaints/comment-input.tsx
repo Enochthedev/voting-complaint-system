@@ -11,57 +11,57 @@ interface CommentInputProps {
    * Placeholder text for the textarea
    */
   placeholder?: string;
-  
+
   /**
    * Callback when comment is submitted
    */
   onSubmit?: (comment: string, isInternal: boolean) => Promise<void>;
-  
+
   /**
    * Callback when cancel is clicked
    */
   onCancel?: () => void;
-  
+
   /**
    * Whether to show the internal note toggle (lecturer-only feature)
    */
   showInternalToggle?: boolean;
-  
+
   /**
    * Whether the component is in a loading state
    */
   isLoading?: boolean;
-  
+
   /**
    * Initial value for the comment (for editing)
    */
   initialValue?: string;
-  
+
   /**
    * Initial value for internal flag (for editing)
    */
   initialIsInternal?: boolean;
-  
+
   /**
    * Whether this is editing an existing comment
    */
   isEditing?: boolean;
-  
+
   /**
    * Minimum character length
    */
   minLength?: number;
-  
+
   /**
    * Maximum character length
    */
   maxLength?: number;
-  
+
   /**
    * Whether to auto-focus the textarea on mount
    */
   autoFocus?: boolean;
-  
+
   /**
    * Custom class name for the container
    */
@@ -79,10 +79,10 @@ const DEFAULT_PLACEHOLDER = 'Write your comment here...';
 
 /**
  * Comment Input Component
- * 
+ *
  * A reusable component for adding comments to complaints.
  * Follows UI-first development approach with mock data.
- * 
+ *
  * Features:
  * - Character count and validation
  * - Internal notes toggle for lecturers
@@ -90,7 +90,7 @@ const DEFAULT_PLACEHOLDER = 'Write your comment here...';
  * - Error handling
  * - Edit existing comments
  * - Auto-focus support
- * 
+ *
  * @example
  * ```tsx
  * <CommentInput
@@ -175,11 +175,11 @@ export function CommentInput({
       if (onSubmit) {
         // Call the provided onSubmit handler
         await onSubmit(comment.trim(), isInternal);
-        
+
         // Reset form after successful submission
         setComment('');
         setIsInternal(false);
-        
+
         // Call onCancel if provided (to close edit mode)
         if (onCancel && isEditing) {
           onCancel();
@@ -191,18 +191,18 @@ export function CommentInput({
           isInternal,
           isEditing,
         });
-        
+
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 500));
-        
+
         // In Phase 12, this will be replaced with actual Supabase call:
         // if (isEditing && existingCommentId) {
         //   await supabase
         //     .from('complaint_comments')
-        //     .update({ 
+        //     .update({
         //       comment: comment.trim(),
         //       is_internal: isInternal,
-        //       updated_at: new Date().toISOString() 
+        //       updated_at: new Date().toISOString()
         //     })
         //     .eq('id', existingCommentId);
         // } else {
@@ -219,11 +219,11 @@ export function CommentInput({
         // - Creates notification for complaint owner (if not internal)
         // - Creates notification for assigned lecturer (if applicable)
         // - Logs comment in complaint_history
-        
+
         // Reset form after successful submission
         setComment('');
         setIsInternal(false);
-        
+
         // Call onCancel if provided (to close edit mode)
         if (onCancel && isEditing) {
           onCancel();
@@ -247,7 +247,7 @@ export function CommentInput({
     setComment(initialValue);
     setIsInternal(initialIsInternal);
     setErrors({});
-    
+
     if (onCancel) {
       onCancel();
     }
@@ -258,7 +258,7 @@ export function CommentInput({
    */
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
-    
+
     // Clear error when user starts typing
     if (errors.comment) {
       setErrors((prev) => ({ ...prev, comment: undefined }));
@@ -274,7 +274,7 @@ export function CommentInput({
       e.preventDefault();
       handleSubmit(e as any);
     }
-    
+
     // Cancel on Escape
     if (e.key === 'Escape' && onCancel) {
       e.preventDefault();
@@ -311,9 +311,7 @@ export function CommentInput({
         {/* Textarea */}
         <div className="space-y-2">
           {isEditing && (
-            <Label htmlFor="comment-input">
-              Edit Comment {isInternal && '(Internal Note)'}
-            </Label>
+            <Label htmlFor="comment-input">Edit Comment {isInternal && '(Internal Note)'}</Label>
           )}
           <textarea
             ref={textareaRef}
@@ -332,7 +330,7 @@ export function CommentInput({
             aria-invalid={!!errors.comment}
             aria-describedby={errors.comment ? 'comment-error' : undefined}
           />
-          
+
           {/* Character Count and Error */}
           <div className="flex items-center justify-between text-xs">
             {errors.comment ? (
@@ -350,8 +348,8 @@ export function CommentInput({
                 isOverLimit
                   ? 'font-medium text-destructive'
                   : isUnderLimit
-                  ? 'text-orange-500'
-                  : 'text-muted-foreground'
+                    ? 'text-orange-500'
+                    : 'text-muted-foreground'
               }`}
             >
               {characterCount}/{maxLength}

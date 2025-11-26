@@ -26,17 +26,17 @@ const MAX_CONTENT_LENGTH = 5000;
 
 /**
  * Feedback Form Component for Lecturers
- * 
+ *
  * Allows lecturers to write and send feedback on student complaints.
  * Follows UI-first development approach with mock data.
- * 
+ *
  * Features:
  * - Rich text editor for formatted feedback
  * - Character count and validation
  * - Loading states
  * - Error handling
  * - Edit existing feedback (within time limit)
- * 
+ *
  * @param complaintId - ID of the complaint to provide feedback for
  * @param onSubmit - Callback when feedback is submitted
  * @param onCancel - Callback when form is cancelled
@@ -109,10 +109,10 @@ export function FeedbackForm({
           content,
           isEditing,
         });
-        
+
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        
+
         // In Phase 12, this will be replaced with actual Supabase call:
         // if (isEditing && existingFeedback) {
         //   await supabase
@@ -135,7 +135,7 @@ export function FeedbackForm({
 
       // Show success message
       setShowSuccess(true);
-      
+
       // Reset form after short delay
       setTimeout(() => {
         setContent('');
@@ -193,7 +193,8 @@ export function FeedbackForm({
         <Alert variant="success" className="mb-4">
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>
-            Feedback {isEditing ? 'updated' : 'submitted'} successfully! The student will be notified.
+            Feedback {isEditing ? 'updated' : 'submitted'} successfully! The student will be
+            notified.
           </AlertDescription>
         </Alert>
       )}
@@ -239,23 +240,21 @@ export function FeedbackForm({
             maxLength={MAX_CONTENT_LENGTH}
             error={!!errors.content}
           />
-          
+
           {/* Character Count and Error */}
           <div className="flex items-center justify-between text-xs">
             {errors.content ? (
               <span className="text-red-500">{errors.content}</span>
             ) : (
-              <span className="text-muted-foreground">
-                Minimum {MIN_CONTENT_LENGTH} characters
-              </span>
+              <span className="text-muted-foreground">Minimum {MIN_CONTENT_LENGTH} characters</span>
             )}
             <span
               className={`${
                 characterCount < MIN_CONTENT_LENGTH
                   ? 'text-orange-500'
                   : characterCount > MAX_CONTENT_LENGTH
-                  ? 'text-red-500'
-                  : 'text-muted-foreground'
+                    ? 'text-red-500'
+                    : 'text-muted-foreground'
               }`}
             >
               {characterCount}/{MAX_CONTENT_LENGTH}
@@ -266,12 +265,7 @@ export function FeedbackForm({
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-2">
           {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
               Cancel
             </Button>
           )}

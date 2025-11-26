@@ -1,6 +1,14 @@
 -- Create vote_responses table
 -- This table stores individual student responses to voting polls
--- Enforces one vote per student per poll
+-- 
+-- IMPORTANT: Enforces one vote per student per poll through UNIQUE constraint
+-- The constraint 'unique_vote_per_student' on (vote_id, student_id) ensures
+-- that each student can only vote once per poll. Any attempt to insert a
+-- duplicate will fail with error code 23505.
+--
+-- This satisfies:
+-- - Acceptance Criteria AC6: "Students can only vote once per poll"
+-- - Design Property P6: "Vote Uniqueness"
 
 -- Create vote_responses table
 CREATE TABLE IF NOT EXISTS public.vote_responses (

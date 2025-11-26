@@ -33,32 +33,37 @@ interface ComplaintListProps {
   searchQuery?: string; // Search query for highlighting
   isSearchResult?: boolean; // Whether the list is showing search results
   onClearSearch?: () => void; // Callback to clear search
+  // Bulk selection props
+  selectionMode?: boolean; // Whether selection mode is enabled
+  selectedIds?: Set<string>; // Set of selected complaint IDs
+  onSelectionChange?: (selectedIds: Set<string>) => void; // Callback when selection changes
 }
 
 // Status badge configuration
-const STATUS_CONFIG: Record<
-  ComplaintStatus,
-  { label: string; className: string }
-> = {
+const STATUS_CONFIG: Record<ComplaintStatus, { label: string; className: string }> = {
   draft: {
     label: 'Draft',
     className: 'bg-muted text-muted-foreground border-border',
   },
   new: {
     label: 'New',
-    className: 'bg-blue-500/10 text-blue-700 border-blue-500/20 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
+    className:
+      'bg-blue-500/10 text-blue-700 border-blue-500/20 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
   },
   opened: {
     label: 'Opened',
-    className: 'bg-purple-500/10 text-purple-700 border-purple-500/20 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+    className:
+      'bg-purple-500/10 text-purple-700 border-purple-500/20 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
   },
   in_progress: {
     label: 'In Progress',
-    className: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-500/30',
+    className:
+      'bg-yellow-500/10 text-yellow-700 border-yellow-500/20 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-500/30',
   },
   resolved: {
     label: 'Resolved',
-    className: 'bg-green-500/10 text-green-700 border-green-500/20 dark:bg-green-500/20 dark:text-green-300 dark:border-green-500/30',
+    className:
+      'bg-green-500/10 text-green-700 border-green-500/20 dark:bg-green-500/20 dark:text-green-300 dark:border-green-500/30',
   },
   closed: {
     label: 'Closed',
@@ -66,7 +71,8 @@ const STATUS_CONFIG: Record<
   },
   reopened: {
     label: 'Reopened',
-    className: 'bg-orange-500/10 text-orange-700 border-orange-500/20 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30',
+    className:
+      'bg-orange-500/10 text-orange-700 border-orange-500/20 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30',
   },
 };
 
@@ -142,28 +148,62 @@ function ComplaintListItem({
   complaint,
   onClick,
   searchQuery,
+  selectionMode,
+  isSelected,
+  onSelectionToggle,
 }: {
   complaint: ComplaintWithTags;
   onClick?: (id: string) => void;
   searchQuery?: string;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onSelectionToggle?: (id: string) => void;
 }) {
   const statusConfig = STATUS_CONFIG[complaint.status];
   const priorityConfig = PRIORITY_CONFIG[complaint.priority];
   const categoryLabel = CATEGORY_LABELS[complaint.category];
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (selectionMode) {
+      e.stopPropagation();
+      onSelectionToggle?.(complaint.id);
+    } else {
+      onClick?.(complaint.id);
+    }
+  };
+
+  const handleCheckboxClick = (e: React.MouseEvent | React.ChangeEvent) => {
+    e.stopPropagation();
+    onSelectionToggle?.(complaint.id);
+  };
+
   return (
     <div
-      onClick={() => onClick?.(complaint.id)}
+      onClick={handleClick}
       className={cn(
         'group relative rounded-lg border bg-card p-4 transition-all hover:border-ring hover:shadow-md',
-        onClick && 'cursor-pointer'
+        (onClick || selectionMode) && 'cursor-pointer',
+        isSelected && 'border-primary bg-primary/5'
       )}
     >
       {/* Header: Title and Status */}
       <div className="mb-3 flex items-start justify-between gap-3">
-        <h3 className="flex-1 text-lg font-semibold text-card-foreground">
-          <HighlightText text={complaint.title} query={searchQuery} />
-        </h3>
+        <div className="flex flex-1 items-start gap-3">
+          {/* Checkbox for selection mode */}
+          {selectionMode && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={handleCheckboxClick}
+              onClick={handleCheckboxClick}
+              className="mt-1 h-4 w-4 cursor-pointer rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              aria-label={`Select ${complaint.title}`}
+            />
+          )}
+          <h3 className="flex-1 text-lg font-semibold text-card-foreground">
+            <HighlightText text={complaint.title} query={searchQuery} />
+          </h3>
+        </div>
         <span
           className={cn(
             'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold',
@@ -177,7 +217,10 @@ function ComplaintListItem({
       {/* Description Preview */}
       <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
         <HighlightHTML
-          html={complaint.description.substring(0, 150) + (complaint.description.length > 150 ? '...' : '')}
+          html={
+            complaint.description.substring(0, 150) +
+            (complaint.description.length > 150 ? '...' : '')
+          }
           query={searchQuery}
         />
       </p>
@@ -247,12 +290,12 @@ function ComplaintListItem({
 /**
  * Empty State Component
  */
-function EmptyState({ 
-  message, 
+function EmptyState({
+  message,
   isSearchResult = false,
   searchQuery,
   onClearSearch,
-}: { 
+}: {
   message: string;
   isSearchResult?: boolean;
   searchQuery?: string;
@@ -265,14 +308,12 @@ function EmptyState({
         {isSearchResult ? 'No search results found' : 'No complaints found'}
       </h3>
       <p className="mb-4 text-sm text-muted-foreground">{message}</p>
-      
+
       {/* Search-specific suggestions */}
       {isSearchResult && searchQuery && (
         <div className="mt-4 w-full max-w-md space-y-3">
           <div className="rounded-lg bg-card p-4 text-left">
-            <p className="mb-2 text-sm font-medium text-card-foreground">
-              Try these suggestions:
-            </p>
+            <p className="mb-2 text-sm font-medium text-card-foreground">Try these suggestions:</p>
             <ul className="space-y-1 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5">•</span>
@@ -280,7 +321,9 @@ function EmptyState({
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5">•</span>
-                <span>Use more general terms (e.g., "wifi" instead of "wifi connection problem")</span>
+                <span>
+                  Use more general terms (e.g., "wifi" instead of "wifi connection problem")
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5">•</span>
@@ -292,13 +335,9 @@ function EmptyState({
               </li>
             </ul>
           </div>
-          
+
           {onClearSearch && (
-            <Button
-              onClick={onClearSearch}
-              variant="outline"
-              className="w-full"
-            >
+            <Button onClick={onClearSearch} variant="outline" className="w-full">
               Clear search and show all complaints
             </Button>
           )}
@@ -330,10 +369,7 @@ function ComplaintListSkeleton() {
   return (
     <div className="space-y-4">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div
-          key={i}
-          className="rounded-lg border bg-card p-4"
-        >
+        <div key={i} className="rounded-lg border bg-card p-4">
           <div className="mb-3 flex items-start justify-between gap-3">
             <LoadingSkeleton className="h-6 w-3/4" />
             <LoadingSkeleton className="h-6 w-20" />
@@ -419,7 +455,7 @@ function Pagination({
 
 /**
  * Complaint List Component
- * 
+ *
  * Displays a list of complaints with pagination, loading states, and empty states.
  * Supports role-based filtering (handled by parent component).
  */
@@ -436,7 +472,22 @@ export function ComplaintList({
   searchQuery,
   isSearchResult = false,
   onClearSearch,
+  selectionMode = false,
+  selectedIds = new Set(),
+  onSelectionChange,
 }: ComplaintListProps) {
+  // Handle selection toggle
+  const handleSelectionToggle = (id: string) => {
+    if (!onSelectionChange) return;
+
+    const newSelection = new Set(selectedIds);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    onSelectionChange(newSelection);
+  };
   // Loading state
   if (isLoading) {
     return <ComplaintListSkeleton />;
@@ -450,7 +501,7 @@ export function ComplaintList({
   // Empty state
   if (complaints.length === 0) {
     return (
-      <EmptyState 
+      <EmptyState
         message={emptyMessage}
         isSearchResult={isSearchResult}
         searchQuery={searchQuery}
@@ -469,17 +520,16 @@ export function ComplaintList({
             complaint={complaint}
             onClick={onComplaintClick}
             searchQuery={searchQuery}
+            selectionMode={selectionMode}
+            isSelected={selectedIds.has(complaint.id)}
+            onSelectionToggle={handleSelectionToggle}
           />
         ))}
       </div>
 
       {/* Pagination */}
       {showPagination && totalPages > 1 && onPageChange && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
       )}
     </div>
   );

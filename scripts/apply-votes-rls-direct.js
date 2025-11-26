@@ -19,7 +19,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
   db: { schema: 'public' },
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 async function executeSQLStatements() {
@@ -70,15 +70,15 @@ async function executeSQLStatements() {
         ON public.vote_responses
         FOR INSERT
         TO authenticated
-        WITH CHECK (student_id = auth.uid())`
+        WITH CHECK (student_id = auth.uid())`,
     ];
 
     for (let i = 0; i < statements.length; i++) {
       const stmt = statements[i];
       console.log(`Executing statement ${i + 1}/${statements.length}...`);
-      
+
       const { error } = await adminClient.rpc('exec_sql', { sql: stmt });
-      
+
       if (error) {
         console.error(`❌ Error on statement ${i + 1}:`, error.message);
         console.log('Statement:', stmt);
@@ -97,7 +97,6 @@ async function executeSQLStatements() {
     console.log('   node scripts/test-votes-rls.js\n');
 
     return true;
-
   } catch (error) {
     console.error('\n❌ Failed to apply migration:', error.message);
     console.log('\n📋 SQL statements to apply manually:');
@@ -110,10 +109,10 @@ async function executeSQLStatements() {
 
 // Apply migration
 executeSQLStatements()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Error:', error);
     process.exit(1);
   });

@@ -30,7 +30,7 @@ async function testNotificationsRLS() {
       .from('notifications')
       .select('*')
       .limit(1);
-    
+
     if (tableError && tableError.code !== 'PGRST116') {
       console.log('❌ FAIL: Notifications table does not exist or is not accessible');
       console.log('   Error:', tableError.message);
@@ -42,7 +42,7 @@ async function testNotificationsRLS() {
     console.log('\n📋 Test 2: Check if RLS is enabled');
     console.log('⚠️  INFO: RLS status verification requires direct database access');
     console.log('   RLS is enabled in migration file 011_create_notifications_table.sql');
-    console.log('✅ PASS: RLS is enabled on notifications table (verified in migration)')
+    console.log('✅ PASS: RLS is enabled on notifications table (verified in migration)');
 
     // Test 3: Verify RLS policies exist
     console.log('\n📋 Test 3: Verify RLS policies exist');
@@ -51,7 +51,7 @@ async function testNotificationsRLS() {
     console.log('  - Users update own notifications (UPDATE)');
     console.log('  - System insert notifications (INSERT)');
     console.log('  - Users delete own notifications (DELETE)');
-    
+
     // We can't directly query pg_policies without special permissions,
     // but we can test the policies by attempting operations
     console.log('✅ PASS: RLS policies are defined in migration file');
@@ -88,7 +88,7 @@ async function testNotificationsRLS() {
     console.log('   - idx_notifications_related_id');
     console.log('   - idx_notifications_user_unread (composite)');
     console.log('   - idx_notifications_user_type (composite)');
-    console.log('✅ PASS: Indexes defined correctly in migration')
+    console.log('✅ PASS: Indexes defined correctly in migration');
 
     console.log('\n' + '='.repeat(60));
     console.log('✅ All RLS policy checks passed!');
@@ -98,14 +98,13 @@ async function testNotificationsRLS() {
     console.log('  3. INSERT: System can insert notifications for any user');
     console.log('  4. DELETE: Users can delete their own notifications');
     console.log('\nSecurity Properties:');
-    console.log('  ✓ Users cannot view other users\' notifications');
-    console.log('  ✓ Users cannot modify other users\' notifications');
-    console.log('  ✓ Users cannot delete other users\' notifications');
+    console.log("  ✓ Users cannot view other users' notifications");
+    console.log("  ✓ Users cannot modify other users' notifications");
+    console.log("  ✓ Users cannot delete other users' notifications");
     console.log('  ✓ All operations are scoped to auth.uid()');
     console.log('='.repeat(60));
 
     return true;
-
   } catch (error) {
     console.error('\n❌ Error during testing:', error.message);
     return false;
@@ -114,10 +113,10 @@ async function testNotificationsRLS() {
 
 // Run tests
 testNotificationsRLS()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Fatal error:', error);
     process.exit(1);
   });

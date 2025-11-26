@@ -1,6 +1,6 @@
 /**
  * Rich Text Editor Component Tests
- * 
+ *
  * These tests verify the functionality of the RichTextEditor component
  * used in the complaint form for formatted text input.
  */

@@ -1,6 +1,6 @@
 /**
  * File Validation Tests
- * 
+ *
  * Tests for file upload validation logic including size, type, and count validation.
  */
 
@@ -20,11 +20,7 @@ import {
 import { MAX_FILE_SIZE, MAX_FILES_PER_COMPLAINT } from '../constants';
 
 // Helper to create mock File objects
-function createMockFile(
-  name: string,
-  size: number,
-  type: string
-): File {
+function createMockFile(name: string, size: number, type: string): File {
   const blob = new Blob(['x'.repeat(size)], { type });
   return new File([blob], name, { type });
 }
@@ -33,7 +29,7 @@ describe('validateFile', () => {
   it('should accept valid JPEG image within size limit', () => {
     const file = createMockFile('test.jpg', 1024 * 1024, 'image/jpeg'); // 1MB
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(true);
     expect(result.error).toBeUndefined();
   });
@@ -41,7 +37,7 @@ describe('validateFile', () => {
   it('should accept valid PNG image within size limit', () => {
     const file = createMockFile('test.png', 2 * 1024 * 1024, 'image/png'); // 2MB
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(true);
     expect(result.error).toBeUndefined();
   });
@@ -49,7 +45,7 @@ describe('validateFile', () => {
   it('should accept valid PDF within size limit', () => {
     const file = createMockFile('document.pdf', 5 * 1024 * 1024, 'application/pdf'); // 5MB
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(true);
     expect(result.error).toBeUndefined();
   });
@@ -57,7 +53,7 @@ describe('validateFile', () => {
   it('should reject file exceeding size limit', () => {
     const file = createMockFile('large.jpg', MAX_FILE_SIZE + 1, 'image/jpeg');
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(false);
     expect(result.error).toContain('exceeds maximum size');
     expect(result.error).toContain('10MB');
@@ -66,7 +62,7 @@ describe('validateFile', () => {
   it('should reject unsupported file type', () => {
     const file = createMockFile('video.mp4', 1024 * 1024, 'video/mp4');
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(false);
     expect(result.error).toContain('unsupported type');
   });
@@ -74,7 +70,7 @@ describe('validateFile', () => {
   it('should reject executable file', () => {
     const file = createMockFile('malware.exe', 1024, 'application/x-msdownload');
     const result = validateFile(file);
-    
+
     expect(result.valid).toBe(false);
     expect(result.error).toContain('unsupported type');
   });
@@ -87,9 +83,9 @@ describe('validateFiles', () => {
       createMockFile('image2.png', 2 * 1024 * 1024, 'image/png'),
       createMockFile('doc.pdf', 3 * 1024 * 1024, 'application/pdf'),
     ];
-    
+
     const result = validateFiles(files);
-    
+
     expect(result.valid).toHaveLength(3);
     expect(result.invalid).toHaveLength(0);
   });
@@ -101,9 +97,9 @@ describe('validateFiles', () => {
       createMockFile('invalid.mp4', 1024 * 1024, 'video/mp4'),
       createMockFile('valid.pdf', 2 * 1024 * 1024, 'application/pdf'),
     ];
-    
+
     const result = validateFiles(files);
-    
+
     expect(result.valid).toHaveLength(2);
     expect(result.invalid).toHaveLength(2);
     expect(result.valid[0].name).toBe('valid.jpg');
@@ -114,9 +110,9 @@ describe('validateFiles', () => {
     const files = Array.from({ length: MAX_FILES_PER_COMPLAINT + 2 }, (_, i) =>
       createMockFile(`file${i}.jpg`, 1024 * 1024, 'image/jpeg')
     );
-    
+
     const result = validateFiles(files);
-    
+
     expect(result.valid).toHaveLength(MAX_FILES_PER_COMPLAINT);
     expect(result.invalid).toHaveLength(2);
     expect(result.invalid[0].error).toContain('Maximum');
@@ -127,9 +123,9 @@ describe('validateFiles', () => {
     const files = Array.from({ length: 3 }, (_, i) =>
       createMockFile(`file${i}.jpg`, 1024 * 1024, 'image/jpeg')
     );
-    
+
     const result = validateFiles(files, existingCount);
-    
+
     // With 3 existing and max 5, only 2 new files should be valid
     expect(result.valid).toHaveLength(2);
     expect(result.invalid).toHaveLength(1);
@@ -137,7 +133,7 @@ describe('validateFiles', () => {
 
   it('should handle empty file array', () => {
     const result = validateFiles([]);
-    
+
     expect(result.valid).toHaveLength(0);
     expect(result.invalid).toHaveLength(0);
   });
@@ -162,7 +158,9 @@ describe('isFileTypeAllowed', () => {
 
   it('should allow Word documents', () => {
     expect(isFileTypeAllowed('application/msword')).toBe(true);
-    expect(isFileTypeAllowed('application/vnd.openxmlformats-officedocument.wordprocessingml.document')).toBe(true);
+    expect(
+      isFileTypeAllowed('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    ).toBe(true);
   });
 
   it('should reject video files', () => {

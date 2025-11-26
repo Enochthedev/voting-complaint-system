@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ComplaintForm } from '@/components/complaints/complaint-form';
 import { useToast } from '@/components/ui/toast';
-import { getMockUser } from '@/lib/mock-auth';
+import { useAuth } from '@/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { ComplaintCategory, ComplaintPriority } from '@/types/database.types';
 
 interface ComplaintFormData {
@@ -21,7 +22,8 @@ interface ComplaintFormData {
 const mockDrafts: Record<string, ComplaintFormData> = {
   'draft-1': {
     title: 'WiFi connectivity issues in library',
-    description: '<p>The WiFi in the library keeps disconnecting every few minutes. This makes it very difficult to complete online assignments and research.</p>',
+    description:
+      '<p>The WiFi in the library keeps disconnecting every few minutes. This makes it very difficult to complete online assignments and research.</p>',
     category: 'facilities',
     priority: 'medium',
     isAnonymous: false,
@@ -29,7 +31,8 @@ const mockDrafts: Record<string, ComplaintFormData> = {
   },
   'draft-2': {
     title: 'Unclear grading criteria for assignment',
-    description: '<p>The grading rubric for Assignment 3 is not clear. Several students are confused about the expectations.</p>',
+    description:
+      '<p>The grading rubric for Assignment 3 is not clear. Several students are confused about the expectations.</p>',
     category: 'academic',
     priority: 'low',
     isAnonymous: false,
@@ -41,12 +44,18 @@ export default function NewComplaintPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
+  const { user, isLoading: authLoading, error: authError } = useAuth();
   const draftId = searchParams.get('draft');
-  const currentUser = getMockUser();
-  
+
   // Load draft data if editing
   const [initialData, setInitialData] = React.useState<ComplaintFormData | undefined>();
   const [isLoading, setIsLoading] = React.useState(!!draftId);
+
+  React.useEffect(() => {
+    if (!authLoading && !user && !authError) {
+      router.push('/login');
+    }
+  }, [user, authLoading, authError, router]);
 
   React.useEffect(() => {
     if (draftId) {
@@ -82,7 +91,9 @@ export default function NewComplaintPage() {
       // Show success message with toast notification
       if (isDraft) {
         toast.success(
-          draftId ? 'Your draft has been updated successfully!' : 'Your draft has been saved successfully!',
+          draftId
+            ? 'Your draft has been updated successfully!'
+            : 'Your draft has been saved successfully!',
           'Draft Saved'
         );
         router.push('/complaints/drafts');
@@ -107,46 +118,48 @@ export default function NewComplaintPage() {
     router.back();
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading || !user) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-4 text-muted-foreground">Loading draft...</p>
-          </div>
+      <AppLayout
+        userRole={(user?.role as any) || 'student'}
+        userName={user?.full_name || 'Loading...'}
+        userEmail={user?.email || ''}
+      >
+        <div className="container mx-auto max-w-4xl px-4 py-8">
+          <Skeleton className="h-12 w-[300px] mb-4" />
+          <Skeleton className="h-96" />
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
   return (
     <AppLayout
-      userRole={currentUser?.role || 'student'}
-      userName={currentUser?.full_name || 'User'}
-      userEmail={currentUser?.email || 'user@example.com'}
+      userRole={user.role as any}
+      userName={user.full_name}
+      userEmail={user.email}
     >
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             {draftId ? 'Edit Draft Complaint' : 'Submit a Complaint'}
           </h1>
-        <p className="mt-2 text-muted-foreground">
-          {draftId
-            ? 'Continue editing your draft complaint. You can save your changes or submit the complaint.'
-            : 'Fill out the form below to submit your complaint. You can save it as a draft and complete it later, or submit it immediately.'}
-        </p>
-      </div>
+          <p className="mt-2 text-muted-foreground">
+            {draftId
+              ? 'Continue editing your draft complaint. You can save your changes or submit the complaint.'
+              : 'Fill out the form below to submit your complaint. You can save it as a draft and complete it later, or submit it immediately.'}
+          </p>
+        </div>
 
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-        <ComplaintForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          initialData={initialData}
-          isEditing={!!draftId}
-        />
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+          <ComplaintForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            initialData={initialData}
+            isEditing={!!draftId}
+          />
+        </div>
       </div>
-    </div>
     </AppLayout>
   );
 }

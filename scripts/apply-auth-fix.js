@@ -2,10 +2,10 @@
 
 /**
  * Apply Authentication Fix
- * 
+ *
  * This script applies the fix for users table authentication
  * by recreating the trigger with proper permissions.
- * 
+ *
  * Usage: node scripts/apply-auth-fix.js
  */
 
@@ -40,7 +40,7 @@ async function main() {
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   log('Please run the following SQL in your Supabase SQL Editor:\n', 'yellow');
-  
+
   const sql = `
 -- Fix for users table trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -83,13 +83,13 @@ CREATE POLICY "Allow user creation via trigger"
 `;
 
   console.log(sql);
-  
+
   log('\nSteps:', 'cyan');
   log('1. Copy the SQL above', 'yellow');
   log('2. Go to your Supabase Dashboard > SQL Editor', 'yellow');
   log('3. Paste and run the SQL', 'yellow');
   log('4. Run: node scripts/test-email-auth.js', 'yellow');
-  
+
   log('\n');
 }
 

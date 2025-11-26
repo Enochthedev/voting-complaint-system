@@ -16,10 +16,10 @@ interface ProtectedRouteProps {
 
 /**
  * Protected Route Wrapper Component
- * 
+ *
  * Wraps components that require authentication and optionally role-based access.
  * Shows a loading state while checking authentication, redirects if unauthorized.
- * 
+ *
  * @param children - Components to render if authorized
  * @param allowedRoles - Optional array of roles that can access this route
  * @param redirectTo - Optional custom redirect path (defaults to /auth/login)
@@ -61,7 +61,7 @@ export function ProtectedRoute({
             setError('You do not have permission to access this page.');
             setIsAuthorized(false);
             setIsLoading(false);
-            
+
             // Redirect to dashboard after a short delay
             setTimeout(() => {
               router.push('/dashboard');
@@ -75,12 +75,12 @@ export function ProtectedRoute({
         setIsLoading(false);
       } catch (err) {
         console.error('Error checking authentication:', err);
-        
+
         if (!isMounted) return;
 
         setError('An error occurred while verifying your access.');
         setIsLoading(false);
-        
+
         // Redirect to login on error
         setTimeout(() => {
           router.push(redirectTo);
@@ -105,9 +105,7 @@ export function ProtectedRoute({
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-foreground" />
-          <p className="mt-4 text-sm text-muted-foreground">
-            Verifying access...
-          </p>
+          <p className="mt-4 text-sm text-muted-foreground">Verifying access...</p>
         </div>
       </div>
     );
@@ -118,15 +116,9 @@ export function ProtectedRoute({
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950">
-          <h2 className="text-lg font-semibold text-red-900 dark:text-red-50">
-            Access Denied
-          </h2>
-          <p className="mt-2 text-sm text-red-700 dark:text-red-200">
-            {error}
-          </p>
-          <p className="mt-4 text-xs text-red-600 dark:text-red-300">
-            Redirecting...
-          </p>
+          <h2 className="text-lg font-semibold text-red-900 dark:text-red-50">Access Denied</h2>
+          <p className="mt-2 text-sm text-red-700 dark:text-red-200">{error}</p>
+          <p className="mt-4 text-xs text-red-600 dark:text-red-300">Redirecting...</p>
         </div>
       </div>
     );
@@ -143,7 +135,7 @@ export function ProtectedRoute({
 
 /**
  * Hook to use protected route functionality
- * 
+ *
  * @param allowedRoles - Optional array of roles that can access
  * @returns Object with loading state, user, and authorization status
  */
@@ -187,7 +179,7 @@ export function useProtectedRoute(allowedRoles?: UserRole[]) {
         setIsLoading(false);
       } catch (err) {
         console.error('Error checking authentication:', err);
-        
+
         if (!isMounted) return;
 
         setError('An error occurred while verifying your access.');

@@ -24,10 +24,7 @@ async function testUsersTable() {
   try {
     // Test 1: Check if users table exists by querying it
     console.log('Test 1: Checking if users table exists...');
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .limit(1);
+    const { data, error } = await supabase.from('users').select('*').limit(1);
 
     if (error) {
       if (error.message.includes('relation "public.users" does not exist')) {
@@ -83,7 +80,6 @@ async function testUsersTable() {
 
     console.log('\n✨ All tests passed! Users table migration is working correctly.');
     return true;
-
   } catch (err) {
     console.error('❌ Unexpected error:', err.message);
     return false;
@@ -92,10 +88,10 @@ async function testUsersTable() {
 
 // Run tests
 testUsersTable()
-  .then(success => {
+  .then((success) => {
     process.exit(success ? 0 : 1);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Fatal error:', err);
     process.exit(1);
   });

@@ -2,7 +2,7 @@
 
 /**
  * Execute Announcements RLS Fix
- * 
+ *
  * This script directly executes the SQL statements to fix announcements RLS policies.
  */
 
@@ -19,7 +19,7 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey, {
-  db: { schema: 'public' }
+  db: { schema: 'public' },
 });
 
 async function executeFix() {
@@ -30,12 +30,12 @@ async function executeFix() {
 
   try {
     console.log('Step 1: Dropping old policies...');
-    
+
     // Drop old policies one by one
     const dropStatements = [
       `DROP POLICY IF EXISTS "Lecturers create announcements" ON public.announcements`,
       `DROP POLICY IF EXISTS "Lecturers update own announcements" ON public.announcements`,
-      `DROP POLICY IF EXISTS "Lecturers delete own announcements" ON public.announcements`
+      `DROP POLICY IF EXISTS "Lecturers delete own announcements" ON public.announcements`,
     ];
 
     for (const stmt of dropStatements) {
@@ -44,11 +44,11 @@ async function executeFix() {
         console.log(`   ⚠️  ${error.message}`);
       }
     }
-    
+
     console.log('✅ Old policies dropped\n');
 
     console.log('Step 2: Creating new policies with JWT claims...');
-    
+
     // Create new policies
     const createStatements = [
       {
@@ -61,7 +61,7 @@ async function executeFix() {
             WITH CHECK (
               auth.jwt()->>'role' IN ('lecturer', 'admin')
             )
-        `
+        `,
       },
       {
         name: 'UPDATE policy',
@@ -78,7 +78,7 @@ async function executeFix() {
               created_by = auth.uid() AND
               auth.jwt()->>'role' IN ('lecturer', 'admin')
             )
-        `
+        `,
       },
       {
         name: 'DELETE policy',
@@ -91,8 +91,8 @@ async function executeFix() {
               created_by = auth.uid() AND
               auth.jwt()->>'role' IN ('lecturer', 'admin')
             )
-        `
-      }
+        `,
+      },
     ];
 
     for (const { name, sql } of createStatements) {
@@ -115,7 +115,6 @@ async function executeFix() {
     console.log('');
     console.log('Run: node scripts/test-announcements-rls.js to verify');
     console.log('');
-
   } catch (error) {
     console.error('❌ Error:', error.message);
     console.error('');

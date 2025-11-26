@@ -18,7 +18,10 @@ console.log('='.repeat(80));
 async function displayInstructions() {
   try {
     // Read the migration file
-    const migrationPath = join(__dirname, '../supabase/migrations/022_fix_complaint_comments_rls.sql');
+    const migrationPath = join(
+      __dirname,
+      '../supabase/migrations/022_fix_complaint_comments_rls.sql'
+    );
     const migrationSQL = readFileSync(migrationPath, 'utf8');
 
     console.log('\n📝 INSTRUCTIONS TO APPLY MIGRATION:\n');
@@ -37,9 +40,8 @@ async function displayInstructions() {
     console.log('='.repeat(80));
     console.log('\n✅ Migration file: supabase/migrations/022_fix_complaint_comments_rls.sql');
     console.log('📖 Documentation: docs/TASK_2.2_COMPLAINT_COMMENTS_RLS_COMPLETION.md\n');
-    
-    return true;
 
+    return true;
   } catch (error) {
     console.error('❌ Failed to read migration file:', error.message);
     return false;
@@ -48,14 +50,14 @@ async function displayInstructions() {
 
 // Display instructions
 displayInstructions()
-  .then(success => {
+  .then((success) => {
     if (success) {
       process.exit(0);
     } else {
       process.exit(1);
     }
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Error:', error);
     process.exit(1);
   });

@@ -12,17 +12,12 @@ export const COMPLAINT_CATEGORIES = [
   'other',
 ] as const;
 
-export type ComplaintCategory = typeof COMPLAINT_CATEGORIES[number];
+export type ComplaintCategory = (typeof COMPLAINT_CATEGORIES)[number];
 
 // Complaint Priorities
-export const COMPLAINT_PRIORITIES = [
-  'low',
-  'medium',
-  'high',
-  'critical',
-] as const;
+export const COMPLAINT_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 
-export type ComplaintPriority = typeof COMPLAINT_PRIORITIES[number];
+export type ComplaintPriority = (typeof COMPLAINT_PRIORITIES)[number];
 
 // Complaint Statuses
 export const COMPLAINT_STATUSES = [
@@ -35,12 +30,12 @@ export const COMPLAINT_STATUSES = [
   'reopened',
 ] as const;
 
-export type ComplaintStatus = typeof COMPLAINT_STATUSES[number];
+export type ComplaintStatus = (typeof COMPLAINT_STATUSES)[number];
 
 // User Roles
 export const USER_ROLES = ['student', 'lecturer', 'admin'] as const;
 
-export type UserRole = typeof USER_ROLES[number];
+export type UserRole = (typeof USER_ROLES)[number];
 
 // Notification Types
 export const NOTIFICATION_TYPES = [
@@ -54,7 +49,7 @@ export const NOTIFICATION_TYPES = [
   'escalation',
 ] as const;
 
-export type NotificationType = typeof NOTIFICATION_TYPES[number];
+export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
 // File Upload Constraints
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

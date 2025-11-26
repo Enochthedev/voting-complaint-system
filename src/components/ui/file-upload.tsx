@@ -26,32 +26,32 @@ export interface FileUploadProps {
    * Callback when files are selected and validated
    */
   onFilesSelected?: (files: File[]) => void;
-  
+
   /**
    * Callback when a file is removed
    */
   onFileRemove?: (file: File) => void;
-  
+
   /**
    * Currently selected files
    */
   files?: File[];
-  
+
   /**
    * Upload progress for files being uploaded
    */
   uploadProgress?: FileUploadProgress[];
-  
+
   /**
    * Maximum number of files (defaults to MAX_FILES_PER_COMPLAINT)
    */
   maxFiles?: number;
-  
+
   /**
    * Whether the component is disabled
    */
   disabled?: boolean;
-  
+
   /**
    * Additional CSS classes
    */
@@ -98,9 +98,9 @@ export function FileUpload({
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     dragCounter.current++;
-    
+
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       setIsDragging(true);
     }
@@ -109,9 +109,9 @@ export function FileUpload({
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     dragCounter.current--;
-    
+
     if (dragCounter.current === 0) {
       setIsDragging(false);
     }
@@ -125,7 +125,7 @@ export function FileUpload({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setIsDragging(false);
     dragCounter.current = 0;
 
@@ -166,10 +166,7 @@ export function FileUpload({
         onDrop={handleDrop}
         className={`
           relative rounded-lg border-2 border-dashed p-8 text-center transition-colors
-          ${isDragging
-            ? 'border-primary bg-accent'
-            : 'border-input bg-background'
-          }
+          ${isDragging ? 'border-primary bg-accent' : 'border-input bg-background'}
           ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-ring'}
         `}
         onClick={!disabled ? handleBrowseClick : undefined}
@@ -191,12 +188,8 @@ export function FileUpload({
             <p className="text-sm font-medium text-foreground">
               {canAddMoreFiles ? (
                 <>
-                  <span className="text-muted-foreground">
-                    Drag and drop files here, or{' '}
-                  </span>
-                  <span className="text-foreground underline">
-                    browse
-                  </span>
+                  <span className="text-muted-foreground">Drag and drop files here, or </span>
+                  <span className="text-foreground underline">browse</span>
                 </>
               ) : (
                 <span className="text-muted-foreground">
@@ -220,9 +213,7 @@ export function FileUpload({
           {validationErrors.map((error, index) => (
             <Alert key={index} variant="destructive" className="relative pr-10">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                {error.error}
-              </AlertDescription>
+              <AlertDescription className="text-sm">{error.error}</AlertDescription>
               <button
                 onClick={() => dismissError(index)}
                 className="absolute right-2 top-2 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
@@ -240,15 +231,13 @@ export function FileUpload({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-foreground">
-              Uploading Files ({uploadProgress.filter(p => p.status === 'completed').length}/{uploadProgress.length})
+              Uploading Files ({uploadProgress.filter((p) => p.status === 'completed').length}/
+              {uploadProgress.length})
             </p>
           </div>
           <div className="space-y-2">
             {uploadProgress.map((progress, index) => (
-              <FileUploadItem
-                key={`${progress.file.name}-${index}`}
-                progress={progress}
-              />
+              <FileUploadItem key={`${progress.file.name}-${index}`} progress={progress} />
             ))}
           </div>
         </div>
@@ -326,9 +315,7 @@ function FileUploadItem({ progress }: FileUploadItemProps) {
 
         {/* File Info */}
         <div className="flex-1 min-w-0">
-          <p className="truncate text-sm font-medium text-card-foreground">
-            {file.name}
-          </p>
+          <p className="truncate text-sm font-medium text-card-foreground">{file.name}</p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{formatFileSize(file.size)}</span>
             <span>•</span>
@@ -343,9 +330,7 @@ function FileUploadItem({ progress }: FileUploadItemProps) {
         {status === 'uploading' && (
           <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-muted-foreground" />
         )}
-        {status === 'error' && (
-          <AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
-        )}
+        {status === 'error' && <AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />}
       </div>
 
       {/* Progress Bar */}
@@ -408,9 +393,7 @@ function FileItem({ file, onRemove, disabled }: FileItemProps) {
 
       {/* File Info */}
       <div className="flex-1 min-w-0">
-        <p className="truncate text-sm font-medium text-card-foreground">
-          {file.name}
-        </p>
+        <p className="truncate text-sm font-medium text-card-foreground">{file.name}</p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{formatFileSize(file.size)}</span>
           <span>•</span>

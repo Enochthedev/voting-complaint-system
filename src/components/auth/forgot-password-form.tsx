@@ -35,7 +35,7 @@ export function ForgotPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Clear previous errors and success state
     setErrors({});
     setIsSuccess(false);
@@ -84,7 +84,8 @@ export function ForgotPasswordForm() {
         <Alert variant="success">
           <CheckCircle2 className="h-4 w-4" />
           <AlertDescription>
-            Password reset email sent! Please check your inbox and follow the instructions to reset your password.
+            Password reset email sent! Please check your inbox and follow the instructions to reset
+            your password.
           </AlertDescription>
         </Alert>
 
@@ -92,7 +93,7 @@ export function ForgotPasswordForm() {
           <p className="text-sm text-muted-foreground">
             If you don&apos;t see the email, please check your spam folder.
           </p>
-          
+
           <Button
             type="button"
             variant="outline"
@@ -103,10 +104,7 @@ export function ForgotPasswordForm() {
           </Button>
 
           <div className="text-center">
-            <a
-              href="/auth/login"
-              className="text-sm font-medium text-foreground hover:underline"
-            >
+            <a href="/auth/login" className="text-sm font-medium text-foreground hover:underline">
               Back to login
             </a>
           </div>
@@ -137,19 +135,13 @@ export function ForgotPasswordForm() {
           autoComplete="email"
           autoFocus
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
         <p className="text-sm text-muted-foreground">
           Enter your email address and we&apos;ll send you a link to reset your password.
         </p>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -161,13 +153,8 @@ export function ForgotPasswordForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">
-          Remember your password?{' '}
-        </span>
-        <a
-          href="/auth/login"
-          className="font-medium text-foreground hover:underline"
-        >
+        <span className="text-muted-foreground">Remember your password? </span>
+        <a href="/auth/login" className="font-medium text-foreground hover:underline">
           Sign in
         </a>
       </div>

@@ -37,7 +37,7 @@ async function testRLSPolicies() {
       .from('complaint_comments')
       .select('id')
       .limit(0);
-    
+
     if (tableError) {
       console.error('❌ Table check failed:', tableError.message);
       return false;
@@ -50,7 +50,7 @@ async function testRLSPolicies() {
 
     // 3. Test policy behavior with mock data
     console.log('3️⃣  Testing policy behavior...');
-    
+
     // Create test users
     console.log('   Creating test users...');
     const studentEmail = `test-student-${Date.now()}@example.com`;
@@ -64,8 +64,8 @@ async function testRLSPolicies() {
       email_confirm: true,
       user_metadata: {
         role: 'student',
-        full_name: 'Test Student'
-      }
+        full_name: 'Test Student',
+      },
     });
 
     if (studentAuthError) {
@@ -74,29 +74,28 @@ async function testRLSPolicies() {
     }
 
     // Insert student into users table
-    const { error: studentInsertError } = await adminClient
-      .from('users')
-      .insert({
-        id: studentAuth.user.id,
-        email: studentEmail,
-        role: 'student',
-        full_name: 'Test Student'
-      });
+    const { error: studentInsertError } = await adminClient.from('users').insert({
+      id: studentAuth.user.id,
+      email: studentEmail,
+      role: 'student',
+      full_name: 'Test Student',
+    });
 
     if (studentInsertError) {
       console.error('❌ Failed to insert student into users table:', studentInsertError.message);
     }
 
     // Create lecturer user
-    const { data: lecturerAuth, error: lecturerAuthError } = await adminClient.auth.admin.createUser({
-      email: lecturerEmail,
-      password: password,
-      email_confirm: true,
-      user_metadata: {
-        role: 'lecturer',
-        full_name: 'Test Lecturer'
-      }
-    });
+    const { data: lecturerAuth, error: lecturerAuthError } =
+      await adminClient.auth.admin.createUser({
+        email: lecturerEmail,
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          role: 'lecturer',
+          full_name: 'Test Lecturer',
+        },
+      });
 
     if (lecturerAuthError) {
       console.error('❌ Failed to create lecturer user:', lecturerAuthError.message);
@@ -104,14 +103,12 @@ async function testRLSPolicies() {
     }
 
     // Insert lecturer into users table
-    const { error: lecturerInsertError } = await adminClient
-      .from('users')
-      .insert({
-        id: lecturerAuth.user.id,
-        email: lecturerEmail,
-        role: 'lecturer',
-        full_name: 'Test Lecturer'
-      });
+    const { error: lecturerInsertError } = await adminClient.from('users').insert({
+      id: lecturerAuth.user.id,
+      email: lecturerEmail,
+      role: 'lecturer',
+      full_name: 'Test Lecturer',
+    });
 
     if (lecturerInsertError) {
       console.error('❌ Failed to insert lecturer into users table:', lecturerInsertError.message);
@@ -131,7 +128,7 @@ async function testRLSPolicies() {
         description: 'This is a test complaint',
         category: 'academic',
         priority: 'medium',
-        status: 'new'
+        status: 'new',
       })
       .select()
       .single();
@@ -148,7 +145,7 @@ async function testRLSPolicies() {
     const studentClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     const { data: studentSession } = await studentClient.auth.signInWithPassword({
       email: studentEmail,
-      password: password
+      password: password,
     });
 
     const { data: studentComment, error: studentCommentError } = await studentClient
@@ -157,7 +154,7 @@ async function testRLSPolicies() {
         complaint_id: complaint.id,
         user_id: studentAuth.user.id,
         comment: 'This is a student comment',
-        is_internal: false
+        is_internal: false,
       })
       .select()
       .single();
@@ -188,7 +185,7 @@ async function testRLSPolicies() {
     const lecturerClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     await lecturerClient.auth.signInWithPassword({
       email: lecturerEmail,
-      password: password
+      password: password,
     });
 
     const { data: lecturerComment, error: lecturerCommentError } = await lecturerClient
@@ -197,7 +194,7 @@ async function testRLSPolicies() {
         complaint_id: complaint.id,
         user_id: lecturerAuth.user.id,
         comment: 'This is a lecturer comment',
-        is_internal: false
+        is_internal: false,
       })
       .select()
       .single();
@@ -216,7 +213,7 @@ async function testRLSPolicies() {
         complaint_id: complaint.id,
         user_id: lecturerAuth.user.id,
         comment: 'This is an internal note',
-        is_internal: true
+        is_internal: true,
       })
       .select()
       .single();
@@ -246,7 +243,7 @@ async function testRLSPolicies() {
     console.log('   Test 6: Student cannot see internal notes...');
     await studentClient.auth.signInWithPassword({
       email: studentEmail,
-      password: password
+      password: password,
     });
 
     const { data: studentViewComments2, error: studentViewError2 } = await studentClient
@@ -257,7 +254,7 @@ async function testRLSPolicies() {
     if (studentViewError2) {
       console.error('   ❌ Student could not view comments:', studentViewError2.message);
     } else {
-      const internalCount = studentViewComments2.filter(c => c.is_internal).length;
+      const internalCount = studentViewComments2.filter((c) => c.is_internal).length;
       if (internalCount === 0) {
         console.log('   ✅ Student cannot see internal notes (correct)');
       } else {
@@ -271,7 +268,6 @@ async function testRLSPolicies() {
     console.log('   ✅ Cleanup complete');
 
     return true;
-
   } catch (error) {
     console.error('❌ Test failed with error:', error.message);
     return false;
@@ -284,11 +280,11 @@ async function cleanup(studentId, lecturerId, complaintId) {
     if (complaintId) {
       await adminClient.from('complaints').delete().eq('id', complaintId);
     }
-    
+
     // Delete users
     await adminClient.from('users').delete().eq('id', studentId);
     await adminClient.from('users').delete().eq('id', lecturerId);
-    
+
     // Delete auth users
     await adminClient.auth.admin.deleteUser(studentId);
     await adminClient.auth.admin.deleteUser(lecturerId);
@@ -299,7 +295,7 @@ async function cleanup(studentId, lecturerId, complaintId) {
 
 // Run tests
 testRLSPolicies()
-  .then(success => {
+  .then((success) => {
     if (success) {
       console.log('\n✅ All complaint_comments RLS policy tests passed!');
       process.exit(0);
@@ -308,7 +304,7 @@ testRLSPolicies()
       process.exit(1);
     }
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('\n❌ Test execution failed:', error);
     process.exit(1);
   });

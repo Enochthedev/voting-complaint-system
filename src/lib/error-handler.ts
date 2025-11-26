@@ -1,6 +1,6 @@
 /**
  * Error Handling Utilities
- * 
+ *
  * Provides utilities for handling and formatting errors consistently
  * across the application.
  */
@@ -73,16 +73,12 @@ export function formatAuthError(error: AuthError): string {
     'Invalid login credentials': 'Invalid email or password. Please try again.',
     'Email not confirmed': 'Please verify your email address before logging in.',
     'User already registered': 'This email is already registered. Please sign in instead.',
-    'Password should be at least 6 characters':
-      'Password must be at least 8 characters long.',
-    'Unable to validate email address: invalid format':
-      'Please enter a valid email address.',
+    'Password should be at least 6 characters': 'Password must be at least 8 characters long.',
+    'Unable to validate email address: invalid format': 'Please enter a valid email address.',
     'Signups not allowed for this instance':
       'Registration is currently disabled. Please contact support.',
-    'Email rate limit exceeded':
-      'Too many requests. Please wait a few minutes and try again.',
-    'Invalid Refresh Token: Already Used':
-      'Your session has expired. Please sign in again.',
+    'Email rate limit exceeded': 'Too many requests. Please wait a few minutes and try again.',
+    'Invalid Refresh Token: Already Used': 'Your session has expired. Please sign in again.',
   };
 
   // Check for exact matches
@@ -142,11 +138,7 @@ export function formatError(error: any): string {
 /**
  * Log error with context
  */
-export function logError(
-  error: any,
-  context?: string,
-  additionalInfo?: Record<string, any>
-) {
+export function logError(error: any, context?: string, additionalInfo?: Record<string, any>) {
   const errorInfo = {
     message: formatError(error),
     context,

@@ -2,8 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { mockSignIn } from '@/lib/mock-auth';
-import { isValidEmail } from '@/lib/auth';
+import { signIn, isValidEmail } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,7 +55,7 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Clear previous errors
     setErrors({});
 
@@ -68,19 +67,19 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
-      // Using mock auth for UI development (Phase 3-11)
-      // TODO: Replace with real auth in Phase 12
-      const result = mockSignIn(email.trim(), password);
+      // Use real Supabase authentication
+      const { user, error } = await signIn(email.trim(), password);
 
-      if (!result.success) {
+      if (error) {
+        console.error('Sign in error:', error);
         setErrors({
-          general: result.error || 'Invalid email or password. Please try again.',
+          general: error.message || 'Invalid email or password. Please try again.',
         });
         return;
       }
 
-      if (result.user) {
-        console.log('✅ Mock login successful:', result.user.full_name);
+      if (user) {
+        console.log('✅ Login successful:', user.email);
         // Redirect to the requested page or dashboard on successful login
         const redirectPath = getRedirectPath();
         router.push(redirectPath);
@@ -134,9 +133,7 @@ export function LoginForm() {
           autoComplete="email"
           autoFocus
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
       </div>
 
       <div className="space-y-2">
@@ -157,7 +154,9 @@ export function LoginForm() {
             value={password}
             onChange={handlePasswordChange}
             disabled={isLoading}
-            className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+            className={
+              errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'
+            }
             autoComplete="current-password"
           />
           <button
@@ -167,23 +166,13 @@ export function LoginForm() {
             disabled={isLoading}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,13 +184,8 @@ export function LoginForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">
-          Don&apos;t have an account?{' '}
-        </span>
-        <a
-          href="/auth/register"
-          className="font-medium text-foreground hover:underline"
-        >
+        <span className="text-muted-foreground">Don&apos;t have an account? </span>
+        <a href="/auth/register" className="font-medium text-foreground hover:underline">
           Sign up
         </a>
       </div>

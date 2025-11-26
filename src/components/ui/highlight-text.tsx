@@ -19,16 +19,16 @@ function escapeRegex(str: string): string {
 
 /**
  * HighlightText Component
- * 
+ *
  * Renders text with highlighted search terms.
  * Wraps matching terms in <mark> elements for visual highlighting.
- * 
+ *
  * Features:
  * - Case-insensitive matching
  * - Multiple search terms support
  * - Customizable highlight styling
  * - Preserves original text formatting
- * 
+ *
  * @example
  * <HighlightText text="Broken AC in Lecture Hall" query="lecture hall" />
  * // Renders: Broken AC in <mark>Lecture</mark> <mark>Hall</mark>
@@ -66,19 +66,11 @@ export function HighlightText({
     <span className={className}>
       {parts.map((part, index) => {
         // Check if this part matches any search term (case-insensitive)
-        const isMatch = terms.some(
-          (term) => part.toLowerCase() === term.toLowerCase()
-        );
+        const isMatch = terms.some((term) => part.toLowerCase() === term.toLowerCase());
 
         if (isMatch) {
           return (
-            <mark
-              key={index}
-              className={cn(
-                'rounded px-0.5 font-medium',
-                highlightClassName
-              )}
-            >
+            <mark key={index} className={cn('rounded px-0.5 font-medium', highlightClassName)}>
               {part}
             </mark>
           );
@@ -92,10 +84,10 @@ export function HighlightText({
 
 /**
  * HighlightHTML Component
- * 
+ *
  * Similar to HighlightText but handles HTML content.
  * Strips HTML tags before highlighting to avoid breaking markup.
- * 
+ *
  * @example
  * <HighlightHTML html="<p>Broken AC in Lecture Hall</p>" query="lecture" />
  */

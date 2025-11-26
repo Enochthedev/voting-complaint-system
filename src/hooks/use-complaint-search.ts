@@ -1,6 +1,6 @@
 /**
  * useComplaintSearch Hook
- * 
+ *
  * React hook for managing complaint search state and operations.
  * Provides search functionality with debouncing, loading states, and error handling.
  */
@@ -26,12 +26,12 @@ export interface UseComplaintSearchReturn {
   isLoading: boolean;
   error: string | null;
   suggestions: string[];
-  
+
   // Search actions
   setQuery: (query: string) => void;
   search: (query?: string) => Promise<void>;
   clearSearch: () => void;
-  
+
   // Pagination
   goToPage: (page: number) => void;
   nextPage: () => void;
@@ -40,18 +40,14 @@ export interface UseComplaintSearchReturn {
 
 /**
  * Hook for managing complaint search
- * 
+ *
  * @param options - Search options including filters, sorting, and debouncing
  * @returns Search state and actions
  */
 export function useComplaintSearch(
   options: UseComplaintSearchOptions = {}
 ): UseComplaintSearchReturn {
-  const {
-    debounceMs = 300,
-    autoSearch = false,
-    ...searchOptions
-  } = options;
+  const { debounceMs = 300, autoSearch = false, ...searchOptions } = options;
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult | null>(null);
@@ -94,8 +90,7 @@ export function useComplaintSearch(
 
         setResults(searchResults);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to search complaints';
+        const errorMessage = err instanceof Error ? err.message : 'Failed to search complaints';
         setError(errorMessage);
         setResults(null);
       } finally {

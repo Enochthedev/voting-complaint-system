@@ -1,6 +1,6 @@
 /**
  * Priority Filter Tests
- * 
+ *
  * Tests for the priority filtering functionality in the FilterPanel component.
  * Validates that priority filtering works correctly for complaints.
  */
@@ -117,9 +117,7 @@ function filterComplaintsByPriority(
   if (priorityFilters.length === 0) {
     return complaints;
   }
-  return complaints.filter((complaint) =>
-    priorityFilters.includes(complaint.priority)
-  );
+  return complaints.filter((complaint) => priorityFilters.includes(complaint.priority));
 }
 
 describe('Priority Filter', () => {
@@ -193,9 +191,9 @@ describe('Priority Filter', () => {
   it('should not mutate original complaints array', () => {
     const originalLength = mockComplaints.length;
     const originalFirst = mockComplaints[0];
-    
+
     filterComplaintsByPriority(mockComplaints, ['high']);
-    
+
     expect(mockComplaints).toHaveLength(originalLength);
     expect(mockComplaints[0]).toBe(originalFirst);
   });

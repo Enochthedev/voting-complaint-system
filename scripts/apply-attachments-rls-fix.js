@@ -31,20 +31,20 @@ const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
 async function applyMigration(migrationPath, migrationName) {
   console.log(`\n📝 Applying ${migrationName}...`);
-  
+
   try {
     const sql = readFileSync(migrationPath, 'utf8');
-    
+
     // Split by semicolons and execute each statement
     const statements = sql
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
-    
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && !s.startsWith('--'));
+
     for (const statement of statements) {
       if (statement.trim()) {
         const { error } = await adminClient.rpc('exec_sql', { sql_query: statement + ';' });
-        
+
         if (error) {
           // Try direct execution if rpc fails
           const { error: directError } = await adminClient.from('_migrations').select('*').limit(0);
@@ -54,7 +54,7 @@ async function applyMigration(migrationPath, migrationName) {
         }
       }
     }
-    
+
     console.log(`✅ ${migrationName} applied successfully`);
     return true;
   } catch (error) {
@@ -67,15 +67,30 @@ async function main() {
   console.log('🚀 Applying RLS policy fixes...\n');
   console.log('This will fix the infinite recursion issue in RLS policies');
   console.log('by using JWT claims instead of querying the users table.\n');
-  
+
   // Apply users table RLS fix
-  const usersFixPath = join(__dirname, '..', 'supabase', 'migrations', '020_fix_users_table_rls.sql');
+  const usersFixPath = join(
+    __dirname,
+    '..',
+    'supabase',
+    'migrations',
+    '020_fix_users_table_rls.sql'
+  );
   const usersSuccess = await applyMigration(usersFixPath, 'Users table RLS fix');
-  
+
   // Apply complaint_attachments RLS fix
-  const attachmentsFixPath = join(__dirname, '..', 'supabase', 'migrations', '019_fix_complaint_attachments_rls.sql');
-  const attachmentsSuccess = await applyMigration(attachmentsFixPath, 'Complaint attachments RLS fix');
-  
+  const attachmentsFixPath = join(
+    __dirname,
+    '..',
+    'supabase',
+    'migrations',
+    '019_fix_complaint_attachments_rls.sql'
+  );
+  const attachmentsSuccess = await applyMigration(
+    attachmentsFixPath,
+    'Complaint attachments RLS fix'
+  );
+
   if (usersSuccess && attachmentsSuccess) {
     console.log('\n✅ All migrations applied successfully!');
     console.log('\n📋 Next steps:');

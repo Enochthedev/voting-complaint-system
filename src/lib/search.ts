@@ -1,9 +1,9 @@
 /**
  * Full-Text Search Utilities
- * 
+ *
  * Implements full-text search functionality for complaints using PostgreSQL's
  * full-text search capabilities via Supabase.
- * 
+ *
  * Features:
  * - Full-text search across complaint titles and descriptions
  * - Search vector indexing for performance
@@ -14,11 +14,6 @@
 
 import { supabase } from './supabase';
 import type { Complaint, ComplaintTag } from '@/types/database.types';
-import { mockSearchComplaints, mockGetSearchSuggestions } from './search-mock';
-
-// Feature flag for using mock data during development
-// Set to false in Phase 12 when connecting real APIs
-const USE_MOCK_DATA = true;
 
 export interface SearchFilters {
   status?: string[];
@@ -48,10 +43,10 @@ export interface SearchResult {
 
 /**
  * Performs full-text search on complaints table
- * 
+ *
  * Uses PostgreSQL's full-text search with the search_vector column
  * that indexes both title and description fields.
- * 
+ *
  * @param query - Search query string
  * @param options - Search options including filters, sorting, and pagination
  * @returns Search results with complaints and pagination info
@@ -60,10 +55,6 @@ export async function searchComplaints(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResult> {
-  // Use mock data during UI development (Phase 3-11)
-  if (USE_MOCK_DATA) {
-    return mockSearchComplaints(query, options);
-  }
 
   const {
     filters = {},
@@ -74,9 +65,7 @@ export async function searchComplaints(
   } = options;
 
   // Build the base query
-  let queryBuilder = supabase
-    .from('complaints')
-    .select('*, complaint_tags(*)', { count: 'exact' });
+  let queryBuilder = supabase.from('complaints').select('*, complaint_tags(*)', { count: 'exact' });
 
   // Apply full-text search if query is provided
   if (query && query.trim()) {
@@ -168,7 +157,7 @@ export async function searchComplaints(
 
 /**
  * Searches complaints with simple query (for backward compatibility)
- * 
+ *
  * @param query - Search query string
  * @param page - Page number (1-indexed)
  * @param pageSize - Number of results per page
@@ -184,10 +173,10 @@ export async function simpleSearchComplaints(
 
 /**
  * Gets search suggestions based on partial query
- * 
+ *
  * This can be used for autocomplete functionality.
  * Returns recent search terms or common complaint titles.
- * 
+ *
  * @param partialQuery - Partial search query
  * @param limit - Maximum number of suggestions
  * @returns Array of suggestion strings
@@ -196,10 +185,6 @@ export async function getSearchSuggestions(
   partialQuery: string,
   limit: number = 5
 ): Promise<string[]> {
-  // Use mock data during UI development (Phase 3-11)
-  if (USE_MOCK_DATA) {
-    return mockGetSearchSuggestions(partialQuery, limit);
-  }
 
   if (!partialQuery || partialQuery.trim().length < 2) {
     return [];
@@ -224,10 +209,10 @@ export async function getSearchSuggestions(
 
 /**
  * Highlights search terms in text
- * 
+ *
  * Utility function to highlight matching search terms in complaint text.
  * Useful for displaying search results with highlighted matches.
- * 
+ *
  * @param text - Text to highlight
  * @param query - Search query
  * @returns Text with <mark> tags around matches
@@ -266,9 +251,9 @@ function escapeRegex(str: string): string {
 
 /**
  * Validates search query
- * 
+ *
  * Checks if the search query is valid and not too short/long.
- * 
+ *
  * @param query - Search query to validate
  * @returns Validation result with error message if invalid
  */

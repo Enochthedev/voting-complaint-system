@@ -1,6 +1,6 @@
 /**
  * FileUpload Component Tests
- * 
+ *
  * Tests for the FileUpload UI component including drag-and-drop,
  * file selection, validation display, and file removal.
  */
@@ -11,11 +11,7 @@ import { FileUpload } from '../file-upload';
 import { MAX_FILES_PER_COMPLAINT } from '@/lib/constants';
 
 // Helper to create mock File objects
-function createMockFile(
-  name: string,
-  size: number,
-  type: string
-): File {
+function createMockFile(name: string, size: number, type: string): File {
   const blob = new Blob(['x'.repeat(size)], { type });
   return new File([blob], name, { type });
 }
@@ -23,21 +19,23 @@ function createMockFile(
 describe('FileUpload Component', () => {
   it('should render upload area with instructions', () => {
     render(<FileUpload />);
-    
+
     expect(screen.getByText(/Drag and drop files here/i)).toBeInTheDocument();
     expect(screen.getByText(/browse/i)).toBeInTheDocument();
   });
 
   it('should display file size and count limits', () => {
     render(<FileUpload />);
-    
+
     expect(screen.getByText(/Max 10MB per file/i)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`${MAX_FILES_PER_COMPLAINT} files total`, 'i'))).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(`${MAX_FILES_PER_COMPLAINT} files total`, 'i'))
+    ).toBeInTheDocument();
   });
 
   it('should display allowed file types', () => {
     render(<FileUpload />);
-    
+
     expect(screen.getByText(/\.jpg, \.jpeg, \.png, \.gif/i)).toBeInTheDocument();
     expect(screen.getByText(/\.pdf/i)).toBeInTheDocument();
   });
@@ -45,31 +43,31 @@ describe('FileUpload Component', () => {
   it('should call onFilesSelected when valid files are added', () => {
     const onFilesSelected = vi.fn();
     render(<FileUpload onFilesSelected={onFilesSelected} />);
-    
+
     const file = createMockFile('test.jpg', 1024 * 1024, 'image/jpeg');
     const input = screen.getByLabelText('File upload input') as HTMLInputElement;
-    
+
     fireEvent.change(input, { target: { files: [file] } });
-    
+
     expect(onFilesSelected).toHaveBeenCalledWith([file]);
   });
 
   it('should display validation errors for invalid files', () => {
     render(<FileUpload />);
-    
+
     // Create a file that's too large
     const largeFile = createMockFile('large.jpg', 11 * 1024 * 1024, 'image/jpeg');
     const input = screen.getByLabelText('File upload input') as HTMLInputElement;
-    
+
     fireEvent.change(input, { target: { files: [largeFile] } });
-    
+
     expect(screen.getByText(/exceeds maximum size/i)).toBeInTheDocument();
   });
 
   it('should display selected files', () => {
     const file = createMockFile('test.jpg', 1024 * 1024, 'image/jpeg');
     render(<FileUpload files={[file]} />);
-    
+
     expect(screen.getByText('test.jpg')).toBeInTheDocument();
     expect(screen.getByText(/1 MB/i)).toBeInTheDocument();
   });
@@ -77,12 +75,12 @@ describe('FileUpload Component', () => {
   it('should call onFileRemove when remove button is clicked', () => {
     const file = createMockFile('test.jpg', 1024 * 1024, 'image/jpeg');
     const onFileRemove = vi.fn();
-    
+
     render(<FileUpload files={[file]} onFileRemove={onFileRemove} />);
-    
+
     const removeButton = screen.getByLabelText('Remove test.jpg');
     fireEvent.click(removeButton);
-    
+
     expect(onFileRemove).toHaveBeenCalledWith(file);
   });
 
@@ -91,15 +89,15 @@ describe('FileUpload Component', () => {
       createMockFile('file1.jpg', 1024, 'image/jpeg'),
       createMockFile('file2.jpg', 1024, 'image/jpeg'),
     ];
-    
+
     render(<FileUpload files={files} />);
-    
+
     expect(screen.getByText(`Selected Files (2/${MAX_FILES_PER_COMPLAINT})`)).toBeInTheDocument();
   });
 
   it('should disable upload when disabled prop is true', () => {
     render(<FileUpload disabled={true} />);
-    
+
     const input = screen.getByLabelText('File upload input') as HTMLInputElement;
     expect(input).toBeDisabled();
   });
@@ -108,35 +106,35 @@ describe('FileUpload Component', () => {
     const files = Array.from({ length: MAX_FILES_PER_COMPLAINT }, (_, i) =>
       createMockFile(`file${i}.jpg`, 1024, 'image/jpeg')
     );
-    
+
     render(<FileUpload files={files} />);
-    
+
     expect(screen.getByText(/Maximum file limit reached/i)).toBeInTheDocument();
   });
 
   it('should display help text when no files are selected', () => {
     render(<FileUpload />);
-    
+
     expect(screen.getByText(/File Upload Guidelines/i)).toBeInTheDocument();
     expect(screen.getByText(/Maximum.*files per complaint/i)).toBeInTheDocument();
   });
 
   it('should allow dismissing validation errors', () => {
     render(<FileUpload />);
-    
+
     // Add invalid file
     const invalidFile = createMockFile('test.mp4', 1024, 'video/mp4');
     const input = screen.getByLabelText('File upload input') as HTMLInputElement;
-    
+
     fireEvent.change(input, { target: { files: [invalidFile] } });
-    
+
     // Error should be visible
     expect(screen.getByText(/unsupported type/i)).toBeInTheDocument();
-    
+
     // Dismiss error
     const dismissButton = screen.getByLabelText('Dismiss error');
     fireEvent.click(dismissButton);
-    
+
     // Error should be gone
     expect(screen.queryByText(/unsupported type/i)).not.toBeInTheDocument();
   });
@@ -144,7 +142,7 @@ describe('FileUpload Component', () => {
   it('should show image preview for image files', () => {
     const imageFile = createMockFile('image.jpg', 1024, 'image/jpeg');
     render(<FileUpload files={[imageFile]} />);
-    
+
     const img = screen.getByAltText('image.jpg');
     expect(img).toBeInTheDocument();
   });
@@ -152,7 +150,7 @@ describe('FileUpload Component', () => {
   it('should show file icon for non-image files', () => {
     const pdfFile = createMockFile('document.pdf', 1024, 'application/pdf');
     render(<FileUpload files={[pdfFile]} />);
-    
+
     expect(screen.getByText('document.pdf')).toBeInTheDocument();
     // File icon should be present (we can't easily test for the icon itself)
   });
@@ -287,12 +285,7 @@ describe('FileUpload Component', () => {
         },
       ];
 
-      render(
-        <FileUpload
-          files={[completedFile]}
-          uploadProgress={uploadProgress}
-        />
-      );
+      render(<FileUpload files={[completedFile]} uploadProgress={uploadProgress} />);
 
       expect(screen.getByText('Uploading Files (0/1)')).toBeInTheDocument();
       expect(screen.getByText('Selected Files (1/5)')).toBeInTheDocument();

@@ -2,7 +2,7 @@
 
 /**
  * Verify Role Setup
- * 
+ *
  * This script verifies that the role field is properly configured
  * in user metadata and JWT claims.
  */

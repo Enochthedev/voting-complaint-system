@@ -1,6 +1,6 @@
 /**
  * Authentication Type Definitions
- * 
+ *
  * This file contains all type definitions related to authentication,
  * user management, and authorization.
  */
@@ -194,10 +194,7 @@ export function getRolePermissions(role: UserRole | null): RolePermissions {
 /**
  * Check if user has permission
  */
-export function hasPermission(
-  role: UserRole | null,
-  permission: keyof RolePermissions
-): boolean {
+export function hasPermission(role: UserRole | null, permission: keyof RolePermissions): boolean {
   const permissions = getRolePermissions(role);
   return permissions[permission];
 }

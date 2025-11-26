@@ -1,6 +1,6 @@
 /**
  * Assigned to Me Quick Filter Tests
- * 
+ *
  * Tests for the "Assigned to Me" quick filter button functionality.
  * Validates that the quick filter correctly filters complaints assigned to the current user.
  */
@@ -110,10 +110,7 @@ const mockComplaints: Complaint[] = [
 /**
  * Apply "Assigned to Me" quick filter
  */
-function applyAssignedToMeFilter(
-  complaints: Complaint[],
-  currentUserId: string
-): Complaint[] {
+function applyAssignedToMeFilter(complaints: Complaint[], currentUserId: string): Complaint[] {
   return complaints.filter((complaint) => complaint.assigned_to === currentUserId);
 }
 
@@ -129,7 +126,7 @@ describe('Assigned to Me Quick Filter', () => {
   it('should include complaints with different statuses', () => {
     const filtered = applyAssignedToMeFilter(mockComplaints, currentUserId);
     expect(filtered).toHaveLength(3);
-    
+
     const statuses = filtered.map((c) => c.status);
     expect(statuses).toContain('opened');
     expect(statuses).toContain('in_progress');
@@ -139,7 +136,7 @@ describe('Assigned to Me Quick Filter', () => {
   it('should include complaints with different priorities', () => {
     const filtered = applyAssignedToMeFilter(mockComplaints, currentUserId);
     expect(filtered).toHaveLength(3);
-    
+
     const priorities = filtered.map((c) => c.priority);
     expect(priorities).toContain('medium');
     expect(priorities).toContain('critical');
@@ -174,9 +171,9 @@ describe('Assigned to Me Quick Filter', () => {
   it('should not mutate original complaints array', () => {
     const originalLength = mockComplaints.length;
     const originalFirst = mockComplaints[0];
-    
+
     applyAssignedToMeFilter(mockComplaints, currentUserId);
-    
+
     expect(mockComplaints).toHaveLength(originalLength);
     expect(mockComplaints[0]).toBe(originalFirst);
   });
@@ -184,7 +181,7 @@ describe('Assigned to Me Quick Filter', () => {
   it('should work with different complaint categories', () => {
     const filtered = applyAssignedToMeFilter(mockComplaints, currentUserId);
     expect(filtered).toHaveLength(3);
-    
+
     const categories = filtered.map((c) => c.category);
     expect(categories).toContain('facilities');
     expect(categories).toContain('course_content');
@@ -197,10 +194,10 @@ describe('Assigned to Me Quick Filter', () => {
 
   it('should correctly identify all complaints for a specific user', () => {
     const filtered = applyAssignedToMeFilter(mockComplaints, currentUserId);
-    
+
     // Verify all returned complaints belong to current user
     expect(filtered.every((c) => c.assigned_to === currentUserId)).toBe(true);
-    
+
     // Verify we got all complaints for current user
     const expectedIds = ['2', '4', '5'];
     const actualIds = filtered.map((c) => c.id);
@@ -210,11 +207,11 @@ describe('Assigned to Me Quick Filter', () => {
   it('should work when combined with other filters (status)', () => {
     // First apply "Assigned to Me" filter
     const assignedToMe = applyAssignedToMeFilter(mockComplaints, currentUserId);
-    
+
     // Then apply status filter for unresolved complaints
     const unresolvedStatuses = ['new', 'opened', 'in_progress', 'reopened'];
     const filtered = assignedToMe.filter((c) => unresolvedStatuses.includes(c.status));
-    
+
     expect(filtered).toHaveLength(2);
     expect(filtered.every((c) => c.assigned_to === currentUserId)).toBe(true);
     expect(filtered.every((c) => unresolvedStatuses.includes(c.status))).toBe(true);
@@ -223,11 +220,11 @@ describe('Assigned to Me Quick Filter', () => {
   it('should work when combined with other filters (priority)', () => {
     // First apply "Assigned to Me" filter
     const assignedToMe = applyAssignedToMeFilter(mockComplaints, currentUserId);
-    
+
     // Then apply priority filter for high priority complaints
     const highPriorities = ['high', 'critical'];
     const filtered = assignedToMe.filter((c) => highPriorities.includes(c.priority));
-    
+
     expect(filtered).toHaveLength(2);
     expect(filtered.every((c) => c.assigned_to === currentUserId)).toBe(true);
     expect(filtered.every((c) => highPriorities.includes(c.priority))).toBe(true);

@@ -1,6 +1,6 @@
 /**
  * Draft Editing Tests
- * 
+ *
  * Tests the draft editing functionality for complaints
  * Validates: Requirements AC10, P11
  */
@@ -33,7 +33,7 @@ describe('Draft Editing Functionality', () => {
 
       // Simulate loading draft
       const loadedDraft = mockDraft;
-      
+
       expect(loadedDraft.id).toBe('draft-1');
       expect(loadedDraft.title).toBe('WiFi connectivity issues in library');
       expect(loadedDraft.category).toBe('facilities');
@@ -138,7 +138,7 @@ describe('Draft Editing Functionality', () => {
       expect(withNewTag.tags).toEqual(['tag1', 'tag2', 'tag3']);
 
       // Remove tag
-      const withRemovedTag = { ...draft, tags: draft.tags.filter(t => t !== 'tag1') };
+      const withRemovedTag = { ...draft, tags: draft.tags.filter((t) => t !== 'tag1') };
       expect(withRemovedTag.tags).toEqual(['tag2']);
     });
 
@@ -208,7 +208,7 @@ describe('Draft Editing Functionality', () => {
         priority: 'high',
       };
 
-      const isValid = 
+      const isValid =
         incompleteData.title.trim().length > 0 &&
         incompleteData.description.trim().length > 0 &&
         incompleteData.category.length > 0 &&
@@ -227,12 +227,12 @@ describe('Draft Editing Functionality', () => {
       };
 
       // For drafts, validation is lenient
-      const isValidForDraft = isDraft ? true : (
-        partialData.title.trim().length > 0 &&
-        partialData.description.trim().length > 0 &&
-        partialData.category.length > 0 &&
-        partialData.priority.length > 0
-      );
+      const isValidForDraft = isDraft
+        ? true
+        : partialData.title.trim().length > 0 &&
+          partialData.description.trim().length > 0 &&
+          partialData.category.length > 0 &&
+          partialData.priority.length > 0;
 
       expect(isValidForDraft).toBe(true);
     });
@@ -242,14 +242,14 @@ describe('Draft Editing Functionality', () => {
     it('should detect draft ID from URL parameter', () => {
       const searchParams = new URLSearchParams('?draft=draft-1');
       const draftId = searchParams.get('draft');
-      
+
       expect(draftId).toBe('draft-1');
     });
 
     it('should handle missing draft parameter', () => {
       const searchParams = new URLSearchParams('');
       const draftId = searchParams.get('draft');
-      
+
       expect(draftId).toBeNull();
     });
 
@@ -317,7 +317,7 @@ describe('Draft Editing Functionality', () => {
     it('should navigate to drafts page after saving draft', () => {
       const isDraft = true;
       const expectedRoute = '/complaints/drafts';
-      
+
       // After successful draft save, should redirect to drafts page
       expect(isDraft).toBe(true);
       expect(expectedRoute).toBe('/complaints/drafts');
@@ -326,7 +326,7 @@ describe('Draft Editing Functionality', () => {
     it('should navigate to dashboard after submitting complaint', () => {
       const isDraft = false;
       const expectedRoute = '/dashboard';
-      
+
       // After successful submission, should redirect to dashboard
       expect(isDraft).toBe(false);
       expect(expectedRoute).toBe('/dashboard');
@@ -335,7 +335,7 @@ describe('Draft Editing Functionality', () => {
     it('should construct edit URL with draft ID', () => {
       const draftId = 'draft-1';
       const editUrl = `/complaints/new?draft=${draftId}`;
-      
+
       expect(editUrl).toBe('/complaints/new?draft=draft-1');
     });
   });
@@ -344,18 +344,18 @@ describe('Draft Editing Functionality', () => {
     it('should show different success message for draft update vs creation', () => {
       const isEditing = true;
       const isDraft = true;
-      
-      const message = isEditing 
+
+      const message = isEditing
         ? 'Your draft has been updated successfully!'
         : 'Your draft has been saved successfully!';
-      
+
       expect(message).toBe('Your draft has been updated successfully!');
     });
 
     it('should show appropriate page title when editing', () => {
       const isEditing = true;
       const pageTitle = isEditing ? 'Edit Draft Complaint' : 'Submit a Complaint';
-      
+
       expect(pageTitle).toBe('Edit Draft Complaint');
     });
 
@@ -364,7 +364,7 @@ describe('Draft Editing Functionality', () => {
       const description = isEditing
         ? 'Continue editing your draft complaint. You can save your changes or submit the complaint.'
         : 'Fill out the form below to submit your complaint. You can save it as a draft and complete it later, or submit it immediately.';
-      
+
       expect(description).toContain('Continue editing');
     });
   });

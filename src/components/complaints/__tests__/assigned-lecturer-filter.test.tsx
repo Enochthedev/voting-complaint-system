@@ -1,6 +1,6 @@
 /**
  * Assigned Lecturer Filter Tests
- * 
+ *
  * Tests for the assigned lecturer filter functionality in the FilterPanel component.
  * Validates that filtering by assigned lecturer works correctly for complaints.
  */
@@ -172,9 +172,9 @@ describe('Assigned Lecturer Filter', () => {
   it('should not mutate original complaints array', () => {
     const originalLength = mockComplaints.length;
     const originalFirst = mockComplaints[0];
-    
+
     filterComplaintsByAssignedLecturer(mockComplaints, 'lecturer-1');
-    
+
     expect(mockComplaints).toHaveLength(originalLength);
     expect(mockComplaints[0]).toBe(originalFirst);
   });

@@ -1,6 +1,6 @@
 /**
  * Filter Preset Tests
- * 
+ *
  * Tests for the filter preset save/load/delete functionality
  */
 

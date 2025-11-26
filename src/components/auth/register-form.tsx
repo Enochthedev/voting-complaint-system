@@ -81,11 +81,7 @@ export function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const { user, error } = await signUp(
-        email.trim(),
-        password,
-        fullName.trim()
-      );
+      const { user, error } = await signUp(email.trim(), password, fullName.trim());
 
       if (error) {
         // Handle specific error cases
@@ -154,14 +150,12 @@ export function RegisterForm() {
         <Alert variant="success">
           <CheckCircle2 className="h-4 w-4" />
           <AlertDescription>
-            Registration successful! Please check your email to verify your account before signing in.
+            Registration successful! Please check your email to verify your account before signing
+            in.
           </AlertDescription>
         </Alert>
 
-        <Button
-          onClick={() => router.push('/auth/login')}
-          className="w-full"
-        >
+        <Button onClick={() => router.push('/auth/login')} className="w-full">
           Go to Sign In
         </Button>
       </div>
@@ -190,9 +184,7 @@ export function RegisterForm() {
           autoComplete="name"
           autoFocus
         />
-        {errors.fullName && (
-          <p className="text-sm text-destructive">{errors.fullName}</p>
-        )}
+        {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
       </div>
 
       <div className="space-y-2">
@@ -207,9 +199,7 @@ export function RegisterForm() {
           className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
           autoComplete="email"
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
       </div>
 
       <div className="space-y-2">
@@ -222,7 +212,9 @@ export function RegisterForm() {
             value={password}
             onChange={handlePasswordChange}
             disabled={isLoading}
-            className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+            className={
+              errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'
+            }
             autoComplete="new-password"
           />
           <button
@@ -232,16 +224,10 @@ export function RegisterForm() {
             disabled={isLoading}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
         <p className="text-xs text-muted-foreground">
           Must be at least 8 characters with uppercase, lowercase, and numbers
         </p>
@@ -257,7 +243,11 @@ export function RegisterForm() {
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
             disabled={isLoading}
-            className={errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+            className={
+              errors.confirmPassword
+                ? 'border-destructive focus-visible:ring-destructive pr-10'
+                : 'pr-10'
+            }
             autoComplete="new-password"
           />
           <button
@@ -267,11 +257,7 @@ export function RegisterForm() {
             disabled={isLoading}
             aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
           >
-            {showConfirmPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.confirmPassword && (
@@ -279,11 +265,7 @@ export function RegisterForm() {
         )}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -295,13 +277,8 @@ export function RegisterForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">
-          Already have an account?{' '}
-        </span>
-        <a
-          href="/auth/login"
-          className="font-medium text-foreground hover:underline"
-        >
+        <span className="text-muted-foreground">Already have an account? </span>
+        <a href="/auth/login" className="font-medium text-foreground hover:underline">
           Sign in
         </a>
       </div>

@@ -9,11 +9,7 @@ import { isValidEmail } from '@/lib/auth';
 console.log('Testing email validation...');
 
 // Valid emails
-const validEmails = [
-  'student@university.edu',
-  'test.user@example.com',
-  'user+tag@domain.co.uk',
-];
+const validEmails = ['student@university.edu', 'test.user@example.com', 'user+tag@domain.co.uk'];
 
 validEmails.forEach((email) => {
   const result = isValidEmail(email);
@@ -24,14 +20,7 @@ validEmails.forEach((email) => {
 });
 
 // Invalid emails
-const invalidEmails = [
-  '',
-  'notanemail',
-  '@example.com',
-  'user@',
-  'user @example.com',
-  'user@.com',
-];
+const invalidEmails = ['', 'notanemail', '@example.com', 'user@', 'user @example.com', 'user@.com'];
 
 invalidEmails.forEach((email) => {
   const result = isValidEmail(email);

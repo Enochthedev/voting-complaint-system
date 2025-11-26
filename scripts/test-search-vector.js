@@ -1,7 +1,7 @@
 /**
  * Test script for search_vector functionality
  * This script demonstrates that the full-text search is working correctly
- * 
+ *
  * Run with: node scripts/test-search-vector.js
  */
 
@@ -74,15 +74,14 @@ async function testSearchVector() {
     console.log('Note: To test actual search queries, you need complaints in the database.');
     console.log('Example search query:');
     console.log('  const { data } = await supabase');
-    console.log('    .from(\'complaints\')');
-    console.log('    .select(\'*\')');
-    console.log('    .textSearch(\'search_vector\', \'academic issue\', {');
-    console.log('      type: \'websearch\',');
-    console.log('      config: \'english\'');
+    console.log("    .from('complaints')");
+    console.log("    .select('*')");
+    console.log("    .textSearch('search_vector', 'academic issue', {");
+    console.log("      type: 'websearch',");
+    console.log("      config: 'english'");
     console.log('    });\n');
 
     return true;
-
   } catch (err) {
     console.error('❌ Unexpected error:', err.message);
     return false;
@@ -91,7 +90,7 @@ async function testSearchVector() {
 
 // Run test
 testSearchVector()
-  .then(success => {
+  .then((success) => {
     if (success) {
       console.log('✅ All tests PASSED - search_vector is working correctly!\n');
       process.exit(0);
@@ -100,7 +99,7 @@ testSearchVector()
       process.exit(1);
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Fatal error:', err);
     process.exit(1);
   });

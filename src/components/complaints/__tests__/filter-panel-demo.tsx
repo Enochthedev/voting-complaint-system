@@ -5,7 +5,7 @@ import { FilterPanel, FilterState } from '../filter-panel';
 
 /**
  * Filter Panel Demo Component
- * 
+ *
  * This component demonstrates the filter panel UI with mock data.
  * It shows all the filtering capabilities including:
  * - Status, category, priority filters
@@ -80,9 +80,7 @@ export default function FilterPanelDemo() {
       <div className="mx-auto max-w-7xl space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-            Filter Panel Demo
-          </h1>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Filter Panel Demo</h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
             Interactive demonstration of the complaint filter panel UI
           </p>
@@ -151,99 +149,91 @@ export default function FilterPanelDemo() {
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Status Filter:</strong> Filter by complaint status
-                    (New, Opened, In Progress, Resolved, Closed, Reopened)
+                    <strong>Status Filter:</strong> Filter by complaint status (New, Opened, In
+                    Progress, Resolved, Closed, Reopened)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Category Filter:</strong> Filter by complaint
-                    category (Academic, Facilities, Harassment, etc.)
+                    <strong>Category Filter:</strong> Filter by complaint category (Academic,
+                    Facilities, Harassment, etc.)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Priority Filter:</strong> Filter by priority level
-                    (Low, Medium, High, Critical)
+                    <strong>Priority Filter:</strong> Filter by priority level (Low, Medium, High,
+                    Critical)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Date Range:</strong> Filter complaints by creation
-                    date range
+                    <strong>Date Range:</strong> Filter complaints by creation date range
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Tag Filter:</strong> Filter by complaint tags with
-                    scrollable list
+                    <strong>Tag Filter:</strong> Filter by complaint tags with scrollable list
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Assigned Lecturer:</strong> Filter by assigned
-                    lecturer (dropdown)
+                    <strong>Assigned Lecturer:</strong> Filter by assigned lecturer (dropdown)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Sort Options:</strong> Sort by date, priority,
-                    status, or title (ascending/descending)
+                    <strong>Sort Options:</strong> Sort by date, priority, status, or title
+                    (ascending/descending)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Active Filters:</strong> Display active filters as
-                    removable chips
+                    <strong>Active Filters:</strong> Display active filters as removable chips
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Clear All:</strong> Quick button to clear all
-                    filters at once
+                    <strong>Clear All:</strong> Quick button to clear all filters at once
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Save Presets:</strong> Save current filter
-                    configuration as a named preset
+                    <strong>Save Presets:</strong> Save current filter configuration as a named
+                    preset
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Collapsible:</strong> Collapse/expand filter panel
-                    to save space
+                    <strong>Collapsible:</strong> Collapse/expand filter panel to save space
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Filter Count Badge:</strong> Shows number of active
-                    filters in header
+                    <strong>Filter Count Badge:</strong> Shows number of active filters in header
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Expandable Sections:</strong> Each filter section
-                    can be expanded/collapsed independently
+                    <strong>Expandable Sections:</strong> Each filter section can be
+                    expanded/collapsed independently
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✓</span>
                   <span>
-                    <strong>Responsive Design:</strong> Works on mobile and
-                    desktop screens
+                    <strong>Responsive Design:</strong> Works on mobile and desktop screens
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -268,12 +258,10 @@ export default function FilterPanelDemo() {
                   <strong>2.</strong> Watch the filter state update in real-time
                 </li>
                 <li>
-                  <strong>3.</strong> Active filters appear as chips at the
-                  bottom
+                  <strong>3.</strong> Active filters appear as chips at the bottom
                 </li>
                 <li>
-                  <strong>4.</strong> Click the X on a chip to remove that
-                  filter
+                  <strong>4.</strong> Click the X on a chip to remove that filter
                 </li>
                 <li>
                   <strong>5.</strong> Use "Clear All" to reset all filters

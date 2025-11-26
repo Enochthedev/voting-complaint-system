@@ -22,17 +22,14 @@ const STORAGE_KEY = 'complaint-filter-presets';
 
 /**
  * Filter Preset Manager Component
- * 
+ *
  * Manages saved filter presets with:
  * - Display list of saved presets
  * - Load preset functionality
  * - Delete preset functionality
  * - LocalStorage persistence
  */
-export function FilterPresetManager({
-  onLoadPreset,
-  className,
-}: FilterPresetManagerProps) {
+export function FilterPresetManager({ onLoadPreset, className }: FilterPresetManagerProps) {
   const [presets, setPresets] = React.useState<FilterPreset[]>([]);
   const [activePresetId, setActivePresetId] = React.useState<string | null>(null);
 
@@ -92,12 +89,9 @@ export function FilterPresetManager({
   };
 
   // Expose addPreset function to parent
-  React.useImperativeHandle(
-    React.useRef<{ addPreset: typeof addPreset }>(null),
-    () => ({
-      addPreset,
-    })
-  );
+  React.useImperativeHandle(React.useRef<{ addPreset: typeof addPreset }>(null), () => ({
+    addPreset,
+  }));
 
   if (presets.length === 0) {
     return null;
@@ -107,11 +101,9 @@ export function FilterPresetManager({
     <div className={cn('rounded-lg border bg-card p-4', className)}>
       <div className="mb-3 flex items-center gap-2">
         <Bookmark className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold text-card-foreground">
-          Saved Presets
-        </h3>
+        <h3 className="text-sm font-semibold text-card-foreground">Saved Presets</h3>
       </div>
-      
+
       <div className="space-y-2">
         {presets.map((preset) => (
           <div
@@ -127,14 +119,10 @@ export function FilterPresetManager({
               onClick={() => handleLoadPreset(preset)}
               className="flex flex-1 items-center gap-2 text-left"
             >
-              {activePresetId === preset.id && (
-                <Check className="h-3 w-3 text-foreground" />
-              )}
-              <span className="text-sm font-medium text-foreground">
-                {preset.name}
-              </span>
+              {activePresetId === preset.id && <Check className="h-3 w-3 text-foreground" />}
+              <span className="text-sm font-medium text-foreground">{preset.name}</span>
             </button>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -150,7 +138,7 @@ export function FilterPresetManager({
           </div>
         ))}
       </div>
-      
+
       <div className="mt-3 text-xs text-muted-foreground">
         {presets.length} saved preset{presets.length !== 1 ? 's' : ''}
       </div>
@@ -166,7 +154,7 @@ export function saveFilterPreset(name: string, filters: FilterState): FilterPres
     filters,
     createdAt: new Date().toISOString(),
   };
-  
+
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     const presets: FilterPreset[] = stored ? JSON.parse(stored) : [];

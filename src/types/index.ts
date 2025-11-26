@@ -1,6 +1,6 @@
 /**
  * Central type exports
- * 
+ *
  * This file re-exports all types used throughout the application
  */
 

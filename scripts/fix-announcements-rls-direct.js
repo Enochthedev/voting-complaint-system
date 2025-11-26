@@ -2,7 +2,7 @@
 
 /**
  * Fix Announcements RLS Policies Directly
- * 
+ *
  * This script uses the Supabase admin client to directly execute
  * SQL statements to fix the announcements RLS policies.
  */
@@ -23,17 +23,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function executeSQL(description, sql) {
   console.log(`\n${description}...`);
-  
+
   // Use the REST API directly to execute SQL
   const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'apikey': supabaseKey,
-      'Authorization': `Bearer ${supabaseKey}`,
-      'Prefer': 'return=representation'
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Prefer: 'return=representation',
     },
-    body: JSON.stringify({ query: sql })
+    body: JSON.stringify({ query: sql }),
   });
 
   if (!response.ok) {
@@ -53,17 +53,17 @@ async function fixAnnouncementsRLS() {
   try {
     // Step 1: Drop old policies
     console.log('\n📝 Step 1: Dropping old policies');
-    
+
     await executeSQL(
       '  Dropping INSERT policy',
       `DROP POLICY IF EXISTS "Lecturers create announcements" ON public.announcements;`
     );
-    
+
     await executeSQL(
       '  Dropping UPDATE policy',
       `DROP POLICY IF EXISTS "Lecturers update own announcements" ON public.announcements;`
     );
-    
+
     await executeSQL(
       '  Dropping DELETE policy',
       `DROP POLICY IF EXISTS "Lecturers delete own announcements" ON public.announcements;`
@@ -71,7 +71,7 @@ async function fixAnnouncementsRLS() {
 
     // Step 2: Create new policies with JWT claims
     console.log('\n📝 Step 2: Creating new policies with JWT claims');
-    
+
     await executeSQL(
       '  Creating INSERT policy',
       `CREATE POLICY "Lecturers create announcements"
@@ -82,7 +82,7 @@ async function fixAnnouncementsRLS() {
           auth.jwt()->>'role' IN ('lecturer', 'admin')
         );`
     );
-    
+
     await executeSQL(
       '  Creating UPDATE policy',
       `CREATE POLICY "Lecturers update own announcements"
@@ -98,7 +98,7 @@ async function fixAnnouncementsRLS() {
           auth.jwt()->>'role' IN ('lecturer', 'admin')
         );`
     );
-    
+
     await executeSQL(
       '  Creating DELETE policy',
       `CREATE POLICY "Lecturers delete own announcements"
@@ -119,7 +119,6 @@ async function fixAnnouncementsRLS() {
     console.log('\nNext step: Run test script to verify');
     console.log('  node scripts/test-announcements-rls.js');
     console.log('');
-
   } catch (error) {
     console.error('\n❌ Error:', error.message);
     console.error('\nPlease apply the fix manually:');

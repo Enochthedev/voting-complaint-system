@@ -1,6 +1,6 @@
 /**
  * Date Range Filter Tests
- * 
+ *
  * Tests for the date range filter functionality in the FilterPanel component.
  * Validates that date range filtering works correctly for complaints.
  */
@@ -121,18 +121,14 @@ function filterComplaintsByDateRange(
   // Apply dateFrom filter
   if (dateFrom) {
     const fromDate = new Date(dateFrom);
-    filtered = filtered.filter(
-      (complaint) => new Date(complaint.created_at) >= fromDate
-    );
+    filtered = filtered.filter((complaint) => new Date(complaint.created_at) >= fromDate);
   }
 
   // Apply dateTo filter
   if (dateTo) {
     const toDate = new Date(dateTo);
     toDate.setHours(23, 59, 59, 999); // Include the entire day
-    filtered = filtered.filter(
-      (complaint) => new Date(complaint.created_at) <= toDate
-    );
+    filtered = filtered.filter((complaint) => new Date(complaint.created_at) <= toDate);
   }
 
   return filtered;
@@ -149,131 +145,79 @@ describe('Date Range Filter', () => {
 
   describe('From Date Only', () => {
     it('should filter complaints from a specific date onwards', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-19',
-        ''
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-19', '');
       expect(filtered).toHaveLength(2);
       expect(filtered.map((c) => c.id)).toEqual(['1', '2']);
     });
 
     it('should include complaints created on the from date', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-20',
-        ''
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-20', '');
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe('1');
     });
 
     it('should filter complaints from last week', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-13',
-        ''
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-13', '');
       expect(filtered).toHaveLength(3);
       expect(filtered.map((c) => c.id)).toEqual(['1', '2', '3']);
     });
 
     it('should return empty array when from date is in the future', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-12-01',
-        ''
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-12-01', '');
       expect(filtered).toHaveLength(0);
     });
   });
 
   describe('To Date Only', () => {
     it('should filter complaints up to a specific date', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '',
-        '2024-11-13'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '', '2024-11-13');
       expect(filtered).toHaveLength(3);
       expect(filtered.map((c) => c.id)).toEqual(['3', '4', '5']);
     });
 
     it('should include complaints created on the to date (entire day)', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '', '2024-11-20');
       expect(filtered).toHaveLength(5); // All complaints up to and including today
     });
 
     it('should filter complaints up to yesterday', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '',
-        '2024-11-19'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '', '2024-11-19');
       expect(filtered).toHaveLength(4);
       expect(filtered.map((c) => c.id)).toEqual(['2', '3', '4', '5']);
     });
 
     it('should return all complaints when to date is in the future', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '',
-        '2024-12-31'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '', '2024-12-31');
       expect(filtered).toHaveLength(5);
     });
   });
 
   describe('Date Range (Both From and To)', () => {
     it('should filter complaints within a specific date range', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-13',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-13', '2024-11-20');
       expect(filtered).toHaveLength(3);
       expect(filtered.map((c) => c.id)).toEqual(['1', '2', '3']);
     });
 
     it('should filter complaints for a single day', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-19',
-        '2024-11-19'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-19', '2024-11-19');
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe('2');
     });
 
     it('should filter complaints for last week range', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-13',
-        '2024-11-19'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-11-13', '2024-11-19');
       expect(filtered).toHaveLength(2);
       expect(filtered.map((c) => c.id)).toEqual(['2', '3']);
     });
 
     it('should return empty array when date range has no matching complaints', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-08-01',
-        '2024-08-31'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-08-01', '2024-08-31');
       expect(filtered).toHaveLength(0);
     });
 
     it('should handle date range spanning multiple months', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-10-01',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-10-01', '2024-11-20');
       expect(filtered).toHaveLength(4);
       expect(filtered.map((c) => c.id)).toEqual(['1', '2', '3', '4']);
     });
@@ -299,11 +243,7 @@ describe('Date Range Filter', () => {
         },
       ];
 
-      const filtered = filterComplaintsByDateRange(
-        sameDay,
-        '2024-11-20',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(sameDay, '2024-11-20', '2024-11-20');
       expect(filtered).toHaveLength(3);
     });
 
@@ -326,11 +266,7 @@ describe('Date Range Filter', () => {
         },
       ];
 
-      const filtered = filterComplaintsByDateRange(
-        midnightComplaints,
-        '2024-11-20',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(midnightComplaints, '2024-11-20', '2024-11-20');
       expect(filtered).toHaveLength(2); // at-midnight and after-midnight
       expect(filtered.map((c) => c.id)).toEqual(['at-midnight', 'after-midnight']);
     });
@@ -346,11 +282,7 @@ describe('Date Range Filter', () => {
     });
 
     it('should preserve complaint order when filtering', () => {
-      const filtered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-10-01',
-        '2024-11-20'
-      );
+      const filtered = filterComplaintsByDateRange(mockComplaints, '2024-10-01', '2024-11-20');
       expect(filtered).toHaveLength(4);
       // Should maintain original order
       expect(filtered[0].id).toBe('1');
@@ -369,30 +301,22 @@ describe('Date Range Filter', () => {
   describe('Integration with Other Filters', () => {
     it('should work correctly when combined with status filter', () => {
       // First filter by date range
-      const dateFiltered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-11-13',
-        '2024-11-20'
-      );
-      
+      const dateFiltered = filterComplaintsByDateRange(mockComplaints, '2024-11-13', '2024-11-20');
+
       // Then filter by status
       const statusFiltered = dateFiltered.filter((c) => c.status === 'opened');
-      
+
       expect(statusFiltered).toHaveLength(1);
       expect(statusFiltered[0].id).toBe('2');
     });
 
     it('should work correctly when combined with category filter', () => {
       // First filter by date range
-      const dateFiltered = filterComplaintsByDateRange(
-        mockComplaints,
-        '2024-10-01',
-        '2024-11-20'
-      );
-      
+      const dateFiltered = filterComplaintsByDateRange(mockComplaints, '2024-10-01', '2024-11-20');
+
       // Then filter by category
       const categoryFiltered = dateFiltered.filter((c) => c.category === 'facilities');
-      
+
       expect(categoryFiltered).toHaveLength(2);
       expect(categoryFiltered.map((c) => c.id)).toEqual(['2', '4']);
     });

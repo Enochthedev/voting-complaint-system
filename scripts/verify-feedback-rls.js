@@ -47,20 +47,20 @@ async function verifyRLSPolicies() {
         WHERE schemaname = 'public' 
         AND tablename = 'feedback'
         ORDER BY policyname;
-      `
+      `,
     });
 
     if (error) {
       console.error('❌ Error querying policies:', error.message);
       console.log('\nTrying alternative method...\n');
-      
+
       // Alternative: Direct SQL query
       const { data: altData, error: altError } = await supabase
         .from('pg_policies')
         .select('*')
         .eq('schemaname', 'public')
         .eq('tablename', 'feedback');
-      
+
       if (altError) {
         console.error('❌ Alternative method also failed:', altError.message);
         console.log('\n⚠️  Unable to verify policies programmatically.');
@@ -74,7 +74,7 @@ async function verifyRLSPolicies() {
         console.log('   - Lecturers delete own feedback\n');
         return;
       }
-      
+
       displayPolicies(altData);
       return;
     }
@@ -86,7 +86,6 @@ async function verifyRLSPolicies() {
     }
 
     displayPolicies(data);
-
   } catch (error) {
     console.error('❌ Verification failed:', error.message);
     console.log('\nPlease verify manually in Supabase Dashboard\n');
@@ -95,12 +94,12 @@ async function verifyRLSPolicies() {
 
 function displayPolicies(policies) {
   console.log('✅ Found', policies.length, 'RLS policies for feedback table:\n');
-  
+
   const expectedPolicies = [
     'Students view feedback',
     'Lecturers insert feedback',
     'Lecturers update own feedback',
-    'Lecturers delete own feedback'
+    'Lecturers delete own feedback',
   ];
 
   policies.forEach((policy, index) => {
@@ -111,14 +110,14 @@ function displayPolicies(policies) {
   });
 
   // Check if all expected policies exist
-  const policyNames = policies.map(p => p.policyname);
-  const missingPolicies = expectedPolicies.filter(name => !policyNames.includes(name));
+  const policyNames = policies.map((p) => p.policyname);
+  const missingPolicies = expectedPolicies.filter((name) => !policyNames.includes(name));
 
   if (missingPolicies.length === 0) {
     console.log('✅ All expected policies are present!\n');
   } else {
     console.log('⚠️  Missing policies:');
-    missingPolicies.forEach(name => console.log(`   - ${name}`));
+    missingPolicies.forEach((name) => console.log(`   - ${name}`));
     console.log('\nPlease apply the migration: node scripts/apply-feedback-rls-fix.js\n');
   }
 }

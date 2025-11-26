@@ -1,133 +1,180 @@
 # Escalation Rules - Quick Reference
 
-## 🚀 Quick Start
+## Overview
+The Escalation Rules page allows administrators to configure automatic escalation of complaints that remain unaddressed for a specified time period.
 
-```bash
-# Apply migration
-node scripts/apply-escalation-rules-rls-fix.js
+## Access
+- **URL**: `/admin/escalation-rules`
+- **Role**: Admin only
+- **Navigation**: Sidebar → "Escalation Rules"
 
-# Verify policies
-node scripts/verify-escalation-rules-policies.js
+## Key Features
 
-# Run tests
-node scripts/test-escalation-rules-rls.js
+### 1. Rule Configuration
+Each escalation rule defines:
+- **Category**: Type of complaint (Academic, Facilities, Harassment, etc.)
+- **Priority**: Urgency level (Low, Medium, High, Critical)
+- **Time Threshold**: Hours before escalation (displayed as hours or days)
+- **Escalate To**: User who will receive the escalated complaint
+- **Status**: Active or Inactive
+
+### 2. Search and Filtering
+- **Search**: By category name or assigned user name
+- **Category Filter**: Filter by complaint category
+- **Priority Filter**: Filter by priority level
+- **Status Filter**: Show active, inactive, or all rules
+
+### 3. Rule Management
+- **Create**: Add new escalation rules (form to be implemented)
+- **Edit**: Modify existing rules (form to be implemented)
+- **Delete**: Remove rules with confirmation
+- **Toggle**: Enable/disable rules without deleting
+
+### 4. Visual Indicators
+- **Active Badge**: Green badge for active rules
+- **Inactive Badge**: Gray badge for inactive rules
+- **Priority Badges**: Color-coded (Blue=Low, Yellow=Medium, Orange=High, Red=Critical)
+- **Icons**: Clock for threshold, ArrowUpCircle for escalation target
+
+## How Escalation Works
+
+1. **Rule Matching**: System checks complaints against active rules hourly
+2. **Time Check**: Compares complaint age against threshold
+3. **Auto-Assignment**: Matching complaints are reassigned to designated user
+4. **Notification**: Escalation target receives notification
+5. **History Logging**: Escalation event is logged in complaint history
+
+## Example Rules
+
+### Critical Harassment (2 hours)
+- Harassment complaints with critical priority
+- Escalates after 2 hours
+- Assigned to senior admin for immediate attention
+
+### High Priority Facilities (24 hours)
+- Facilities complaints with high priority
+- Escalates after 1 day
+- Assigned to facilities manager
+
+### Academic Issues (48 hours)
+- Academic complaints with high priority
+- Escalates after 2 days
+- Assigned to academic dean
+
+## Time Threshold Guidelines
+
+| Priority | Recommended Threshold |
+|----------|----------------------|
+| Critical | 2-4 hours |
+| High | 24-48 hours |
+| Medium | 3-7 days |
+| Low | 7-14 days |
+
+## Best Practices
+
+1. **Start Conservative**: Begin with longer thresholds and adjust based on data
+2. **Monitor Impact**: Track escalation frequency in analytics
+3. **Clear Ownership**: Assign escalations to users with authority to act
+4. **Category-Specific**: Different categories may need different thresholds
+5. **Test Rules**: Start with inactive rules and enable after testing
+6. **Regular Review**: Review and adjust rules quarterly
+
+## Common Use Cases
+
+### Urgent Safety Issues
+- Category: Harassment
+- Priority: Critical
+- Threshold: 2 hours
+- Escalate To: Safety Officer
+
+### Facility Emergencies
+- Category: Facilities
+- Priority: High
+- Threshold: 4 hours
+- Escalate To: Facilities Director
+
+### Academic Disputes
+- Category: Academic
+- Priority: High
+- Threshold: 48 hours
+- Escalate To: Academic Dean
+
+### General Administrative
+- Category: Administrative
+- Priority: Medium
+- Threshold: 7 days
+- Escalate To: Admin Manager
+
+## UI Components
+
+### Rule Card
+```
+┌─────────────────────────────────────────────┐
+│ Category - Priority Badge        Status     │
+│                                             │
+│ 🕐 Time Threshold: X hours/days            │
+│ ⬆️ Escalate To: User Name                  │
+│                                             │
+│ Created: Date • Last updated: Date         │
+│                                             │
+│                        [👁️] [✏️] [🗑️]      │
+└─────────────────────────────────────────────┘
 ```
 
-## 🔐 Access Control
+### Action Buttons
+- **Eye/EyeOff**: Toggle active/inactive status
+- **Edit**: Open edit modal (to be implemented)
+- **Trash**: Delete with confirmation
 
-| Role     | View | Create | Update | Delete |
-|----------|------|--------|--------|--------|
-| Student  | ❌   | ❌     | ❌     | ❌     |
-| Lecturer | ✅   | ❌     | ❌     | ❌     |
-| Admin    | ✅   | ✅     | ✅     | ✅     |
+### Success Messages
+- Auto-dismiss after 3 seconds
+- Green background with checkmark icon
+- Clear action confirmation
 
-## 📝 RLS Policies
+## Data Structure
 
-### SELECT (Lecturers & Admins)
-```sql
-auth.jwt()->>'role' IN ('lecturer', 'admin')
+```typescript
+interface EscalationRule {
+  id: string;
+  category: ComplaintCategory;
+  priority: ComplaintPriority;
+  hours_threshold: number;
+  escalate_to: string; // User ID
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 ```
 
-### INSERT (Admins Only)
-```sql
-auth.jwt()->>'role' = 'admin'
-```
+## Future Enhancements (Phase 12)
 
-### UPDATE (Admins Only)
-```sql
-auth.jwt()->>'role' = 'admin'
-```
+- [ ] API integration with Supabase
+- [ ] Rule creation form
+- [ ] Rule editing form
+- [ ] Form validation
+- [ ] Duplicate rule detection
+- [ ] Rule conflict detection
+- [ ] Escalation history tracking
+- [ ] Analytics on escalation effectiveness
+- [ ] Email notifications for escalations
+- [ ] Custom escalation chains (multi-level)
 
-### DELETE (Admins Only)
-```sql
-auth.jwt()->>'role' = 'admin'
-```
+## Related Features
 
-## 💻 Code Examples
+- **Complaint History**: Escalation events are logged
+- **Notifications**: Escalation targets receive notifications
+- **Analytics**: Track escalation frequency and effectiveness
+- **User Management**: Assign escalation targets
 
-### Create Rule (Admin)
-```javascript
-const { data, error } = await supabase
-  .from('escalation_rules')
-  .insert({
-    category: 'academic',
-    priority: 'high',
-    hours_threshold: 48,
-    escalate_to: adminUserId,
-    is_active: true
-  });
-```
+## Support
 
-### View Rules (Lecturer/Admin)
-```javascript
-const { data, error } = await supabase
-  .from('escalation_rules')
-  .select('*')
-  .eq('is_active', true);
-```
+For issues or questions:
+1. Check the visual test guide: `ESCALATION_RULES_VISUAL_TEST.md`
+2. Review implementation details: `TASK_10.1_ESCALATION_RULES_PAGE_COMPLETION.md`
+3. Test with mock data before API integration
 
-### Update Rule (Admin)
-```javascript
-const { data, error } = await supabase
-  .from('escalation_rules')
-  .update({ hours_threshold: 72 })
-  .eq('id', ruleId);
-```
+## Status
 
-### Delete Rule (Admin)
-```javascript
-const { data, error } = await supabase
-  .from('escalation_rules')
-  .delete()
-  .eq('id', ruleId);
-```
-
-## 🔍 Troubleshooting
-
-### Policy Violation Error
-```
-Error: new row violates row-level security policy
-```
-**Fix:** Verify user has admin role in JWT token
-
-### Empty Results for Lecturers
-```
-Returns: []
-```
-**Fix:** Check JWT role claim is set correctly
-
-### Migration Fails
-```
-Error: policy already exists
-```
-**Fix:** Migration handles this automatically with DROP IF EXISTS
-
-## 📁 Key Files
-
-- **Migration:** `supabase/migrations/028_fix_escalation_rules_rls.sql`
-- **Apply Script:** `scripts/apply-escalation-rules-rls-fix.js`
-- **Test Script:** `scripts/test-escalation-rules-rls.js`
-- **Docs:** `docs/ESCALATION_RULES_RLS_POLICIES.md`
-
-## ✅ Verification Checklist
-
-- [ ] Migration applied successfully
-- [ ] RLS enabled on table
-- [ ] 4 policies exist (SELECT, INSERT, UPDATE, DELETE)
-- [ ] Policies use JWT claims
-- [ ] All 6 tests pass
-- [ ] No infinite recursion errors
-
-## 🎯 Requirements
-
-- **AC21:** Auto-Escalation System ✅
-- **P7:** Role-Based Access ✅
-- **P16:** Escalation Timing ✅
-- **NFR2:** Security ✅
-
-## 📞 Support
-
-For detailed information, see:
-- `docs/ESCALATION_RULES_RLS_POLICIES.md`
-- `supabase/APPLY_ESCALATION_RULES_RLS_FIX.md`
-- `docs/TASK_2.2_ESCALATION_RULES_RLS_COMPLETION.md`
+✅ **Phase 1 Complete**: UI and basic functionality with mock data
+⏳ **Phase 2 Pending**: Form components for create/edit
+⏳ **Phase 3 Pending**: API integration (Phase 12)

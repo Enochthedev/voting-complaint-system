@@ -27,10 +27,10 @@ export interface SearchBarProps {
 
 /**
  * Search Bar Component
- * 
+ *
  * A reusable search bar with autocomplete suggestions, loading states,
  * and clear functionality. Designed for full-text search across complaints.
- * 
+ *
  * Features:
  * - Real-time search input
  * - Autocomplete suggestions dropdown
@@ -106,9 +106,7 @@ export function SearchBar({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
+        setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
         break;
       case 'ArrowUp':
         e.preventDefault();
@@ -132,10 +130,7 @@ export function SearchBar({
   // Close suggestions when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsFocused(false);
       }
     };
@@ -177,7 +172,7 @@ export function SearchBar({
           aria-label="Search complaints"
           aria-autocomplete="list"
           aria-controls={showSuggestionsDropdown ? 'search-suggestions' : undefined}
-          aria-expanded={showSuggestionsDropdown}
+          aria-expanded={showSuggestionsDropdown ? true : undefined}
         />
 
         {/* Clear Button */}

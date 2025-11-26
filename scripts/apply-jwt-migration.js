@@ -10,14 +10,14 @@ const supabase = createClient(
 
 async function applyMigration() {
   const sql = fs.readFileSync('supabase/migrations/018_add_role_to_jwt_claims.sql', 'utf8');
-  
+
   const { error } = await supabase.rpc('exec_sql', { sql });
-  
+
   if (error) {
     console.error('Error:', error);
     process.exit(1);
   }
-  
+
   console.log('✅ Migration applied successfully');
 }
 
