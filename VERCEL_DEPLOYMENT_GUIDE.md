@@ -14,8 +14,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
 **Recommended Variables:**
 ```
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+```
+
+**⚠️ Server-Only Variables (DO NOT ADD for frontend-only deployments):**
+```
+# ONLY add this if you have server-side API routes that need admin access
+# NEVER expose this to the client!
+# Currently NOT USED in this application
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 ```
 
 **Optional Variables (with defaults):**

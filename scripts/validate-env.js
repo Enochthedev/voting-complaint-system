@@ -81,16 +81,21 @@ const requiredVars = [
 // Optional but recommended variables
 const recommendedVars = [
   {
-    name: 'SUPABASE_SERVICE_ROLE_KEY',
-    description: 'Supabase service role key (for admin operations)',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    location: 'Supabase Dashboard > Project Settings > API',
-  },
-  {
     name: 'NEXT_PUBLIC_APP_URL',
     description: 'Application base URL',
     example: 'http://localhost:3000',
     default: 'http://localhost:3000',
+  },
+];
+
+// Server-only variables (not required for frontend-only deployments)
+const serverOnlyVars = [
+  {
+    name: 'SUPABASE_SERVICE_ROLE_KEY',
+    description: 'Supabase service role key (ONLY for server-side admin operations)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    location: 'Supabase Dashboard > Project Settings > API',
+    warning: '⚠️  NEVER expose this to the client! Only use in server-side code.',
   },
 ];
 
@@ -124,7 +129,7 @@ function validateEnvironment() {
   log('\nRecommended Variables:', 'cyan');
   recommendedVars.forEach((varInfo) => {
     const value = envVars[varInfo.name];
-    const isSet = value && value !== 'your-service-role-key' && value !== 'your-project-url';
+    const isSet = value && value !== 'your-project-url';
 
     if (isSet) {
       log(`  ✓ ${varInfo.name}`, 'green');
@@ -135,6 +140,23 @@ function validateEnvironment() {
         log(`    Default: ${varInfo.default}`, 'yellow');
       }
       hasWarnings = true;
+    }
+  });
+
+  // Check server-only variables (informational only)
+  log('\nServer-Only Variables (Optional):', 'cyan');
+  serverOnlyVars.forEach((varInfo) => {
+    const value = envVars[varInfo.name];
+    const isSet = value && value !== 'your-service-role-key';
+
+    if (isSet) {
+      log(`  ✓ ${varInfo.name}`, 'green');
+      if (varInfo.warning) {
+        log(`    ${varInfo.warning}`, 'yellow');
+      }
+    } else {
+      log(`  ℹ ${varInfo.name} - NOT SET (OK for frontend-only deployments)`, 'cyan');
+      log(`    Description: ${varInfo.description}`, 'cyan');
     }
   });
 
