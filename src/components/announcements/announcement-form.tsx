@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import type { Announcement } from '@/types/database.types';
+import { sanitizeText } from '@/lib/sanitize';
 
 interface AnnouncementFormProps {
   announcement?: Announcement | null;
@@ -57,9 +58,10 @@ export function AnnouncementForm({
       return;
     }
 
+    // Sanitize input before submission
     const announcementData: Partial<Announcement> = {
-      title: title.trim(),
-      content: content.trim(),
+      title: sanitizeText(title.trim()),
+      content: sanitizeText(content.trim()),
     };
 
     if (announcement?.id) {

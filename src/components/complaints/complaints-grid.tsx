@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { ComplaintList } from '@/components/complaints';
+import { ComplaintList, ComplaintListVirtualized } from '@/components/complaints';
+import { useVirtualScrolling, useContainerHeight } from '@/hooks/use-virtual-scrolling';
 import type { Complaint, User } from '@/types/database.types';
 
 export interface ComplaintsGridProps {
@@ -67,12 +68,25 @@ export interface ComplaintsGridProps {
    * Callback when selection changes
    */
   onSelectionChange?: (selectedIds: Set<string>) => void;
+
+  /**
+   * Force virtual scrolling regardless of item count
+   * @default false
+   */
+  forceVirtual?: boolean;
+
+  /**
+   * Disable virtual scrolling regardless of item count
+   * @default false
+   */
+  disableVirtual?: boolean;
 }
 
 /**
  * ComplaintsGrid Component
  *
- * Displays the main complaint list with pagination.
+ * Displays the main complaint list with pagination or virtual scrolling.
+ * Automatically switches to virtual scrolling for large lists (50+ items).
  * Handles both normal filtered view and search results view.
  */
 export function ComplaintsGrid({
@@ -89,7 +103,47 @@ export function ComplaintsGrid({
   selectionMode,
   selectedIds,
   onSelectionChange,
+  forceVirtual = false,
+  disableVirtual = false,
 }: ComplaintsGridProps) {
+  // Determine if virtual scrolling should be used
+  // Virtual scrolling is beneficial for lists with 50+ items
+  const shouldUseVirtual = useVirtualScrolling(complaints.length, {
+    threshold: 50,
+    forceVirtual,
+    disableVirtual,
+  });
+
+  // Get optimal container height for virtual scrolling
+  const containerHeight = useContainerHeight(600, 0.7);
+
+  const emptyMessage = useSearch
+    ? `No complaints found matching "${searchQuery}"`
+    : userRole === 'student'
+      ? 'No complaints to display. Submit your first complaint to get started.'
+      : 'No complaints have been submitted yet.';
+
+  // Use virtual scrolling for large lists
+  if (shouldUseVirtual && !isLoading) {
+    return (
+      <ComplaintListVirtualized
+        complaints={complaints}
+        isLoading={isLoading}
+        onComplaintClick={onComplaintClick}
+        searchQuery={useSearch ? searchQuery : undefined}
+        isSearchResult={useSearch}
+        onClearSearch={onClearSearch}
+        selectionMode={selectionMode}
+        selectedIds={selectedIds}
+        onSelectionChange={onSelectionChange}
+        emptyMessage={emptyMessage}
+        containerHeight={containerHeight}
+        estimateSize={200}
+      />
+    );
+  }
+
+  // Use regular list with pagination for smaller lists
   return (
     <ComplaintList
       complaints={complaints}
@@ -105,13 +159,7 @@ export function ComplaintsGrid({
       selectionMode={selectionMode}
       selectedIds={selectedIds}
       onSelectionChange={onSelectionChange}
-      emptyMessage={
-        useSearch
-          ? `No complaints found matching "${searchQuery}"`
-          : userRole === 'student'
-            ? 'No complaints to display. Submit your first complaint to get started.'
-            : 'No complaints have been submitted yet.'
-      }
+      emptyMessage={emptyMessage}
     />
   );
 }

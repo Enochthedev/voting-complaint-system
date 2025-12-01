@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { AppLayout } from '@/components/layout/app-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +20,6 @@ import {
 } from 'lucide-react';
 import { getVoteById, submitVoteResponse, hasStudentVoted, getVoteResults } from '@/lib/api/votes';
 import type { Vote } from '@/types/database.types';
-import { useAuth } from '@/hooks/useAuth';
 
 export default function VoteDetailPage() {
   const params = useParams();
@@ -150,35 +151,43 @@ export default function VoteDetailPage() {
   const canVote = vote && !hasVoted && !isVoteClosed(vote) && vote.is_active;
   const isLecturerOrAdmin = userRole === 'lecturer' || userRole === 'admin';
 
-  if (isLoading || isAuthLoading) {
+  if (isLoading || isAuthLoading || !user) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
-        <Skeleton className="mb-6 h-10 w-32" />
-        <Card className="p-6">
-          <Skeleton className="mb-4 h-8 w-3/4" />
-          <Skeleton className="mb-6 h-20 w-full" />
-          <div className="space-y-3">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        </Card>
-      </div>
+      <AppLayout
+        userRole={(user?.role as any) || 'student'}
+        userName={user?.full_name || 'Loading...'}
+        userEmail={user?.email || ''}
+      >
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-32" />
+          <Card className="p-6">
+            <Skeleton className="mb-4 h-8 w-3/4" />
+            <Skeleton className="mb-6 h-20 w-full" />
+            <div className="space-y-3">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
   if (error && !vote) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
-        <Button variant="ghost" onClick={() => router.push('/votes')} className="mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Votes
-        </Button>
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
+      <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
+        <div className="space-y-6">
+          <Button variant="ghost" onClick={() => router.push('/votes')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Votes
+          </Button>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </div>
+      </AppLayout>
     );
   }
 
@@ -191,199 +200,201 @@ export default function VoteDetailPage() {
   const totalVotes = getTotalVotes();
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      {/* Back Button */}
-      <Button variant="ghost" onClick={() => router.push('/votes')} className="mb-6">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Votes
-      </Button>
+    <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
+      <div className="space-y-6">
+        {/* Back Button */}
+        <Button variant="ghost" onClick={() => router.push('/votes')} className="mb-6">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Votes
+        </Button>
 
-      {/* Success Message */}
-      {successMessage && (
-        <Alert className="mb-6 border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100">
-          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertDescription>{successMessage}</AlertDescription>
-        </Alert>
-      )}
+        {/* Success Message */}
+        {successMessage && (
+          <Alert className="mb-6 border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
 
-      {/* Error Message */}
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+        {/* Error Message */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {/* Vote Card */}
-      <Card className="p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-bold text-foreground">{vote.title}</h1>
-            {isClosed && <Badge variant="secondary">Closed</Badge>}
-            {!vote.is_active && <Badge variant="secondary">Inactive</Badge>}
-            {hasVoted && (
-              <Badge className="bg-green-500 text-white">
-                <CheckCircle2 className="mr-1 h-3 w-3" />
-                Voted
-              </Badge>
-            )}
-          </div>
-
-          <p className="text-muted-foreground">{vote.description}</p>
-        </div>
-
-        {/* Metadata */}
-        <div className="mb-6 flex flex-wrap items-center gap-4 border-b border-border pb-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>Posted {formatDate(vote.created_at)}</span>
-          </div>
-
-          {vote.closes_at && (
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>
-                {isClosed ? 'Closed' : 'Closes'} {formatDate(vote.closes_at)}
-              </span>
-            </div>
-          )}
-
-          {showResults && (
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>
-                {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Voting Section or Results */}
-        {canVote ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Cast Your Vote</h2>
-            </div>
-
-            <div className="space-y-3">
-              {optionsArray.map((option, index) => (
-                <label
-                  key={index}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors ${
-                    selectedOption === option
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:bg-muted'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="vote-option"
-                    value={option}
-                    checked={selectedOption === option}
-                    onChange={() => setSelectedOption(option)}
-                    className="h-4 w-4 text-primary focus:ring-2 focus:ring-primary"
-                    disabled={isSubmitting}
-                  />
-                  <span className="flex-1 text-sm font-medium text-foreground">{option}</span>
-                </label>
-              ))}
-            </div>
-
-            <Button
-              onClick={handleSubmitVote}
-              disabled={!selectedOption || isSubmitting}
-              className="w-full"
-              size="lg"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Vote'}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">
-                <BarChart3 className="mr-2 inline-block h-5 w-5" />
-                Vote Results
-              </h2>
-              {isLecturerOrAdmin && !isClosed && vote.is_active && (
-                <Badge variant="outline">Live Results</Badge>
+        {/* Vote Card */}
+        <Card className="p-6">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <h1 className="text-3xl font-bold text-foreground">{vote.title}</h1>
+              {isClosed && <Badge variant="secondary">Closed</Badge>}
+              {!vote.is_active && <Badge variant="secondary">Inactive</Badge>}
+              {hasVoted && (
+                <Badge className="bg-green-500 text-white">
+                  <CheckCircle2 className="mr-1 h-3 w-3" />
+                  Voted
+                </Badge>
               )}
             </div>
 
-            {showResults && totalVotes > 0 ? (
-              <div className="space-y-4">
-                {optionsArray.map((option, index) => {
-                  const count = results[option] || 0;
-                  const percentage = getPercentage(count);
+            <p className="text-muted-foreground">{vote.description}</p>
+          </div>
 
-                  return (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-foreground">{option}</span>
-                        <span className="text-muted-foreground">
-                          {count} {count === 1 ? 'vote' : 'votes'} ({percentage}%)
-                        </span>
-                      </div>
-                      <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-primary transition-all duration-500"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+          {/* Metadata */}
+          <div className="mb-6 flex flex-wrap items-center gap-4 border-b border-border pb-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-4 w-4" />
+              <span>Posted {formatDate(vote.created_at)}</span>
+            </div>
 
-                <div className="mt-6 rounded-lg border border-border bg-muted p-4">
-                  <p className="text-center text-sm font-medium text-muted-foreground">
-                    Total Votes: {totalVotes}
-                  </p>
+            {vote.closes_at && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>
+                  {isClosed ? 'Closed' : 'Closes'} {formatDate(vote.closes_at)}
+                </span>
+              </div>
+            )}
+
+            {showResults && (
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>
+                  {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Voting Section or Results */}
+          {canVote ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Cast Your Vote</h2>
+              </div>
+
+              <div className="space-y-3">
+                {optionsArray.map((option, index) => (
+                  <label
+                    key={index}
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors ${
+                      selectedOption === option
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:bg-muted'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="vote-option"
+                      value={option}
+                      checked={selectedOption === option}
+                      onChange={() => setSelectedOption(option)}
+                      className="h-4 w-4 text-primary focus:ring-2 focus:ring-primary"
+                      disabled={isSubmitting}
+                    />
+                    <span className="flex-1 text-sm font-medium text-foreground">{option}</span>
+                  </label>
+                ))}
+              </div>
+
+              <Button
+                onClick={handleSubmitVote}
+                disabled={!selectedOption || isSubmitting}
+                className="w-full"
+                size="lg"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Vote'}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">
+                  <BarChart3 className="mr-2 inline-block h-5 w-5" />
+                  Vote Results
+                </h2>
+                {isLecturerOrAdmin && !isClosed && vote.is_active && (
+                  <Badge variant="outline">Live Results</Badge>
+                )}
+              </div>
+
+              {showResults && totalVotes > 0 ? (
+                <div className="space-y-4">
+                  {optionsArray.map((option, index) => {
+                    const count = results[option] || 0;
+                    const percentage = getPercentage(count);
+
+                    return (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-foreground">{option}</span>
+                          <span className="text-muted-foreground">
+                            {count} {count === 1 ? 'vote' : 'votes'} ({percentage}%)
+                          </span>
+                        </div>
+                        <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <div className="mt-6 rounded-lg border border-border bg-muted p-4">
+                    <p className="text-center text-sm font-medium text-muted-foreground">
+                      Total Votes: {totalVotes}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-border bg-muted p-8 text-center">
-                <p className="text-sm text-muted-foreground">No votes have been cast yet</p>
-              </div>
-            )}
+              ) : (
+                <div className="rounded-lg border border-border bg-muted p-8 text-center">
+                  <p className="text-sm text-muted-foreground">No votes have been cast yet</p>
+                </div>
+              )}
 
-            {hasVoted && !isClosed && vote.is_active && (
-              <Alert className="border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100">
-                <AlertDescription>
-                  Thank you for participating! You can view the results above.
-                </AlertDescription>
-              </Alert>
-            )}
+              {hasVoted && !isClosed && vote.is_active && (
+                <Alert className="border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100">
+                  <AlertDescription>
+                    Thank you for participating! You can view the results above.
+                  </AlertDescription>
+                </Alert>
+              )}
 
-            {isClosed && (
-              <Alert>
-                <AlertDescription>
-                  This poll has closed. {hasVoted ? 'Thank you for participating!' : ''}
-                </AlertDescription>
-              </Alert>
-            )}
+              {isClosed && (
+                <Alert>
+                  <AlertDescription>
+                    This poll has closed. {hasVoted ? 'Thank you for participating!' : ''}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-            {!vote.is_active && (
-              <Alert>
-                <AlertDescription>This poll is currently inactive.</AlertDescription>
-              </Alert>
-            )}
-          </div>
-        )}
+              {!vote.is_active && (
+                <Alert>
+                  <AlertDescription>This poll is currently inactive.</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
 
-        {/* Related Complaint Link */}
-        {vote.related_complaint_id && (
-          <div className="mt-6 border-t border-border pt-6">
-            <p className="mb-2 text-sm font-medium text-muted-foreground">Related to:</p>
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/complaints/${vote.related_complaint_id}`)}
-            >
-              View Related Complaint
-            </Button>
-          </div>
-        )}
-      </Card>
-    </div>
+          {/* Related Complaint Link */}
+          {vote.related_complaint_id && (
+            <div className="mt-6 border-t border-border pt-6">
+              <p className="mb-2 text-sm font-medium text-muted-foreground">Related to:</p>
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/complaints/${vote.related_complaint_id}`)}
+              >
+                View Related Complaint
+              </Button>
+            </div>
+          )}
+        </Card>
+      </div>
+    </AppLayout>
   );
 }

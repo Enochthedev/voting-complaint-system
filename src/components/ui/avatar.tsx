@@ -4,6 +4,7 @@ import * as React from 'react';
 import { createAvatar } from '@dicebear/core';
 import { avataaars } from '@dicebear/collection';
 import { cn } from '@/lib/utils';
+import { sanitizeSvg } from '@/lib/sanitize';
 
 interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -23,7 +24,8 @@ export function Avatar({ name, size = 40, className, ...props }: AvatarProps) {
       radius: 50,
     });
 
-    setAvatarSvg(avatar.toString());
+    // Sanitize SVG content to prevent XSS
+    setAvatarSvg(sanitizeSvg(avatar.toString()));
   }, [name, size]);
 
   return (

@@ -1,16 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import { lazy, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/app-layout';
 import {
   ComplaintsHeader,
   ComplaintsSearchBar,
-  ComplaintsFilters,
-  ComplaintsGrid,
-  BulkActionBar,
-  BulkActionConfirmationModal,
-  BulkAssignmentModal,
-  BulkTagAdditionModal,
   saveFilterPreset,
   type FilterState,
   type FilterPreset,
@@ -21,6 +16,26 @@ import { useAuth } from '@/hooks/useAuth';
 import { useComplaintSearch } from '@/hooks/use-complaint-search';
 import { exportComplaintsToCSV } from '@/lib/export';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// Lazy load heavy components for better initial page load
+const ComplaintsFilters = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.ComplaintsFilters }))
+);
+const ComplaintsGrid = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.ComplaintsGrid }))
+);
+const BulkActionBar = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.BulkActionBar }))
+);
+const BulkActionConfirmationModal = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.BulkActionConfirmationModal }))
+);
+const BulkAssignmentModal = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.BulkAssignmentModal }))
+);
+const BulkTagAdditionModal = lazy(() =>
+  import('@/components/complaints').then((mod) => ({ default: mod.BulkTagAdditionModal }))
+);
 
 // Mock lecturer data
 const MOCK_LECTURERS: Record<string, User> = {
@@ -953,11 +968,7 @@ export default function ComplaintsPage() {
   }
 
   return (
-    <AppLayout
-      userRole={userRole}
-      userName={user.full_name}
-      userEmail={user.email}
-    >
+    <AppLayout userRole={userRole} userName={user.full_name} userEmail={user.email}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <ComplaintsHeader
@@ -986,93 +997,121 @@ export default function ComplaintsPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Filter Panel - Sidebar */}
           <div className="lg:col-span-1">
-            <ComplaintsFilters
-              userRole={userRole}
-              userId={userId}
-              filters={filters}
-              availableTags={availableTags}
-              availableLecturers={availableLecturers}
-              useSearch={useSearch}
-              presetManagerKey={presetManagerKey}
-              onFiltersChange={setFilters}
-              onResetPage={() => setCurrentPage(1)}
-              onClearSearch={handleClearSearch}
-              onSavePreset={handleSavePreset}
-              onLoadPreset={handleLoadPreset}
-            />
+            <Suspense
+              fallback={
+                <div className="space-y-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                </div>
+              }
+            >
+              <ComplaintsFilters
+                userRole={userRole}
+                userId={userId}
+                filters={filters}
+                availableTags={availableTags}
+                availableLecturers={availableLecturers}
+                useSearch={useSearch}
+                presetManagerKey={presetManagerKey}
+                onFiltersChange={setFilters}
+                onResetPage={() => setCurrentPage(1)}
+                onClearSearch={handleClearSearch}
+                onSavePreset={handleSavePreset}
+                onLoadPreset={handleLoadPreset}
+              />
+            </Suspense>
           </div>
 
           {/* Complaint List - Main Content */}
           <div className="lg:col-span-3">
-            <ComplaintsGrid
-              userRole={userRole}
-              complaints={displayComplaints}
-              isLoading={isLoading || isSearching}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              useSearch={useSearch}
-              searchQuery={searchQuery}
-              onComplaintClick={handleComplaintClick}
-              onPageChange={handlePageChange}
-              onClearSearch={handleClearSearch}
-              selectionMode={selectionMode}
-              selectedIds={selectedIds}
-              onSelectionChange={setSelectedIds}
-            />
+            <Suspense
+              fallback={
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-48 w-full" />
+                  ))}
+                </div>
+              }
+            >
+              <ComplaintsGrid
+                userRole={userRole}
+                complaints={displayComplaints}
+                isLoading={isLoading || isSearching}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                useSearch={useSearch}
+                searchQuery={searchQuery}
+                onComplaintClick={handleComplaintClick}
+                onPageChange={handlePageChange}
+                onClearSearch={handleClearSearch}
+                selectionMode={selectionMode}
+                selectedIds={selectedIds}
+                onSelectionChange={setSelectedIds}
+              />
+            </Suspense>
           </div>
         </div>
 
         {/* Bulk Action Bar */}
-        <BulkActionBar
-          selectedCount={selectedIds.size}
-          totalCount={filteredComplaints.length}
-          isExporting={isExporting}
-          exportProgress={exportProgress}
-          exportMessage={exportMessage}
-          isBulkActionLoading={isBulkActionLoading}
-          bulkActionProgress={bulkActionProgress}
-          bulkActionMessage={bulkActionMessage}
-          onExport={handleBulkExport}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-          onBulkStatusChange={handleBulkStatusChange}
-          onBulkAssignment={handleBulkAssignment}
-          onBulkTagAddition={handleBulkTagAddition}
-          userRole={userRole}
-        />
+        <Suspense fallback={null}>
+          <BulkActionBar
+            selectedCount={selectedIds.size}
+            totalCount={filteredComplaints.length}
+            isExporting={isExporting}
+            exportProgress={exportProgress}
+            exportMessage={exportMessage}
+            isBulkActionLoading={isBulkActionLoading}
+            bulkActionProgress={bulkActionProgress}
+            bulkActionMessage={bulkActionMessage}
+            onExport={handleBulkExport}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+            onBulkStatusChange={handleBulkStatusChange}
+            onBulkAssignment={handleBulkAssignment}
+            onBulkTagAddition={handleBulkTagAddition}
+            userRole={userRole}
+          />
+        </Suspense>
 
         {/* Bulk Action Confirmation Modal */}
         {confirmationConfig && (
-          <BulkActionConfirmationModal
-            open={showConfirmationModal}
-            onOpenChange={setShowConfirmationModal}
-            title={confirmationConfig.title}
-            description={confirmationConfig.description}
-            itemCount={selectedIds.size}
-            onConfirm={confirmationConfig.action}
-            isLoading={isBulkActionLoading}
-          />
+          <Suspense fallback={null}>
+            <BulkActionConfirmationModal
+              open={showConfirmationModal}
+              onOpenChange={setShowConfirmationModal}
+              title={confirmationConfig.title}
+              description={confirmationConfig.description}
+              itemCount={selectedIds.size}
+              onConfirm={confirmationConfig.action}
+              isLoading={isBulkActionLoading}
+            />
+          </Suspense>
         )}
 
         {/* Bulk Assignment Modal */}
-        <BulkAssignmentModal
-          open={bulkActionModal.type === 'assignment'}
-          onOpenChange={(open) => !open && setBulkActionModal({ type: null })}
-          itemCount={selectedIds.size}
-          availableLecturers={availableLecturers}
-          onConfirm={performBulkAssignment}
-          isLoading={isBulkActionLoading}
-        />
+        <Suspense fallback={null}>
+          <BulkAssignmentModal
+            open={bulkActionModal.type === 'assignment'}
+            onOpenChange={(open) => !open && setBulkActionModal({ type: null })}
+            itemCount={selectedIds.size}
+            availableLecturers={availableLecturers}
+            onConfirm={performBulkAssignment}
+            isLoading={isBulkActionLoading}
+          />
+        </Suspense>
 
         {/* Bulk Tag Addition Modal */}
-        <BulkTagAdditionModal
-          open={bulkActionModal.type === 'tags'}
-          onOpenChange={(open) => !open && setBulkActionModal({ type: null })}
-          itemCount={selectedIds.size}
-          availableTags={availableTags}
-          onConfirm={performBulkTagAddition}
-          isLoading={isBulkActionLoading}
-        />
+        <Suspense fallback={null}>
+          <BulkTagAdditionModal
+            open={bulkActionModal.type === 'tags'}
+            onOpenChange={(open) => !open && setBulkActionModal({ type: null })}
+            itemCount={selectedIds.size}
+            availableTags={availableTags}
+            onConfirm={performBulkTagAddition}
+            isLoading={isBulkActionLoading}
+          />
+        </Suspense>
       </div>
     </AppLayout>
   );

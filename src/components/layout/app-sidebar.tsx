@@ -19,6 +19,8 @@ import {
   User,
   ChevronUp,
   ArrowUpCircle,
+  X,
+  Vote,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/avatar';
@@ -36,9 +38,10 @@ interface SidebarProps {
   userRole: 'student' | 'lecturer' | 'admin';
   userName: string;
   userEmail: string;
+  onClose?: () => void;
 }
 
-export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
+export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -56,6 +59,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/complaints', label: 'My Complaints', icon: FileText, badge: 12 },
     { href: '/complaints/drafts', label: 'Drafts', icon: Inbox, badge: 2 },
+    { href: '/votes', label: 'Votes', icon: Vote },
     { href: '/announcements', label: 'Announcements', icon: Megaphone },
     { href: '/settings', label: 'Settings', icon: Settings },
   ];
@@ -65,6 +69,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
     { href: '/complaints', label: 'All Complaints', icon: FileText, badge: 45 },
     { href: '/complaints?filter=assigned', label: 'Assigned to Me', icon: Users, badge: 8 },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/admin/votes', label: 'Manage Votes', icon: Vote },
     { href: '/admin/templates', label: 'Templates', icon: MessageSquare },
     { href: '/announcements', label: 'Announcements', icon: Megaphone },
     { href: '/settings', label: 'Settings', icon: Settings },
@@ -75,6 +80,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
     { href: '/complaints', label: 'All Complaints', icon: FileText, badge: 45 },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/users', label: 'User Management', icon: Users },
+    { href: '/admin/votes', label: 'Manage Votes', icon: Vote },
     { href: '/admin/templates', label: 'Templates', icon: MessageSquare },
     { href: '/admin/escalation-rules', label: 'Escalation Rules', icon: ArrowUpCircle },
     { href: '/announcements', label: 'Announcements', icon: Megaphone },
@@ -87,8 +93,8 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
       {/* Logo/Brand */}
-      <div className="flex h-16 items-center px-6 border-b">
-        <Link href="/dashboard" className="flex items-center gap-3">
+      <div className="flex h-16 items-center justify-between px-6 border-b">
+        <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg">
             <FileText className="h-5 w-5" />
           </div>
@@ -98,6 +104,16 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
             </span>
           </div>
         </Link>
+        {/* Close button for mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
       {/* Quick Action */}
@@ -105,6 +121,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
         <div className="p-4">
           <Link
             href="/complaints/new"
+            onClick={onClose}
             className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
           >
             <Plus className="h-4 w-4" />
@@ -123,6 +140,7 @@ export function AppSidebar({ userRole, userName, userEmail }: SidebarProps) {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onClose}
               className={cn(
                 'group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                 isActive

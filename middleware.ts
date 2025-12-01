@@ -1,11 +1,13 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { validateCsrfRequest } from '@/lib/csrf';
 
 /**
  * Next.js Middleware for Route Protection and Role-Based Access Control
  *
  * This middleware runs before every request and handles:
+ * - CSRF protection for state-changing requests
  * - Authentication verification
  * - Role-based authorization
  * - Automatic redirects for unauthenticated users
@@ -60,9 +62,29 @@ function hasAccess(userRole: string | null, requiredRoles: string[]): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for static files and API routes
-  if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.includes('.')) {
+  // Skip middleware for static files
+  if (pathname.startsWith('/_next') || pathname.includes('.')) {
     return NextResponse.next();
+  }
+
+  // Skip CSRF validation for CSRF token endpoint and auth callback
+  const skipCsrfPaths = ['/api/csrf-token', '/auth/callback', '/callback'];
+  const shouldSkipCsrf = skipCsrfPaths.some((path) => pathname.startsWith(path));
+
+  // Validate CSRF for state-changing requests (POST, PUT, PATCH, DELETE)
+  if (!shouldSkipCsrf && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+    const isValidCsrf = await validateCsrfRequest(request);
+
+    if (!isValidCsrf) {
+      console.warn(`CSRF validation failed for ${request.method} ${pathname}`);
+      return NextResponse.json(
+        {
+          error: 'CSRF validation failed',
+          message: 'Invalid or missing CSRF token',
+        },
+        { status: 403 }
+      );
+    }
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

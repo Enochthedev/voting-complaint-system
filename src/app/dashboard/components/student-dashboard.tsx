@@ -63,8 +63,13 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
   const { data: activeVotes = [], isLoading: votesLoading } = useVotes({ isActive: true });
 
   // Derive loading and error states
-  const isLoading = statsLoading || complaintsLoading || draftsLoading || 
-                    announcementsLoading || notificationsLoading || votesLoading;
+  const isLoading =
+    statsLoading ||
+    complaintsLoading ||
+    draftsLoading ||
+    announcementsLoading ||
+    notificationsLoading ||
+    votesLoading;
   const error = statsError ? 'Failed to load dashboard data. Please try again.' : null;
 
   // Get recent complaints (first 3)
@@ -122,10 +127,10 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Welcome back, {userName.split(' ')[0]}!
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Here's what's happening with your complaints today.
         </p>
       </div>

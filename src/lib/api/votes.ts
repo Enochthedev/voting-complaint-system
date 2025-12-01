@@ -1,5 +1,6 @@
 import type { Vote, VoteResponse } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
+import { withRateLimit } from '@/lib/rate-limiter';
 
 /**
  * Vote API functions
@@ -12,7 +13,7 @@ import { supabase } from '@/lib/supabase';
  * @param voteData - Partial vote data (without id and created_at)
  * @returns Created vote
  */
-export async function createVote(voteData: Omit<Vote, 'id' | 'created_at'>): Promise<Vote> {
+async function createVoteImpl(voteData: Omit<Vote, 'id' | 'created_at'>): Promise<Vote> {
   const { data, error } = await supabase.from('votes').insert(voteData).select().single();
 
   if (error) {
@@ -25,15 +26,14 @@ export async function createVote(voteData: Omit<Vote, 'id' | 'created_at'>): Pro
   return data;
 }
 
+export const createVote = withRateLimit(createVoteImpl, 'write');
+
 /**
  * Get all votes (with optional filtering)
  * @param options - Filter options
  * @returns Array of votes
  */
-export async function getVotes(options?: {
-  isActive?: boolean;
-  createdBy?: string;
-}): Promise<Vote[]> {
+async function getVotesImpl(options?: { isActive?: boolean; createdBy?: string }): Promise<Vote[]> {
   let query = supabase.from('votes').select('*');
 
   if (options?.isActive !== undefined) {
@@ -53,12 +53,14 @@ export async function getVotes(options?: {
   return data || [];
 }
 
+export const getVotes = withRateLimit(getVotesImpl, 'read');
+
 /**
  * Get a single vote by ID
  * @param voteId - Vote ID
  * @returns Vote or null if not found
  */
-export async function getVoteById(voteId: string): Promise<Vote | null> {
+async function getVoteByIdImpl(voteId: string): Promise<Vote | null> {
   const { data, error } = await supabase.from('votes').select('*').eq('id', voteId).maybeSingle();
 
   if (error) {
@@ -68,13 +70,15 @@ export async function getVoteById(voteId: string): Promise<Vote | null> {
   return data;
 }
 
+export const getVoteById = withRateLimit(getVoteByIdImpl, 'read');
+
 /**
  * Update a vote
  * @param voteId - Vote ID
  * @param updates - Partial vote data to update
  * @returns Updated vote
  */
-export async function updateVote(
+async function updateVoteImpl(
   voteId: string,
   updates: Partial<Omit<Vote, 'id' | 'created_at' | 'created_by'>>
 ): Promise<Vote> {
@@ -92,11 +96,13 @@ export async function updateVote(
   return data;
 }
 
+export const updateVote = withRateLimit(updateVoteImpl, 'write');
+
 /**
  * Delete a vote
  * @param voteId - Vote ID
  */
-export async function deleteVote(voteId: string): Promise<void> {
+async function deleteVoteImpl(voteId: string): Promise<void> {
   const { error } = await supabase.from('votes').delete().eq('id', voteId);
 
   if (error) {
@@ -105,6 +111,8 @@ export async function deleteVote(voteId: string): Promise<void> {
 
   // Note: Associated vote_responses are automatically deleted via CASCADE foreign key
 }
+
+export const deleteVote = withRateLimit(deleteVoteImpl, 'write');
 
 /**
  * Submit a vote response (student casts a vote)
@@ -117,7 +125,7 @@ export async function deleteVote(voteId: string): Promise<void> {
  * on (vote_id, student_id). If a student tries to vote twice, the database will
  * reject the insert with a constraint violation error.
  */
-export async function submitVoteResponse(
+async function submitVoteResponseImpl(
   voteId: string,
   studentId: string,
   selectedOption: string
@@ -142,16 +150,15 @@ export async function submitVoteResponse(
   return data;
 }
 
+export const submitVoteResponse = withRateLimit(submitVoteResponseImpl, 'write');
+
 /**
  * Get vote responses for a specific vote
  * @param voteId - Vote ID
  * @returns Array of vote responses
  */
-export async function getVoteResponses(voteId: string): Promise<VoteResponse[]> {
-  const { data, error } = await supabase
-    .from('vote_responses')
-    .select('*')
-    .eq('vote_id', voteId);
+async function getVoteResponsesImpl(voteId: string): Promise<VoteResponse[]> {
+  const { data, error } = await supabase.from('vote_responses').select('*').eq('vote_id', voteId);
 
   if (error) {
     throw new Error(error.message || 'Failed to fetch vote responses');
@@ -160,13 +167,15 @@ export async function getVoteResponses(voteId: string): Promise<VoteResponse[]> 
   return data || [];
 }
 
+export const getVoteResponses = withRateLimit(getVoteResponsesImpl, 'read');
+
 /**
  * Check if a student has voted on a specific vote
  * @param voteId - Vote ID
  * @param studentId - Student ID
  * @returns true if student has voted, false otherwise
  */
-export async function hasStudentVoted(voteId: string, studentId: string): Promise<boolean> {
+async function hasStudentVotedImpl(voteId: string, studentId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('vote_responses')
     .select('id')
@@ -182,12 +191,14 @@ export async function hasStudentVoted(voteId: string, studentId: string): Promis
   return !!data;
 }
 
+export const hasStudentVoted = withRateLimit(hasStudentVotedImpl, 'read');
+
 /**
  * Get vote results (aggregated by option)
  * @param voteId - Vote ID
  * @returns Object with option counts
  */
-export async function getVoteResults(voteId: string): Promise<Record<string, number>> {
+async function getVoteResultsImpl(voteId: string): Promise<Record<string, number>> {
   const { data, error } = await supabase
     .from('vote_responses')
     .select('selected_option')
@@ -205,20 +216,26 @@ export async function getVoteResults(voteId: string): Promise<Record<string, num
   return results;
 }
 
+export const getVoteResults = withRateLimit(getVoteResultsImpl, 'read');
+
 /**
  * Close a vote (set is_active to false)
  * @param voteId - Vote ID
  * @returns Updated vote
  */
-export async function closeVote(voteId: string): Promise<Vote> {
-  return updateVote(voteId, { is_active: false });
+async function closeVoteImpl(voteId: string): Promise<Vote> {
+  return updateVoteImpl(voteId, { is_active: false });
 }
+
+export const closeVote = withRateLimit(closeVoteImpl, 'write');
 
 /**
  * Reopen a vote (set is_active to true)
  * @param voteId - Vote ID
  * @returns Updated vote
  */
-export async function reopenVote(voteId: string): Promise<Vote> {
-  return updateVote(voteId, { is_active: true });
+async function reopenVoteImpl(voteId: string): Promise<Vote> {
+  return updateVoteImpl(voteId, { is_active: true });
 }
+
+export const reopenVote = withRateLimit(reopenVoteImpl, 'write');

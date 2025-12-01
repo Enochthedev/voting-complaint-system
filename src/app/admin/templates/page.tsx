@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import { lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TemplateForm } from '@/components/complaints/template-form';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Search,
@@ -17,6 +18,11 @@ import {
   CheckCircle,
   Loader2,
 } from 'lucide-react';
+
+// Lazy load the template form component for better performance
+const TemplateForm = lazy(() =>
+  import('@/components/complaints/template-form').then((mod) => ({ default: mod.TemplateForm }))
+);
 import type {
   ComplaintTemplate,
   ComplaintCategory,
@@ -470,15 +476,26 @@ export default function TemplateManagementPage() {
                     : 'Create a new template to help students submit complaints more efficiently'}
                 </p>
               </div>
-              <TemplateForm
-                template={editingTemplate}
-                onSave={handleSaveTemplate}
-                onCancel={() => {
-                  setShowCreateModal(false);
-                  setEditingTemplate(null);
-                }}
-                isLoading={false}
-              />
+              <Suspense
+                fallback={
+                  <div className="space-y-6">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-32 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                }
+              >
+                <TemplateForm
+                  template={editingTemplate}
+                  onSave={handleSaveTemplate}
+                  onCancel={() => {
+                    setShowCreateModal(false);
+                    setEditingTemplate(null);
+                  }}
+                  isLoading={false}
+                />
+              </Suspense>
             </div>
           </div>
         )}

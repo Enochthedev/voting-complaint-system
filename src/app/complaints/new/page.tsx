@@ -1,14 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
-import { ComplaintForm } from '@/components/complaints/complaint-form';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FormSkeleton } from '@/components/ui/skeletons';
 import type { ComplaintCategory, ComplaintPriority } from '@/types/database.types';
+
+// Lazy load the heavy complaint form component
+const ComplaintForm = lazy(() =>
+  import('@/components/complaints/complaint-form').then((mod) => ({
+    default: mod.ComplaintForm,
+  }))
+);
 
 interface ComplaintFormData {
   title: string;
@@ -135,36 +142,42 @@ function NewComplaintPageContent() {
   }
 
   return (
-    <AppLayout
-      userRole={user.role as any}
-      userName={user.full_name}
-      userEmail={user.email}
-    >
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+    <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
+      <div className="container mx-auto max-w-4xl px-4 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             {draftId ? 'Edit Draft Complaint' : 'Submit a Complaint'}
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-sm sm:text-base text-muted-foreground">
             {draftId
               ? 'Continue editing your draft complaint. You can save your changes or submit the complaint.'
               : 'Fill out the form below to submit your complaint. You can save it as a draft and complete it later, or submit it immediately.'}
           </p>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-          <ComplaintForm
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            initialData={initialData}
-            isEditing={!!draftId}
-          />
+        <div className="rounded-lg border border-border bg-card p-4 sm:p-6 shadow-sm">
+          <Suspense
+            fallback={
+              <div className="space-y-6">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            }
+          >
+            <ComplaintForm
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              initialData={initialData}
+              isEditing={!!draftId}
+            />
+          </Suspense>
         </div>
       </div>
     </AppLayout>
   );
 }
-
 
 export default function NewComplaintPage() {
   return (
@@ -173,7 +186,7 @@ export default function NewComplaintPage() {
         <AppLayout userRole="student" userName="Loading..." userEmail="">
           <div className="container mx-auto max-w-4xl px-4 py-8">
             <Skeleton className="h-12 w-[300px] mb-4" />
-            <Skeleton className="h-96" />
+            <FormSkeleton />
           </div>
         </AppLayout>
       }

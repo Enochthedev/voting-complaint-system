@@ -1,13 +1,31 @@
 import type { ComplaintFormData, FormErrors } from './types';
 import { MAX_TITLE_LENGTH, MAX_DESCRIPTION_LENGTH } from './constants';
+import { sanitizeText, sanitizeHtml } from '@/lib/sanitize';
 
 /**
  * Helper function to strip HTML tags and get text content
  */
 export function getTextContent(html: string): string {
+  if (typeof window === 'undefined') {
+    // Server-side: simple HTML stripping
+    return html.replace(/<[^>]*>/g, '');
+  }
   const div = document.createElement('div');
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
+}
+
+/**
+ * Sanitize form data before submission
+ * Removes potentially dangerous content while preserving formatting
+ */
+export function sanitizeFormData(formData: ComplaintFormData): ComplaintFormData {
+  return {
+    ...formData,
+    title: sanitizeText(formData.title),
+    description: sanitizeHtml(formData.description),
+    tags: formData.tags.map((tag) => sanitizeText(tag)),
+  };
 }
 
 /**

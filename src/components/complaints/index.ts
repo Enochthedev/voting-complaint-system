@@ -1,6 +1,7 @@
 // Export all complaint-related components
 export { ComplaintForm } from './complaint-form';
 export { ComplaintList } from './complaint-list';
+export { ComplaintListVirtualized } from './complaint-list-virtualized';
 export { ComplaintDetailView } from './complaint-detail';
 export { FilterPanel } from './filter-panel';
 export type { FilterState, FilterPanelProps, SortOption } from './filter-panel';

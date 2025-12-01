@@ -1,15 +1,31 @@
 import { getSupabaseClient } from '@/lib/auth';
+import { withRateLimit } from '@/lib/rate-limiter';
 
 /**
  * Fetch complaints for the current user
+ * Optimized: Only select necessary columns for list view
  */
-export async function getUserComplaints(userId: string) {
+async function getUserComplaintsImpl(userId: string) {
   console.log('getUserComplaints called with userId:', userId);
 
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')
-    .select('*')
+    .select(
+      `
+      id,
+      title,
+      description,
+      status,
+      priority,
+      category,
+      is_anonymous,
+      created_at,
+      updated_at,
+      assigned_to,
+      assigned_user:users!complaints_assigned_to_fkey(id, full_name)
+    `
+    )
     .eq('student_id', userId)
     .eq('is_draft', false)
     .order('created_at', { ascending: false });
@@ -19,16 +35,29 @@ export async function getUserComplaints(userId: string) {
   return data;
 }
 
+export const getUserComplaints = withRateLimit(getUserComplaintsImpl, 'read');
+
 /**
  * Fetch draft complaints for the current user
+ * Optimized: Only select necessary columns for draft list view
  */
-export async function getUserDrafts(userId: string) {
+async function getUserDraftsImpl(userId: string) {
   console.log('getUserDrafts called with userId:', userId);
 
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')
-    .select('*')
+    .select(
+      `
+      id,
+      title,
+      description,
+      category,
+      priority,
+      created_at,
+      updated_at
+    `
+    )
     .eq('student_id', userId)
     .eq('is_draft', true)
     .order('updated_at', { ascending: false });
@@ -38,39 +67,84 @@ export async function getUserDrafts(userId: string) {
   return data;
 }
 
+export const getUserDrafts = withRateLimit(getUserDraftsImpl, 'read');
+
 /**
  * Get complaint statistics for a user
+ * Optimized: Use database aggregation instead of client-side filtering
  */
-export async function getUserComplaintStats(userId: string) {
+async function getUserComplaintStatsImpl(userId: string) {
   console.log('getUserComplaintStats called with userId:', userId);
 
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('complaints')
-    .select('status')
-    .eq('student_id', userId)
-    .eq('is_draft', false);
 
-  console.log('getUserComplaintStats result:', { data, error });
-  if (error) throw error;
+  // Use Promise.all to run all count queries in parallel
+  const [totalResult, newResult, openResult, inProgressResult, resolvedResult, closedResult] =
+    await Promise.all([
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false),
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false)
+        .eq('status', 'new'),
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false)
+        .eq('status', 'open'),
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false)
+        .eq('status', 'in_progress'),
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false)
+        .eq('status', 'resolved'),
+      supabase
+        .from('complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', userId)
+        .eq('is_draft', false)
+        .eq('status', 'closed'),
+    ]);
+
+  // Check for errors
+  if (totalResult.error) throw totalResult.error;
+  if (newResult.error) throw newResult.error;
+  if (openResult.error) throw openResult.error;
+  if (inProgressResult.error) throw inProgressResult.error;
+  if (resolvedResult.error) throw resolvedResult.error;
+  if (closedResult.error) throw closedResult.error;
 
   const stats = {
-    total: data.length,
-    new: data.filter((c: any) => c.status === 'new').length,
-    open: data.filter((c: any) => c.status === 'open').length,
-    in_progress: data.filter((c: any) => c.status === 'in_progress').length,
-    resolved: data.filter((c: any) => c.status === 'resolved').length,
-    closed: data.filter((c: any) => c.status === 'closed').length,
+    total: totalResult.count || 0,
+    new: newResult.count || 0,
+    open: openResult.count || 0,
+    in_progress: inProgressResult.count || 0,
+    resolved: resolvedResult.count || 0,
+    closed: closedResult.count || 0,
   };
 
   console.log('getUserComplaintStats stats:', stats);
   return stats;
 }
 
+export const getUserComplaintStats = withRateLimit(getUserComplaintStatsImpl, 'read');
+
 /**
  * Fetch all complaints (for lecturers/admins)
  */
-export async function getAllComplaints() {
+async function getAllComplaintsImpl() {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')
@@ -88,10 +162,12 @@ export async function getAllComplaints() {
   return data;
 }
 
+export const getAllComplaints = withRateLimit(getAllComplaintsImpl, 'read');
+
 /**
  * Fetch a single complaint by ID
  */
-export async function getComplaintById(id: string) {
+async function getComplaintByIdImpl(id: string) {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')
@@ -145,10 +221,12 @@ export async function getComplaintById(id: string) {
   return data;
 }
 
+export const getComplaintById = withRateLimit(getComplaintByIdImpl, 'read');
+
 /**
  * Create a new complaint
  */
-export async function createComplaint(complaint: any) {
+async function createComplaintImpl(complaint: any) {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase.from('complaints').insert(complaint).select().single();
 
@@ -156,10 +234,12 @@ export async function createComplaint(complaint: any) {
   return data;
 }
 
+export const createComplaint = withRateLimit(createComplaintImpl, 'write');
+
 /**
  * Update a complaint
  */
-export async function updateComplaint(id: string, updates: any) {
+async function updateComplaintImpl(id: string, updates: any) {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')
@@ -172,20 +252,24 @@ export async function updateComplaint(id: string, updates: any) {
   return data;
 }
 
+export const updateComplaint = withRateLimit(updateComplaintImpl, 'write');
+
 /**
  * Delete a complaint (drafts only)
  */
-export async function deleteComplaint(id: string) {
+async function deleteComplaintImpl(id: string) {
   const supabase = getSupabaseClient();
   const { error } = await supabase.from('complaints').delete().eq('id', id).eq('is_draft', true);
 
   if (error) throw error;
 }
 
+export const deleteComplaint = withRateLimit(deleteComplaintImpl, 'write');
+
 /**
  * Reopen a resolved complaint with justification
  */
-export async function reopenComplaint(id: string, justification: string, userId: string) {
+async function reopenComplaintImpl(id: string, justification: string, userId: string) {
   const supabase = getSupabaseClient();
 
   // Update complaint status to reopened
@@ -231,11 +315,13 @@ export async function reopenComplaint(id: string, justification: string, userId:
   return complaint;
 }
 
+export const reopenComplaint = withRateLimit(reopenComplaintImpl, 'write');
+
 /**
  * Submit a rating for a resolved complaint
  * Validates: Requirements AC16 (Satisfaction Rating)
  */
-export async function submitRating(
+async function submitRatingImpl(
   complaintId: string,
   studentId: string,
   rating: number,
@@ -309,10 +395,12 @@ export async function submitRating(
   return newRating;
 }
 
+export const submitRating = withRateLimit(submitRatingImpl, 'write');
+
 /**
  * Check if a complaint has been rated by a student
  */
-export async function hasRatedComplaint(complaintId: string, studentId: string): Promise<boolean> {
+async function hasRatedComplaintImpl(complaintId: string, studentId: string): Promise<boolean> {
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
@@ -330,36 +418,27 @@ export async function hasRatedComplaint(complaintId: string, studentId: string):
   return !!data;
 }
 
+export const hasRatedComplaint = withRateLimit(hasRatedComplaintImpl, 'read');
+
 /**
  * Get average rating for a user's resolved complaints
  * Validates: Requirements AC16 (Satisfaction Rating)
+ * Optimized: Use a single query with join instead of two separate queries
  */
-export async function getUserAverageRating(userId: string): Promise<number | null> {
+async function getUserAverageRatingImpl(userId: string): Promise<number | null> {
   const supabase = getSupabaseClient();
 
-  // Get all ratings for user's complaints
-  const { data: complaints, error: complaintsError } = await supabase
-    .from('complaints')
-    .select('id')
-    .eq('student_id', userId)
-    .eq('status', 'resolved');
-
-  if (complaintsError) {
-    console.error('Error fetching user complaints:', complaintsError);
-    return null;
-  }
-
-  if (!complaints || complaints.length === 0) {
-    return null; // No resolved complaints
-  }
-
-  const complaintIds = complaints.map((c) => c.id);
-
-  // Get ratings for these complaints
+  // Use a single query with join to get ratings for user's resolved complaints
   const { data: ratings, error: ratingsError } = await supabase
     .from('complaint_ratings')
-    .select('rating')
-    .in('complaint_id', complaintIds);
+    .select(
+      `
+      rating,
+      complaint:complaints!inner(student_id, status)
+    `
+    )
+    .eq('complaint.student_id', userId)
+    .eq('complaint.status', 'resolved');
 
   if (ratingsError) {
     console.error('Error fetching ratings:', ratingsError);
@@ -377,11 +456,14 @@ export async function getUserAverageRating(userId: string): Promise<number | nul
   return Math.round(average * 10) / 10; // Round to 1 decimal place
 }
 
+export const getUserAverageRating = withRateLimit(getUserAverageRatingImpl, 'read');
+
 /**
  * Bulk assign multiple complaints to a lecturer
  * Validates: Requirements AC18 (Bulk Actions)
+ * Optimized: Use batch operations and reduce round trips
  */
-export async function bulkAssignComplaints(
+async function bulkAssignComplaintsImpl(
   complaintIds: string[],
   lecturerId: string,
   performedBy: string
@@ -409,92 +491,88 @@ export async function bulkAssignComplaints(
     throw new Error('Invalid lecturer selected');
   }
 
-  // Process each complaint
-  for (const complaintId of complaintIds) {
-    try {
-      // Get complaint details before update
-      const { data: complaint, error: fetchError } = await supabase
-        .from('complaints')
-        .select('id, title, assigned_to')
-        .eq('id', complaintId)
-        .single();
+  // Fetch all complaints in one query
+  const { data: complaints, error: fetchError } = await supabase
+    .from('complaints')
+    .select('id, title, assigned_to')
+    .in('id', complaintIds);
 
-      if (fetchError || !complaint) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: Not found`);
-        continue;
-      }
-
-      const oldAssignedTo = complaint.assigned_to;
-
-      // Update complaint assignment
-      const { error: updateError } = await supabase
-        .from('complaints')
-        .update({
-          assigned_to: lecturerId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', complaintId);
-
-      if (updateError) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: ${updateError.message}`);
-        continue;
-      }
-
-      // Log assignment in history
-      const { error: historyError } = await supabase.from('complaint_history').insert({
-        complaint_id: complaintId,
-        action: 'assigned',
-        old_value: oldAssignedTo || 'unassigned',
-        new_value: lecturerId,
-        performed_by: performedBy,
-        details: {
-          lecturer_name: lecturer.full_name,
-          bulk_action: true,
-        },
-      });
-
-      if (historyError) {
-        console.error(`Failed to log history for complaint ${complaintId}:`, historyError);
-        // Don't fail the operation if history logging fails
-      }
-
-      // Create notification for assigned lecturer
-      const { error: notificationError } = await supabase.from('notifications').insert({
-        user_id: lecturerId,
-        type: 'complaint_assigned',
-        title: 'New Complaint Assigned',
-        message: `You have been assigned to: "${complaint.title}"`,
-        related_id: complaintId,
-        is_read: false,
-      });
-
-      if (notificationError) {
-        console.error(
-          `Failed to create notification for complaint ${complaintId}:`,
-          notificationError
-        );
-        // Don't fail the operation if notification fails
-      }
-
-      results.success++;
-    } catch (error) {
-      results.failed++;
-      results.errors.push(
-        `Complaint ${complaintId}: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
+  if (fetchError) {
+    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
   }
+
+  if (!complaints || complaints.length === 0) {
+    throw new Error('No valid complaints found');
+  }
+
+  const timestamp = new Date().toISOString();
+
+  // Batch update all complaints
+  const { error: updateError } = await supabase
+    .from('complaints')
+    .update({
+      assigned_to: lecturerId,
+      updated_at: timestamp,
+    })
+    .in('id', complaintIds);
+
+  if (updateError) {
+    throw new Error(`Failed to update complaints: ${updateError.message}`);
+  }
+
+  // Prepare batch inserts for history and notifications
+  const historyInserts = complaints.map((complaint) => ({
+    complaint_id: complaint.id,
+    action: 'assigned',
+    old_value: complaint.assigned_to || 'unassigned',
+    new_value: lecturerId,
+    performed_by: performedBy,
+    details: {
+      lecturer_name: lecturer.full_name,
+      bulk_action: true,
+    },
+  }));
+
+  const notificationInserts = complaints.map((complaint) => ({
+    user_id: lecturerId,
+    type: 'complaint_assigned',
+    title: 'New Complaint Assigned',
+    message: `You have been assigned to: "${complaint.title}"`,
+    related_id: complaint.id,
+    is_read: false,
+  }));
+
+  // Batch insert history records
+  const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
+
+  if (historyError) {
+    console.error('Failed to log history for bulk assignment:', historyError);
+    // Don't fail the operation if history logging fails
+  }
+
+  // Batch insert notifications
+  const { error: notificationError } = await supabase
+    .from('notifications')
+    .insert(notificationInserts);
+
+  if (notificationError) {
+    console.error('Failed to create notifications for bulk assignment:', notificationError);
+    // Don't fail the operation if notification fails
+  }
+
+  results.success = complaints.length;
 
   return results;
 }
 
+export const bulkAssignComplaints = withRateLimit(bulkAssignComplaintsImpl, 'bulk');
+
 /**
  * Bulk change status of multiple complaints
  * Validates: Requirements AC18 (Bulk Actions)
+ * Optimized: Use batch operations and reduce round trips
  */
-export async function bulkChangeStatus(
+async function bulkChangeStatusImpl(
   complaintIds: string[],
   newStatus: string,
   performedBy: string
@@ -511,79 +589,78 @@ export async function bulkChangeStatus(
     errors: [] as string[],
   };
 
-  // Process each complaint
-  for (const complaintId of complaintIds) {
-    try {
-      // Get complaint details before update
-      const { data: complaint, error: fetchError } = await supabase
-        .from('complaints')
-        .select('id, title, status')
-        .eq('id', complaintId)
-        .single();
+  // Fetch all complaints in one query
+  const { data: complaints, error: fetchError } = await supabase
+    .from('complaints')
+    .select('id, title, status')
+    .in('id', complaintIds);
 
-      if (fetchError || !complaint) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: Not found`);
-        continue;
-      }
-
-      const oldStatus = complaint.status;
-
-      // Skip if status is already the target status
-      if (oldStatus === newStatus) {
-        results.success++;
-        continue;
-      }
-
-      // Update complaint status
-      const { error: updateError } = await supabase
-        .from('complaints')
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', complaintId);
-
-      if (updateError) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: ${updateError.message}`);
-        continue;
-      }
-
-      // Log status change in history
-      const { error: historyError } = await supabase.from('complaint_history').insert({
-        complaint_id: complaintId,
-        action: 'status_changed',
-        old_value: oldStatus,
-        new_value: newStatus,
-        performed_by: performedBy,
-        details: {
-          bulk_action: true,
-        },
-      });
-
-      if (historyError) {
-        console.error(`Failed to log history for complaint ${complaintId}:`, historyError);
-        // Don't fail the operation if history logging fails
-      }
-
-      results.success++;
-    } catch (error) {
-      results.failed++;
-      results.errors.push(
-        `Complaint ${complaintId}: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
+  if (fetchError) {
+    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
   }
+
+  if (!complaints || complaints.length === 0) {
+    throw new Error('No valid complaints found');
+  }
+
+  // Filter out complaints that already have the target status
+  const complaintsToUpdate = complaints.filter((c) => c.status !== newStatus);
+
+  if (complaintsToUpdate.length === 0) {
+    // All complaints already have the target status
+    results.success = complaints.length;
+    return results;
+  }
+
+  const timestamp = new Date().toISOString();
+  const idsToUpdate = complaintsToUpdate.map((c) => c.id);
+
+  // Batch update all complaints
+  const { error: updateError } = await supabase
+    .from('complaints')
+    .update({
+      status: newStatus,
+      updated_at: timestamp,
+    })
+    .in('id', idsToUpdate);
+
+  if (updateError) {
+    throw new Error(`Failed to update complaints: ${updateError.message}`);
+  }
+
+  // Prepare batch insert for history
+  const historyInserts = complaintsToUpdate.map((complaint) => ({
+    complaint_id: complaint.id,
+    action: 'status_changed',
+    old_value: complaint.status,
+    new_value: newStatus,
+    performed_by: performedBy,
+    details: {
+      bulk_action: true,
+    },
+  }));
+
+  // Batch insert history records
+  const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
+
+  if (historyError) {
+    console.error('Failed to log history for bulk status change:', historyError);
+    // Don't fail the operation if history logging fails
+  }
+
+  results.success = complaints.length;
 
   return results;
 }
 
+export const bulkChangeStatus = withRateLimit(bulkChangeStatusImpl, 'bulk');
+
 /**
  * Bulk add tags to multiple complaints
  * Validates: Requirements AC18 (Bulk Actions)
+ * Optimized: Use batch operations and reduce round trips
  */
-export async function bulkAddTags(
+async function bulkAddTagsImpl(
   complaintIds: string[],
   tags: string[],
   performedBy: string
@@ -604,85 +681,93 @@ export async function bulkAddTags(
     errors: [] as string[],
   };
 
-  // Process each complaint
-  for (const complaintId of complaintIds) {
-    try {
-      // Verify complaint exists
-      const { data: complaint, error: fetchError } = await supabase
-        .from('complaints')
-        .select('id, title')
-        .eq('id', complaintId)
-        .single();
+  // Fetch all complaints in one query to verify they exist
+  const { data: complaints, error: fetchError } = await supabase
+    .from('complaints')
+    .select('id, title')
+    .in('id', complaintIds);
 
-      if (fetchError || !complaint) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: Not found`);
-        continue;
-      }
+  if (fetchError) {
+    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
+  }
 
-      // Get existing tags for this complaint
-      const { data: existingTags, error: existingTagsError } = await supabase
-        .from('complaint_tags')
-        .select('tag_name')
-        .eq('complaint_id', complaintId);
+  if (!complaints || complaints.length === 0) {
+    throw new Error('No valid complaints found');
+  }
 
-      if (existingTagsError) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: Failed to fetch existing tags`);
-        continue;
-      }
+  // Get all existing tags for these complaints in one query
+  const { data: existingTags, error: existingTagsError } = await supabase
+    .from('complaint_tags')
+    .select('complaint_id, tag_name')
+    .in('complaint_id', complaintIds);
 
-      const existingTagNames = new Set(existingTags?.map((t) => t.tag_name) || []);
+  if (existingTagsError) {
+    throw new Error(`Failed to fetch existing tags: ${existingTagsError.message}`);
+  }
 
-      // Filter out tags that already exist
-      const newTags = tags.filter((tag) => !existingTagNames.has(tag));
+  // Build a map of complaint_id -> Set of existing tag names
+  const existingTagsMap = new Map<string, Set<string>>();
+  (existingTags || []).forEach((tag) => {
+    if (!existingTagsMap.has(tag.complaint_id)) {
+      existingTagsMap.set(tag.complaint_id, new Set());
+    }
+    existingTagsMap.get(tag.complaint_id)!.add(tag.tag_name);
+  });
 
-      if (newTags.length === 0) {
-        // All tags already exist, consider this a success
-        results.success++;
-        continue;
-      }
+  // Prepare batch inserts for new tags
+  const tagInserts: Array<{ complaint_id: string; tag_name: string }> = [];
+  const historyInserts: Array<unknown> = [];
 
-      // Insert new tags
-      const tagInserts = newTags.map((tag) => ({
-        complaint_id: complaintId,
-        tag_name: tag,
-      }));
+  complaints.forEach((complaint) => {
+    const existingTagNames = existingTagsMap.get(complaint.id) || new Set();
+    const newTags = tags.filter((tag) => !existingTagNames.has(tag));
 
-      const { error: insertError } = await supabase.from('complaint_tags').insert(tagInserts);
+    if (newTags.length > 0) {
+      // Add tag inserts
+      newTags.forEach((tag) => {
+        tagInserts.push({
+          complaint_id: complaint.id,
+          tag_name: tag,
+        });
+      });
 
-      if (insertError) {
-        results.failed++;
-        results.errors.push(`Complaint ${complaintId}: ${insertError.message}`);
-        continue;
-      }
-
-      // Log tag addition in history
-      const { error: historyError } = await supabase.from('complaint_history').insert({
-        complaint_id: complaintId,
+      // Add history insert
+      historyInserts.push({
+        complaint_id: complaint.id,
         action: 'tags_added',
         old_value: Array.from(existingTagNames).join(', ') || 'none',
-        new_value: [...existingTagNames, ...newTags].join(', '),
+        new_value: Array.from(existingTagNames).concat(newTags).join(', '),
         performed_by: performedBy,
         details: {
           added_tags: newTags,
           bulk_action: true,
         },
       });
+    }
+  });
 
-      if (historyError) {
-        console.error(`Failed to log history for complaint ${complaintId}:`, historyError);
-        // Don't fail the operation if history logging fails
-      }
+  // Batch insert all new tags
+  if (tagInserts.length > 0) {
+    const { error: insertError } = await supabase.from('complaint_tags').insert(tagInserts);
 
-      results.success++;
-    } catch (error) {
-      results.failed++;
-      results.errors.push(
-        `Complaint ${complaintId}: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+    if (insertError) {
+      throw new Error(`Failed to insert tags: ${insertError.message}`);
     }
   }
 
+  // Batch insert history records
+  if (historyInserts.length > 0) {
+    const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
+
+    if (historyError) {
+      console.error('Failed to log history for bulk tag addition:', historyError);
+      // Don't fail the operation if history logging fails
+    }
+  }
+
+  results.success = complaints.length;
+
   return results;
 }
+
+export const bulkAddTags = withRateLimit(bulkAddTagsImpl, 'bulk');

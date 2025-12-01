@@ -6,7 +6,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { Label } from '@/components/ui/label';
 import { AlertCircle } from 'lucide-react';
 import type { ComplaintFormData, ComplaintFormProps, ComplaintTemplate } from './types';
-import { validateForm } from './validation';
+import { validateForm, sanitizeFormData } from './validation';
 import { applyTemplateToFormData } from './template-utils';
 import { TemplateSelector } from './TemplateSelector';
 import { FormFields } from './FormFields';
@@ -58,12 +58,15 @@ export function ComplaintForm({
     }
 
     try {
+      // Sanitize form data before submission
+      const sanitizedData = sanitizeFormData(formData);
+
       // Call the onSubmit callback if provided
       if (onSubmit) {
-        await onSubmit(formData, isDraft);
+        await onSubmit(sanitizedData, isDraft);
       } else {
         // Mock submission for UI development
-        console.log('Form submitted:', { ...formData, isDraft });
+        console.log('Form submitted:', { ...sanitizedData, isDraft });
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }

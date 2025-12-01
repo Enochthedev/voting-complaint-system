@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { AlertCircle, Loader2, Send, X, CheckCircle } from 'lucide-react';
 import type { Feedback } from '@/types/database.types';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface FeedbackFormProps {
   complaintId: string;
@@ -100,13 +101,16 @@ export function FeedbackForm({
     setIsSubmitting(true);
 
     try {
+      // Sanitize HTML content before submission
+      const sanitizedContent = sanitizeHtml(content);
+
       if (onSubmit) {
-        await onSubmit(content);
+        await onSubmit(sanitizedContent);
       } else {
         // Mock submission for UI development (Phase 12 will implement real API)
         console.log('Feedback submitted:', {
           complaintId,
-          content,
+          content: sanitizedContent,
           isEditing,
         });
 

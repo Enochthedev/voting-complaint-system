@@ -1,13 +1,19 @@
 'use client';
 
 import * as React from 'react';
+import { lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
-import { VoteForm } from '@/components/votes';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { createVote } from '@/lib/api/votes';
 import type { Vote } from '@/types/database.types';
+
+// Lazy load the vote form component
+const VoteForm = lazy(() =>
+  import('@/components/votes').then((mod) => ({ default: mod.VoteForm }))
+);
 
 export default function NewVotePage() {
   const router = useRouter();
@@ -82,7 +88,18 @@ export default function NewVotePage() {
       )}
 
       <Card className="p-6">
-        <VoteForm onSave={handleSave} onCancel={handleCancel} isLoading={isLoading} />
+        <Suspense
+          fallback={
+            <div className="space-y-6">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          }
+        >
+          <VoteForm onSave={handleSave} onCancel={handleCancel} isLoading={isLoading} />
+        </Suspense>
       </Card>
     </div>
   );

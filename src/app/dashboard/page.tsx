@@ -1,14 +1,23 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DashboardGridSkeleton } from '@/components/ui/skeletons';
 import { AlertCircle } from 'lucide-react';
-import { StudentDashboard } from './components/student-dashboard';
-import { LecturerDashboard } from './components/lecturer-dashboard';
-import { AdminDashboard } from './components/admin-dashboard';
+
+// Lazy load dashboard components for better performance
+const StudentDashboard = lazy(() =>
+  import('./components/student-dashboard').then((mod) => ({ default: mod.StudentDashboard }))
+);
+const LecturerDashboard = lazy(() =>
+  import('./components/lecturer-dashboard').then((mod) => ({ default: mod.LecturerDashboard }))
+);
+const AdminDashboard = lazy(() =>
+  import('./components/admin-dashboard').then((mod) => ({ default: mod.AdminDashboard }))
+);
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -63,16 +72,30 @@ export default function DashboardPage() {
     );
   }
 
-  // Role-based dashboard rendering
+  // Role-based dashboard rendering with lazy loading
   const renderDashboard = () => {
+    const DashboardLoadingFallback = <DashboardGridSkeleton />;
+
     switch (user.role) {
       case 'admin':
-        return <AdminDashboard userId={user.id} userName={user.full_name} />;
+        return (
+          <Suspense fallback={DashboardLoadingFallback}>
+            <AdminDashboard userId={user.id} userName={user.full_name} />
+          </Suspense>
+        );
       case 'lecturer':
-        return <LecturerDashboard userId={user.id} userName={user.full_name} />;
+        return (
+          <Suspense fallback={DashboardLoadingFallback}>
+            <LecturerDashboard userId={user.id} userName={user.full_name} />
+          </Suspense>
+        );
       case 'student':
       default:
-        return <StudentDashboard userId={user.id} userName={user.full_name} />;
+        return (
+          <Suspense fallback={DashboardLoadingFallback}>
+            <StudentDashboard userId={user.id} userName={user.full_name} />
+          </Suspense>
+        );
     }
   };
 

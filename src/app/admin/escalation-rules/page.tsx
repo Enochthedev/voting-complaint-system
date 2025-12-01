@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import { lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { EscalationRuleForm } from '@/components/complaints/escalation-rule-form';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Search,
@@ -18,6 +19,13 @@ import {
   Clock,
   ArrowUpCircle,
 } from 'lucide-react';
+
+// Lazy load the escalation rule form component for better performance
+const EscalationRuleForm = lazy(() =>
+  import('@/components/complaints/escalation-rule-form').then((mod) => ({
+    default: mod.EscalationRuleForm,
+  }))
+);
 import type {
   EscalationRule,
   ComplaintCategory,
@@ -524,16 +532,27 @@ export default function EscalationRulesPage() {
               <h3 className="mb-6 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 {editingRule ? 'Edit Escalation Rule' : 'Create New Escalation Rule'}
               </h3>
-              <EscalationRuleForm
-                rule={editingRule}
-                users={users}
-                existingRules={rules}
-                onSave={handleSaveRule}
-                onCancel={() => {
-                  setShowCreateModal(false);
-                  setEditingRule(null);
-                }}
-              />
+              <Suspense
+                fallback={
+                  <div className="space-y-6">
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                }
+              >
+                <EscalationRuleForm
+                  rule={editingRule}
+                  users={users}
+                  existingRules={rules}
+                  onSave={handleSaveRule}
+                  onCancel={() => {
+                    setShowCreateModal(false);
+                    setEditingRule(null);
+                  }}
+                />
+              </Suspense>
             </div>
           </div>
         )}

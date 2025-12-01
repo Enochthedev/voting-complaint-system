@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ChartSkeleton, DashboardCardSkeleton, TableSkeleton } from '@/components/ui/skeletons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,7 @@ import {
   exportAnalyticsAsJSON,
   exportAnalyticsAsPDF,
 } from '@/lib/utils/export-analytics';
+import { ChartLoadingFallback } from '@/lib/utils/lazy-load';
 
 // Mock data for analytics
 const mockAnalyticsData = {

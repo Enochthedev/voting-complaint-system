@@ -1,11 +1,19 @@
 'use client';
 
 import * as React from 'react';
+import { lazy, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
-import { ComplaintDetailView } from '@/components/complaints/complaint-detail';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ComplaintDetailSkeleton } from '@/components/ui/skeletons';
+
+// Lazy load the heavy complaint detail view component
+const ComplaintDetailView = lazy(() =>
+  import('@/components/complaints/complaint-detail').then((mod) => ({
+    default: mod.ComplaintDetailView,
+  }))
+);
 
 /**
  * Complaint Detail Page
@@ -41,21 +49,18 @@ export default function ComplaintDetailPage() {
         userEmail={user?.email || ''}
       >
         <div className="container mx-auto max-w-6xl px-4 py-8">
-          <Skeleton className="h-12 w-[300px] mb-4" />
-          <Skeleton className="h-96" />
+          <ComplaintDetailSkeleton />
         </div>
       </AppLayout>
     );
   }
 
   return (
-    <AppLayout
-      userRole={user.role as any}
-      userName={user.full_name}
-      userEmail={user.email}
-    >
-      <div className="container mx-auto max-w-6xl px-4 py-8">
-        <ComplaintDetailView complaintId={complaintId} onBack={handleBack} />
+    <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
+      <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">
+        <Suspense fallback={<ComplaintDetailSkeleton />}>
+          <ComplaintDetailView complaintId={complaintId} onBack={handleBack} />
+        </Suspense>
       </div>
     </AppLayout>
   );

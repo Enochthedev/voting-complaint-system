@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2, Send, X } from 'lucide-react';
+import { sanitizeText } from '@/lib/sanitize';
 
 interface CommentInputProps {
   /**
@@ -172,9 +173,12 @@ export function CommentInput({
     setIsSubmitting(true);
 
     try {
+      // Sanitize comment text before submission
+      const sanitizedComment = sanitizeText(comment.trim());
+
       if (onSubmit) {
         // Call the provided onSubmit handler
-        await onSubmit(comment.trim(), isInternal);
+        await onSubmit(sanitizedComment, isInternal);
 
         // Reset form after successful submission
         setComment('');
@@ -187,7 +191,7 @@ export function CommentInput({
       } else {
         // Mock submission for UI development (Phase 12 will implement real API)
         console.log('Comment submitted:', {
-          comment: comment.trim(),
+          comment: sanitizedComment,
           isInternal,
           isEditing,
         });

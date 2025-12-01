@@ -303,6 +303,8 @@ function FileUploadItem({ progress }: FileUploadItemProps) {
               src={URL.createObjectURL(file)}
               alt={file.name}
               className="h-full w-full rounded object-cover"
+              loading="lazy"
+              decoding="async"
               onLoad={(e) => {
                 // Clean up object URL after image loads
                 URL.revokeObjectURL((e.target as HTMLImageElement).src);
@@ -381,6 +383,8 @@ function FileItem({ file, onRemove, disabled }: FileItemProps) {
             src={URL.createObjectURL(file)}
             alt={file.name}
             className="h-full w-full rounded object-cover"
+            loading="lazy"
+            decoding="async"
             onLoad={(e) => {
               // Clean up object URL after image loads
               URL.revokeObjectURL((e.target as HTMLImageElement).src);

@@ -11,6 +11,7 @@
 
 import { supabase } from '@/lib/supabase';
 import type { Notification } from '@/types/database.types';
+import { withRateLimit } from '@/lib/rate-limiter';
 
 /**
  * Fetch notifications for the current user
@@ -18,7 +19,7 @@ import type { Notification } from '@/types/database.types';
  * @param limit - Maximum number of notifications to fetch (default: 50)
  * @returns Array of notifications ordered by creation date (newest first)
  */
-export async function fetchNotifications(limit: number = 50): Promise<Notification[]> {
+async function fetchNotificationsImpl(limit: number = 50): Promise<Notification[]> {
   const {
     data: { user },
     error: authError,
@@ -42,12 +43,14 @@ export async function fetchNotifications(limit: number = 50): Promise<Notificati
   return data || [];
 }
 
+export const fetchNotifications = withRateLimit(fetchNotificationsImpl, 'read');
+
 /**
  * Mark a single notification as read
  *
  * @param notificationId - ID of the notification to mark as read
  */
-export async function markNotificationAsRead(notificationId: string): Promise<void> {
+async function markNotificationAsReadImpl(notificationId: string): Promise<void> {
   const {
     data: { user },
     error: authError,
@@ -68,10 +71,12 @@ export async function markNotificationAsRead(notificationId: string): Promise<vo
   }
 }
 
+export const markNotificationAsRead = withRateLimit(markNotificationAsReadImpl, 'write');
+
 /**
  * Mark all unread notifications as read for the current user
  */
-export async function markAllNotificationsAsRead(): Promise<void> {
+async function markAllNotificationsAsReadImpl(): Promise<void> {
   const {
     data: { user },
     error: authError,
@@ -92,12 +97,14 @@ export async function markAllNotificationsAsRead(): Promise<void> {
   }
 }
 
+export const markAllNotificationsAsRead = withRateLimit(markAllNotificationsAsReadImpl, 'write');
+
 /**
  * Get count of unread notifications for the current user
  *
  * @returns Number of unread notifications
  */
-export async function getUnreadNotificationCount(): Promise<number> {
+async function getUnreadNotificationCountImpl(): Promise<number> {
   const {
     data: { user },
     error: authError,
@@ -119,3 +126,5 @@ export async function getUnreadNotificationCount(): Promise<number> {
 
   return count || 0;
 }
+
+export const getUnreadNotificationCount = withRateLimit(getUnreadNotificationCountImpl, 'read');

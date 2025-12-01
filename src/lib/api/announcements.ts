@@ -1,5 +1,6 @@
 import type { Announcement } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
+import { withRateLimit } from '@/lib/rate-limiter';
 
 /**
  * Announcement API functions
@@ -12,7 +13,7 @@ import { supabase } from '@/lib/supabase';
  * @param announcementData - Partial announcement data (without id, created_at, updated_at)
  * @returns Created announcement
  */
-export async function createAnnouncement(
+async function createAnnouncementImpl(
   announcementData: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Announcement> {
   const { data, error } = await supabase
@@ -31,19 +32,18 @@ export async function createAnnouncement(
   return data;
 }
 
+export const createAnnouncement = withRateLimit(createAnnouncementImpl, 'write');
+
 /**
  * Get all announcements (sorted by created_at descending)
  * @param options - Filter options
  * @returns Array of announcements
  */
-export async function getAnnouncements(options?: {
+async function getAnnouncementsImpl(options?: {
   limit?: number;
   createdBy?: string;
 }): Promise<Announcement[]> {
-  let query = supabase
-    .from('announcements')
-    .select('*')
-    .order('created_at', { ascending: false });
+  let query = supabase.from('announcements').select('*').order('created_at', { ascending: false });
 
   if (options?.limit) {
     query = query.limit(options.limit);
@@ -62,12 +62,14 @@ export async function getAnnouncements(options?: {
   return data || [];
 }
 
+export const getAnnouncements = withRateLimit(getAnnouncementsImpl, 'read');
+
 /**
  * Get a single announcement by ID
  * @param announcementId - Announcement ID
  * @returns Announcement or null if not found
  */
-export async function getAnnouncementById(announcementId: string): Promise<Announcement | null> {
+async function getAnnouncementByIdImpl(announcementId: string): Promise<Announcement | null> {
   const { data, error } = await supabase
     .from('announcements')
     .select('*')
@@ -81,13 +83,15 @@ export async function getAnnouncementById(announcementId: string): Promise<Annou
   return data;
 }
 
+export const getAnnouncementById = withRateLimit(getAnnouncementByIdImpl, 'read');
+
 /**
  * Update an announcement
  * @param announcementId - Announcement ID
  * @param updates - Partial announcement data to update
  * @returns Updated announcement
  */
-export async function updateAnnouncement(
+async function updateAnnouncementImpl(
   announcementId: string,
   updates: Partial<Omit<Announcement, 'id' | 'created_at' | 'created_by'>>
 ): Promise<Announcement> {
@@ -108,11 +112,13 @@ export async function updateAnnouncement(
   return data;
 }
 
+export const updateAnnouncement = withRateLimit(updateAnnouncementImpl, 'write');
+
 /**
  * Delete an announcement
  * @param announcementId - Announcement ID
  */
-export async function deleteAnnouncement(announcementId: string): Promise<void> {
+async function deleteAnnouncementImpl(announcementId: string): Promise<void> {
   const { error } = await supabase.from('announcements').delete().eq('id', announcementId);
 
   if (error) {
@@ -120,11 +126,15 @@ export async function deleteAnnouncement(announcementId: string): Promise<void> 
   }
 }
 
+export const deleteAnnouncement = withRateLimit(deleteAnnouncementImpl, 'write');
+
 /**
  * Get recent announcements (for dashboard display)
  * @param limit - Number of announcements to return (default: 5)
  * @returns Array of recent announcements
  */
-export async function getRecentAnnouncements(limit: number = 5): Promise<Announcement[]> {
-  return getAnnouncements({ limit });
+async function getRecentAnnouncementsImpl(limit: number = 5): Promise<Announcement[]> {
+  return getAnnouncementsImpl({ limit });
 }
+
+export const getRecentAnnouncements = withRateLimit(getRecentAnnouncementsImpl, 'read');

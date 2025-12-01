@@ -1,0 +1,23 @@
+# Browserslist configuration
+# This defines which browsers the application supports
+# Used by tools like Autoprefixer, Babel, and PostCSS
+
+# Production browsers
+> 0.5%
+last 2 versions
+Firefox ESR
+not dead
+not IE 11
+
+# Specific minimum versions for Student Complaint Resolution System
+Chrome >= 90
+Firefox >= 88
+Safari >= 14
+Edge >= 90
+iOS >= 14
+ChromeAndroid >= 90
+
+# Exclude very old browsers
+not IE 11
+not op_mini all
+not dead

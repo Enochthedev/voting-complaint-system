@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare, Edit, Clock, User } from 'lucide-react';
 import type { Feedback, User as UserType } from '@/types/database.types';
 import { FeedbackForm } from './feedback-form';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface FeedbackWithUser extends Feedback {
   lecturer?: UserType;
@@ -235,7 +236,7 @@ export function FeedbackDisplay({
                     {/* Feedback Content */}
                     <div
                       className="prose prose-sm max-w-none dark:prose-invert"
-                      dangerouslySetInnerHTML={{ __html: item.content }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content) }}
                     />
 
                     {/* Edit Time Limit Notice */}

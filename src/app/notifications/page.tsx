@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NotificationListSkeleton } from '@/components/ui/skeletons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,12 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadNotificationCount } from '@/hooks/use-notifications';
+import {
+  useNotifications,
+  useMarkAsRead,
+  useMarkAllAsRead,
+  useUnreadNotificationCount,
+} from '@/hooks/use-notifications';
 import type { Notification, NotificationType } from '@/types/database.types';
 import { cn } from '@/lib/utils';
 
@@ -256,7 +262,7 @@ function NotificationGroup({ type, notifications, onMarkAsRead, onClick }: Notif
 export default function NotificationsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, error: authError } = useAuth();
-  
+
   // Use React Query hooks
   const { data: notifications = [], isLoading: notificationsLoading } = useNotifications();
   const { data: unreadCount = 0 } = useUnreadNotificationCount();
@@ -330,7 +336,11 @@ export default function NotificationsPage() {
   }
 
   return (
-    <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>
+    <AppLayout
+      userRole={user.role as 'student' | 'lecturer' | 'admin'}
+      userName={user.full_name}
+      userEmail={user.email}
+    >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -348,13 +358,7 @@ export default function NotificationsPage() {
         </div>
 
         {notificationsLoading ? (
-          <Card>
-            <CardContent className="py-12">
-              <div className="flex items-center justify-center">
-                <div className="text-sm text-muted-foreground">Loading notifications...</div>
-              </div>
-            </CardContent>
-          </Card>
+          <NotificationListSkeleton />
         ) : notifications.length === 0 ? (
           <Card>
             <CardContent className="py-12">

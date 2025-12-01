@@ -30,6 +30,7 @@ const mockDrafts = [
 import { AppLayout } from '@/components/layout/app-layout';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ComplaintCardSkeleton } from '@/components/ui/skeletons';
 
 export default function DraftsPage() {
   const router = useRouter();
@@ -51,7 +52,11 @@ export default function DraftsPage() {
       >
         <div className="space-y-6">
           <Skeleton className="h-12 w-[300px]" />
-          <Skeleton className="h-96" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <ComplaintCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </AppLayout>
     );
