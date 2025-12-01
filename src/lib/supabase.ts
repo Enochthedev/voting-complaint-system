@@ -14,4 +14,13 @@ if (!supabaseAnonKey) {
 
 // Create a single supabase client for interacting with your database
 // Using createBrowserClient from @supabase/ssr for proper cookie-based session management
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Auto-refresh tokens when they're about to expire
+    autoRefreshToken: true,
+    // Persist session to storage
+    persistSession: true,
+    // Detect session in URL (for OAuth callbacks)
+    detectSessionInUrl: true,
+  },
+});

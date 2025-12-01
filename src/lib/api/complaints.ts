@@ -1,5 +1,6 @@
 import { getSupabaseClient } from '@/lib/auth';
 import { withRateLimit } from '@/lib/rate-limiter';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Fetch complaints for the current user
@@ -8,31 +9,33 @@ import { withRateLimit } from '@/lib/rate-limiter';
 async function getUserComplaintsImpl(userId: string) {
   console.log('getUserComplaints called with userId:', userId);
 
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('complaints')
-    .select(
+  return withTokenRefresh(async () => {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('complaints')
+      .select(
+        `
+        id,
+        title,
+        description,
+        status,
+        priority,
+        category,
+        is_anonymous,
+        created_at,
+        updated_at,
+        assigned_to,
+        assigned_user:users!complaints_assigned_to_fkey(id, full_name)
       `
-      id,
-      title,
-      description,
-      status,
-      priority,
-      category,
-      is_anonymous,
-      created_at,
-      updated_at,
-      assigned_to,
-      assigned_user:users!complaints_assigned_to_fkey(id, full_name)
-    `
-    )
-    .eq('student_id', userId)
-    .eq('is_draft', false)
-    .order('created_at', { ascending: false });
+      )
+      .eq('student_id', userId)
+      .eq('is_draft', false)
+      .order('created_at', { ascending: false });
 
-  console.log('getUserComplaints result:', { data, error });
-  if (error) throw error;
-  return data;
+    console.log('getUserComplaints result:', { data, error });
+    if (error) throw error;
+    return data;
+  });
 }
 
 export const getUserComplaints = withRateLimit(getUserComplaintsImpl, 'read');
