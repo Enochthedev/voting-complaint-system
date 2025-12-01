@@ -24,16 +24,58 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+      console.log('Auth state changed:', event);
+
       if (event === 'SIGNED_IN' && session) {
         await loadUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         router.push('/login');
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed successfully');
+        await loadUser();
+      } else if (event === 'USER_UPDATED') {
+        await loadUser();
       }
     });
 
+    // Set up automatic session refresh check every 5 minutes
+    const refreshInterval = setInterval(
+      async () => {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          // Check if session is about to expire (within 10 minutes)
+          const expiresAt = session.expires_at ? session.expires_at * 1000 : 0;
+          const now = Date.now();
+          const timeUntilExpiry = expiresAt - now;
+
+          // If session expires in less than 10 minutes, refresh it
+          if (timeUntilExpiry < 10 * 60 * 1000) {
+            console.log('Session expiring soon, refreshing...');
+            const { error } = await supabase.auth.refreshSession();
+            if (error) {
+              console.error('Failed to refresh session:', error);
+              // Session expired, redirect to login
+              setUser(null);
+              router.push('/login');
+            }
+          }
+        } else {
+          // No session, redirect to login
+          console.log('No session found, redirecting to login');
+          setUser(null);
+          router.push('/login');
+        }
+      },
+      5 * 60 * 1000
+    ); // Check every 5 minutes
+
     return () => {
       subscription.unsubscribe();
+      clearInterval(refreshInterval);
     };
   }, [router]);
 
@@ -79,8 +121,12 @@ export function useAuth() {
         console.error('Error details:', JSON.stringify(dbError, null, 2));
         console.error('Error code:', dbError.code);
         console.error('Error message:', dbError.message);
-        setError('Failed to load user data');
-        setUser(null);
+
+        // Don't clear user if we already have one - just log the error
+        if (!user) {
+          setError('Failed to load user data');
+          setUser(null);
+        }
         setIsLoading(false);
         return;
       }
@@ -88,8 +134,12 @@ export function useAuth() {
       if (!userData) {
         console.error('User not found in database:', authUser.id);
         console.error('This might be an RLS policy issue');
-        setError('User profile not found');
-        setUser(null);
+
+        // Don't clear user if we already have one
+        if (!user) {
+          setError('User profile not found');
+          setUser(null);
+        }
         setIsLoading(false);
         return;
       }
@@ -98,8 +148,12 @@ export function useAuth() {
       setUser(userData as AuthUser);
     } catch (err) {
       console.error('Error loading user:', err);
-      setError('Failed to load user');
-      setUser(null);
+
+      // Don't clear user if we already have one - prevents blank page
+      if (!user) {
+        setError('Failed to load user');
+        setUser(null);
+      }
     } finally {
       setIsLoading(false);
     }
