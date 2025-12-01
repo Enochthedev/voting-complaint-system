@@ -5,7 +5,6 @@ import { ToastProvider } from '@/components/ui/toast';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { ReactQueryProvider } from '@/lib/react-query';
 import { CsrfProvider } from '@/components/providers/csrf-provider';
-import { getOrCreateCsrfToken } from '@/lib/csrf';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,19 +21,16 @@ export const metadata: Metadata = {
   description: 'A comprehensive system for managing student complaints',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Generate CSRF token on server for initial page load
-  const csrfToken = await getOrCreateCsrfToken();
-
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ReactQueryProvider>
-          <CsrfProvider initialToken={csrfToken}>
+          <CsrfProvider>
             <ErrorBoundary>
               <ToastProvider>{children}</ToastProvider>
             </ErrorBoundary>

@@ -10,15 +10,19 @@
  * - All text input should be escaped when displayed
  */
 
-// Lazy import DOMPurify only on client side
-let DOMPurify: any = null;
-
-// Initialize DOMPurify only in browser environment
-if (typeof window !== 'undefined') {
-  import('dompurify').then((module) => {
-    DOMPurify = module.default;
-  });
-}
+// Only import DOMPurify on client side
+const getDOMPurify = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const DOMPurify = require('dompurify');
+    return DOMPurify.default || DOMPurify;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Configuration for DOMPurify based on content type
@@ -101,7 +105,8 @@ export function sanitizeHtml(html: string): string {
   }
 
   // Check if we're in a browser environment
-  if (typeof window === 'undefined' || !DOMPurify) {
+  const DOMPurify = getDOMPurify();
+  if (!DOMPurify) {
     // Server-side: strip all HTML tags
     return html.replace(/<[^>]*>/g, '');
   }
@@ -130,7 +135,8 @@ export function sanitizeText(text: string): string {
   }
 
   // Check if we're in a browser environment
-  if (typeof window === 'undefined' || !DOMPurify) {
+  const DOMPurify = getDOMPurify();
+  if (!DOMPurify) {
     // Server-side: strip HTML tags
     return text.replace(/<[^>]*>/g, '');
   }
@@ -159,7 +165,8 @@ export function sanitizeSvg(svg: string): string {
   }
 
   // Check if we're in a browser environment
-  if (typeof window === 'undefined' || !DOMPurify) {
+  const DOMPurify = getDOMPurify();
+  if (!DOMPurify) {
     // Server-side: return empty string for safety
     return '';
   }
