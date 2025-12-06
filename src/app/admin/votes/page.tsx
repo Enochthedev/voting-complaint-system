@@ -38,9 +38,6 @@ export default function AdminVotesPage() {
   const [voteResults, setVoteResults] = React.useState<Record<string, Record<string, number>>>({});
   const [expandedVoteId, setExpandedVoteId] = React.useState<string | null>(null);
 
-  // TODO: Phase 12 - Get actual lecturer ID from auth context
-  const mockLecturerId = user?.id || 'lecturer-1';
-
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {
       router.push('/login');
@@ -60,8 +57,8 @@ export default function AdminVotesPage() {
     try {
       setIsLoading(true);
       setError(null);
-      // Get all votes created by this lecturer
-      const data = await getVotes({ createdBy: mockLecturerId });
+      // Get all votes (admins see all, lecturers see their own)
+      const data = await getVotes(user?.role === 'admin' ? {} : { createdBy: user?.id });
       setVotes(data);
 
       // Load results for all votes
@@ -82,26 +79,54 @@ export default function AdminVotesPage() {
   const handleCreateVote = async (voteData: Partial<Vote>) => {
     try {
       setError(null);
-      // TODO: Phase 12 - Use real API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (!user?.id) {
+        setError('User not authenticated');
+        return;
+      }
+
+      // Import createVote dynamically to avoid circular dependencies
+      const { createVote } = await import('@/lib/api/votes');
+
+      await createVote({
+        title: voteData.title!,
+        description: voteData.description || '',
+        options: voteData.options!,
+        is_active: voteData.is_active ?? true,
+        related_complaint_id: voteData.related_complaint_id || null,
+        closes_at: voteData.closes_at || null,
+        created_by: user.id,
+      });
+
       setShowCreateForm(false);
       await loadVotes();
     } catch (err) {
       console.error('Error creating vote:', err);
-      setError('Failed to create vote. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to create vote. Please try again.');
     }
   };
 
   const handleUpdateVote = async (voteData: Partial<Vote>) => {
     try {
       setError(null);
-      // TODO: Phase 12 - Use real API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (!editingVote) return;
+
+      // Import updateVote dynamically
+      const { updateVote } = await import('@/lib/api/votes');
+
+      await updateVote(editingVote.id, {
+        title: voteData.title,
+        description: voteData.description,
+        options: voteData.options,
+        is_active: voteData.is_active,
+        related_complaint_id: voteData.related_complaint_id,
+        closes_at: voteData.closes_at,
+      });
+
       setEditingVote(null);
       await loadVotes();
     } catch (err) {
       console.error('Error updating vote:', err);
-      setError('Failed to update vote. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to update vote. Please try again.');
     }
   };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,13 +22,16 @@ import {
   Plus,
 } from 'lucide-react';
 import { LecturerAnalyticsTab } from './lecturer-analytics-tab';
+import { useAllComplaints } from '@/hooks/use-complaints';
+import { useNotifications } from '@/hooks/use-notifications';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LecturerDashboardProps {
   userId: string;
   userName: string;
 }
 
-// Mock data for development (following UI-first approach)
+// Analytics data structure for the analytics tab
 const mockAnalyticsData = {
   keyMetrics: {
     totalComplaints: 247,
@@ -113,89 +117,27 @@ const mockAnalyticsData = {
   ],
 };
 
-const mockComplaints = [
-  {
-    id: '1',
-    title: 'Broken AC in Lecture Hall B',
-    category: 'Facilities',
-    priority: 'High',
-    status: 'New',
-    created_at: '2024-11-25T10:30:00Z',
-    student_name: 'Anonymous',
-    is_anonymous: true,
-  },
-  {
-    id: '2',
-    title: 'Course material not uploaded on time',
-    category: 'Academic',
-    priority: 'Medium',
-    status: 'In Progress',
-    created_at: '2024-11-24T14:20:00Z',
-    student_name: 'John Smith',
-    is_anonymous: false,
-  },
-  {
-    id: '3',
-    title: 'Grading discrepancy in midterm exam',
-    category: 'Academic',
-    priority: 'High',
-    status: 'Opened',
-    created_at: '2024-11-24T09:15:00Z',
-    student_name: 'Sarah Johnson',
-    is_anonymous: false,
-  },
-  {
-    id: '4',
-    title: 'Library computer not working',
-    category: 'Facilities',
-    priority: 'Low',
-    status: 'Resolved',
-    created_at: '2024-11-23T16:45:00Z',
-    student_name: 'Anonymous',
-    is_anonymous: true,
-  },
-  {
-    id: '5',
-    title: 'Assignment deadline too short',
-    category: 'Course Content',
-    priority: 'Medium',
-    status: 'In Progress',
-    created_at: '2024-11-23T11:30:00Z',
-    student_name: 'Michael Chen',
-    is_anonymous: false,
-  },
-];
-
-const mockRecentActivity = [
-  {
-    id: '1',
-    type: 'new_complaint',
-    message: 'New complaint submitted: "Broken AC in Lecture Hall B"',
-    time: '5 minutes ago',
-  },
-  {
-    id: '2',
-    type: 'status_change',
-    message: 'Complaint #247 status changed to Resolved',
-    time: '1 hour ago',
-  },
-  {
-    id: '3',
-    type: 'assignment',
-    message: 'Complaint #245 assigned to Dr. Sarah Johnson',
-    time: '2 hours ago',
-  },
-  {
-    id: '4',
-    type: 'feedback',
-    message: 'Feedback added to complaint #243',
-    time: '3 hours ago',
-  },
-];
-
-export function LecturerDashboard({ userName }: LecturerDashboardProps) {
+export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Fetch real data
+  const { data: allComplaints = [], isLoading: complaintsLoading } = useAllComplaints();
+  const { data: notifications = [], isLoading: notificationsLoading } = useNotifications(5);
+
+  // Calculate real statistics from complaints
+  const stats = {
+    totalComplaints: allComplaints.length,
+    assignedToMe: allComplaints.filter((c) => c.assigned_to === userId).length,
+    newComplaints: allComplaints.filter((c) => c.status === 'new').length,
+    inProgress: allComplaints.filter((c) => c.status === 'in_progress').length,
+    resolved: allComplaints.filter((c) => c.status === 'resolved').length,
+    closed: allComplaints.filter((c) => c.status === 'closed').length,
+  };
+
+  // Get recent complaints (last 5)
+  const recentComplaints = allComplaints.slice(0, 5);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status.toLowerCase()) {
@@ -204,6 +146,7 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
       case 'opened':
         return 'secondary';
       case 'in progress':
+      case 'in_progress':
         return 'default';
       case 'resolved':
         return 'default';
@@ -217,6 +160,7 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
   const getPriorityBadgeVariant = (priority: string) => {
     switch (priority.toLowerCase()) {
       case 'critical':
+      case 'urgent':
         return 'destructive';
       case 'high':
         return 'destructive';
@@ -228,6 +172,23 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
         return 'secondary';
     }
   };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  if (complaintsLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-[300px]" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -261,28 +222,44 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
 
       {/* Quick Filters */}
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push('/complaints?filter=assigned')}
+        >
           Assigned to Me
           <Badge variant="secondary" className="ml-2">
-            12
+            {stats.assignedToMe}
           </Badge>
         </Button>
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push('/complaints?priority=high')}
+        >
           High Priority
           <Badge variant="destructive" className="ml-2">
-            8
+            {allComplaints.filter((c) => c.priority === 'high' || c.priority === 'urgent').length}
           </Badge>
         </Button>
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push('/complaints?status=escalated')}
+        >
           Escalated
           <Badge variant="destructive" className="ml-2">
-            3
+            {allComplaints.filter((c) => c.status === 'escalated').length}
           </Badge>
         </Button>
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push('/complaints?status=new,open,in_progress')}
+        >
           Unresolved
           <Badge variant="default" className="ml-2">
-            42
+            {stats.newComplaints + stats.inProgress}
           </Badge>
         </Button>
       </div>
@@ -318,10 +295,8 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">247</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+12.5%</span> from last month
-                </p>
+                <div className="text-2xl font-bold">{stats.totalComplaints}</div>
+                <p className="text-xs text-muted-foreground">All complaints in system</p>
               </CardContent>
             </Card>
 
@@ -331,35 +306,36 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
+                <div className="text-2xl font-bold">{stats.assignedToMe}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-blue-600">3 new</span> today
+                  {stats.newComplaints} new complaints
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">4.2h</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">-15%</span> improvement
-                </p>
+                <div className="text-2xl font-bold">{stats.inProgress}</div>
+                <p className="text-xs text-muted-foreground">Currently being handled</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Resolution Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Resolved</CardTitle>
                 <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">87%</div>
+                <div className="text-2xl font-bold">{stats.resolved + stats.closed}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+5%</span> from last month
+                  {stats.totalComplaints > 0
+                    ? Math.round(((stats.resolved + stats.closed) / stats.totalComplaints) * 100)
+                    : 0}
+                  % resolution rate
                 </p>
               </CardContent>
             </Card>
@@ -375,72 +351,97 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockComplaints.slice(0, 5).map((complaint) => (
-                    <div
-                      key={complaint.id}
-                      className="flex items-start justify-between space-x-4 rounded-lg border p-3 hover:bg-accent/50 cursor-pointer transition-colors"
-                    >
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm font-medium leading-none">{complaint.title}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{complaint.student_name}</span>
-                          <span>•</span>
-                          <span>{new Date(complaint.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge
-                            variant={getStatusBadgeVariant(complaint.status)}
-                            className="text-xs"
-                          >
-                            {complaint.status}
-                          </Badge>
-                          <Badge
-                            variant={getPriorityBadgeVariant(complaint.priority)}
-                            className="text-xs"
-                          >
-                            {complaint.priority}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {complaint.category}
-                          </Badge>
+                  {recentComplaints.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>No complaints yet</p>
+                    </div>
+                  ) : (
+                    recentComplaints.map((complaint) => (
+                      <div
+                        key={complaint.id}
+                        className="flex items-start justify-between space-x-4 rounded-lg border p-3 hover:bg-accent/50 cursor-pointer transition-colors"
+                        onClick={() => router.push(`/complaints/${complaint.id}`)}
+                      >
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm font-medium leading-none">{complaint.title}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>
+                              {complaint.is_anonymous
+                                ? 'Anonymous'
+                                : complaint.student?.full_name || 'Unknown'}
+                            </span>
+                            <span>•</span>
+                            <span>{formatDate(complaint.created_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge
+                              variant={getStatusBadgeVariant(complaint.status)}
+                              className="text-xs"
+                            >
+                              {complaint.status}
+                            </Badge>
+                            <Badge
+                              variant={getPriorityBadgeVariant(complaint.priority)}
+                              className="text-xs"
+                            >
+                              {complaint.priority}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {complaint.category}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Recent Notifications */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest actions and updates</CardDescription>
+                <CardTitle>Recent Notifications</CardTitle>
+                <CardDescription>Latest updates and alerts</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockRecentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                        {activity.type === 'new_complaint' && (
-                          <FileText className="h-4 w-4 text-primary" />
-                        )}
-                        {activity.type === 'status_change' && (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        )}
-                        {activity.type === 'assignment' && (
-                          <Users className="h-4 w-4 text-blue-600" />
-                        )}
-                        {activity.type === 'feedback' && (
-                          <AlertCircle className="h-4 w-4 text-orange-600" />
-                        )}
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm">{activity.message}</p>
-                        <p className="text-xs text-muted-foreground">{activity.time}</p>
-                      </div>
+                  {notificationsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-16" />
+                      ))}
                     </div>
-                  ))}
+                  ) : notifications.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>No notifications</p>
+                    </div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex items-start gap-3 cursor-pointer hover:bg-accent/50 rounded-lg p-2 transition-colors"
+                        onClick={() => {
+                          if (notification.related_id) {
+                            router.push(`/complaints/${notification.related_id}`);
+                          }
+                        }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                          <Bell className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm font-medium">{notification.title}</p>
+                          <p className="text-xs text-muted-foreground">{notification.message}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(notification.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -454,25 +455,41 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Button variant="outline" className="h-auto flex-col items-start p-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => router.push('/complaints')}
+                >
                   <FileText className="mb-2 h-5 w-5" />
                   <span className="font-semibold">Review Complaints</span>
-                  <span className="text-xs text-muted-foreground">View pending items</span>
+                  <span className="text-xs text-muted-foreground">View all complaints</span>
                 </Button>
-                <Button variant="outline" className="h-auto flex-col items-start p-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => router.push('/admin/templates')}
+                >
                   <Plus className="mb-2 h-5 w-5" />
-                  <span className="font-semibold">Create Template</span>
-                  <span className="text-xs text-muted-foreground">Add new template</span>
+                  <span className="font-semibold">Manage Templates</span>
+                  <span className="text-xs text-muted-foreground">Create templates</span>
                 </Button>
-                <Button variant="outline" className="h-auto flex-col items-start p-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => router.push('/admin/votes')}
+                >
                   <BarChart3 className="mb-2 h-5 w-5" />
-                  <span className="font-semibold">View Analytics</span>
-                  <span className="text-xs text-muted-foreground">Detailed reports</span>
+                  <span className="font-semibold">Manage Votes</span>
+                  <span className="text-xs text-muted-foreground">Create polls</span>
                 </Button>
-                <Button variant="outline" className="h-auto flex-col items-start p-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => router.push('/admin/announcements')}
+                >
                   <Settings className="mb-2 h-5 w-5" />
-                  <span className="font-semibold">Manage Settings</span>
-                  <span className="text-xs text-muted-foreground">Configure system</span>
+                  <span className="font-semibold">Announcements</span>
+                  <span className="text-xs text-muted-foreground">Post updates</span>
                 </Button>
               </div>
             </CardContent>
@@ -488,50 +505,62 @@ export function LecturerDashboard({ userName }: LecturerDashboardProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockComplaints.map((complaint) => (
-                  <div
-                    key={complaint.id}
-                    className="flex items-start justify-between space-x-4 rounded-lg border p-4 hover:bg-accent/50 cursor-pointer transition-colors"
-                  >
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-start justify-between">
-                        <p className="text-sm font-medium leading-none">{complaint.title}</p>
-                        <Button variant="ghost" size="sm">
-                          View Details
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{complaint.student_name}</span>
-                        <span>•</span>
-                        <span>{new Date(complaint.created_at).toLocaleDateString()}</span>
-                        <span>•</span>
-                        <span>ID: {complaint.id}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={getStatusBadgeVariant(complaint.status)}
-                          className="text-xs"
-                        >
-                          {complaint.status}
-                        </Badge>
-                        <Badge
-                          variant={getPriorityBadgeVariant(complaint.priority)}
-                          className="text-xs"
-                        >
-                          {complaint.priority}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {complaint.category}
-                        </Badge>
-                        {complaint.is_anonymous && (
-                          <Badge variant="secondary" className="text-xs">
-                            Anonymous
+                {allComplaints.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No complaints yet</p>
+                  </div>
+                ) : (
+                  allComplaints.slice(0, 10).map((complaint) => (
+                    <div
+                      key={complaint.id}
+                      className="flex items-start justify-between space-x-4 rounded-lg border p-4 hover:bg-accent/50 cursor-pointer transition-colors"
+                      onClick={() => router.push(`/complaints/${complaint.id}`)}
+                    >
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <p className="text-sm font-medium leading-none">{complaint.title}</p>
+                          <Button variant="ghost" size="sm">
+                            View Details
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>
+                            {complaint.is_anonymous
+                              ? 'Anonymous'
+                              : complaint.student?.full_name || 'Unknown'}
+                          </span>
+                          <span>•</span>
+                          <span>{formatDate(complaint.created_at)}</span>
+                          <span>•</span>
+                          <span>ID: {complaint.id.slice(0, 8)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={getStatusBadgeVariant(complaint.status)}
+                            className="text-xs"
+                          >
+                            {complaint.status}
                           </Badge>
-                        )}
+                          <Badge
+                            variant={getPriorityBadgeVariant(complaint.priority)}
+                            className="text-xs"
+                          >
+                            {complaint.priority}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {complaint.category}
+                          </Badge>
+                          {complaint.is_anonymous && (
+                            <Badge variant="secondary" className="text-xs">
+                              Anonymous
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

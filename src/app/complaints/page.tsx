@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import type { Complaint, ComplaintTag, ComplaintStatus, User } from '@/types/database.types';
 import { useAuth } from '@/hooks/useAuth';
 import { useComplaintSearch } from '@/hooks/use-complaint-search';
+import { useAllComplaints, useUserComplaints } from '@/hooks/use-complaints';
 import { exportComplaintsToCSV } from '@/lib/export';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -36,288 +37,6 @@ const BulkAssignmentModal = lazy(() =>
 const BulkTagAdditionModal = lazy(() =>
   import('@/components/complaints').then((mod) => ({ default: mod.BulkTagAdditionModal }))
 );
-
-// Mock lecturer data
-const MOCK_LECTURERS: Record<string, User> = {
-  'lecturer-1': {
-    id: 'lecturer-1',
-    email: 'smith@university.edu',
-    role: 'lecturer',
-    full_name: 'Dr. Smith',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  'lecturer-2': {
-    id: 'lecturer-2',
-    email: 'johnson@university.edu',
-    role: 'lecturer',
-    full_name: 'Prof. Johnson',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  'admin-1': {
-    id: 'admin-1',
-    email: 'davis@university.edu',
-    role: 'admin',
-    full_name: 'Admin Davis',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  'admin-2': {
-    id: 'admin-2',
-    email: 'wilson@university.edu',
-    role: 'admin',
-    full_name: 'Admin Wilson',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-};
-
-// Mock data for UI development
-// Note: Using mock-student-id to match the getMockUser() ID for proper filtering
-const MOCK_COMPLAINTS: (Complaint & {
-  complaint_tags?: ComplaintTag[];
-  assigned_lecturer?: User | null;
-})[] = [
-  {
-    id: '1',
-    student_id: 'mock-student-id', // Matches the mock student user
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Broken Air Conditioning in Lecture Hall A',
-    description:
-      '<p>The air conditioning system in Lecture Hall A has been malfunctioning for the past week. The temperature is unbearable during afternoon classes, making it difficult to concentrate.</p>',
-    category: 'facilities',
-    priority: 'high',
-    status: 'new',
-    assigned_to: null,
-    assigned_lecturer: null,
-    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-    updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    opened_at: null,
-    opened_by: null,
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      {
-        id: 't1',
-        complaint_id: '1',
-        tag_name: 'air-conditioning',
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 't2',
-        complaint_id: '1',
-        tag_name: 'lecture-hall',
-        created_at: new Date().toISOString(),
-      },
-      { id: 't3', complaint_id: '1', tag_name: 'urgent', created_at: new Date().toISOString() },
-    ],
-  },
-  {
-    id: '2',
-    student_id: null,
-    is_anonymous: true,
-    is_draft: false,
-    title: 'Unfair Grading in CS101',
-    description:
-      '<p>I believe the grading criteria for the recent CS101 assignment were not clearly communicated. Several students received lower grades than expected without proper feedback.</p>',
-    category: 'academic',
-    priority: 'medium',
-    status: 'opened',
-    assigned_to: 'lecturer-1',
-    assigned_lecturer: MOCK_LECTURERS['lecturer-1'],
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    opened_by: 'lecturer-1',
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      { id: 't4', complaint_id: '2', tag_name: 'grading', created_at: new Date().toISOString() },
-      { id: 't5', complaint_id: '2', tag_name: 'cs101', created_at: new Date().toISOString() },
-    ],
-  },
-  {
-    id: '3',
-    student_id: 'mock-student-id', // Matches the mock student user
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Library WiFi Connection Issues',
-    description:
-      '<p>The WiFi in the library keeps disconnecting every 10-15 minutes. This is affecting my ability to complete online assignments and research.</p>',
-    category: 'facilities',
-    priority: 'medium',
-    status: 'in_progress',
-    assigned_to: 'admin-1',
-    assigned_lecturer: MOCK_LECTURERS['admin-1'],
-    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-    updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_by: 'admin-1',
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      { id: 't6', complaint_id: '3', tag_name: 'wifi', created_at: new Date().toISOString() },
-      { id: 't7', complaint_id: '3', tag_name: 'library', created_at: new Date().toISOString() },
-      {
-        id: 't8',
-        complaint_id: '3',
-        tag_name: 'connectivity',
-        created_at: new Date().toISOString(),
-      },
-    ],
-  },
-  {
-    id: '4',
-    student_id: 'student-2',
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Missing Course Materials for MATH202',
-    description:
-      '<p>The professor mentioned that course materials would be uploaded to the portal, but they have not been made available yet. The midterm is next week and we need these materials to study.</p>',
-    category: 'course_content',
-    priority: 'high',
-    status: 'new',
-    assigned_to: null,
-    assigned_lecturer: null,
-    created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
-    updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    opened_at: null,
-    opened_by: null,
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      {
-        id: 't9',
-        complaint_id: '4',
-        tag_name: 'course-materials',
-        created_at: new Date().toISOString(),
-      },
-      { id: 't10', complaint_id: '4', tag_name: 'math202', created_at: new Date().toISOString() },
-    ],
-  },
-  {
-    id: '5',
-    student_id: 'mock-student-id', // Matches the mock student user
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Parking Lot Lighting Safety Concern',
-    description:
-      '<p>Several lights in the north parking lot are not working, making it very dark and unsafe for students leaving evening classes. This is a safety hazard that needs immediate attention.</p>',
-    category: 'facilities',
-    priority: 'critical',
-    status: 'opened',
-    assigned_to: 'admin-2',
-    assigned_lecturer: MOCK_LECTURERS['admin-2'],
-    created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), // 6 days ago
-    updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_by: 'admin-2',
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      { id: 't11', complaint_id: '5', tag_name: 'parking', created_at: new Date().toISOString() },
-      { id: 't12', complaint_id: '5', tag_name: 'safety', created_at: new Date().toISOString() },
-      { id: 't13', complaint_id: '5', tag_name: 'lighting', created_at: new Date().toISOString() },
-    ],
-  },
-  {
-    id: '6',
-    student_id: 'student-3',
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Registration System Error',
-    description:
-      '<p>I am unable to register for next semester courses. The system shows an error message every time I try to add a course to my schedule.</p>',
-    category: 'administrative',
-    priority: 'high',
-    status: 'resolved',
-    assigned_to: 'admin-1',
-    assigned_lecturer: MOCK_LECTURERS['admin-1'],
-    created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-    updated_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_by: 'admin-1',
-    resolved_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      {
-        id: 't14',
-        complaint_id: '6',
-        tag_name: 'registration',
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 't15',
-        complaint_id: '6',
-        tag_name: 'system-error',
-        created_at: new Date().toISOString(),
-      },
-    ],
-  },
-  {
-    id: '7',
-    student_id: null,
-    is_anonymous: true,
-    is_draft: false,
-    title: 'Inappropriate Behavior in Class',
-    description:
-      '<p>There have been instances of disruptive and inappropriate behavior from certain students during lectures. This is affecting the learning environment for everyone.</p>',
-    category: 'harassment',
-    priority: 'high',
-    status: 'in_progress',
-    assigned_to: 'lecturer-2',
-    assigned_lecturer: MOCK_LECTURERS['lecturer-2'],
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-    updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    opened_by: 'lecturer-2',
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      { id: 't16', complaint_id: '7', tag_name: 'behavior', created_at: new Date().toISOString() },
-      { id: 't17', complaint_id: '7', tag_name: 'classroom', created_at: new Date().toISOString() },
-    ],
-  },
-  {
-    id: '8',
-    student_id: 'mock-student-id', // Matches the mock student user
-    is_anonymous: false,
-    is_draft: false,
-    title: 'Cafeteria Food Quality',
-    description:
-      '<p>The quality of food in the cafeteria has declined significantly. Many students have complained about the taste and freshness of the meals.</p>',
-    category: 'other',
-    priority: 'low',
-    status: 'new',
-    assigned_to: null,
-    assigned_lecturer: null,
-    created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-    updated_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    opened_at: null,
-    opened_by: null,
-    resolved_at: null,
-    escalated_at: null,
-    escalation_level: 0,
-    complaint_tags: [
-      { id: 't18', complaint_id: '8', tag_name: 'cafeteria', created_at: new Date().toISOString() },
-      {
-        id: 't19',
-        complaint_id: '8',
-        tag_name: 'food-quality',
-        created_at: new Date().toISOString(),
-      },
-    ],
-  },
-];
 
 export default function ComplaintsPage() {
   const router = useRouter();
@@ -352,6 +71,20 @@ export default function ComplaintsPage() {
   const { user, isLoading: authLoading, error: authError } = useAuth();
   const userRole = user?.role || 'student';
   const userId = user?.id || '';
+
+  // Fetch complaints based on user role
+  const { data: allComplaints, isLoading: allComplaintsLoading } = useAllComplaints();
+  const { data: userComplaints, isLoading: userComplaintsLoading } = useUserComplaints(userId);
+
+  // Determine which complaints to use based on role
+  const baseComplaints = React.useMemo(() => {
+    if (userRole === 'student') {
+      return userComplaints || [];
+    }
+    return allComplaints || [];
+  }, [userRole, userComplaints, allComplaints]);
+
+  const complaintsLoading = userRole === 'student' ? userComplaintsLoading : allComplaintsLoading;
 
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {
@@ -389,13 +122,10 @@ export default function ComplaintsPage() {
 
   // Filter complaints based on user role and active filters
   const filteredComplaints = React.useMemo(() => {
-    let complaints = MOCK_COMPLAINTS;
+    let complaints = baseComplaints;
 
-    // First, apply role-based filtering
-    if (userRole === 'student') {
-      // Students see only their own complaints
-      complaints = complaints.filter((complaint) => complaint.student_id === userId);
-    }
+    // Role-based filtering is already handled by baseComplaints
+    // Students get userComplaints, lecturers/admins get allComplaints
 
     // Apply status filter
     if (filters.status.length > 0) {
@@ -426,7 +156,7 @@ export default function ComplaintsPage() {
     // Apply tag filter
     if (filters.tags.length > 0) {
       complaints = complaints.filter((complaint) =>
-        complaint.complaint_tags?.some((tag) => filters.tags.includes(tag.tag_name))
+        complaint.complaint_tags?.some((tag: any) => filters.tags.includes(tag.tag_name))
       );
     }
 
@@ -450,9 +180,15 @@ export default function ComplaintsPage() {
           bValue = new Date(b.updated_at).getTime();
           break;
         case 'priority':
-          const priorityOrder = { low: 1, medium: 2, high: 3, critical: 4 };
-          aValue = priorityOrder[a.priority];
-          bValue = priorityOrder[b.priority];
+          const priorityOrder: Record<string, number> = {
+            low: 1,
+            medium: 2,
+            high: 3,
+            urgent: 4,
+            critical: 4,
+          };
+          aValue = priorityOrder[a.priority] || 0;
+          bValue = priorityOrder[b.priority] || 0;
           break;
         case 'status':
           const statusOrder: Record<string, number> = {
@@ -484,7 +220,7 @@ export default function ComplaintsPage() {
     });
 
     return complaints;
-  }, [userRole, userId, filters]);
+  }, [baseComplaints, filters]);
 
   // Determine which complaints to display
   const displayComplaints = React.useMemo(() => {
@@ -557,23 +293,24 @@ export default function ComplaintsPage() {
   // Extract available tags from all complaints
   const availableTags = React.useMemo(() => {
     const tagSet = new Set<string>();
-    MOCK_COMPLAINTS.forEach((complaint) => {
-      complaint.complaint_tags?.forEach((tag) => {
+    baseComplaints.forEach((complaint) => {
+      complaint.complaint_tags?.forEach((tag: any) => {
         tagSet.add(tag.tag_name);
       });
     });
     return Array.from(tagSet).sort();
-  }, []);
+  }, [baseComplaints]);
 
-  // Mock lecturers for filter
+  // Extract available lecturers from complaints
   const availableLecturers = React.useMemo(() => {
-    return [
-      { id: 'lecturer-1', name: 'Dr. Smith' },
-      { id: 'lecturer-2', name: 'Prof. Johnson' },
-      { id: 'admin-1', name: 'Admin Davis' },
-      { id: 'admin-2', name: 'Admin Wilson' },
-    ];
-  }, []);
+    const lecturerMap = new Map<string, string>();
+    baseComplaints.forEach((complaint) => {
+      if (complaint.assigned_user) {
+        lecturerMap.set(complaint.assigned_user.id, complaint.assigned_user.full_name);
+      }
+    });
+    return Array.from(lecturerMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [baseComplaints]);
 
   // Handle save filter preset
   const handleSavePreset = (name: string, presetFilters: FilterState) => {
@@ -605,10 +342,8 @@ export default function ComplaintsPage() {
       // Export all filtered complaints (not just current page)
       const complaintsToExport = filteredComplaints.map((complaint) => ({
         ...complaint,
-        student: complaint.student_id
-          ? { id: complaint.student_id, full_name: 'Student', email: 'student@example.com' }
-          : null,
-        assigned_user: complaint.assigned_to ? MOCK_LECTURERS[complaint.assigned_to] : null,
+        student: complaint.student || null,
+        assigned_user: complaint.assigned_user || null,
         tags: complaint.complaint_tags,
       }));
 
@@ -653,10 +388,8 @@ export default function ComplaintsPage() {
 
       const complaintsToExport = selectedComplaints.map((complaint) => ({
         ...complaint,
-        student: complaint.student_id
-          ? { id: complaint.student_id, full_name: 'Student', email: 'student@example.com' }
-          : null,
-        assigned_user: complaint.assigned_to ? MOCK_LECTURERS[complaint.assigned_to] : null,
+        student: complaint.student || null,
+        assigned_user: complaint.assigned_user || null,
         tags: complaint.complaint_tags,
       }));
 
@@ -948,7 +681,7 @@ export default function ComplaintsPage() {
     }
   };
 
-  if (authLoading || !user) {
+  if (authLoading || !user || complaintsLoading) {
     return (
       <AppLayout
         userRole={(user?.role as any) || 'student'}

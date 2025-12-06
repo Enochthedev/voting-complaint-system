@@ -242,7 +242,7 @@ export const createComplaint = withRateLimit(createComplaintImpl, 'write');
 /**
  * Update a complaint
  */
-async function updateComplaintImpl(id: string, updates: any) {
+async function updateComplaintImpl(id: string, updates: unknown) {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('complaints')

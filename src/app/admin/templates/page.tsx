@@ -18,6 +18,14 @@ import {
   CheckCircle,
   Loader2,
 } from 'lucide-react';
+import {
+  useTemplates,
+  useCreateTemplate,
+  useUpdateTemplate,
+  useDeleteTemplate,
+  useToggleTemplateActive,
+} from '@/hooks/use-templates';
+import { useAuth } from '@/hooks/useAuth';
 
 // Lazy load the template form component for better performance
 const TemplateForm = lazy(() =>
@@ -28,94 +36,6 @@ import type {
   ComplaintCategory,
   ComplaintPriority,
 } from '@/types/database.types';
-
-// Mock templates data for UI development
-const mockTemplates: ComplaintTemplate[] = [
-  {
-    id: '1',
-    title: 'Broken Equipment in Lab',
-    description:
-      'Template for reporting broken or malfunctioning equipment in laboratory facilities',
-    category: 'facilities',
-    suggested_priority: 'high',
-    fields: {
-      equipment_name: '',
-      lab_room: '',
-      issue_description: '',
-    },
-    created_by: 'lecturer-1',
-    is_active: true,
-    created_at: '2024-11-15T10:00:00Z',
-    updated_at: '2024-11-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    title: 'Assignment Grading Issue',
-    description: 'Template for students to report concerns about assignment grading',
-    category: 'academic',
-    suggested_priority: 'medium',
-    fields: {
-      assignment_name: '',
-      course_code: '',
-      expected_grade: '',
-      received_grade: '',
-      concern_details: '',
-    },
-    created_by: 'lecturer-1',
-    is_active: true,
-    created_at: '2024-11-10T14:30:00Z',
-    updated_at: '2024-11-10T14:30:00Z',
-  },
-  {
-    id: '3',
-    title: 'Classroom AC Not Working',
-    description: 'Template for reporting air conditioning issues in classrooms',
-    category: 'facilities',
-    suggested_priority: 'medium',
-    fields: {
-      room_number: '',
-      building: '',
-      temperature_issue: '',
-    },
-    created_by: 'lecturer-2',
-    is_active: true,
-    created_at: '2024-11-08T09:15:00Z',
-    updated_at: '2024-11-08T09:15:00Z',
-  },
-  {
-    id: '4',
-    title: 'Course Material Access Problem',
-    description: 'Template for reporting issues accessing course materials or online resources',
-    category: 'course_content',
-    suggested_priority: 'high',
-    fields: {
-      course_name: '',
-      material_type: '',
-      access_error: '',
-      platform: '',
-    },
-    created_by: 'lecturer-1',
-    is_active: false,
-    created_at: '2024-11-05T11:20:00Z',
-    updated_at: '2024-11-18T16:45:00Z',
-  },
-  {
-    id: '5',
-    title: 'Parking Permit Issue',
-    description: 'Template for reporting problems with parking permits or parking facilities',
-    category: 'administrative',
-    suggested_priority: 'low',
-    fields: {
-      permit_number: '',
-      parking_lot: '',
-      issue_type: '',
-    },
-    created_by: 'lecturer-3',
-    is_active: true,
-    created_at: '2024-11-01T08:00:00Z',
-    updated_at: '2024-11-01T08:00:00Z',
-  },
-];
 
 const CATEGORIES: { value: ComplaintCategory; label: string }[] = [
   { value: 'academic', label: 'Academic' },
@@ -134,7 +54,7 @@ const PRIORITIES: { value: ComplaintPriority; label: string; color: string }[] =
 ];
 
 export default function TemplateManagementPage() {
-  const [templates, setTemplates] = React.useState<ComplaintTemplate[]>(mockTemplates);
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filterCategory, setFilterCategory] = React.useState<ComplaintCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = React.useState<'all' | 'active' | 'inactive'>('all');
@@ -143,6 +63,13 @@ export default function TemplateManagementPage() {
   const [deletingTemplate, setDeletingTemplate] = React.useState<ComplaintTemplate | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  // Fetch templates using React Query
+  const { data: templates = [], isLoading, error } = useTemplates();
+  const createTemplate = useCreateTemplate();
+  const updateTemplate = useUpdateTemplate();
+  const deleteTemplate = useDeleteTemplate();
+  const toggleActive = useToggleTemplateActive();
 
   // Filter templates based on search and filters
   const filteredTemplates = React.useMemo(() => {
@@ -163,25 +90,32 @@ export default function TemplateManagementPage() {
     });
   }, [templates, searchQuery, filterCategory, filterStatus]);
 
-  const handleToggleActive = (template: ComplaintTemplate) => {
-    setTemplates((prev) =>
-      prev.map((t) =>
-        t.id === template.id
-          ? { ...t, is_active: !t.is_active, updated_at: new Date().toISOString() }
-          : t
-      )
-    );
-    setSuccessMessage(
-      `Template "${template.title}" ${template.is_active ? 'deactivated' : 'activated'} successfully`
-    );
-    setTimeout(() => setSuccessMessage(null), 3000);
+  const handleToggleActive = async (template: ComplaintTemplate) => {
+    try {
+      await toggleActive.mutateAsync({
+        templateId: template.id,
+        isActive: !template.is_active,
+      });
+      setSuccessMessage(
+        `Template "${template.title}" ${template.is_active ? 'deactivated' : 'activated'} successfully`
+      );
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to toggle template status');
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
   };
 
-  const handleDelete = (template: ComplaintTemplate) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== template.id));
-    setDeletingTemplate(null);
-    setSuccessMessage(`Template "${template.title}" deleted successfully`);
-    setTimeout(() => setSuccessMessage(null), 3000);
+  const handleDelete = async (template: ComplaintTemplate) => {
+    try {
+      await deleteTemplate.mutateAsync(template.id);
+      setDeletingTemplate(null);
+      setSuccessMessage(`Template "${template.title}" deleted successfully`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to delete template');
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
   };
 
   const handleEdit = (template: ComplaintTemplate) => {
@@ -194,41 +128,39 @@ export default function TemplateManagementPage() {
     setShowCreateModal(true);
   };
 
-  const handleSaveTemplate = (templateData: Partial<ComplaintTemplate>) => {
-    if (editingTemplate) {
-      // Update existing template
-      setTemplates((prev) =>
-        prev.map((t) =>
-          t.id === editingTemplate.id
-            ? {
-                ...t,
-                ...templateData,
-                updated_at: new Date().toISOString(),
-              }
-            : t
-        )
-      );
-      setSuccessMessage(`Template "${templateData.title}" updated successfully`);
-    } else {
-      // Create new template
-      const newTemplate: ComplaintTemplate = {
-        id: `template-${Date.now()}`,
-        title: templateData.title!,
-        description: templateData.description!,
-        category: templateData.category!,
-        suggested_priority: templateData.suggested_priority!,
-        fields: templateData.fields || {},
-        created_by: 'mock-lecturer-id',
-        is_active: templateData.is_active ?? true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setTemplates((prev) => [newTemplate, ...prev]);
-      setSuccessMessage(`Template "${templateData.title}" created successfully`);
+  const handleSaveTemplate = async (templateData: Partial<ComplaintTemplate>) => {
+    try {
+      if (editingTemplate) {
+        // Update existing template
+        await updateTemplate.mutateAsync({
+          templateId: editingTemplate.id,
+          updates: templateData,
+        });
+        setSuccessMessage(`Template "${templateData.title}" updated successfully`);
+      } else {
+        // Create new template
+        if (!user?.id) {
+          setErrorMessage('User not authenticated');
+          return;
+        }
+        await createTemplate.mutateAsync({
+          title: templateData.title!,
+          description: templateData.description!,
+          category: templateData.category!,
+          suggested_priority: templateData.suggested_priority!,
+          fields: templateData.fields || {},
+          created_by: user.id,
+          is_active: templateData.is_active ?? true,
+        });
+        setSuccessMessage(`Template "${templateData.title}" created successfully`);
+      }
+      setShowCreateModal(false);
+      setEditingTemplate(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to save template');
+      setTimeout(() => setErrorMessage(null), 3000);
     }
-    setShowCreateModal(false);
-    setEditingTemplate(null);
-    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   const getCategoryLabel = (category: ComplaintCategory) => {
@@ -338,7 +270,13 @@ export default function TemplateManagementPage() {
 
         {/* Templates List */}
         <div className="space-y-4">
-          {filteredTemplates.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-48" />
+              ))}
+            </div>
+          ) : filteredTemplates.length === 0 ? (
             <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center dark:border-zinc-800 dark:bg-zinc-950">
               <p className="text-zinc-600 dark:text-zinc-400">
                 {searchQuery || filterCategory !== 'all' || filterStatus !== 'all'
