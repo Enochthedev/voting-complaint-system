@@ -21,7 +21,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from '@/components/ui/dropdown-menu';
-import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadNotificationCount } from '@/hooks/use-notifications';
+import {
+  useNotifications,
+  useMarkAsRead,
+  useMarkAllAsRead,
+  useUnreadNotificationCount,
+} from '@/hooks/use-notifications';
 import type { Notification, NotificationType } from '@/types/database.types';
 import { cn } from '@/lib/utils';
 
@@ -135,9 +140,9 @@ function NotificationItem({ notification, onMarkAsRead, onClick }: NotificationI
   return (
     <div
       className={cn(
-        'group relative flex gap-3 rounded-lg p-3 transition-colors cursor-pointer',
-        'hover:bg-accent',
-        !notification.is_read && 'bg-accent/50'
+        'group relative flex gap-3 rounded-lg p-3 transition-colors cursor-pointer bg-card',
+        'hover:bg-muted/50',
+        !notification.is_read && 'bg-muted/30 border-l-2 border-l-primary'
       )}
       onClick={() => onClick(notification)}
     >
@@ -243,7 +248,7 @@ function NotificationGroup({ type, notifications, onMarkAsRead, onClick }: Notif
     <div className="border-b last:border-b-0">
       {/* Group Header */}
       <button
-        className="w-full flex items-center justify-between px-4 py-2 hover:bg-accent/50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2 bg-card hover:bg-muted/30 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
@@ -272,7 +277,7 @@ function NotificationGroup({ type, notifications, onMarkAsRead, onClick }: Notif
 
       {/* Group Items */}
       {isExpanded && (
-        <div className="py-1 px-2 space-y-1 bg-accent/20">
+        <div className="py-1 px-2 space-y-1 bg-muted/30">
           {notifications.map((notification) => (
             <NotificationItem
               key={notification.id}
@@ -326,7 +331,7 @@ function getAllNotificationTypes(): NotificationType[] {
  */
 export function NotificationDropdown({ className }: NotificationDropdownProps) {
   const router = useRouter();
-  
+
   // Use React Query hooks
   const { data: notifications = [], isLoading } = useNotifications(10);
   const { data: unreadCount = 0 } = useUnreadNotificationCount();
@@ -405,15 +410,14 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     <Button
       variant="ghost"
       size="icon"
-      className={className}
+      className={cn(className, 'hover:bg-purple-100 text-purple-600 hover:text-purple-700')}
       aria-label={`View notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
     >
       <div className="relative">
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <Badge
-            variant="destructive"
-            className="absolute -right-2 -top-2 h-5 min-w-[1.25rem] rounded-full px-1 text-xs flex items-center justify-center"
+            className="absolute -right-2 -top-2 h-5 min-w-[1.25rem] rounded-full px-1 text-xs flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse"
             aria-label={`${unreadCount} unread notifications`}
           >
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -423,17 +427,15 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     </Button>
   );
 
-
-
   return (
     <DropdownMenu align="end">
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[380px] max-w-[calc(100vw-2rem)] p-0">
-        <div>
+      <DropdownMenuContent className="w-[380px] max-w-[calc(100vw-2rem)] p-0 bg-card border-2 border-purple-200 shadow-xl">
+        <div className="bg-gradient-to-b from-purple-50 to-white dark:from-purple-950 dark:to-card">
           {/* Header */}
-          <div className="flex items-center justify-between border-b px-4 py-3">
+          <div className="flex items-center justify-between border-b border-purple-200 px-4 py-3 bg-gradient-to-r from-purple-100 to-pink-100">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm">Notifications</h3>
+              <h3 className="font-semibold text-sm text-purple-800">Notifications</h3>
               {unreadCount > 0 && (
                 <Badge variant="secondary" className="h-5 px-1.5 text-xs">
                   {unreadCount}
@@ -475,11 +477,9 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
             </div>
           </div>
 
-
-
           {/* Filter Panel */}
           {showFilterPanel && (
-            <div className="border-b bg-accent/30 px-4 py-3">
+            <div className="border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground">Filter by type</span>
                 <div className="flex gap-2">
@@ -523,7 +523,7 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
           )}
 
           {/* Content */}
-          <div className="max-h-[400px] overflow-y-auto">
+          <div className="max-h-[400px] overflow-y-auto bg-card">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="text-sm text-muted-foreground">Loading...</div>
@@ -557,7 +557,7 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
 
           {/* Footer */}
           {filteredNotifications.length > 0 && (
-            <div className="border-t px-4 py-2">
+            <div className="border-t px-4 py-2 bg-card">
               <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleViewAll}>
                 View all notifications
               </Button>

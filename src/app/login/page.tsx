@@ -33,19 +33,29 @@ export default async function LoginPage({
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 px-4 py-12">
       <div className="w-full max-w-md space-y-8">
+        {/* App Logo/Branding */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome back</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white shadow-lg animate-pulse">
+            <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-sm text-purple-600">
             Sign in to your Student Complaint System account
           </p>
-          <div className="mt-4 rounded-md bg-muted p-3">
-            <p className="text-xs text-foreground">
+          <div className="mt-4 rounded-lg bg-gradient-to-r from-blue-100 to-purple-100 p-3 border border-purple-200">
+            <p className="text-xs text-purple-800">
               🎭 <strong>Mock Auth Mode:</strong> Use any test account with password{' '}
-              <code className="rounded bg-background px-1 border">password123</code>
+              <code className="rounded bg-white px-2 py-1 border border-purple-300 text-purple-700 font-mono">
+                password123
+              </code>
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-purple-600">
               Try: student@test.com, lecturer@test.com, or admin@test.com
             </p>
           </div>
@@ -74,11 +84,11 @@ export default async function LoginPage({
           </Alert>
         )}
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-xl border-2 border-purple-200 bg-white p-8 shadow-xl backdrop-blur-sm">
           <LoginForm />
         </div>
 
-        <div className="text-center text-xs text-muted-foreground">
+        <div className="text-center text-xs text-purple-600">
           By signing in, you agree to our Terms of Service and Privacy Policy
         </div>
       </div>

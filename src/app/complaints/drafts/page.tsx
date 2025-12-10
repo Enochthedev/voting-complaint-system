@@ -6,36 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { FileText, Clock, Trash2 } from 'lucide-react';
-
-// Mock draft data for UI development
-const mockDrafts = [
-  {
-    id: 'draft-1',
-    title: 'WiFi connectivity issues in library',
-    category: 'facilities',
-    priority: 'medium',
-    updatedAt: '2024-11-19T14:30:00Z',
-    tags: ['wifi-issues', 'library'],
-  },
-  {
-    id: 'draft-2',
-    title: 'Unclear grading criteria for assignment',
-    category: 'academic',
-    priority: 'low',
-    updatedAt: '2024-11-18T10:15:00Z',
-    tags: ['grading', 'assignment'],
-  },
-];
-
 import { AppLayout } from '@/components/layout/app-layout';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ComplaintCardSkeleton } from '@/components/ui/skeletons';
+import { useUserDrafts } from '@/hooks/use-complaints';
 
 export default function DraftsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, error: authError } = useAuth();
-  const [drafts, setDrafts] = React.useState(mockDrafts);
+
+  // Use real API call for drafts
+  const {
+    data: drafts = [],
+    isLoading: draftsLoading,
+    error: draftsError,
+  } = useUserDrafts(user?.id || '');
 
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {
@@ -43,7 +29,7 @@ export default function DraftsPage() {
     }
   }, [user, authLoading, authError, router]);
 
-  if (authLoading || !user) {
+  if (authLoading || !user || draftsLoading) {
     return (
       <AppLayout
         userRole={(user?.role as any) || 'student'}
@@ -68,11 +54,18 @@ export default function DraftsPage() {
     router.push(`/complaints/new?draft=${draftId}`);
   };
 
-  const handleDelete = (draftId: string) => {
-    // TODO: Implement actual deletion in Phase 12
+  const handleDelete = async (draftId: string) => {
     if (confirm('Are you sure you want to delete this draft?')) {
-      setDrafts((prev) => prev.filter((d) => d.id !== draftId));
-      console.log('Deleted draft:', draftId);
+      try {
+        // Import the delete function
+        const { deleteComplaint } = await import('@/lib/api/complaints');
+        await deleteComplaint(draftId);
+        console.log('Deleted draft:', draftId);
+        // The useUserDrafts hook will automatically refetch and update the UI
+      } catch (error) {
+        console.error('Failed to delete draft:', error);
+        alert('Failed to delete draft. Please try again.');
+      }
     }
   };
 
@@ -94,6 +87,34 @@ export default function DraftsPage() {
       return date.toLocaleDateString();
     }
   };
+
+  // Show error state
+  if (draftsError) {
+    return (
+      <AppLayout
+        userRole={user?.role as any}
+        userName={user?.full_name || ''}
+        userEmail={user?.email || ''}
+      >
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Draft Complaints</h1>
+          <p className="mt-2 text-muted-foreground">
+            Continue working on your saved drafts or delete them if no longer needed.
+          </p>
+        </div>
+        <Card className="p-12 text-center">
+          <FileText className="mx-auto h-12 w-12 text-destructive" />
+          <h3 className="mt-4 text-lg font-semibold text-foreground">Error Loading Drafts</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Failed to load your draft complaints. Please try refreshing the page.
+          </p>
+          <Button className="mt-6" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </Card>
+      </AppLayout>
+    );
+  }
 
   const getCategoryLabel = (category: string) => {
     const labels: Record<string, string> = {
@@ -152,15 +173,10 @@ export default function DraftsPage() {
                     <Badge variant={getPriorityVariant(draft.priority)}>
                       {draft.priority.charAt(0).toUpperCase() + draft.priority.slice(1)}
                     </Badge>
-                    {draft.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-muted-foreground">
-                        #{tag}
-                      </Badge>
-                    ))}
                   </div>
                   <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    <span>Last edited {formatDate(draft.updatedAt)}</span>
+                    <span>Last edited {formatDate(draft.updated_at)}</span>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">

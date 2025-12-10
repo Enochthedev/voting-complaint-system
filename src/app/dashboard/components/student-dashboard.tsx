@@ -39,7 +39,7 @@ type Complaint = {
 type Stats = {
   total: number;
   new: number;
-  open: number;
+  opened: number;
   in_progress: number;
   resolved: number;
   closed: number;
@@ -126,23 +126,25 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div>
+      <div className="bg-gradient-rainbow p-6 rounded-xl text-white shadow-lg">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Welcome back, {userName.split(' ')[0]}!
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-1">
+        <p className="text-sm sm:text-base text-white/90 mt-1">
           Here's what's happening with your complaints today.
         </p>
       </div>
 
       {/* Statistics Widget */}
-      <Card>
+      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-purple-800">
+            <div className="p-2 rounded-lg bg-purple-500 text-white">
+              <TrendingUp className="h-5 w-5" />
+            </div>
             Your Complaint Statistics
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-purple-600">
             Overview of your complaint activity and resolution metrics
           </CardDescription>
         </CardHeader>
@@ -175,18 +177,18 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stats.new + stats.open}</div>
+                <div className="text-2xl font-bold">{stats.new + stats.opened}</div>
                 <p className="text-xs text-muted-foreground">Awaiting review</p>
                 {stats.total > 0 && (
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-yellow-500 transition-all duration-300"
-                        style={{ width: `${((stats.new + stats.open) / stats.total) * 100}%` }}
+                        style={{ width: `${((stats.new + stats.opened) / stats.total) * 100}%` }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round(((stats.new + stats.open) / stats.total) * 100)}%
+                      {Math.round(((stats.new + stats.opened) / stats.total) * 100)}%
                     </span>
                   </div>
                 )}
@@ -282,7 +284,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                     <span className="text-sm font-medium text-muted-foreground">Active</span>
                   </div>
                   <div className="text-xl font-bold">
-                    {stats.new + stats.open + stats.in_progress}
+                    {stats.new + stats.opened + stats.in_progress}
                   </div>
                   <p className="text-xs text-muted-foreground">Complaints in progress</p>
                 </div>

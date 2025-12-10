@@ -44,7 +44,7 @@ import {
 } from '@/lib/utils/export-analytics';
 import { ChartLoadingFallback } from '@/lib/utils/lazy-load';
 
-// Mock data for analytics
+// TODO: Replace with real analytics data from API
 const mockAnalyticsData = {
   timePeriod: 'Last 30 days',
   keyMetrics: {

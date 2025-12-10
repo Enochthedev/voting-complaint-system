@@ -1,48 +1,86 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: 220 17% 97%;
-  --foreground: 222 47% 11%;
+  --background: 340 100% 99%;
+  --foreground: 260 15% 8%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 260 15% 8%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 221 83% 53%;
+  --popover-foreground: 260 15% 8%;
+  --primary: 262 83% 58%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 220 17% 95%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 220 17% 95%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 217 91% 60%;
-  --accent-foreground: 0 0% 100%;
+  --secondary: 315 100% 96%;
+  --secondary-foreground: 260 15% 8%;
+  --muted: 315 100% 96%;
+  --muted-foreground: 260 10% 40%;
+  --accent: 45 100% 70%;
+  --accent-foreground: 260 15% 8%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 221 83% 53%;
+  --border: 315 100% 92%;
+  --input: 315 100% 92%;
+  --ring: 262 83% 58%;
   --radius: 0.75rem;
+
+  /* Additional colorful variables */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+  --info: 199 89% 48%;
+  --info-foreground: 0 0% 100%;
+  --purple: 262 83% 58%;
+  --purple-foreground: 0 0% 100%;
+  --pink: 330 81% 60%;
+  --pink-foreground: 0 0% 100%;
+  --orange: 25 95% 53%;
+  --orange-foreground: 0 0% 100%;
+  --teal: 173 80% 40%;
+  --teal-foreground: 0 0% 100%;
+  --indigo: 231 48% 48%;
+  --indigo-foreground: 0 0% 100%;
 }
 
 .dark {
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
-  --card: 224 71% 4%;
-  --card-foreground: 210 40% 98%;
-  --popover: 224 71% 4%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 222 47% 11%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 223 47% 11%;
-  --muted-foreground: 215 20% 65%;
-  --accent: 216 34% 17%;
-  --accent-foreground: 210 40% 98%;
+  --background: 260 15% 8%;
+  --foreground: 315 100% 96%;
+  --card: 260 20% 12%;
+  --card-foreground: 315 100% 96%;
+  --popover: 260 20% 12%;
+  --popover-foreground: 315 100% 96%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 260 20% 16%;
+  --secondary-foreground: 315 100% 96%;
+  --muted: 260 20% 16%;
+  --muted-foreground: 315 20% 65%;
+  --accent: 45 100% 70%;
+  --accent-foreground: 260 15% 8%;
   --destructive: 0 63% 31%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 216 34% 17%;
-  --input: 216 34% 17%;
-  --ring: 216 34% 17%;
+  --destructive-foreground: 315 100% 96%;
+  --border: 260 20% 20%;
+  --input: 260 20% 20%;
+  --ring: 262 83% 58%;
+
+  /* Dark mode colorful variables */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+  --info: 199 89% 48%;
+  --info-foreground: 0 0% 100%;
+  --purple: 262 83% 58%;
+  --purple-foreground: 0 0% 100%;
+  --pink: 330 81% 60%;
+  --pink-foreground: 0 0% 100%;
+  --orange: 25 95% 53%;
+  --orange-foreground: 0 0% 100%;
+  --teal: 173 80% 40%;
+  --teal-foreground: 0 0% 100%;
+  --indigo: 231 48% 48%;
+  --indigo-foreground: 0 0% 100%;
 }
 
 * {
@@ -52,7 +90,9 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
 }
 
 /* Tiptap Editor Styles */
@@ -132,4 +172,166 @@ body {
   background-color: transparent;
   padding: 0;
   color: inherit;
+}
+
+/* Colorful utility classes */
+.bg-gradient-rainbow {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--purple)) 0%,
+    hsl(var(--pink)) 25%,
+    hsl(var(--orange)) 50%,
+    hsl(var(--accent)) 75%,
+    hsl(var(--teal)) 100%
+  );
+}
+
+.bg-gradient-sunset {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--orange)) 0%,
+    hsl(var(--pink)) 50%,
+    hsl(var(--purple)) 100%
+  );
+}
+
+.bg-gradient-ocean {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--teal)) 0%,
+    hsl(var(--info)) 50%,
+    hsl(var(--indigo)) 100%
+  );
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--purple)), hsl(var(--pink)), hsl(var(--orange)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Colorful status badges */
+.status-new {
+  background-color: hsl(var(--info));
+  color: hsl(var(--info-foreground));
+}
+
+.status-open {
+  background-color: hsl(var(--warning));
+  color: hsl(var(--warning-foreground));
+}
+
+.status-in-progress {
+  background-color: hsl(var(--purple));
+  color: hsl(var(--purple-foreground));
+}
+
+.status-resolved {
+  background-color: hsl(var(--success));
+  color: hsl(var(--success-foreground));
+}
+
+.status-closed {
+  background-color: hsl(var(--muted-foreground));
+  color: hsl(var(--background));
+}
+
+.status-escalated {
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+}
+
+/* Priority badges */
+.priority-low {
+  background-color: hsl(var(--teal));
+  color: hsl(var(--teal-foreground));
+}
+
+.priority-medium {
+  background-color: hsl(var(--warning));
+  color: hsl(var(--warning-foreground));
+}
+
+.priority-high {
+  background-color: hsl(var(--orange));
+  color: hsl(var(--orange-foreground));
+}
+
+.priority-urgent,
+.priority-critical {
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+}
+
+/* Category colors */
+.category-academic {
+  background-color: hsl(var(--indigo));
+  color: hsl(var(--indigo-foreground));
+}
+
+.category-facilities {
+  background-color: hsl(var(--teal));
+  color: hsl(var(--teal-foreground));
+}
+
+.category-administrative {
+  background-color: hsl(var(--purple));
+  color: hsl(var(--purple-foreground));
+}
+
+.category-harassment {
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+}
+
+.category-discrimination {
+  background-color: hsl(var(--pink));
+  color: hsl(var(--pink-foreground));
+}
+
+.category-other {
+  background-color: hsl(var(--muted-foreground));
+  color: hsl(var(--background));
+}
+
+/* Colorful animations */
+@keyframes rainbow-pulse {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-rainbow {
+  background: linear-gradient(
+    270deg,
+    hsl(var(--purple)),
+    hsl(var(--pink)),
+    hsl(var(--orange)),
+    hsl(var(--accent)),
+    hsl(var(--teal)),
+    hsl(var(--info))
+  );
+  background-size: 400% 400%;
+  animation: rainbow-pulse 3s ease infinite;
+}
+
+/* Colorful hover effects */
+.hover-colorful:hover {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--purple) / 0.1),
+    hsl(var(--pink) / 0.1),
+    hsl(var(--orange) / 0.1)
+  );
+  transition: all 0.3s ease;
+}
+
+/* Colorful borders */
+.border-colorful {
+  border-image: linear-gradient(135deg, hsl(var(--purple)), hsl(var(--pink)), hsl(var(--orange))) 1;
 }

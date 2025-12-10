@@ -51,11 +51,11 @@ export function ComplaintsHeader({
 }: ComplaintsHeaderProps) {
   return (
     <div className="mb-8 flex items-center justify-between">
-      <div>
+      <div className="bg-gradient-ocean p-6 rounded-xl text-white shadow-lg">
         <h1 className="text-3xl font-bold">
           {userRole === 'student' ? 'My Complaints' : 'All Complaints'}
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-white/90">
           {selectionMode
             ? 'Select complaints to export'
             : userRole === 'student'
@@ -65,13 +65,26 @@ export function ComplaintsHeader({
       </div>
       <div className="flex gap-2">
         {onExportCSV && !selectionMode && (
-          <Button variant="outline" onClick={onExportCSV} disabled={isExporting}>
+          <Button
+            variant="outline"
+            onClick={onExportCSV}
+            disabled={isExporting}
+            className="border-teal-300 text-teal-700 hover:bg-teal-50"
+          >
             <Download className="h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export CSV'}
           </Button>
         )}
         {onToggleSelectionMode && (
-          <Button variant={selectionMode ? 'secondary' : 'outline'} onClick={onToggleSelectionMode}>
+          <Button
+            variant={selectionMode ? 'secondary' : 'outline'}
+            onClick={onToggleSelectionMode}
+            className={
+              selectionMode
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'border-purple-300 text-purple-700 hover:bg-purple-50'
+            }
+          >
             {selectionMode ? (
               <>
                 <X className="h-4 w-4" />
@@ -86,7 +99,10 @@ export function ComplaintsHeader({
           </Button>
         )}
         {userRole === 'student' && !selectionMode && (
-          <Button onClick={onNewComplaint}>
+          <Button
+            onClick={onNewComplaint}
+            className="bg-gradient-sunset text-white hover:shadow-lg hover:scale-105 transition-all"
+          >
             <Plus className="h-4 w-4" />
             New Complaint
           </Button>

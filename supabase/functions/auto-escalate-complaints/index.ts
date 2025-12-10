@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
         )
         .eq('category', rule.category)
         .eq('priority', rule.priority)
-        .in('status', ['new', 'open'])
+        .in('status', ['new', 'opened'])
         .lt('created_at', thresholdISO)
         .is('escalated_at', null);
 

@@ -39,7 +39,7 @@ export default function VoteDetailPage() {
 
   // Get user role from auth context
   const userRole = user?.role || 'student';
-  const userId = user?.id || 'mock-student-id';
+  const userId = user?.id;
 
   React.useEffect(() => {
     // Wait for auth to load before fetching vote details
@@ -65,7 +65,7 @@ export default function VoteDetailPage() {
       setVote(voteData);
 
       // Check if student has voted
-      const voted = await hasStudentVoted(voteId, userId);
+      const voted = userId ? await hasStudentVoted(voteId, userId) : false;
       setHasVoted(voted);
 
       // Load results if user has voted or if user is a lecturer/admin
@@ -94,6 +94,10 @@ export default function VoteDetailPage() {
     setSuccessMessage(null);
 
     try {
+      if (!userId) {
+        setError('You must be logged in to vote');
+        return;
+      }
       await submitVoteResponse(voteId, userId, selectedOption);
 
       // Update state

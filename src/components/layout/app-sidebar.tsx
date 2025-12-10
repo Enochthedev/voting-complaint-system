@@ -45,12 +45,15 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    // TODO: Implement actual logout in Phase 12
-    console.log('Logging out...');
-    // Clear mock user and redirect to login
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('mockUser');
+  const handleLogout = async () => {
+    try {
+      // Use real auth logout
+      const { signOut } = await import('@/lib/auth');
+      await signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback: redirect anyway
       router.push('/login');
     }
   };
@@ -93,22 +96,20 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
       {/* Logo/Brand */}
-      <div className="flex h-16 items-center justify-between px-6 border-b">
+      <div className="flex h-16 items-center justify-between px-6 border-b bg-gradient-to-r from-purple-50 to-pink-50">
         <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-rainbow text-white shadow-lg animate-rainbow">
             <FileText className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              ComplaintHub
-            </span>
+            <span className="text-lg font-bold text-gradient">ComplaintHub</span>
           </div>
         </Link>
         {/* Close button for mobile */}
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-pink-100 transition-colors text-purple-600"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -122,7 +123,7 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
           <Link
             href="/complaints/new"
             onClick={onClose}
-            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
+            className="flex items-center justify-center gap-2 rounded-lg bg-gradient-sunset px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:shadow-xl hover:scale-105"
           >
             <Plus className="h-4 w-4" />
             New Complaint
@@ -144,23 +145,27 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
               className={cn(
                 'group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                 isActive
-                  ? 'bg-primary/10 text-primary shadow-sm'
-                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                  ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 shadow-sm border border-purple-200'
+                  : 'text-muted-foreground hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 hover:text-orange-700'
               )}
             >
               <div className="flex items-center gap-3">
                 <Icon
                   className={cn(
                     'h-4 w-4 transition-transform group-hover:scale-110',
-                    isActive && 'text-primary'
+                    isActive && 'text-purple-600'
                   )}
                 />
                 <span>{link.label}</span>
               </div>
               {link.badge && link.badge > 0 && (
                 <Badge
-                  variant={isActive ? 'default' : 'secondary'}
-                  className="h-5 min-w-[20px] px-1.5 text-xs"
+                  className={cn(
+                    'h-5 min-w-[20px] px-1.5 text-xs',
+                    isActive
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                      : 'bg-gradient-to-r from-orange-400 to-red-400 text-white'
+                  )}
                 >
                   {link.badge > 99 ? '99+' : link.badge}
                 </Badge>
@@ -176,13 +181,13 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
       <div className="p-4">
         <DropdownMenu align="end">
           <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center gap-3 rounded-lg bg-secondary/50 p-3 transition-all hover:bg-secondary cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring">
+            <button className="w-full flex items-center gap-3 rounded-lg bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-200 p-3 transition-all hover:from-teal-100 hover:to-blue-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-300">
               <Avatar name={userName} size={40} />
               <div className="flex-1 overflow-hidden text-left">
-                <p className="text-sm font-semibold truncate">{userName}</p>
-                <p className="text-xs text-muted-foreground truncate capitalize">{userRole}</p>
+                <p className="text-sm font-semibold truncate text-teal-800">{userName}</p>
+                <p className="text-xs text-teal-600 truncate capitalize">{userRole}</p>
               </div>
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              <ChevronUp className="h-4 w-4 text-teal-600" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>

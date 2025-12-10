@@ -141,7 +141,7 @@ export function LoginForm() {
           <Label htmlFor="password">Password</Label>
           <a
             href="/forgot-password"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-sm text-purple-600 hover:text-purple-700 hover:underline"
           >
             Forgot password?
           </a>
@@ -172,7 +172,11 @@ export function LoginForm() {
         {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button
+        type="submit"
+        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:shadow-lg hover:scale-105 transition-all"
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -184,8 +188,11 @@ export function LoginForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">Don&apos;t have an account? </span>
-        <a href="/register" className="font-medium text-foreground hover:underline">
+        <span className="text-purple-600">Don&apos;t have an account? </span>
+        <a
+          href="/register"
+          className="font-medium text-purple-700 hover:text-purple-800 hover:underline"
+        >
           Sign up
         </a>
       </div>

@@ -26,27 +26,7 @@ interface ComplaintFormData {
   tags: string[];
 }
 
-// Mock draft data for UI development
-const mockDrafts: Record<string, ComplaintFormData> = {
-  'draft-1': {
-    title: 'WiFi connectivity issues in library',
-    description:
-      '<p>The WiFi in the library keeps disconnecting every few minutes. This makes it very difficult to complete online assignments and research.</p>',
-    category: 'facilities',
-    priority: 'medium',
-    isAnonymous: false,
-    tags: ['wifi-issues', 'library'],
-  },
-  'draft-2': {
-    title: 'Unclear grading criteria for assignment',
-    description:
-      '<p>The grading rubric for Assignment 3 is not clear. Several students are confused about the expectations.</p>',
-    category: 'academic',
-    priority: 'low',
-    isAnonymous: false,
-    tags: ['grading', 'assignment'],
-  },
-};
+// TODO: Remove mock data and implement real draft loading from API
 
 function NewComplaintPageContent() {
   const router = useRouter();
@@ -66,44 +46,70 @@ function NewComplaintPageContent() {
   }, [user, authLoading, authError, router]);
 
   React.useEffect(() => {
-    if (draftId) {
-      // TODO: Replace with real Supabase API call in Phase 12
-      // Simulate loading draft from database
-      setTimeout(() => {
-        const draftData = mockDrafts[draftId];
-        if (draftData) {
-          setInitialData(draftData);
-        } else {
-          toast.error('Draft not found', 'Error');
+    if (draftId && user?.id) {
+      // Load draft from API
+      const loadDraft = async () => {
+        try {
+          const { getComplaintById } = await import('@/lib/api/complaints');
+          const draft = await getComplaintById(draftId);
+
+          if (draft && draft.student_id === user.id && draft.is_draft) {
+            setInitialData({
+              title: draft.title,
+              description: draft.description,
+              category: draft.category as any,
+              priority: draft.priority as any,
+              isAnonymous: draft.is_anonymous,
+              tags: draft.complaint_tags?.map((tag: any) => tag.tag_name) || [],
+            });
+          } else {
+            toast.error('Draft not found', 'Error');
+            router.push('/complaints/new');
+          }
+        } catch (error) {
+          console.error('Failed to load draft:', error);
+          toast.error('Failed to load draft', 'Error');
           router.push('/complaints/new');
+        } finally {
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      }, 500);
+      };
+
+      loadDraft();
     }
-  }, [draftId, router, toast]);
+  }, [draftId, user?.id, router, toast]);
 
   const handleSubmit = async (data: ComplaintFormData, isDraft: boolean) => {
     try {
-      // Mock submission for UI development (Phase 3-11)
-      // TODO: Replace with real Supabase API call in Phase 12
-      const action = draftId ? 'Updating' : 'Submitting';
-      console.log(`${action} complaint:`, { ...data, isDraft, draftId });
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Import the API function
+      const { createComplaint } = await import('@/lib/api/complaints');
 
-      // Mock success response
-      const mockComplaintId = draftId || `complaint-${Date.now()}`;
-      console.log(`✅ Complaint ${draftId ? 'updated' : 'created'}:`, mockComplaintId);
+      // Prepare complaint data
+      const complaintData = {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        is_anonymous: data.isAnonymous,
+        is_draft: isDraft,
+        student_id: user.id,
+        status: isDraft ? 'draft' : 'new',
+        tags: data.tags,
+      };
+
+      console.log('Creating complaint:', complaintData);
+
+      // Create the complaint
+      const result = await createComplaint(complaintData);
+      console.log('✅ Complaint created:', result);
 
       // Show success message with toast notification
       if (isDraft) {
-        toast.success(
-          draftId
-            ? 'Your draft has been updated successfully!'
-            : 'Your draft has been saved successfully!',
-          'Draft Saved'
-        );
+        toast.success('Your draft has been saved successfully!', 'Draft Saved');
         router.push('/complaints/drafts');
       } else {
         toast.success(
@@ -115,7 +121,9 @@ function NewComplaintPageContent() {
     } catch (error) {
       console.error('Submission error:', error);
       toast.error(
-        'There was an error processing your request. Please try again.',
+        error instanceof Error
+          ? error.message
+          : 'There was an error processing your request. Please try again.',
         isDraft ? 'Failed to Save Draft' : 'Submission Failed'
       );
       throw error; // Re-throw to let the form handle it

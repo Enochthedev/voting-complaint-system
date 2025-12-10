@@ -265,7 +265,11 @@ export function RegisterForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button
+        type="submit"
+        className="w-full bg-gradient-to-r from-teal-500 to-blue-500 text-white hover:shadow-lg hover:scale-105 transition-all"
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -277,8 +281,8 @@ export function RegisterForm() {
       </Button>
 
       <div className="text-center text-sm">
-        <span className="text-muted-foreground">Already have an account? </span>
-        <a href="/login" className="font-medium text-foreground hover:underline">
+        <span className="text-teal-600">Already have an account? </span>
+        <a href="/login" className="font-medium text-teal-700 hover:text-teal-800 hover:underline">
           Sign in
         </a>
       </div>

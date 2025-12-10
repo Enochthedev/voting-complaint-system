@@ -39,8 +39,8 @@ export default function VotesPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [successVoteId, setSuccessVoteId] = React.useState<string | null>(null);
 
-  // TODO: Phase 12 - Get actual student ID from auth context
-  const mockStudentId = user?.id || 'mock-student-id';
+  // Get actual student ID from auth context
+  const studentId = user?.id;
 
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {
@@ -61,10 +61,12 @@ export default function VotesPage() {
 
       // Check which votes the student has already voted on
       const votedSet = new Set<string>();
-      for (const vote of data) {
-        const hasVoted = await hasStudentVoted(vote.id, mockStudentId);
-        if (hasVoted) {
-          votedSet.add(vote.id);
+      if (studentId) {
+        for (const vote of data) {
+          const hasVoted = await hasStudentVoted(vote.id, studentId);
+          if (hasVoted) {
+            votedSet.add(vote.id);
+          }
         }
       }
       setVotedPolls(votedSet);
@@ -95,7 +97,11 @@ export default function VotesPage() {
     setSuccessVoteId(null);
 
     try {
-      await submitVoteResponse(voteId, mockStudentId, selectedOption);
+      if (!studentId) {
+        setError('You must be logged in to vote');
+        return;
+      }
+      await submitVoteResponse(voteId, studentId, selectedOption);
 
       // Mark this vote as voted
       setVotedPolls(new Set([...votedPolls, voteId]));

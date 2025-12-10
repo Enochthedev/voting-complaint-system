@@ -30,7 +30,7 @@ export function AdminDashboard({ userId, userName }: AdminDashboardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data for now - will be replaced with real API calls in Phase 12
+  // TODO: Replace with real API calls
   const stats = {
     totalUsers: 342,
     totalComplaints: 156,

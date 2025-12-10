@@ -31,7 +31,7 @@ interface LecturerDashboardProps {
   userName: string;
 }
 
-// Analytics data structure for the analytics tab
+// TODO: Replace with real analytics data from API
 const mockAnalyticsData = {
   keyMetrics: {
     totalComplaints: 247,
@@ -194,16 +194,24 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
     <div className="space-y-6">
       {/* Header Section */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
+        <div className="bg-gradient-rainbow p-6 rounded-xl text-white shadow-lg">
           <h1 className="text-3xl font-bold tracking-tight">Lecturer Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {userName}</p>
+          <p className="text-white/90">Welcome back, {userName}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+          >
             <Filter className="mr-2 h-4 w-4" />
             Filters
           </Button>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-pink-300 text-pink-700 hover:bg-pink-50"
+          >
             <Bell className="h-4 w-4" />
           </Button>
         </div>
@@ -225,40 +233,42 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.push('/complaints?filter=assigned')}
+          className="border-teal-300 text-teal-700 hover:bg-teal-50"
+          onClick={() => router.push('/complaints')}
         >
           Assigned to Me
-          <Badge variant="secondary" className="ml-2">
-            {stats.assignedToMe}
-          </Badge>
+          <Badge className="ml-2 bg-teal-500 text-white">{stats.assignedToMe}</Badge>
         </Button>
         <Button
           variant="outline"
           size="sm"
+          className="border-orange-300 text-orange-700 hover:bg-orange-50"
           onClick={() => router.push('/complaints?priority=high')}
         >
           High Priority
-          <Badge variant="destructive" className="ml-2">
+          <Badge className="ml-2 bg-orange-500 text-white">
             {allComplaints.filter((c) => c.priority === 'high' || c.priority === 'urgent').length}
           </Badge>
         </Button>
         <Button
           variant="outline"
           size="sm"
+          className="border-red-300 text-red-700 hover:bg-red-50"
           onClick={() => router.push('/complaints?status=escalated')}
         >
           Escalated
-          <Badge variant="destructive" className="ml-2">
+          <Badge className="ml-2 bg-red-500 text-white">
             {allComplaints.filter((c) => c.status === 'escalated').length}
           </Badge>
         </Button>
         <Button
           variant="outline"
           size="sm"
+          className="border-purple-300 text-purple-700 hover:bg-purple-50"
           onClick={() => router.push('/complaints?status=new,open,in_progress')}
         >
           Unresolved
-          <Badge variant="default" className="ml-2">
+          <Badge className="ml-2 bg-purple-500 text-white">
             {stats.newComplaints + stats.inProgress}
           </Badge>
         </Button>
@@ -266,20 +276,32 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto">
-          <TabsTrigger value="overview">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200">
+          <TabsTrigger
+            value="overview"
+            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white"
+          >
             <BarChart3 className="mr-2 h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="complaints">
+          <TabsTrigger
+            value="complaints"
+            className="data-[state=active]:bg-teal-500 data-[state=active]:text-white"
+          >
             <FileText className="mr-2 h-4 w-4" />
             Complaints
           </TabsTrigger>
-          <TabsTrigger value="analytics">
+          <TabsTrigger
+            value="analytics"
+            className="data-[state=active]:bg-orange-500 data-[state=active]:text-white"
+          >
             <TrendingUp className="mr-2 h-4 w-4" />
             Analytics
           </TabsTrigger>
-          <TabsTrigger value="management">
+          <TabsTrigger
+            value="management"
+            className="data-[state=active]:bg-pink-500 data-[state=active]:text-white"
+          >
             <Settings className="mr-2 h-4 w-4" />
             Management
           </TabsTrigger>
@@ -289,49 +311,59 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         <TabsContent value="overview" className="space-y-6">
           {/* Key Metrics */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover-colorful">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-purple-800">
+                  Total Complaints
+                </CardTitle>
+                <div className="p-2 rounded-lg bg-purple-500 text-white">
+                  <FileText className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalComplaints}</div>
-                <p className="text-xs text-muted-foreground">All complaints in system</p>
+                <div className="text-2xl font-bold text-purple-900">{stats.totalComplaints}</div>
+                <p className="text-xs text-purple-600">All complaints in system</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 hover-colorful">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Assigned to Me</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-teal-800">Assigned to Me</CardTitle>
+                <div className="p-2 rounded-lg bg-teal-500 text-white">
+                  <Users className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.assignedToMe}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.newComplaints} new complaints
-                </p>
+                <div className="text-2xl font-bold text-teal-900">{stats.assignedToMe}</div>
+                <p className="text-xs text-teal-600">{stats.newComplaints} new complaints</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover-colorful">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-orange-800">In Progress</CardTitle>
+                <div className="p-2 rounded-lg bg-orange-500 text-white">
+                  <Clock className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.inProgress}</div>
-                <p className="text-xs text-muted-foreground">Currently being handled</p>
+                <div className="text-2xl font-bold text-orange-900">{stats.inProgress}</div>
+                <p className="text-xs text-orange-600">Currently being handled</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover-colorful">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-green-800">Resolved</CardTitle>
+                <div className="p-2 rounded-lg bg-green-500 text-white">
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.resolved + stats.closed}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold text-green-900">
+                  {stats.resolved + stats.closed}
+                </div>
+                <p className="text-xs text-green-600">
                   {stats.totalComplaints > 0
                     ? Math.round(((stats.resolved + stats.closed) / stats.totalComplaints) * 100)
                     : 0}
@@ -376,18 +408,18 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                           </div>
                           <div className="flex items-center gap-2 mt-2">
                             <Badge
-                              variant={getStatusBadgeVariant(complaint.status)}
-                              className="text-xs"
+                              className={`text-xs status-${complaint.status.toLowerCase().replace('_', '-')}`}
                             >
                               {complaint.status}
                             </Badge>
                             <Badge
-                              variant={getPriorityBadgeVariant(complaint.priority)}
-                              className="text-xs"
+                              className={`text-xs priority-${complaint.priority.toLowerCase()}`}
                             >
                               {complaint.priority}
                             </Badge>
-                            <Badge variant="outline" className="text-xs">
+                            <Badge
+                              className={`text-xs category-${complaint.category.toLowerCase()}`}
+                            >
                               {complaint.category}
                             </Badge>
                           </div>
@@ -537,24 +569,18 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge
-                            variant={getStatusBadgeVariant(complaint.status)}
-                            className="text-xs"
+                            className={`text-xs status-${complaint.status.toLowerCase().replace('_', '-')}`}
                           >
                             {complaint.status}
                           </Badge>
-                          <Badge
-                            variant={getPriorityBadgeVariant(complaint.priority)}
-                            className="text-xs"
-                          >
+                          <Badge className={`text-xs priority-${complaint.priority.toLowerCase()}`}>
                             {complaint.priority}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge className={`text-xs category-${complaint.category.toLowerCase()}`}>
                             {complaint.category}
                           </Badge>
                           {complaint.is_anonymous && (
-                            <Badge variant="secondary" className="text-xs">
-                              Anonymous
-                            </Badge>
+                            <Badge className="text-xs bg-indigo-500 text-white">Anonymous</Badge>
                           )}
                         </div>
                       </div>

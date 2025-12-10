@@ -100,7 +100,7 @@ async function getUserComplaintStatsImpl(userId: string) {
         .select('*', { count: 'exact', head: true })
         .eq('student_id', userId)
         .eq('is_draft', false)
-        .eq('status', 'open'),
+        .eq('status', 'opened'),
       supabase
         .from('complaints')
         .select('*', { count: 'exact', head: true })
@@ -132,7 +132,7 @@ async function getUserComplaintStatsImpl(userId: string) {
   const stats = {
     total: totalResult.count || 0,
     new: newResult.count || 0,
-    open: openResult.count || 0,
+    opened: openResult.count || 0,
     in_progress: inProgressResult.count || 0,
     resolved: resolvedResult.count || 0,
     closed: closedResult.count || 0,
