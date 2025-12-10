@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserComplaints, useUserDrafts, useAllComplaints } from '@/hooks/use-complaints';
+import type { Complaint } from '@/types/database.types';
 
 interface SidebarProps {
   userRole: 'student' | 'lecturer' | 'admin';
@@ -57,7 +58,9 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
   const myComplaintsCount = userComplaints.length;
   const draftsCount = userDrafts.length;
   const allComplaintsCount = allComplaints.length;
-  const assignedToMeCount = allComplaints.filter((c) => c.assigned_to === user?.id).length;
+  const assignedToMeCount = allComplaints.filter(
+    (c: Complaint) => c.assigned_to === user?.id
+  ).length;
 
   const handleLogout = async () => {
     try {

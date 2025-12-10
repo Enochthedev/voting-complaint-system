@@ -55,7 +55,6 @@ export async function searchComplaints(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResult> {
-
   const {
     filters = {},
     sortBy = 'created_at',
@@ -113,7 +112,7 @@ export async function searchComplaints(
       .in('tag_name', filters.tags);
 
     if (taggedComplaintIds && taggedComplaintIds.length > 0) {
-      const complaintIds = taggedComplaintIds.map((t) => t.complaint_id);
+      const complaintIds = taggedComplaintIds.map((t: any) => t.complaint_id);
       queryBuilder = queryBuilder.in('id', complaintIds);
     } else {
       // No complaints match the tag filter, return empty result
@@ -185,7 +184,6 @@ export async function getSearchSuggestions(
   partialQuery: string,
   limit: number = 5
 ): Promise<string[]> {
-
   if (!partialQuery || partialQuery.trim().length < 2) {
     return [];
   }
@@ -203,7 +201,7 @@ export async function getSearchSuggestions(
   }
 
   // Extract unique titles
-  const suggestions = data?.map((c) => c.title) || [];
+  const suggestions: string[] = data?.map((c: any) => c.title as string) || [];
   return [...new Set(suggestions)];
 }
 

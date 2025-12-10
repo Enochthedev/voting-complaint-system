@@ -13,7 +13,7 @@ import { TimelineSection } from './TimelineSection';
 import { CommentsSection } from './CommentsSection';
 import { ActionButtons } from './ActionButtons';
 import { RatingPrompt } from '../rating-prompt';
-import { getMockLecturers } from './mock-data';
+import { getMockLecturers, getMockComplaintData } from './mock-data';
 import type { ComplaintDetailViewProps, ComplaintWithRelations } from './types';
 import { useAuth } from '@/hooks/useAuth';
 import { useComplaint, useHasRatedComplaint } from '@/hooks/use-complaints';

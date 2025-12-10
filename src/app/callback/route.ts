@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase-server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -38,9 +38,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (error) {
       console.error('Unexpected error in auth callback:', error);
-      return NextResponse.redirect(
-        new URL('/login?error=unexpected_error', requestUrl.origin)
-      );
+      return NextResponse.redirect(new URL('/login?error=unexpected_error', requestUrl.origin));
     }
   }
 

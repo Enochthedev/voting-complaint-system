@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
+import type { Complaint, ComplaintRating, User } from '@/types/database.types';
 
 export interface AnalyticsData {
   timePeriod: string;
@@ -83,7 +84,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
     reopened: 0,
   };
 
-  allComplaints.forEach((c) => {
+  allComplaints.forEach((c: any) => {
     if (statusCounts[c.status] !== undefined) {
       statusCounts[c.status]++;
     }
@@ -124,7 +125,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
 
   // Calculate category distribution
   const categoryCounts: Record<string, number> = {};
-  allComplaints.forEach((c) => {
+  allComplaints.forEach((c: any) => {
     categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1;
   });
 
@@ -144,7 +145,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
     low: 0,
   };
 
-  allComplaints.forEach((c) => {
+  allComplaints.forEach((c: any) => {
     if (priorityCounts[c.priority] !== undefined) {
       priorityCounts[c.priority]++;
     }
@@ -179,7 +180,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
 
   // Calculate complaints over time (group by day)
   const dateCounts: Record<string, number> = {};
-  allComplaints.forEach((c) => {
+  allComplaints.forEach((c: any) => {
     const date = new Date(c.created_at).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -204,7 +205,9 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
 
   const avgRating =
     ratings && ratings.length > 0
-      ? Math.round((ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length) * 10) / 10
+      ? Math.round(
+          (ratings.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / ratings.length) * 10
+        ) / 10
       : 0;
 
   // Get lecturer performance
@@ -214,10 +217,11 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
     .eq('role', 'lecturer');
 
   const lecturerPerformance = (lecturers || [])
-    .map((lecturer) => {
-      const handled = allComplaints.filter((c) => c.assigned_to === lecturer.id).length;
+    .map((lecturer: any) => {
+      const handled = allComplaints.filter((c: any) => c.assigned_to === lecturer.id).length;
       const resolved = allComplaints.filter(
-        (c) => c.assigned_to === lecturer.id && (c.status === 'resolved' || c.status === 'closed')
+        (c: any) =>
+          c.assigned_to === lecturer.id && (c.status === 'resolved' || c.status === 'closed')
       ).length;
       return {
         id: lecturer.id,
@@ -228,7 +232,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
         satisfactionRating: 0,
       };
     })
-    .filter((l) => l.complaintsHandled > 0);
+    .filter((l: any) => l.complaintsHandled > 0);
 
   return {
     timePeriod: `Last ${days} days`,

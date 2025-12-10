@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, getSupabaseClient } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 export interface AuthUser {
@@ -20,7 +21,7 @@ export function useAuth() {
     loadUser();
 
     // Subscribe to auth changes
-    const supabase = getSupabaseClient();
+    // Using singleton supabase client
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
@@ -96,7 +97,7 @@ export function useAuth() {
       console.log('Auth user found:', authUser.id, authUser.email);
 
       // Check current session
-      const supabase = getSupabaseClient();
+      // Using singleton supabase client
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -161,7 +162,7 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      const supabase = getSupabaseClient();
+      // Using singleton supabase client
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);

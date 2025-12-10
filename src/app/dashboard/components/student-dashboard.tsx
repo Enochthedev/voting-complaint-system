@@ -85,11 +85,11 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
   // Calculate stats from complaints if stats query failed but we have complaints
   const calculatedStats: Stats = stats || {
     total: complaints.length,
-    new: complaints.filter((c) => c.status === 'new').length,
-    opened: complaints.filter((c) => c.status === 'opened').length,
-    in_progress: complaints.filter((c) => c.status === 'in_progress').length,
-    resolved: complaints.filter((c) => c.status === 'resolved').length,
-    closed: complaints.filter((c) => c.status === 'closed').length,
+    new: complaints.filter((c: Complaint) => c.status === 'new').length,
+    opened: complaints.filter((c: Complaint) => c.status === 'opened').length,
+    in_progress: complaints.filter((c: Complaint) => c.status === 'in_progress').length,
+    resolved: complaints.filter((c: Complaint) => c.status === 'resolved').length,
+    closed: complaints.filter((c: Complaint) => c.status === 'closed').length,
   };
 
   // Get recent complaints (first 3)
@@ -197,18 +197,26 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{calculatedStats.new + calculatedStats.opened}</div>
+                <div className="text-2xl font-bold">
+                  {calculatedStats.new + calculatedStats.opened}
+                </div>
                 <p className="text-xs text-muted-foreground">Awaiting review</p>
                 {calculatedStats.total > 0 && (
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-yellow-500 transition-all duration-300"
-                        style={{ width: `${((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) * 100}%` }}
+                        style={{
+                          width: `${((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) * 100}%`,
+                        }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round(((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) * 100)}%
+                      {Math.round(
+                        ((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) *
+                          100
+                      )}
+                      %
                     </span>
                   </div>
                 )}
@@ -233,7 +241,9 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-blue-500 transition-all duration-300"
-                        style={{ width: `${(calculatedStats.in_progress / calculatedStats.total) * 100}%` }}
+                        style={{
+                          width: `${(calculatedStats.in_progress / calculatedStats.total) * 100}%`,
+                        }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -255,7 +265,9 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{calculatedStats.resolved + calculatedStats.closed}</div>
+                <div className="text-2xl font-bold">
+                  {calculatedStats.resolved + calculatedStats.closed}
+                </div>
                 <p className="text-xs text-muted-foreground">Successfully closed</p>
                 {calculatedStats.total > 0 && (
                   <div className="flex items-center gap-1">
@@ -268,7 +280,12 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round(((calculatedStats.resolved + calculatedStats.closed) / calculatedStats.total) * 100)}%
+                      {Math.round(
+                        ((calculatedStats.resolved + calculatedStats.closed) /
+                          calculatedStats.total) *
+                          100
+                      )}
+                      %
                     </span>
                   </div>
                 )}
@@ -290,10 +307,16 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                     </span>
                   </div>
                   <div className="text-xl font-bold">
-                    {Math.round(((calculatedStats.resolved + calculatedStats.closed) / calculatedStats.total) * 100)}%
+                    {Math.round(
+                      ((calculatedStats.resolved + calculatedStats.closed) /
+                        calculatedStats.total) *
+                        100
+                    )}
+                    %
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {calculatedStats.resolved + calculatedStats.closed} of {calculatedStats.total} resolved
+                    {calculatedStats.resolved + calculatedStats.closed} of {calculatedStats.total}{' '}
+                    resolved
                   </p>
                 </div>
 
@@ -358,7 +381,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {announcements.map((announcement) => (
+              {announcements.map((announcement: Announcement) => (
                 <div
                   key={announcement.id}
                   className="rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
@@ -410,7 +433,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
               </div>
             ) : (
               <div className="space-y-3">
-                {notifications.map((notification) => (
+                {notifications.map((notification: Notification) => (
                   <div
                     key={notification.id}
                     className={`flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent cursor-pointer ${
@@ -479,7 +502,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
               </div>
             ) : (
               <div className="space-y-3">
-                {activeVotes.slice(0, 3).map((vote) => {
+                {activeVotes.slice(0, 3).map((vote: Vote) => {
                   const hasVoted = votedPolls.has(vote.id);
                   const daysLeft = vote.closes_at
                     ? Math.ceil(
@@ -552,7 +575,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {recentComplaints.map((complaint) => {
+                {recentComplaints.map((complaint: Complaint) => {
                   const statusInfo = getStatusBadge(complaint.status);
                   const StatusIcon = statusInfo.icon;
 
@@ -611,7 +634,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {drafts.map((draft) => (
+                {drafts.map((draft: any) => (
                   <div
                     key={draft.id}
                     className="flex items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-accent"

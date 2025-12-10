@@ -1,6 +1,7 @@
-import { getSupabaseClient } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import { withTokenRefresh } from '@/lib/api-wrapper';
+import type { ComplaintRating } from '@/types/database.types';
 
 /**
  * Fetch complaints for the current user
@@ -10,7 +11,7 @@ async function getUserComplaintsImpl(userId: string) {
   console.log('getUserComplaints called with userId:', userId);
 
   return withTokenRefresh(async () => {
-    const supabase = getSupabaseClient();
+    // Using singleton supabase client
     const { data, error } = await supabase
       .from('complaints')
       .select(
@@ -47,7 +48,7 @@ export const getUserComplaints = withRateLimit(getUserComplaintsImpl, 'read');
 async function getUserDraftsImpl(userId: string) {
   console.log('getUserDrafts called with userId:', userId);
 
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
     .select(
@@ -79,7 +80,7 @@ export const getUserDrafts = withRateLimit(getUserDraftsImpl, 'read');
 async function getUserComplaintStatsImpl(userId: string) {
   console.log('getUserComplaintStats called with userId:', userId);
 
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   // Use Promise.all to run all count queries in parallel
   const [totalResult, newResult, openResult, inProgressResult, resolvedResult, closedResult] =
@@ -148,7 +149,7 @@ export const getUserComplaintStats = withRateLimit(getUserComplaintStatsImpl, 'r
  * Fetch all complaints (for lecturers/admins)
  */
 async function getAllComplaintsImpl() {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
     .select(
@@ -171,7 +172,7 @@ export const getAllComplaints = withRateLimit(getAllComplaintsImpl, 'read');
  * Fetch a single complaint by ID
  */
 async function getComplaintByIdImpl(id: string) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
     .select(
@@ -230,7 +231,7 @@ export const getComplaintById = withRateLimit(getComplaintByIdImpl, 'read');
  * Create a new complaint
  */
 async function createComplaintImpl(complaint: any) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase.from('complaints').insert(complaint).select().single();
 
   if (error) throw error;
@@ -243,7 +244,7 @@ export const createComplaint = withRateLimit(createComplaintImpl, 'write');
  * Update a complaint
  */
 async function updateComplaintImpl(id: string, updates: unknown) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
     .update(updates)
@@ -261,7 +262,7 @@ export const updateComplaint = withRateLimit(updateComplaintImpl, 'write');
  * Delete a complaint (drafts only)
  */
 async function deleteComplaintImpl(id: string) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { error } = await supabase.from('complaints').delete().eq('id', id).eq('is_draft', true);
 
   if (error) throw error;
@@ -273,7 +274,7 @@ export const deleteComplaint = withRateLimit(deleteComplaintImpl, 'write');
  * Reopen a resolved complaint with justification
  */
 async function reopenComplaintImpl(id: string, justification: string, userId: string) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   // Update complaint status to reopened
   const { data: complaint, error: updateError } = await supabase
@@ -330,7 +331,7 @@ async function submitRatingImpl(
   rating: number,
   feedbackText?: string
 ) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   // Validate rating is between 1-5
   if (rating < 1 || rating > 5) {
@@ -404,7 +405,7 @@ export const submitRating = withRateLimit(submitRatingImpl, 'write');
  * Check if a complaint has been rated by a student
  */
 async function hasRatedComplaintImpl(complaintId: string, studentId: string): Promise<boolean> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   const { data, error } = await supabase
     .from('complaint_ratings')
@@ -429,7 +430,7 @@ export const hasRatedComplaint = withRateLimit(hasRatedComplaintImpl, 'read');
  * Optimized: Use a single query with join instead of two separate queries
  */
 async function getUserAverageRatingImpl(userId: string): Promise<number | null> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   // Use a single query with join to get ratings for user's resolved complaints
   const { data: ratings, error: ratingsError } = await supabase
@@ -453,7 +454,7 @@ async function getUserAverageRatingImpl(userId: string): Promise<number | null> 
   }
 
   // Calculate average
-  const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+  const sum = ratings.reduce((acc: number, r: any) => acc + Number(r.rating), 0);
   const average = sum / ratings.length;
 
   return Math.round(average * 10) / 10; // Round to 1 decimal place
@@ -471,7 +472,7 @@ async function bulkAssignComplaintsImpl(
   lecturerId: string,
   performedBy: string
 ): Promise<{ success: number; failed: number; errors: string[] }> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   if (complaintIds.length === 0) {
     throw new Error('No complaints selected for assignment');
@@ -524,7 +525,7 @@ async function bulkAssignComplaintsImpl(
   }
 
   // Prepare batch inserts for history and notifications
-  const historyInserts = complaints.map((complaint) => ({
+  const historyInserts = complaints.map((complaint: any) => ({
     complaint_id: complaint.id,
     action: 'assigned',
     old_value: complaint.assigned_to || 'unassigned',
@@ -536,7 +537,7 @@ async function bulkAssignComplaintsImpl(
     },
   }));
 
-  const notificationInserts = complaints.map((complaint) => ({
+  const notificationInserts = complaints.map((complaint: any) => ({
     user_id: lecturerId,
     type: 'complaint_assigned',
     title: 'New Complaint Assigned',
@@ -580,7 +581,7 @@ async function bulkChangeStatusImpl(
   newStatus: string,
   performedBy: string
 ): Promise<{ success: number; failed: number; errors: string[] }> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   if (complaintIds.length === 0) {
     throw new Error('No complaints selected for status change');
@@ -607,7 +608,7 @@ async function bulkChangeStatusImpl(
   }
 
   // Filter out complaints that already have the target status
-  const complaintsToUpdate = complaints.filter((c) => c.status !== newStatus);
+  const complaintsToUpdate = complaints.filter((c: any) => c.status !== newStatus);
 
   if (complaintsToUpdate.length === 0) {
     // All complaints already have the target status
@@ -616,7 +617,7 @@ async function bulkChangeStatusImpl(
   }
 
   const timestamp = new Date().toISOString();
-  const idsToUpdate = complaintsToUpdate.map((c) => c.id);
+  const idsToUpdate = complaintsToUpdate.map((c: any) => c.id);
 
   // Batch update all complaints
   const { error: updateError } = await supabase
@@ -632,7 +633,7 @@ async function bulkChangeStatusImpl(
   }
 
   // Prepare batch insert for history
-  const historyInserts = complaintsToUpdate.map((complaint) => ({
+  const historyInserts = complaintsToUpdate.map((complaint: any) => ({
     complaint_id: complaint.id,
     action: 'status_changed',
     old_value: complaint.status,
@@ -668,7 +669,7 @@ async function bulkAddTagsImpl(
   tags: string[],
   performedBy: string
 ): Promise<{ success: number; failed: number; errors: string[] }> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   if (complaintIds.length === 0) {
     throw new Error('No complaints selected for tag addition');
@@ -710,7 +711,7 @@ async function bulkAddTagsImpl(
 
   // Build a map of complaint_id -> Set of existing tag names
   const existingTagsMap = new Map<string, Set<string>>();
-  (existingTags || []).forEach((tag) => {
+  (existingTags || []).forEach((tag: any) => {
     if (!existingTagsMap.has(tag.complaint_id)) {
       existingTagsMap.set(tag.complaint_id, new Set());
     }
@@ -721,13 +722,13 @@ async function bulkAddTagsImpl(
   const tagInserts: Array<{ complaint_id: string; tag_name: string }> = [];
   const historyInserts: Array<unknown> = [];
 
-  complaints.forEach((complaint) => {
+  complaints.forEach((complaint: unknown) => {
     const existingTagNames = existingTagsMap.get(complaint.id) || new Set();
-    const newTags = tags.filter((tag) => !existingTagNames.has(tag));
+    const newTags = tags.filter((tag: string) => !existingTagNames.has(tag));
 
     if (newTags.length > 0) {
       // Add tag inserts
-      newTags.forEach((tag) => {
+      newTags.forEach((tag: string) => {
         tagInserts.push({
           complaint_id: complaint.id,
           tag_name: tag,

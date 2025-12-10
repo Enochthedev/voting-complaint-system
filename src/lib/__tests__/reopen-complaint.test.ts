@@ -17,9 +17,9 @@ const mockSupabase = {
   },
 };
 
-// Mock the auth module
-vi.mock('@/lib/auth', () => ({
-  getSupabaseClient: () => mockSupabase,
+// Mock the supabase module
+vi.mock('@/lib/supabase', () => ({
+  supabase: mockSupabase,
 }));
 
 describe('reopenComplaint', () => {

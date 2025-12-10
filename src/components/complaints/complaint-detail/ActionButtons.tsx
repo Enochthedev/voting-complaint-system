@@ -99,10 +99,9 @@ export function ActionButtons({
     try {
       // Import the reopenComplaint function
       const { reopenComplaint } = await import('@/lib/api/complaints');
-      const { getSupabaseClient } = await import('@/lib/auth');
+      const { supabase } = await import('@/lib/supabase');
 
       // Get current user ID
-      const supabase = getSupabaseClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();

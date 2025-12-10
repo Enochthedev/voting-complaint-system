@@ -209,7 +209,7 @@ async function getVoteResultsImpl(voteId: string): Promise<Record<string, number
   }
 
   const results: Record<string, number> = {};
-  (data || []).forEach((response) => {
+  (data || []).forEach((response: any) => {
     results[response.selected_option] = (results[response.selected_option] || 0) + 1;
   });
 

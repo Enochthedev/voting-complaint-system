@@ -6,7 +6,7 @@
  * Supabase client with cookie-based session management.
  */
 
-import { createServerClient } from './supabase-server';
+import { createClient as createServerClient } from './supabase/server';
 import type { User } from '@supabase/supabase-js';
 import type { UserRole } from './constants';
 

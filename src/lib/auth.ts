@@ -11,14 +11,6 @@ import type { UserRole } from './constants';
 import { supabase } from './supabase';
 
 /**
- * Get the Supabase client instance
- * Export for use in other modules
- */
-export function getSupabaseClient() {
-  return supabase;
-}
-
-/**
  * Authentication response type
  */
 export interface AuthResponse {
@@ -41,10 +33,9 @@ export async function signUp(
   fullName: string
 ): Promise<AuthResponse> {
   try {
-    const client = getSupabaseClient();
     console.log('Attempting sign up for:', email);
 
-    const { data, error } = await client.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -87,10 +78,9 @@ export async function signUp(
  */
 export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
-    const client = getSupabaseClient();
     console.log('Attempting sign in for:', email);
 
-    const { data, error } = await client.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -129,8 +119,7 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
  */
 export async function signOut(): Promise<AuthError | null> {
   try {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.signOut();
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
       console.error('Sign out error:', error);
@@ -152,11 +141,10 @@ export async function signOut(): Promise<AuthError | null> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const client = getSupabaseClient();
     const {
       data: { user },
       error,
-    } = await client.auth.getUser();
+    } = await supabase.auth.getUser();
 
     if (error) {
       console.error('Error fetching user:', error);
@@ -177,11 +165,10 @@ export async function getCurrentUser(): Promise<User | null> {
  */
 export async function getSession() {
   try {
-    const client = getSupabaseClient();
     const {
       data: { session },
       error,
-    } = await client.auth.getSession();
+    } = await supabase.auth.getSession();
 
     if (error) {
       console.error('Error fetching session:', error);
@@ -211,8 +198,7 @@ export async function getUserRole(): Promise<UserRole | null> {
   }
 
   try {
-    const client = getSupabaseClient();
-    const { data, error } = await client.from('users').select('role').eq('id', user.id).single();
+    const { data, error } = await supabase.from('users').select('role').eq('id', user.id).single();
 
     if (error) {
       console.error('Error fetching user role:', error);
@@ -282,8 +268,7 @@ export async function isLecturerOrAdmin(): Promise<boolean> {
  */
 export async function resetPassword(email: string): Promise<AuthError | null> {
   try {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo:
         typeof window !== 'undefined'
           ? `${window.location.origin}/callback?type=recovery`
@@ -311,8 +296,7 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
  */
 export async function updatePassword(newPassword: string): Promise<AuthError | null> {
   try {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
 
@@ -337,8 +321,7 @@ export async function updatePassword(newPassword: string): Promise<AuthError | n
  */
 export async function updateUserMetadata(metadata: Record<string, any>): Promise<AuthError | null> {
   try {
-    const client = getSupabaseClient();
-    const { error } = await client.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       data: metadata,
     });
 
@@ -362,10 +345,9 @@ export async function updateUserMetadata(metadata: Record<string, any>): Promise
  * @returns Unsubscribe function
  */
 export function onAuthStateChange(callback: (user: User | null) => void): () => void {
-  const client = getSupabaseClient();
   const {
     data: { subscription },
-  } = client.auth.onAuthStateChange((_event: any, session: any) => {
+  } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
     callback(session?.user ?? null);
   });
 

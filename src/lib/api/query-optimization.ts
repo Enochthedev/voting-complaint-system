@@ -7,7 +7,7 @@
  * - Query performance monitoring
  */
 
-import { getSupabaseClient } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Batch fetch multiple complaints by IDs
@@ -16,7 +16,7 @@ import { getSupabaseClient } from '@/lib/auth';
 export async function batchFetchComplaintsByIds(ids: string[]) {
   if (ids.length === 0) return [];
 
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
     .select(
@@ -39,7 +39,7 @@ export async function batchFetchComplaintsByIds(ids: string[]) {
 export async function batchFetchUsersByIds(ids: string[]) {
   if (ids.length === 0) return [];
 
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
   const { data, error } = await supabase
     .from('users')
     .select('id, full_name, email, role')
@@ -58,7 +58,7 @@ export async function getComplaintCountsByStatus(filters?: {
   assignedTo?: string;
   isDraft?: boolean;
 }) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   let query = supabase.from('complaints').select('status');
 
@@ -101,7 +101,7 @@ export async function prefetchComplaintRelatedData(complaintIds: string[]) {
     };
   }
 
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   // Fetch all related data in parallel
   const [tagsResult, commentsResult, attachmentsResult, historyResult] = await Promise.all([
@@ -151,7 +151,7 @@ export async function paginatedQuery<T>(
     orderBy?: { column: string; ascending?: boolean };
   }
 ): Promise<{ data: T[]; total: number; hasMore: boolean }> {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   const from = page * pageSize;
   const to = from + pageSize - 1;
@@ -223,7 +223,7 @@ export async function searchComplaints(
     };
   }
 ) {
-  const supabase = getSupabaseClient();
+  // Using singleton supabase client
 
   let query = supabase
     .from('complaints')
