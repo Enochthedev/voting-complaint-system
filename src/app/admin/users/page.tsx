@@ -99,7 +99,10 @@ export default function UsersPage() {
             ) : (
               <div className="space-y-4">
                 {users.map((u) => (
-                  <div key={u.id} className="flex items-center justify-between rounded-lg border p-4">
+                  <div
+                    key={u.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                         <Users className="h-5 w-5 text-primary" />
@@ -118,8 +121,6 @@ export default function UsersPage() {
                 ))}
               </div>
             )}
-              ))}
-            </div>
           </CardContent>
         </Card>
       </div>
