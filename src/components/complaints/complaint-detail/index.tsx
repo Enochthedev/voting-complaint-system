@@ -13,25 +13,47 @@ import { TimelineSection } from './TimelineSection';
 import { CommentsSection } from './CommentsSection';
 import { ActionButtons } from './ActionButtons';
 import { RatingPrompt } from '../rating-prompt';
-import { getMockComplaintData, getMockLecturers } from './mock-data';
+import { getMockLecturers } from './mock-data';
 import type { ComplaintDetailViewProps, ComplaintWithRelations } from './types';
+import { useAuth } from '@/hooks/useAuth';
+import { useComplaint, useHasRatedComplaint } from '@/hooks/use-complaints';
 
 /**
  * Main Complaint Detail View Component
  * Orchestrates all sub-components and manages top-level state
  */
 export function ComplaintDetailView({ complaintId, onBack }: ComplaintDetailViewProps) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { user } = useAuth();
+  const { data: complaintData, isLoading, error: fetchError, refetch } = useComplaint(complaintId);
   const [complaint, setComplaint] = React.useState<ComplaintWithRelations | null>(null);
   const [showRatingPrompt, setShowRatingPrompt] = React.useState(false);
-  const [hasRated, setHasRated] = React.useState(false);
   const commentsRef = React.useRef<HTMLDivElement>(null);
 
-  // Mock user role - in real implementation, get from auth context
-  // For testing purposes, you can change this to 'lecturer' or 'admin' to see lecturer actions
-  const userRole: 'student' | 'lecturer' | 'admin' = 'student';
-  const currentUserId = userRole === 'student' ? 'student-123' : 'lecturer-456';
+  // Get user role and ID from auth context
+  const userRole = (user?.role || 'student') as 'student' | 'lecturer' | 'admin';
+  const currentUserId = user?.id || '';
+
+  // Check if user has rated this complaint
+  const { data: hasRated = false } = useHasRatedComplaint(complaintId, currentUserId);
+
+  // Update local complaint state when data is fetched
+  React.useEffect(() => {
+    if (complaintData) {
+      setComplaint(complaintData as ComplaintWithRelations);
+
+      // Show rating prompt if conditions are met
+      const wasDismissed = localStorage.getItem(`rating-dismissed-${complaintId}`) === 'true';
+      const shouldShowPrompt =
+        userRole === 'student' &&
+        complaintData.status === 'resolved' &&
+        complaintData.student_id === currentUserId &&
+        !hasRated &&
+        !wasDismissed;
+      setShowRatingPrompt(shouldShowPrompt);
+    }
+  }, [complaintData, complaintId, currentUserId, userRole, hasRated]);
+
+  const error = fetchError ? 'Failed to load complaint details' : null;
 
   // Function to scroll to comments section
   const scrollToComments = () => {
@@ -164,47 +186,16 @@ export function ComplaintDetailView({ complaintId, onBack }: ComplaintDetailView
       const { submitRating } = await import('@/lib/api/complaints');
 
       // Submit rating to database
-      // This will throw an error if the user has already rated
       await submitRating(complaintId, currentUserId, rating, feedbackText);
 
-      // Update local state
-      setHasRated(true);
+      // Hide rating prompt and refetch complaint data
       setShowRatingPrompt(false);
-
-      // Add to history for immediate UI update
-      setComplaint((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          complaint_history: [
-            ...(prev.complaint_history || []),
-            {
-              id: `hist-${Date.now()}`,
-              complaint_id: prev.id,
-              action: 'rated',
-              old_value: null,
-              new_value: rating.toString(),
-              performed_by: currentUserId,
-              details: feedbackText ? { feedback: feedbackText } : null,
-              created_at: new Date().toISOString(),
-              user: {
-                id: currentUserId,
-                email: 'john.doe@university.edu',
-                role: 'student',
-                full_name: 'John Doe',
-                created_at: '2024-09-01T00:00:00Z',
-                updated_at: '2024-09-01T00:00:00Z',
-              },
-            },
-          ],
-        };
-      });
+      refetch();
     } catch (err) {
       console.error('Error submitting rating:', err);
 
       // If the error is about already rating, update the UI state
       if (err instanceof Error && err.message.includes('already rated')) {
-        setHasRated(true);
         setShowRatingPrompt(false);
       }
 
@@ -218,52 +209,6 @@ export function ComplaintDetailView({ complaintId, onBack }: ComplaintDetailView
     // Store dismissal in localStorage to not show again for this complaint
     localStorage.setItem(`rating-dismissed-${complaintId}`, 'true');
   };
-
-  React.useEffect(() => {
-    // Mock data loading - real implementation in Phase 12
-    const loadComplaint = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        const mockData = getMockComplaintData(complaintId);
-        setComplaint(mockData);
-
-        // Check if complaint has been rated using the API function
-        // This properly checks the complaint_ratings table
-        const { hasRatedComplaint } = await import('@/lib/api/complaints');
-        const hasExistingRating = await hasRatedComplaint(complaintId, currentUserId);
-        setHasRated(hasExistingRating);
-
-        // Check if rating prompt was dismissed
-        const wasDismissed = localStorage.getItem(`rating-dismissed-${complaintId}`) === 'true';
-
-        // Show rating prompt if:
-        // 1. User is a student
-        // 2. Complaint is resolved
-        // 3. User is the complaint owner (or complaint is not anonymous)
-        // 4. Hasn't been rated yet
-        // 5. Hasn't been dismissed
-        const shouldShowPrompt =
-          userRole === 'student' &&
-          mockData.status === 'resolved' &&
-          mockData.student_id === currentUserId &&
-          !hasExistingRating &&
-          !wasDismissed;
-
-        setShowRatingPrompt(shouldShowPrompt);
-      } catch (err) {
-        setError('Failed to load complaint details');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadComplaint();
-  }, [complaintId, currentUserId, userRole]);
 
   // Loading state
   if (isLoading) {

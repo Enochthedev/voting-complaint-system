@@ -77,11 +77,12 @@ export default function ComplaintsPage() {
   const { data: userComplaints, isLoading: userComplaintsLoading } = useUserComplaints(userId);
 
   // Determine which complaints to use based on role
-  const baseComplaints = React.useMemo(() => {
+  // Using 'any' here because the API returns complaints with joined relations
+  const baseComplaints = React.useMemo((): any[] => {
     if (userRole === 'student') {
-      return userComplaints || [];
+      return (userComplaints || []) as any[];
     }
-    return allComplaints || [];
+    return (allComplaints || []) as any[];
   }, [userRole, userComplaints, allComplaints]);
 
   const complaintsLoading = userRole === 'student' ? userComplaintsLoading : allComplaintsLoading;

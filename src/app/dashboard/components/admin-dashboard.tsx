@@ -39,12 +39,12 @@ export function AdminDashboard({ userId, userName }: AdminDashboardProps) {
   // Calculate real stats from complaints
   const stats = {
     totalComplaints: allComplaints.length,
-    activeComplaints: allComplaints.filter((c) =>
+    activeComplaints: allComplaints.filter((c: any) =>
       ['new', 'opened', 'in_progress'].includes(c.status)
     ).length,
-    resolvedComplaints: allComplaints.filter((c) => ['resolved', 'closed'].includes(c.status))
+    resolvedComplaints: allComplaints.filter((c: any) => ['resolved', 'closed'].includes(c.status))
       .length,
-    newComplaints: allComplaints.filter((c) => c.status === 'new').length,
+    newComplaints: allComplaints.filter((c: any) => c.status === 'new').length,
   };
 
   // Get recent complaints for activity
@@ -208,7 +208,7 @@ export function AdminDashboard({ userId, userName }: AdminDashboardProps) {
                   <p>No complaints yet</p>
                 </div>
               ) : (
-                recentComplaints.map((complaint) => (
+                recentComplaints.map((complaint: any) => (
                   <div
                     key={complaint.id}
                     className="flex items-start gap-4 cursor-pointer hover:bg-accent/50 rounded-lg p-2 transition-colors"

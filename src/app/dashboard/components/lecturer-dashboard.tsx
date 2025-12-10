@@ -199,11 +199,11 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
   // Calculate real statistics from complaints
   const stats = {
     totalComplaints: allComplaints.length,
-    assignedToMe: allComplaints.filter((c) => c.assigned_to === userId).length,
-    newComplaints: allComplaints.filter((c) => c.status === 'new').length,
-    inProgress: allComplaints.filter((c) => c.status === 'in_progress').length,
-    resolved: allComplaints.filter((c) => c.status === 'resolved').length,
-    closed: allComplaints.filter((c) => c.status === 'closed').length,
+    assignedToMe: allComplaints.filter((c: any) => c.assigned_to === userId).length,
+    newComplaints: allComplaints.filter((c: any) => c.status === 'new').length,
+    inProgress: allComplaints.filter((c: any) => c.status === 'in_progress').length,
+    resolved: allComplaints.filter((c: any) => c.status === 'resolved').length,
+    closed: allComplaints.filter((c: any) => c.status === 'closed').length,
   };
 
   // Get recent complaints (last 5)
@@ -317,7 +317,10 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         >
           High Priority
           <Badge className="ml-2 bg-orange-500 text-white">
-            {allComplaints.filter((c) => c.priority === 'high' || c.priority === 'urgent').length}
+            {
+              allComplaints.filter((c: any) => c.priority === 'high' || c.priority === 'urgent')
+                .length
+            }
           </Badge>
         </Button>
         <Button
@@ -328,7 +331,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         >
           Escalated
           <Badge className="ml-2 bg-red-500 text-white">
-            {allComplaints.filter((c) => c.status === 'escalated').length}
+            {allComplaints.filter((c: any) => c.status === 'escalated').length}
           </Badge>
         </Button>
         <Button
@@ -459,7 +462,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                       <p>No complaints yet</p>
                     </div>
                   ) : (
-                    recentComplaints.map((complaint) => (
+                    recentComplaints.map((complaint: any) => (
                       <div
                         key={complaint.id}
                         className="flex items-start justify-between space-x-4 rounded-lg border p-3 hover:bg-accent/50 cursor-pointer transition-colors"
@@ -613,7 +616,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                     <p>No complaints yet</p>
                   </div>
                 ) : (
-                  allComplaints.slice(0, 10).map((complaint) => (
+                  allComplaints.slice(0, 10).map((complaint: any) => (
                     <div
                       key={complaint.id}
                       className="flex items-start justify-between space-x-4 rounded-lg border p-4 hover:bg-accent/50 cursor-pointer transition-colors"
@@ -676,9 +679,9 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                 <CardDescription>Create and manage complaint templates</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => router.push('/admin/templates')}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create New Template
+                  Manage Templates
                 </Button>
               </CardContent>
             </Card>
@@ -689,7 +692,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                 <CardDescription>Configure auto-escalation settings</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => router.push('/admin/escalation-rules')}>
                   <Settings className="mr-2 h-4 w-4" />
                   Manage Rules
                 </Button>
@@ -702,9 +705,9 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                 <CardDescription>Create system-wide announcements</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => router.push('/admin/announcements')}>
                   <Plus className="mr-2 h-4 w-4" />
-                  New Announcement
+                  Manage Announcements
                 </Button>
               </CardContent>
             </Card>
@@ -715,9 +718,22 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
                 <CardDescription>Create and manage student polls</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => router.push('/admin/votes')}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Poll
+                  Manage Polls
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics</CardTitle>
+                <CardDescription>View detailed analytics and reports</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full" onClick={() => router.push('/analytics')}>
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  View Analytics
                 </Button>
               </CardContent>
             </Card>

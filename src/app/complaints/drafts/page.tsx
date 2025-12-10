@@ -12,16 +12,28 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ComplaintCardSkeleton } from '@/components/ui/skeletons';
 import { useUserDrafts } from '@/hooks/use-complaints';
 
+interface Draft {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function DraftsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, error: authError } = useAuth();
 
   // Use real API call for drafts
   const {
-    data: drafts = [],
+    data: draftsData = [],
     isLoading: draftsLoading,
     error: draftsError,
   } = useUserDrafts(user?.id || '');
+
+  const drafts = draftsData as Draft[];
 
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {

@@ -196,7 +196,8 @@ export function ActionButtons({
   };
 
   const handleRateResolution = () => {
-    alert('Rating functionality will be implemented in Phase 12');
+    // Scroll to top where the rating prompt should be visible
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddComment = () => {
