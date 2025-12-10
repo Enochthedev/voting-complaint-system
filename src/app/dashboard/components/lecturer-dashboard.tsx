@@ -31,73 +31,105 @@ interface LecturerDashboardProps {
   userName: string;
 }
 
-// TODO: Replace with real analytics data from API
+// Analytics data will be calculated from real complaints data
+const calculateAnalyticsFromComplaints = (complaints: any[]) => {
+  const total = complaints.length;
+  
+  // Calculate status distribution
+  const statusCounts: Record<string, number> = {
+    new: 0, opened: 0, in_progress: 0, resolved: 0, closed: 0,
+  };
+  complaints.forEach(c => {
+    if (statusCounts[c.status] !== undefined) statusCounts[c.status]++;
+  });
+
+  // Calculate category distribution
+  const categoryCounts: Record<string, number> = {};
+  complaints.forEach(c => {
+    categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1;
+  });
+
+  // Calculate priority distribution
+  const priorityCounts: Record<string, number> = {
+    low: 0, medium: 0, high: 0, critical: 0,
+  };
+  complaints.forEach(c => {
+    if (priorityCounts[c.priority] !== undefined) priorityCounts[c.priority]++;
+  });
+
+  const resolvedCount = statusCounts.resolved + statusCounts.closed;
+  const resolutionRate = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
+  const activeCases = statusCounts.new + statusCounts.opened + statusCounts.in_progress;
+
+  return {
+    keyMetrics: {
+      totalComplaints: total,
+      totalChange: '+0%',
+      avgResponseTime: 'N/A',
+      responseTimeChange: '0%',
+      resolutionRate,
+      resolutionRateChange: '+0%',
+      activeCases,
+      satisfactionRating: 0,
+      satisfactionChange: '+0',
+    },
+    complaintsByStatus: [
+      { status: 'New', count: statusCounts.new, percentage: total > 0 ? Math.round((statusCounts.new / total) * 100) : 0, color: 'bg-blue-500' },
+      { status: 'Opened', count: statusCounts.opened, percentage: total > 0 ? Math.round((statusCounts.opened / total) * 100) : 0, color: 'bg-purple-500' },
+      { status: 'In Progress', count: statusCounts.in_progress, percentage: total > 0 ? Math.round((statusCounts.in_progress / total) * 100) : 0, color: 'bg-yellow-500' },
+      { status: 'Resolved', count: statusCounts.resolved, percentage: total > 0 ? Math.round((statusCounts.resolved / total) * 100) : 0, color: 'bg-green-500' },
+      { status: 'Closed', count: statusCounts.closed, percentage: total > 0 ? Math.round((statusCounts.closed / total) * 100) : 0, color: 'bg-gray-500' },
+    ],
+    complaintsByCategory: Object.entries(categoryCounts).map(([category, count]) => ({
+      category: category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' '),
+      count,
+      percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+    })),
+    complaintsByPriority: [
+      { priority: 'Low', count: priorityCounts.low, percentage: total > 0 ? Math.round((priorityCounts.low / total) * 100) : 0, color: 'bg-gray-500' },
+      { priority: 'Medium', count: priorityCounts.medium, percentage: total > 0 ? Math.round((priorityCounts.medium / total) * 100) : 0, color: 'bg-blue-500' },
+      { priority: 'High', count: priorityCounts.high, percentage: total > 0 ? Math.round((priorityCounts.high / total) * 100) : 0, color: 'bg-orange-500' },
+      { priority: 'Critical', count: priorityCounts.critical, percentage: total > 0 ? Math.round((priorityCounts.critical / total) * 100) : 0, color: 'bg-red-500' },
+    ],
+    complaintsOverTime: [],
+    lecturerPerformance: [],
+    topComplaintTypes: Object.entries(categoryCounts)
+      .map(([type, count]) => ({ type: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '), count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5),
+  };
+};
+
+// Placeholder for backwards compatibility
 const mockAnalyticsData = {
   keyMetrics: {
-    totalComplaints: 247,
-    totalChange: '+12.5%',
-    avgResponseTime: '4.2h',
-    responseTimeChange: '-15%',
-    resolutionRate: 87,
-    resolutionRateChange: '+5%',
-    activeCases: 42,
-    satisfactionRating: 4.3,
-    satisfactionChange: '+0.3',
+    totalComplaints: 0,
+    totalChange: '+0%',
+    avgResponseTime: 'N/A',
+    responseTimeChange: '0%',
+    resolutionRate: 0,
+    resolutionRateChange: '+0%',
+    activeCases: 0,
+    satisfactionRating: 0,
+    satisfactionChange: '+0',
   },
   complaintsByStatus: [
-    { status: 'New', count: 18, percentage: 17, color: 'bg-blue-500' },
-    { status: 'Opened', count: 12, percentage: 11, color: 'bg-purple-500' },
-    { status: 'In Progress', count: 35, percentage: 33, color: 'bg-yellow-500' },
-    { status: 'Resolved', count: 28, percentage: 26, color: 'bg-green-500' },
-    { status: 'Closed', count: 14, percentage: 13, color: 'bg-gray-500' },
+    { status: 'New', count: 0, percentage: 0, color: 'bg-blue-500' },
+    { status: 'Opened', count: 0, percentage: 0, color: 'bg-purple-500' },
+    { status: 'In Progress', count: 0, percentage: 0, color: 'bg-yellow-500' },
+    { status: 'Resolved', count: 0, percentage: 0, color: 'bg-green-500' },
+    { status: 'Closed', count: 0, percentage: 0, color: 'bg-gray-500' },
   ],
-  complaintsByCategory: [
-    { category: 'Academic', count: 45, percentage: 35 },
-    { category: 'Facilities', count: 38, percentage: 30 },
-    { category: 'Course Content', count: 25, percentage: 20 },
-    { category: 'Administrative', count: 12, percentage: 9 },
-    { category: 'Harassment', count: 5, percentage: 4 },
-    { category: 'Other', count: 3, percentage: 2 },
-  ],
+  complaintsByCategory: [],
   complaintsByPriority: [
-    { priority: 'Low', count: 45, percentage: 35, color: 'bg-gray-500' },
-    { priority: 'Medium', count: 62, percentage: 48, color: 'bg-blue-500' },
-    { priority: 'High', count: 18, percentage: 14, color: 'bg-orange-500' },
-    { priority: 'Critical', count: 4, percentage: 3, color: 'bg-red-500' },
+    { priority: 'Low', count: 0, percentage: 0, color: 'bg-gray-500' },
+    { priority: 'Medium', count: 0, percentage: 0, color: 'bg-blue-500' },
+    { priority: 'High', count: 0, percentage: 0, color: 'bg-orange-500' },
+    { priority: 'Critical', count: 0, percentage: 0, color: 'bg-red-500' },
   ],
-  complaintsOverTime: [
-    { date: '2024-11-19', count: 12, label: 'Mon' },
-    { date: '2024-11-20', count: 18, label: 'Tue' },
-    { date: '2024-11-21', count: 15, label: 'Wed' },
-    { date: '2024-11-22', count: 22, label: 'Thu' },
-    { date: '2024-11-23', count: 19, label: 'Fri' },
-    { date: '2024-11-24', count: 8, label: 'Sat' },
-    { date: '2024-11-25', count: 6, label: 'Sun' },
-  ],
-  lecturerPerformance: [
-    {
-      id: '1',
-      name: 'Dr. Sarah Johnson',
-      complaintsHandled: 45,
-      avgResponseTime: '3.2h',
-      resolutionRate: 92,
-      satisfactionRating: 4.5,
-    },
-    {
-      id: '2',
-      name: 'Prof. Michael Chen',
-      complaintsHandled: 38,
-      avgResponseTime: '4.1h',
-      resolutionRate: 88,
-      satisfactionRating: 4.3,
-    },
-    {
-      id: '3',
-      name: 'Dr. Emily Williams',
-      complaintsHandled: 52,
-      avgResponseTime: '2.8h',
-      resolutionRate: 95,
-      satisfactionRating: 4.7,
+  complaintsOverTime: [],
+  lecturerPerformance: [],
+  topComplaintTypes: []
     },
     {
       id: '4',
@@ -594,7 +626,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
-          <LecturerAnalyticsTab analyticsData={mockAnalyticsData} />
+          <LecturerAnalyticsTab analyticsData={calculateAnalyticsFromComplaints(allComplaints)} />
         </TabsContent>
 
         {/* Management Tab */}

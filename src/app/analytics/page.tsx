@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   BarChart3,
   TrendingUp,
@@ -43,9 +44,10 @@ import {
   exportAnalyticsAsPDF,
 } from '@/lib/utils/export-analytics';
 import { ChartLoadingFallback } from '@/lib/utils/lazy-load';
+import { getAnalyticsData, type AnalyticsData } from '@/lib/api/analytics';
 
-// TODO: Replace with real analytics data from API
-const mockAnalyticsData = {
+// Default empty analytics data
+const emptyAnalyticsData: AnalyticsData = {
   timePeriod: 'Last 30 days',
   keyMetrics: {
     totalComplaints: 245,
@@ -144,6 +146,36 @@ export default function AnalyticsPage() {
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(emptyAnalyticsData);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const getDaysFromPeriod = (period: string): number => {
+    switch (period) {
+      case '7days':
+        return 7;
+      case '30days':
+        return 30;
+      case '90days':
+        return 90;
+      default:
+        return 30;
+    }
+  };
+
+  const loadAnalytics = async (days: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getAnalyticsData(days);
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error('Error loading analytics:', err);
+      setError('Failed to load analytics data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && !user && !authError) {
@@ -156,29 +188,34 @@ export default function AnalyticsPage() {
       router.push('/dashboard');
       return;
     }
-  }, [user, authLoading, authError, router]);
+
+    // Load analytics data when user is authenticated
+    if (user && (user.role === 'lecturer' || user.role === 'admin')) {
+      loadAnalytics(getDaysFromPeriod(selectedPeriod));
+    }
+  }, [user, authLoading, authError, router, selectedPeriod]);
 
   const handleExport = (format: 'csv' | 'json' | 'pdf') => {
-    const analyticsData = {
+    const exportData = {
       timePeriod: getDisplayPeriod(),
-      keyMetrics: mockAnalyticsData.keyMetrics,
-      complaintsByStatus: mockAnalyticsData.complaintsByStatus,
-      complaintsByCategory: mockAnalyticsData.complaintsByCategory,
-      complaintsByPriority: mockAnalyticsData.complaintsByPriority,
-      complaintsOverTime: mockAnalyticsData.complaintsOverTime,
-      lecturerPerformance: mockAnalyticsData.lecturerPerformance,
-      topComplaintTypes: mockAnalyticsData.topComplaintTypes,
+      keyMetrics: analyticsData.keyMetrics,
+      complaintsByStatus: analyticsData.complaintsByStatus,
+      complaintsByCategory: analyticsData.complaintsByCategory,
+      complaintsByPriority: analyticsData.complaintsByPriority,
+      complaintsOverTime: analyticsData.complaintsOverTime,
+      lecturerPerformance: analyticsData.lecturerPerformance,
+      topComplaintTypes: analyticsData.topComplaintTypes,
     };
 
     switch (format) {
       case 'csv':
-        exportAnalyticsAsCSV(analyticsData);
+        exportAnalyticsAsCSV(exportData);
         break;
       case 'json':
-        exportAnalyticsAsJSON(analyticsData);
+        exportAnalyticsAsJSON(exportData);
         break;
       case 'pdf':
-        exportAnalyticsAsPDF(analyticsData);
+        exportAnalyticsAsPDF(exportData);
         break;
     }
   };
@@ -189,16 +226,18 @@ export default function AnalyticsPage() {
       setShowCustomDatePicker(true);
     } else {
       setShowCustomDatePicker(false);
-      // TODO: In Phase 12, fetch data for the selected period
-      console.log(`Fetching data for period: ${period}`);
+      loadAnalytics(getDaysFromPeriod(period));
     }
   };
 
   const handleApplyCustomDates = () => {
     if (customStartDate && customEndDate) {
       setShowCustomDatePicker(false);
-      // TODO: In Phase 12, fetch data for custom date range
-      console.log(`Fetching data from ${customStartDate} to ${customEndDate}`);
+      // Calculate days between dates
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      loadAnalytics(days > 0 ? days : 30);
     }
   };
 
@@ -274,7 +313,47 @@ export default function AnalyticsPage() {
     complaintsOverTime,
     lecturerPerformance,
     topComplaintTypes,
-  } = mockAnalyticsData;
+  } = analyticsData;
+
+  // Show loading state
+  if (isLoading && !analyticsData.keyMetrics.totalComplaints) {
+    return (
+      <AppLayout
+        userRole={(user?.role as any) || 'lecturer'}
+        userName={user?.full_name || 'Loading...'}
+        userEmail={user?.email || ''}
+      >
+        <div className="space-y-6">
+          <Skeleton className="h-12 w-[300px]" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Skeleton className="h-96" />
+            <Skeleton className="h-96" />
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <AppLayout
+        userRole={(user?.role as any) || 'lecturer'}
+        userName={user?.full_name || 'Error'}
+        userEmail={user?.email || ''}
+      >
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout userRole={user.role as any} userName={user.full_name} userEmail={user.email}>

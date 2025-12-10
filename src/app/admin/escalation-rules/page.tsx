@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,72 +32,18 @@ import type {
   ComplaintPriority,
   User,
 } from '@/types/database.types';
+import { getEscalationRules, createEscalationRule, updateEscalationRule, deleteEscalationRule, toggleEscalationRule } from '@/lib/api/escalation-rules';
+import { getAllUsers } from '@/lib/api/users';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { AppLayout } from '@/components/layout/app-layout';
 
-// Mock escalation rules data for UI development
-const mockRules: EscalationRule[] = [
-  {
-    id: '1',
-    category: 'harassment',
-    priority: 'critical',
-    hours_threshold: 2,
-    escalate_to: 'admin-1',
-    is_active: true,
-    created_at: '2024-11-01T10:00:00Z',
-    updated_at: '2024-11-01T10:00:00Z',
-  },
-  {
-    id: '2',
-    category: 'facilities',
-    priority: 'high',
-    hours_threshold: 24,
-    escalate_to: 'admin-2',
-    is_active: true,
-    created_at: '2024-11-05T14:30:00Z',
-    updated_at: '2024-11-05T14:30:00Z',
-  },
-  {
-    id: '3',
-    category: 'academic',
-    priority: 'high',
-    hours_threshold: 48,
-    escalate_to: 'admin-1',
-    is_active: true,
-    created_at: '2024-11-10T09:15:00Z',
-    updated_at: '2024-11-10T09:15:00Z',
-  },
-  {
-    id: '4',
-    category: 'course_content',
-    priority: 'medium',
-    hours_threshold: 72,
-    escalate_to: 'admin-3',
-    is_active: false,
-    created_at: '2024-11-12T11:20:00Z',
-    updated_at: '2024-11-20T16:45:00Z',
-  },
-  {
-    id: '5',
-    category: 'administrative',
-    priority: 'low',
-    hours_threshold: 168,
-    escalate_to: 'admin-2',
-    is_active: true,
-    created_at: '2024-11-15T08:00:00Z',
-    updated_at: '2024-11-15T08:00:00Z',
-  },
-];
+// Empty initial state
+const emptyRules: EscalationRule[] = [];
+const emptyUsers: User[] = [];
 
-// Mock users (lecturers/admins) for assignment
-const mockUsers: User[] = [
-  {
-    id: 'admin-1',
-    email: 'admin1@university.edu',
-    role: 'admin',
-    full_name: 'Dr. Sarah Johnson',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-  {
+// Placeholder for users until loaded
+const placeholderUser: User = {
     id: 'admin-2',
     email: 'admin2@university.edu',
     role: 'admin',
@@ -156,8 +102,11 @@ const PRIORITIES: { value: ComplaintPriority; label: string; color: string }[] =
 ];
 
 export default function EscalationRulesPage() {
-  const [rules, setRules] = React.useState<EscalationRule[]>(mockRules);
-  const [users] = React.useState<User[]>(mockUsers);
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const [rules, setRules] = React.useState<EscalationRule[]>(emptyRules);
+  const [users, setUsers] = React.useState<User[]>(emptyUsers);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filterCategory, setFilterCategory] = React.useState<ComplaintCategory | 'all'>('all');
   const [filterPriority, setFilterPriority] = React.useState<ComplaintPriority | 'all'>('all');
@@ -167,6 +116,38 @@ export default function EscalationRulesPage() {
   const [deletingRule, setDeletingRule] = React.useState<EscalationRule | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  // Load data on mount
+  React.useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+      return;
+    }
+    if (user && user.role !== 'admin') {
+      router.push('/dashboard');
+      return;
+    }
+    if (user && user.role === 'admin') {
+      loadData();
+    }
+  }, [user, authLoading, router]);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [rulesData, usersData] = await Promise.all([
+        getEscalationRules(),
+        getAllUsers(),
+      ]);
+      setRules(rulesData);
+      setUsers(usersData.filter(u => u.role === 'admin' || u.role === 'lecturer'));
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setErrorMessage('Failed to load escalation rules. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Filter rules based on search and filters
   const filteredRules = React.useMemo(() => {
@@ -188,23 +169,33 @@ export default function EscalationRulesPage() {
     });
   }, [rules, users, searchQuery, filterCategory, filterPriority, filterStatus]);
 
-  const handleToggleActive = (rule: EscalationRule) => {
-    setRules((prev) =>
-      prev.map((r) =>
-        r.id === rule.id
-          ? { ...r, is_active: !r.is_active, updated_at: new Date().toISOString() }
-          : r
-      )
-    );
-    setSuccessMessage(`Rule ${rule.is_active ? 'deactivated' : 'activated'} successfully`);
-    setTimeout(() => setSuccessMessage(null), 3000);
+  const handleToggleActive = async (rule: EscalationRule) => {
+    try {
+      const updatedRule = await toggleEscalationRule(rule.id, !rule.is_active);
+      setRules((prev) =>
+        prev.map((r) => r.id === rule.id ? updatedRule : r)
+      );
+      setSuccessMessage(`Rule ${rule.is_active ? 'deactivated' : 'activated'} successfully`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error toggling rule:', err);
+      setErrorMessage('Failed to update rule. Please try again.');
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
   };
 
-  const handleDelete = (rule: EscalationRule) => {
-    setRules((prev) => prev.filter((r) => r.id !== rule.id));
-    setDeletingRule(null);
-    setSuccessMessage('Escalation rule deleted successfully');
-    setTimeout(() => setSuccessMessage(null), 3000);
+  const handleDelete = async (rule: EscalationRule) => {
+    try {
+      await deleteEscalationRule(rule.id);
+      setRules((prev) => prev.filter((r) => r.id !== rule.id));
+      setDeletingRule(null);
+      setSuccessMessage('Escalation rule deleted successfully');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting rule:', err);
+      setErrorMessage('Failed to delete rule. Please try again.');
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
   };
 
   const handleEdit = (rule: EscalationRule) => {
@@ -217,40 +208,36 @@ export default function EscalationRulesPage() {
     setShowCreateModal(true);
   };
 
-  const handleSaveRule = (ruleData: Partial<EscalationRule>) => {
-    if (editingRule) {
-      // Update existing rule
-      setRules((prev) =>
-        prev.map((r) =>
-          r.id === editingRule.id
-            ? {
-                ...r,
-                ...ruleData,
-                updated_at: new Date().toISOString(),
-              }
-            : r
-        )
-      );
-      setSuccessMessage('Escalation rule updated successfully');
-    } else {
-      // Create new rule
-      const newRule: EscalationRule = {
-        id: `rule-${Date.now()}`,
-        category: ruleData.category!,
-        priority: ruleData.priority!,
-        hours_threshold: ruleData.hours_threshold!,
-        escalate_to: ruleData.escalate_to!,
-        is_active: ruleData.is_active ?? true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setRules((prev) => [newRule, ...prev]);
-      setSuccessMessage('Escalation rule created successfully');
-    }
+  const handleSaveRule = async (ruleData: Partial<EscalationRule>) => {
+    try {
+      if (editingRule) {
+        // Update existing rule
+        const updatedRule = await updateEscalationRule(editingRule.id, ruleData);
+        setRules((prev) =>
+          prev.map((r) => r.id === editingRule.id ? updatedRule : r)
+        );
+        setSuccessMessage('Escalation rule updated successfully');
+      } else {
+        // Create new rule
+        const newRule = await createEscalationRule({
+          category: ruleData.category!,
+          priority: ruleData.priority!,
+          hours_threshold: ruleData.hours_threshold!,
+          escalate_to: ruleData.escalate_to!,
+          is_active: ruleData.is_active ?? true,
+        });
+        setRules((prev) => [newRule, ...prev]);
+        setSuccessMessage('Escalation rule created successfully');
+      }
 
-    setShowCreateModal(false);
-    setEditingRule(null);
-    setTimeout(() => setSuccessMessage(null), 3000);
+      setShowCreateModal(false);
+      setEditingRule(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error saving rule:', err);
+      setErrorMessage('Failed to save rule. Please try again.');
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
   };
 
   const getCategoryLabel = (category: ComplaintCategory) => {
