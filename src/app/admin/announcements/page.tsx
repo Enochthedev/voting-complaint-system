@@ -14,7 +14,10 @@ import {
   deleteAnnouncement,
 } from '@/lib/api/announcements';
 
+import { useAuth } from '@/hooks/useAuth';
+
 export default function AdminAnnouncementsPage() {
+  const { user } = useAuth();
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isInitialLoading, setIsInitialLoading] = React.useState(true);
@@ -23,9 +26,6 @@ export default function AdminAnnouncementsPage() {
   const [showCreateForm, setShowCreateForm] = React.useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = React.useState<Announcement | null>(null);
   const [deletingAnnouncementId, setDeletingAnnouncementId] = React.useState<string | null>(null);
-
-  // TODO: Phase 12 - Get actual lecturer ID from auth context
-  const mockLecturerId = 'lecturer-1';
 
   // Load announcements on mount
   React.useEffect(() => {
@@ -50,8 +50,13 @@ export default function AdminAnnouncementsPage() {
       setError(null);
       setIsLoading(true);
 
+      if (!user?.id) {
+        setError('You must be logged in to create announcements.');
+        return;
+      }
+
       const newAnnouncement = await createAnnouncement({
-        created_by: mockLecturerId,
+        created_by: user.id,
         title: announcementData.title!,
         content: announcementData.content!,
       });

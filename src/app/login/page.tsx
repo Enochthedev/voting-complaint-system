@@ -48,17 +48,6 @@ export default async function LoginPage({
           <p className="mt-2 text-sm text-purple-600">
             Sign in to your Student Complaint System account
           </p>
-          <div className="mt-4 rounded-lg bg-gradient-to-r from-blue-100 to-purple-100 p-3 border border-purple-200">
-            <p className="text-xs text-purple-800">
-              🎭 <strong>Mock Auth Mode:</strong> Use any test account with password{' '}
-              <code className="rounded bg-white px-2 py-1 border border-purple-300 text-purple-700 font-mono">
-                password123
-              </code>
-            </p>
-            <p className="mt-1 text-xs text-purple-600">
-              Try: student@test.com, lecturer@test.com, or admin@test.com
-            </p>
-          </div>
         </div>
 
         {showResetSuccess && (

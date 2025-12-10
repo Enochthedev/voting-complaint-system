@@ -1,12 +1,13 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { validateCsrfRequest } from '@/lib/csrf';
+import { updateSession } from '@/lib/supabase/middleware';
 
 /**
  * Next.js Middleware for Route Protection and Role-Based Access Control
  *
  * This middleware runs before every request and handles:
+ * - Session refresh (critical for maintaining auth state)
  * - CSRF protection for state-changing requests
  * - Authentication verification
  * - Role-based authorization
@@ -87,40 +88,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Update session - this is critical for maintaining auth state
+  // It refreshes the session if expired and updates cookies
+  const { supabaseResponse, supabase, user } = await updateSession(request);
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase environment variables');
-    return NextResponse.next();
-  }
+  // Use the response from updateSession to preserve cookie updates
+  let response = supabaseResponse;
 
-  // Create response that we'll mutate with cookies
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      get(name: string) {
-        return request.cookies.get(name)?.value;
-      },
-      set(name: string, value: string, options: any) {
-        // Update both request and response cookies
-        request.cookies.set({ name, value, ...options });
-        response.cookies.set({ name, value, ...options });
-      },
-      remove(name: string, options: any) {
-        // Update both request and response cookies
-        request.cookies.set({ name, value: '', ...options });
-        response.cookies.set({ name, value: '', ...options });
-      },
-    },
-  });
-
-  // Get user session - this will also refresh the session if needed
+  // Get session for additional checks
   const {
     data: { session },
     error: sessionError,
@@ -136,8 +111,6 @@ export async function middleware(request: NextRequest) {
     }
     return response;
   }
-
-  const user = session?.user;
 
   // If route is protected and user is not authenticated
   if (isProtectedRoute(pathname) && !user) {

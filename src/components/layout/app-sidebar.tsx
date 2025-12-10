@@ -33,6 +33,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserComplaints, useUserDrafts, useAllComplaints } from '@/hooks/use-complaints';
 
 interface SidebarProps {
   userRole: 'student' | 'lecturer' | 'admin';
@@ -44,6 +46,18 @@ interface SidebarProps {
 export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user } = useAuth();
+
+  // Get dynamic counts for badges
+  const { data: userComplaints = [] } = useUserComplaints(user?.id || '');
+  const { data: userDrafts = [] } = useUserDrafts(user?.id || '');
+  const { data: allComplaints = [] } = useAllComplaints();
+
+  // Calculate badge counts
+  const myComplaintsCount = userComplaints.length;
+  const draftsCount = userDrafts.length;
+  const allComplaintsCount = allComplaints.length;
+  const assignedToMeCount = allComplaints.filter((c) => c.assigned_to === user?.id).length;
 
   const handleLogout = async () => {
     try {
@@ -60,8 +74,8 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
 
   const studentLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/complaints', label: 'My Complaints', icon: FileText, badge: 12 },
-    { href: '/complaints/drafts', label: 'Drafts', icon: Inbox, badge: 2 },
+    { href: '/complaints', label: 'My Complaints', icon: FileText, badge: myComplaintsCount },
+    { href: '/complaints/drafts', label: 'Drafts', icon: Inbox, badge: draftsCount },
     { href: '/votes', label: 'Votes', icon: Vote },
     { href: '/announcements', label: 'Announcements', icon: Megaphone },
     { href: '/settings', label: 'Settings', icon: Settings },
@@ -69,8 +83,13 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
 
   const lecturerLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/complaints', label: 'All Complaints', icon: FileText, badge: 45 },
-    { href: '/complaints?filter=assigned', label: 'Assigned to Me', icon: Users, badge: 8 },
+    { href: '/complaints', label: 'All Complaints', icon: FileText, badge: allComplaintsCount },
+    {
+      href: '/complaints?filter=assigned',
+      label: 'Assigned to Me',
+      icon: Users,
+      badge: assignedToMeCount,
+    },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/votes', label: 'Manage Votes', icon: Vote },
     { href: '/admin/templates', label: 'Templates', icon: MessageSquare },
@@ -80,7 +99,7 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
 
   const adminLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/complaints', label: 'All Complaints', icon: FileText, badge: 45 },
+    { href: '/complaints', label: 'All Complaints', icon: FileText, badge: allComplaintsCount },
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/users', label: 'User Management', icon: Users },
     { href: '/admin/votes', label: 'Manage Votes', icon: Vote },

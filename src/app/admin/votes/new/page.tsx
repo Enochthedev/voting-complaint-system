@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createVote } from '@/lib/api/votes';
+import { useAuth } from '@/hooks/useAuth';
 import type { Vote } from '@/types/database.types';
 
 // Lazy load the vote form component
@@ -17,6 +18,7 @@ const VoteForm = lazy(() =>
 
 export default function NewVotePage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
@@ -27,12 +29,14 @@ export default function NewVotePage() {
     setSuccess(false);
 
     try {
-      // TODO: Phase 12 - Get actual user ID from auth context
-      const mockUserId = 'mock-lecturer-id';
+      if (!user?.id) {
+        setError('You must be logged in to create votes.');
+        return;
+      }
 
       // Create the vote using the API
       const createdVote = await createVote({
-        created_by: mockUserId,
+        created_by: user.id,
         title: voteData.title!,
         description: voteData.description!,
         options: voteData.options!,
