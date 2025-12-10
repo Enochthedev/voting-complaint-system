@@ -11,7 +11,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Missing Supabase environment variables');
-    return NextResponse.next({ request });
+    return { supabaseResponse: NextResponse.next({ request }), supabase: null as any, user: null };
   }
 
   let supabaseResponse = NextResponse.next({

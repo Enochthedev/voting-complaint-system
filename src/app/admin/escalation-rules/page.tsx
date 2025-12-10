@@ -32,7 +32,13 @@ import type {
   ComplaintPriority,
   User,
 } from '@/types/database.types';
-import { getEscalationRules, createEscalationRule, updateEscalationRule, deleteEscalationRule, toggleEscalationRule } from '@/lib/api/escalation-rules';
+import {
+  getEscalationRules,
+  createEscalationRule,
+  updateEscalationRule,
+  deleteEscalationRule,
+  toggleEscalationRule,
+} from '@/lib/api/escalation-rules';
 import { getAllUsers } from '@/lib/api/users';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -41,33 +47,6 @@ import { AppLayout } from '@/components/layout/app-layout';
 // Empty initial state
 const emptyRules: EscalationRule[] = [];
 const emptyUsers: User[] = [];
-
-// Placeholder for users until loaded
-const placeholderUser: User = {
-    id: 'admin-2',
-    email: 'admin2@university.edu',
-    role: 'admin',
-    full_name: 'Prof. Michael Chen',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: 'admin-3',
-    email: 'admin3@university.edu',
-    role: 'admin',
-    full_name: 'Dr. Emily Rodriguez',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: 'lecturer-1',
-    email: 'lecturer1@university.edu',
-    role: 'lecturer',
-    full_name: 'Dr. James Wilson',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-];
 
 const CATEGORIES: { value: ComplaintCategory; label: string }[] = [
   { value: 'academic', label: 'Academic' },
@@ -135,12 +114,9 @@ export default function EscalationRulesPage() {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [rulesData, usersData] = await Promise.all([
-        getEscalationRules(),
-        getAllUsers(),
-      ]);
+      const [rulesData, usersData] = await Promise.all([getEscalationRules(), getAllUsers()]);
       setRules(rulesData);
-      setUsers(usersData.filter(u => u.role === 'admin' || u.role === 'lecturer'));
+      setUsers(usersData.filter((u) => u.role === 'admin' || u.role === 'lecturer'));
     } catch (err) {
       console.error('Error loading data:', err);
       setErrorMessage('Failed to load escalation rules. Please try again.');
@@ -172,9 +148,7 @@ export default function EscalationRulesPage() {
   const handleToggleActive = async (rule: EscalationRule) => {
     try {
       const updatedRule = await toggleEscalationRule(rule.id, !rule.is_active);
-      setRules((prev) =>
-        prev.map((r) => r.id === rule.id ? updatedRule : r)
-      );
+      setRules((prev) => prev.map((r) => (r.id === rule.id ? updatedRule : r)));
       setSuccessMessage(`Rule ${rule.is_active ? 'deactivated' : 'activated'} successfully`);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
@@ -213,9 +187,7 @@ export default function EscalationRulesPage() {
       if (editingRule) {
         // Update existing rule
         const updatedRule = await updateEscalationRule(editingRule.id, ruleData);
-        setRules((prev) =>
-          prev.map((r) => r.id === editingRule.id ? updatedRule : r)
-        );
+        setRules((prev) => prev.map((r) => (r.id === editingRule.id ? updatedRule : r)));
         setSuccessMessage('Escalation rule updated successfully');
       } else {
         // Create new rule

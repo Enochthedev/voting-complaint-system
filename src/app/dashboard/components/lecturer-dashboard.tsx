@@ -34,26 +34,33 @@ interface LecturerDashboardProps {
 // Analytics data will be calculated from real complaints data
 const calculateAnalyticsFromComplaints = (complaints: any[]) => {
   const total = complaints.length;
-  
+
   // Calculate status distribution
   const statusCounts: Record<string, number> = {
-    new: 0, opened: 0, in_progress: 0, resolved: 0, closed: 0,
+    new: 0,
+    opened: 0,
+    in_progress: 0,
+    resolved: 0,
+    closed: 0,
   };
-  complaints.forEach(c => {
+  complaints.forEach((c) => {
     if (statusCounts[c.status] !== undefined) statusCounts[c.status]++;
   });
 
   // Calculate category distribution
   const categoryCounts: Record<string, number> = {};
-  complaints.forEach(c => {
+  complaints.forEach((c) => {
     categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1;
   });
 
   // Calculate priority distribution
   const priorityCounts: Record<string, number> = {
-    low: 0, medium: 0, high: 0, critical: 0,
+    low: 0,
+    medium: 0,
+    high: 0,
+    critical: 0,
   };
-  complaints.forEach(c => {
+  complaints.forEach((c) => {
     if (priorityCounts[c.priority] !== undefined) priorityCounts[c.priority]++;
   });
 
@@ -74,11 +81,36 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
       satisfactionChange: '+0',
     },
     complaintsByStatus: [
-      { status: 'New', count: statusCounts.new, percentage: total > 0 ? Math.round((statusCounts.new / total) * 100) : 0, color: 'bg-blue-500' },
-      { status: 'Opened', count: statusCounts.opened, percentage: total > 0 ? Math.round((statusCounts.opened / total) * 100) : 0, color: 'bg-purple-500' },
-      { status: 'In Progress', count: statusCounts.in_progress, percentage: total > 0 ? Math.round((statusCounts.in_progress / total) * 100) : 0, color: 'bg-yellow-500' },
-      { status: 'Resolved', count: statusCounts.resolved, percentage: total > 0 ? Math.round((statusCounts.resolved / total) * 100) : 0, color: 'bg-green-500' },
-      { status: 'Closed', count: statusCounts.closed, percentage: total > 0 ? Math.round((statusCounts.closed / total) * 100) : 0, color: 'bg-gray-500' },
+      {
+        status: 'New',
+        count: statusCounts.new,
+        percentage: total > 0 ? Math.round((statusCounts.new / total) * 100) : 0,
+        color: 'bg-blue-500',
+      },
+      {
+        status: 'Opened',
+        count: statusCounts.opened,
+        percentage: total > 0 ? Math.round((statusCounts.opened / total) * 100) : 0,
+        color: 'bg-purple-500',
+      },
+      {
+        status: 'In Progress',
+        count: statusCounts.in_progress,
+        percentage: total > 0 ? Math.round((statusCounts.in_progress / total) * 100) : 0,
+        color: 'bg-yellow-500',
+      },
+      {
+        status: 'Resolved',
+        count: statusCounts.resolved,
+        percentage: total > 0 ? Math.round((statusCounts.resolved / total) * 100) : 0,
+        color: 'bg-green-500',
+      },
+      {
+        status: 'Closed',
+        count: statusCounts.closed,
+        percentage: total > 0 ? Math.round((statusCounts.closed / total) * 100) : 0,
+        color: 'bg-gray-500',
+      },
     ],
     complaintsByCategory: Object.entries(categoryCounts).map(([category, count]) => ({
       category: category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' '),
@@ -86,15 +118,38 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
       percentage: total > 0 ? Math.round((count / total) * 100) : 0,
     })),
     complaintsByPriority: [
-      { priority: 'Low', count: priorityCounts.low, percentage: total > 0 ? Math.round((priorityCounts.low / total) * 100) : 0, color: 'bg-gray-500' },
-      { priority: 'Medium', count: priorityCounts.medium, percentage: total > 0 ? Math.round((priorityCounts.medium / total) * 100) : 0, color: 'bg-blue-500' },
-      { priority: 'High', count: priorityCounts.high, percentage: total > 0 ? Math.round((priorityCounts.high / total) * 100) : 0, color: 'bg-orange-500' },
-      { priority: 'Critical', count: priorityCounts.critical, percentage: total > 0 ? Math.round((priorityCounts.critical / total) * 100) : 0, color: 'bg-red-500' },
+      {
+        priority: 'Low',
+        count: priorityCounts.low,
+        percentage: total > 0 ? Math.round((priorityCounts.low / total) * 100) : 0,
+        color: 'bg-gray-500',
+      },
+      {
+        priority: 'Medium',
+        count: priorityCounts.medium,
+        percentage: total > 0 ? Math.round((priorityCounts.medium / total) * 100) : 0,
+        color: 'bg-blue-500',
+      },
+      {
+        priority: 'High',
+        count: priorityCounts.high,
+        percentage: total > 0 ? Math.round((priorityCounts.high / total) * 100) : 0,
+        color: 'bg-orange-500',
+      },
+      {
+        priority: 'Critical',
+        count: priorityCounts.critical,
+        percentage: total > 0 ? Math.round((priorityCounts.critical / total) * 100) : 0,
+        color: 'bg-red-500',
+      },
     ],
     complaintsOverTime: [],
     lecturerPerformance: [],
     topComplaintTypes: Object.entries(categoryCounts)
-      .map(([type, count]) => ({ type: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '), count }))
+      .map(([type, count]) => ({
+        type: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '),
+        count,
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5),
   };
@@ -129,24 +184,7 @@ const mockAnalyticsData = {
   ],
   complaintsOverTime: [],
   lecturerPerformance: [],
-  topComplaintTypes: []
-    },
-    {
-      id: '4',
-      name: 'Prof. David Brown',
-      complaintsHandled: 31,
-      avgResponseTime: '5.2h',
-      resolutionRate: 82,
-      satisfactionRating: 4.1,
-    },
-  ],
-  topComplaintTypes: [
-    { type: 'Broken Equipment in Lab', count: 28 },
-    { type: 'Course Material Access Issues', count: 24 },
-    { type: 'Grading Concerns', count: 19 },
-    { type: 'Classroom Temperature', count: 15 },
-    { type: 'Assignment Deadline Conflicts', count: 12 },
-  ],
+  topComplaintTypes: [],
 };
 
 export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) {

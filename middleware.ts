@@ -95,6 +95,11 @@ export async function middleware(request: NextRequest) {
   // Use the response from updateSession to preserve cookie updates
   let response = supabaseResponse;
 
+  // If supabase client is not available (missing env vars), just continue
+  if (!supabase) {
+    return response;
+  }
+
   // Get session for additional checks
   const {
     data: { session },
