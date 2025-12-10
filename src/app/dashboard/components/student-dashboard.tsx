@@ -70,7 +70,27 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
     announcementsLoading ||
     notificationsLoading ||
     votesLoading;
-  const error = statsError ? 'Failed to load dashboard data. Please try again.' : null;
+
+  // Log errors for debugging
+  if (statsError) {
+    console.error('Stats error:', statsError);
+  }
+
+  // Don't show error if we have complaints data - we can calculate stats from that
+  const error =
+    statsError && complaints.length === 0
+      ? 'Failed to load dashboard data. Please try again.'
+      : null;
+
+  // Calculate stats from complaints if stats query failed but we have complaints
+  const calculatedStats: Stats = stats || {
+    total: complaints.length,
+    new: complaints.filter((c) => c.status === 'new').length,
+    opened: complaints.filter((c) => c.status === 'opened').length,
+    in_progress: complaints.filter((c) => c.status === 'in_progress').length,
+    resolved: complaints.filter((c) => c.status === 'resolved').length,
+    closed: complaints.filter((c) => c.status === 'closed').length,
+  };
 
   // Get recent complaints (first 3)
   const recentComplaints = complaints.slice(0, 3);
@@ -119,7 +139,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
     );
   }
 
-  if (isLoading || !stats) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -161,7 +181,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-2xl font-bold">{calculatedStats.total}</div>
                 <p className="text-xs text-muted-foreground">All time submissions</p>
               </div>
             </div>
@@ -177,18 +197,18 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stats.new + stats.opened}</div>
+                <div className="text-2xl font-bold">{calculatedStats.new + calculatedStats.opened}</div>
                 <p className="text-xs text-muted-foreground">Awaiting review</p>
-                {stats.total > 0 && (
+                {calculatedStats.total > 0 && (
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-yellow-500 transition-all duration-300"
-                        style={{ width: `${((stats.new + stats.opened) / stats.total) * 100}%` }}
+                        style={{ width: `${((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) * 100}%` }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round(((stats.new + stats.opened) / stats.total) * 100)}%
+                      {Math.round(((calculatedStats.new + calculatedStats.opened) / calculatedStats.total) * 100)}%
                     </span>
                   </div>
                 )}
@@ -206,18 +226,18 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stats.in_progress}</div>
+                <div className="text-2xl font-bold">{calculatedStats.in_progress}</div>
                 <p className="text-xs text-muted-foreground">Being addressed</p>
-                {stats.total > 0 && (
+                {calculatedStats.total > 0 && (
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-blue-500 transition-all duration-300"
-                        style={{ width: `${(stats.in_progress / stats.total) * 100}%` }}
+                        style={{ width: `${(calculatedStats.in_progress / calculatedStats.total) * 100}%` }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round((stats.in_progress / stats.total) * 100)}%
+                      {Math.round((calculatedStats.in_progress / calculatedStats.total) * 100)}%
                     </span>
                   </div>
                 )}
@@ -235,20 +255,20 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stats.resolved + stats.closed}</div>
+                <div className="text-2xl font-bold">{calculatedStats.resolved + calculatedStats.closed}</div>
                 <p className="text-xs text-muted-foreground">Successfully closed</p>
-                {stats.total > 0 && (
+                {calculatedStats.total > 0 && (
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                       <div
                         className="h-full bg-green-500 transition-all duration-300"
                         style={{
-                          width: `${((stats.resolved + stats.closed) / stats.total) * 100}%`,
+                          width: `${((calculatedStats.resolved + calculatedStats.closed) / calculatedStats.total) * 100}%`,
                         }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {Math.round(((stats.resolved + stats.closed) / stats.total) * 100)}%
+                      {Math.round(((calculatedStats.resolved + calculatedStats.closed) / calculatedStats.total) * 100)}%
                     </span>
                   </div>
                 )}
@@ -257,7 +277,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
           </div>
 
           {/* Additional Statistics Row */}
-          {stats.total > 0 && (
+          {calculatedStats.total > 0 && (
             <>
               <Separator className="my-4" />
               <div className="grid gap-4 md:grid-cols-3">
@@ -270,10 +290,10 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                     </span>
                   </div>
                   <div className="text-xl font-bold">
-                    {Math.round(((stats.resolved + stats.closed) / stats.total) * 100)}%
+                    {Math.round(((calculatedStats.resolved + calculatedStats.closed) / calculatedStats.total) * 100)}%
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {stats.resolved + stats.closed} of {stats.total} resolved
+                    {calculatedStats.resolved + calculatedStats.closed} of {calculatedStats.total} resolved
                   </p>
                 </div>
 
@@ -284,7 +304,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
                     <span className="text-sm font-medium text-muted-foreground">Active</span>
                   </div>
                   <div className="text-xl font-bold">
-                    {stats.new + stats.opened + stats.in_progress}
+                    {calculatedStats.new + calculatedStats.opened + calculatedStats.in_progress}
                   </div>
                   <p className="text-xs text-muted-foreground">Complaints in progress</p>
                 </div>
@@ -303,7 +323,7 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
           )}
 
           {/* Empty State */}
-          {stats.total === 0 && (
+          {calculatedStats.total === 0 && (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
               <p className="text-sm font-medium text-muted-foreground mb-1">No complaints yet</p>
