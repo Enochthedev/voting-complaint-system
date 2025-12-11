@@ -85,24 +85,29 @@ export function useAuth() {
       setIsLoading(true);
       setError(null);
 
+      console.log('🔄 Loading user...');
       const authUser = await getCurrentUser();
 
       if (!authUser) {
-        console.log('No auth user found');
+        console.log('❌ No auth user found');
         setUser(null);
         setIsLoading(false);
         return;
       }
 
-      console.log('Auth user found:', authUser.id, authUser.email);
+      console.log('✅ Auth user found:', authUser.id, authUser.email);
 
       // Check current session
       // Using singleton supabase client
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      console.log('Current session:', session ? 'exists' : 'null');
-      console.log('Session user:', session?.user?.id);
+      console.log('🔐 Current session:', session ? 'exists' : 'null');
+      console.log('🔐 Session user:', session?.user?.id);
+      console.log(
+        '🔐 Session expires at:',
+        session?.expires_at ? new Date(session.expires_at * 1000) : 'N/A'
+      );
 
       // Fetch user details from database to get role
       const {
@@ -115,13 +120,13 @@ export function useAuth() {
         .eq('id', authUser.id)
         .maybeSingle(); // Use maybeSingle instead of single to avoid errors if not found
 
-      console.log('Query result - data:', userData, 'error:', dbError, 'count:', count);
+      console.log('📊 Query result - data:', userData, 'error:', dbError, 'count:', count);
 
       if (dbError) {
-        console.error('Error fetching user data:', dbError);
-        console.error('Error details:', JSON.stringify(dbError, null, 2));
-        console.error('Error code:', dbError.code);
-        console.error('Error message:', dbError.message);
+        console.error('❌ Error fetching user data:', dbError);
+        console.error('❌ Error details:', JSON.stringify(dbError, null, 2));
+        console.error('❌ Error code:', dbError.code);
+        console.error('❌ Error message:', dbError.message);
 
         // Don't clear user if we already have one - just log the error
         if (!user) {
@@ -133,8 +138,8 @@ export function useAuth() {
       }
 
       if (!userData) {
-        console.error('User not found in database:', authUser.id);
-        console.error('This might be an RLS policy issue');
+        console.error('❌ User not found in database:', authUser.id);
+        console.error('❌ This might be an RLS policy issue');
 
         // Don't clear user if we already have one
         if (!user) {
@@ -145,7 +150,7 @@ export function useAuth() {
         return;
       }
 
-      console.log('User data loaded:', userData);
+      console.log('✅ User data loaded:', userData);
       setUser(userData as AuthUser);
     } catch (err) {
       console.error('Error loading user:', err);

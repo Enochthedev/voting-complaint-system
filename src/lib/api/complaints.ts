@@ -231,10 +231,27 @@ export const getComplaintById = withRateLimit(getComplaintByIdImpl, 'read');
  * Create a new complaint
  */
 async function createComplaintImpl(complaint: any) {
+  console.log('📝 Creating complaint:', complaint);
+
+  // Check if user is authenticated
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  console.log('🔐 Session check for complaint creation:', session ? 'exists' : 'null');
+
+  if (!session) {
+    throw new Error('User not authenticated');
+  }
+
   // Using singleton supabase client
   const { data, error } = await supabase.from('complaints').insert(complaint).select().single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('❌ Error creating complaint:', error);
+    throw error;
+  }
+
+  console.log('✅ Complaint created successfully:', data);
   return data;
 }
 

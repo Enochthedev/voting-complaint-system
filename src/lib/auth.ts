@@ -141,19 +141,21 @@ export async function signOut(): Promise<AuthError | null> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
+    console.log('🔍 Getting current user...');
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser();
 
     if (error) {
-      console.error('Error fetching user:', error);
+      console.error('❌ Error fetching user:', error);
       return null;
     }
 
+    console.log('👤 Current user:', user ? `${user.id} (${user.email})` : 'null');
     return user;
   } catch (error) {
-    console.error('Unexpected error fetching user:', error);
+    console.error('❌ Unexpected error fetching user:', error);
     return null;
   }
 }
