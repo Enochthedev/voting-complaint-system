@@ -728,7 +728,7 @@ async function bulkAddTagsImpl(
 
   // Build a map of complaint_id -> Set of existing tag names
   const existingTagsMap = new Map<string, Set<string>>();
-  (existingTags || []).forEach((tag: any) => {
+  (existingTags || []).forEach((tag: unknown) => {
     if (!existingTagsMap.has(tag.complaint_id)) {
       existingTagsMap.set(tag.complaint_id, new Set());
     }

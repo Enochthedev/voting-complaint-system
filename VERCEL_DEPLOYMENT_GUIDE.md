@@ -1,32 +1,28 @@
-# Vercel Deployment Guide
+# Vercel Deployment Configuration Guide
 
-## Quick Setup
+## Environment Variables Setup
 
-### 1. Set Environment Variables in Vercel
+To fix the session and authentication issues on Vercel, you need to set the following environment variables in your Vercel dashboard:
 
-Go to your Vercel project dashboard and add these environment variables:
+### Required Variables (Critical)
 
-**Required Variables:**
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-**Recommended Variables:**
-```
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+NEXT_PUBLIC_SUPABASE_URL=https://tnenutksxxdhamlyogto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRuZW51dGtzeHhkaGFtbHlvZ3RvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NjM0NjgsImV4cCI6MjA3OTAzOTQ2OH0.FFrGY6yEdz6gKIxIJADch6LaiSQurz_061qPc9Y_Gvk
 ```
 
-**⚠️ Server-Only Variables (DO NOT ADD for frontend-only deployments):**
+### Production App URL (Important)
+
 ```
-# ONLY add this if you have server-side API routes that need admin access
-# NEVER expose this to the client!
-# Currently NOT USED in this application
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
 ```
 
-**Optional Variables (with defaults):**
+**Replace `your-app-name.vercel.app` with your actual Vercel deployment URL**
+
+### Optional Variables
+
 ```
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRuZW51dGtzeHhkaGFtbHlvZ3RvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzQ2MzQ2OCwiZXhwIjoyMDc5MDM5NDY4fQ.FTHE8QU-zVqjh9sj-1vFyNiHPeG-m90iMoH7oPtXlfo
 NEXT_PUBLIC_MAX_FILE_SIZE=10485760
 NEXT_PUBLIC_MAX_FILES_PER_COMPLAINT=5
 NEXT_PUBLIC_ENABLE_ANONYMOUS_COMPLAINTS=true
@@ -38,127 +34,82 @@ NEXT_PUBLIC_MAX_PAGE_SIZE=100
 SESSION_TIMEOUT=3600
 RATE_LIMIT_COMPLAINTS_PER_HOUR=10
 NEXT_PUBLIC_ENABLE_ANALYTICS=false
-NEXT_PUBLIC_DEBUG_MODE=false
+NEXT_PUBLIC_DEBUG_MODE=true
 ```
 
-### 2. How to Add Environment Variables in Vercel
+## How to Set Environment Variables on Vercel
 
-#### Via Vercel Dashboard:
-1. Go to https://vercel.com/dashboard
+1. Go to your Vercel dashboard
 2. Select your project
-3. Go to **Settings** → **Environment Variables**
-4. Add each variable:
-   - **Key**: Variable name (e.g., `NEXT_PUBLIC_SUPABASE_URL`)
-   - **Value**: Your actual value
-   - **Environments**: Select all (Production, Preview, Development)
-5. Click **Save**
+3. Go to Settings → Environment Variables
+4. Add each variable with its value
+5. Make sure to set them for all environments (Production, Preview, Development)
+6. Redeploy your application
 
-#### Via Vercel CLI:
-```bash
-# Set a single variable
-vercel env add NEXT_PUBLIC_SUPABASE_URL
+## Supabase Configuration
 
-# Pull environment variables to local
-vercel env pull .env.local
-```
+### 1. Update Supabase Auth Settings
 
-### 3. Get Your Supabase Credentials
+In your Supabase dashboard:
 
-1. Go to https://supabase.com/dashboard
-2. Select your project
-3. Go to **Settings** → **API**
-4. Copy:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon/public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role key** → `SUPABASE_SERVICE_ROLE_KEY`
+1. Go to Authentication → Settings
+2. Add your Vercel URL to "Site URL": `https://your-app-name.vercel.app`
+3. Add your Vercel URL to "Redirect URLs": `https://your-app-name.vercel.app/callback`
 
-### 4. Redeploy
+### 2. Check RLS Policies
 
-After adding environment variables:
-```bash
-# Trigger a new deployment
-vercel --prod
+Ensure your Row Level Security policies are properly configured:
 
-# Or push to GitHub (if auto-deploy is enabled)
-git push origin main
-```
+- Users should be able to read their own data
+- Users should be able to create complaints
+- Proper role-based access is set up
 
-## Troubleshooting
+## Common Issues and Solutions
 
-### Build Fails with "Environment Variables Not Set"
+### Issue 1: Dashboard Not Loading
 
-**Solution**: Make sure you've added all required environment variables in Vercel dashboard and redeployed.
-
-### "Invalid Supabase URL" Error
-
-**Solution**: 
-- Check that your URL starts with `https://`
-- Verify it ends with `.supabase.co`
-- Example: `https://abcdefghijk.supabase.co`
-
-### Environment Variables Not Working
-
+**Cause**: User authentication failing
 **Solution**:
-1. Check variable names are exactly correct (case-sensitive)
-2. Make sure you selected the right environments (Production, Preview, Development)
-3. Redeploy after adding variables
-4. Clear Vercel cache: Settings → General → Clear Cache
 
-### Build Works Locally But Fails on Vercel
+- Check that `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set correctly
+- Verify Supabase Site URL includes your Vercel domain
 
+### Issue 2: Can't Submit Complaints
+
+**Cause**: Authentication or RLS policy issues
 **Solution**:
-- Verify all environment variables are set in Vercel
-- Check that you're not using `.env.local` values that aren't in Vercel
-- Review build logs for specific error messages
 
-## Deployment Checklist
+- Check browser console for authentication errors
+- Verify RLS policies allow authenticated users to insert complaints
+- Ensure user session is valid
 
-- [ ] Created Supabase production project
-- [ ] Ran all database migrations
-- [ ] Deployed Edge Functions
-- [ ] Added all required environment variables in Vercel
-- [ ] Added recommended environment variables
-- [ ] Triggered deployment
-- [ ] Verified build succeeded
-- [ ] Tested deployed application
-- [ ] Created test users for each role
-- [ ] Verified all features work in production
+### Issue 3: Redirect Loops
 
-## Security Notes
+**Cause**: Incorrect redirect URLs
+**Solution**:
 
-⚠️ **Important**:
-- Never commit `.env.local` to Git
-- Never share your `SUPABASE_SERVICE_ROLE_KEY` publicly
-- Use different Supabase projects for development and production
-- Rotate keys if they're ever exposed
+- Set `NEXT_PUBLIC_APP_URL` to your actual Vercel URL
+- Update Supabase redirect URLs to match
 
-## Next Steps After Deployment
+## Testing Checklist
 
-1. **Test the Application**
-   - Create test users for each role
-   - Test all major features
-   - Verify notifications work
-   - Test file uploads
+After deployment:
 
-2. **Monitor Performance**
-   - Check Vercel Analytics
-   - Monitor Supabase logs
-   - Set up error tracking (Sentry)
+- [ ] Can access login page
+- [ ] Can log in with test credentials
+- [ ] Dashboard loads without errors
+- [ ] Can submit complaints
+- [ ] Navigation works properly
+- [ ] No console errors related to authentication
 
-3. **Set Up Custom Domain** (Optional)
-   - Go to Vercel → Settings → Domains
-   - Add your custom domain
-   - Update `NEXT_PUBLIC_APP_URL` environment variable
+## Debug Mode
 
-4. **Enable Production Features**
-   - Set `NEXT_PUBLIC_ENABLE_ANALYTICS=true`
-   - Configure email templates in Supabase
-   - Set up backup schedule
+Set `NEXT_PUBLIC_DEBUG_MODE=true` to enable detailed logging in production for troubleshooting.
 
-## Support
+## Test Credentials
 
-If you encounter issues:
-1. Check Vercel build logs
-2. Check Supabase logs
-3. Review browser console for errors
-4. Refer to documentation in `/docs` folder
+Use the credentials from `TEST_USERS.md`:
+
+- Student: student@university.edu / Student123!
+- Lecturer: lecturer@university.edu / Lecturer123!
+- Admin: admin@university.edu / Admin123!

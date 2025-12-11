@@ -6,6 +6,9 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { ReactQueryProvider } from '@/lib/react-query';
 import { CsrfProvider } from '@/components/providers/csrf-provider';
 
+// Import production check for debugging
+import '@/lib/production-check';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],

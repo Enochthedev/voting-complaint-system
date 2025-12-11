@@ -45,7 +45,7 @@ export async function signUp(
         emailRedirectTo:
           typeof window !== 'undefined'
             ? `${window.location.origin}/callback`
-            : `${process.env.NEXT_PUBLIC_APP_URL}/callback`,
+            : `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/callback`,
       },
     });
 
@@ -274,7 +274,7 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
       redirectTo:
         typeof window !== 'undefined'
           ? `${window.location.origin}/callback?type=recovery`
-          : `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+          : `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password`,
     });
 
     if (error) {

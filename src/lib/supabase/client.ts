@@ -19,9 +19,15 @@ export function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase environment variables:', {
+      url: supabaseUrl ? 'Set' : 'Missing',
+      key: supabaseAnonKey ? 'Set' : 'Missing',
+      env: process.env.NODE_ENV,
+    });
     throw new Error('Missing Supabase environment variables');
   }
 
+  console.log('🔧 Creating Supabase client for:', supabaseUrl);
   browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
   return browserClient;
 }
