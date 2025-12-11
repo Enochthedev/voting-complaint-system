@@ -728,7 +728,7 @@ async function bulkAddTagsImpl(
 
   // Build a map of complaint_id -> Set of existing tag names
   const existingTagsMap = new Map<string, Set<string>>();
-  (existingTags || []).forEach((tag: unknown) => {
+  (existingTags || []).forEach((tag: any) => {
     if (!existingTagsMap.has(tag.complaint_id)) {
       existingTagsMap.set(tag.complaint_id, new Set());
     }
@@ -739,7 +739,7 @@ async function bulkAddTagsImpl(
   const tagInserts: Array<{ complaint_id: string; tag_name: string }> = [];
   const historyInserts: Array<unknown> = [];
 
-  complaints.forEach((complaint: unknown) => {
+  complaints.forEach((complaint: any) => {
     const existingTagNames = existingTagsMap.get(complaint.id) || new Set();
     const newTags = tags.filter((tag: string) => !existingTagNames.has(tag));
 
