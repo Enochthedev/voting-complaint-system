@@ -97,6 +97,7 @@ function NewComplaintPageContent() {
         is_anonymous: data.isAnonymous,
         is_draft: isDraft,
         student_id: user.id,
+        // Use 'draft' status for drafts, 'new' for submitted complaints
         status: isDraft ? 'draft' : 'new',
       };
 

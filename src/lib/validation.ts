@@ -34,11 +34,12 @@ export const ComplaintPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent'
 export const ComplaintStatusSchema = z.enum([
   'draft',
   'new',
-  'opened',
+  'open',
   'in_progress',
   'resolved',
   'closed',
   'reopened',
+  'escalated',
 ]);
 
 /**
