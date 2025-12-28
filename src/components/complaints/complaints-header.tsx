@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, CheckSquare, X } from 'lucide-react';
+import { Plus, Download, CheckSquare, X, RefreshCw } from 'lucide-react';
 
 export interface ComplaintsHeaderProps {
   /**
@@ -32,6 +32,16 @@ export interface ComplaintsHeaderProps {
    * Callback when selection mode is toggled
    */
   onToggleSelectionMode?: () => void;
+
+  /**
+   * Callback when refresh button is clicked
+   */
+  onRefresh?: () => void;
+
+  /**
+   * Whether refresh is in progress
+   */
+  isRefreshing?: boolean;
 }
 
 /**
@@ -48,6 +58,8 @@ export function ComplaintsHeader({
   isExporting = false,
   selectionMode = false,
   onToggleSelectionMode,
+  onRefresh,
+  isRefreshing = false,
 }: ComplaintsHeaderProps) {
   return (
     <div className="mb-8 flex items-center justify-between">
@@ -64,6 +76,17 @@ export function ComplaintsHeader({
         </p>
       </div>
       <div className="flex gap-2">
+        {onRefresh && (
+          <Button
+            variant="outline"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        )}
         {onExportCSV && !selectionMode && (
           <Button
             variant="outline"

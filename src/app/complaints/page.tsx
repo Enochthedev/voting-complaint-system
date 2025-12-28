@@ -76,19 +76,124 @@ function ComplaintsPageContent() {
   const userId = user?.id || '';
 
   // Fetch complaints based on user role
-  const { data: allComplaints, isLoading: allComplaintsLoading } = useAllComplaints();
-  const { data: userComplaints, isLoading: userComplaintsLoading } = useUserComplaints(userId);
+  const {
+    data: allComplaints,
+    isLoading: allComplaintsLoading,
+    refetch: refetchAllComplaints,
+  } = useAllComplaints();
+
+  const {
+    data: userComplaints,
+    isLoading: userComplaintsLoading,
+    refetch: refetchUserComplaints,
+  } = useUserComplaints(userId);
 
   // Determine which complaints to use based on role
   // Using 'any' here because the API returns complaints with joined relations
   const baseComplaints = React.useMemo((): any[] => {
     if (userRole === 'student') {
-      return (userComplaints || []) as any[];
+      // For students, we still need client-side filtering since getUserComplaints doesn't support filtering yet
+      let complaints = (userComplaints || []) as any[];
+
+      // Apply client-side filters for students
+      if (filters.status.length > 0) {
+        complaints = complaints.filter((complaint) => filters.status.includes(complaint.status));
+      }
+      if (filters.category.length > 0) {
+        complaints = complaints.filter((complaint) =>
+          filters.category.includes(complaint.category)
+        );
+      }
+      if (filters.priority.length > 0) {
+        complaints = complaints.filter((complaint) =>
+          filters.priority.includes(complaint.priority)
+        );
+      }
+      if (filters.dateFrom) {
+        const fromDate = new Date(filters.dateFrom);
+        complaints = complaints.filter((complaint) => new Date(complaint.created_at) >= fromDate);
+      }
+      if (filters.dateTo) {
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        complaints = complaints.filter((complaint) => new Date(complaint.created_at) <= toDate);
+      }
+      if (filters.tags.length > 0) {
+        complaints = complaints.filter((complaint) =>
+          complaint.complaint_tags?.some((tag: any) => filters.tags.includes(tag.tag_name))
+        );
+      }
+
+      // Apply sorting for students
+      complaints = [...complaints].sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (filters.sortBy) {
+          case 'created_at':
+            aValue = new Date(a.created_at).getTime();
+            bValue = new Date(b.created_at).getTime();
+            break;
+          case 'updated_at':
+            aValue = new Date(a.updated_at).getTime();
+            bValue = new Date(b.updated_at).getTime();
+            break;
+          case 'priority':
+            const priorityOrder: Record<string, number> = {
+              low: 1,
+              medium: 2,
+              high: 3,
+              urgent: 4,
+              critical: 4,
+            };
+            aValue = priorityOrder[a.priority] || 0;
+            bValue = priorityOrder[b.priority] || 0;
+            break;
+          case 'status':
+            const statusOrder: Record<string, number> = {
+              new: 1,
+              opened: 2,
+              in_progress: 3,
+              resolved: 4,
+              closed: 5,
+              reopened: 6,
+              draft: 7,
+            };
+            aValue = statusOrder[a.status] || 0;
+            bValue = statusOrder[b.status] || 0;
+            break;
+          case 'title':
+            aValue = a.title.toLowerCase();
+            bValue = b.title.toLowerCase();
+            break;
+          default:
+            aValue = new Date(a.created_at).getTime();
+            bValue = new Date(b.created_at).getTime();
+        }
+
+        if (filters.sortOrder === 'asc') {
+          return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        } else {
+          return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+        }
+      });
+
+      return complaints;
     }
+    // For lecturers/admins, client-side filtering is applied below
     return (allComplaints || []) as any[];
   }, [userRole, userComplaints, allComplaints]);
 
   const complaintsLoading = userRole === 'student' ? userComplaintsLoading : allComplaintsLoading;
+
+  // Manual refetch function
+  const handleRefresh = React.useCallback(() => {
+    if (userRole === 'student') {
+      refetchUserComplaints();
+    } else {
+      refetchAllComplaints();
+    }
+  }, [userRole, refetchUserComplaints, refetchAllComplaints]);
 
   React.useEffect(() => {
     if (!authLoading && !user && !authError) {
@@ -140,128 +245,26 @@ function ComplaintsPageContent() {
     pageSize: 5,
   });
 
-  // Filter complaints based on user role and active filters
-  const filteredComplaints = React.useMemo(() => {
-    let complaints = baseComplaints;
-
-    // Role-based filtering is already handled by baseComplaints
-    // Students get userComplaints, lecturers/admins get allComplaints
-
-    // Apply status filter
-    if (filters.status.length > 0) {
-      complaints = complaints.filter((complaint) => filters.status.includes(complaint.status));
-    }
-
-    // Apply category filter
-    if (filters.category.length > 0) {
-      complaints = complaints.filter((complaint) => filters.category.includes(complaint.category));
-    }
-
-    // Apply priority filter
-    if (filters.priority.length > 0) {
-      complaints = complaints.filter((complaint) => filters.priority.includes(complaint.priority));
-    }
-
-    // Apply date range filter
-    if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
-      complaints = complaints.filter((complaint) => new Date(complaint.created_at) >= fromDate);
-    }
-    if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999); // Include the entire day
-      complaints = complaints.filter((complaint) => new Date(complaint.created_at) <= toDate);
-    }
-
-    // Apply tag filter
-    if (filters.tags.length > 0) {
-      complaints = complaints.filter((complaint) =>
-        complaint.complaint_tags?.some((tag: any) => filters.tags.includes(tag.tag_name))
-      );
-    }
-
-    // Apply assigned lecturer filter
-    if (filters.assignedTo) {
-      complaints = complaints.filter((complaint) => complaint.assigned_to === filters.assignedTo);
-    }
-
-    // Apply sorting
-    complaints = [...complaints].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      switch (filters.sortBy) {
-        case 'created_at':
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
-        case 'updated_at':
-          aValue = new Date(a.updated_at).getTime();
-          bValue = new Date(b.updated_at).getTime();
-          break;
-        case 'priority':
-          const priorityOrder: Record<string, number> = {
-            low: 1,
-            medium: 2,
-            high: 3,
-            urgent: 4,
-            critical: 4,
-          };
-          aValue = priorityOrder[a.priority] || 0;
-          bValue = priorityOrder[b.priority] || 0;
-          break;
-        case 'status':
-          const statusOrder: Record<string, number> = {
-            new: 1,
-            opened: 2,
-            in_progress: 3,
-            resolved: 4,
-            closed: 5,
-            reopened: 6,
-            draft: 7,
-          };
-          aValue = statusOrder[a.status] || 0;
-          bValue = statusOrder[b.status] || 0;
-          break;
-        case 'title':
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
-          break;
-        default:
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-      }
-
-      if (filters.sortOrder === 'asc') {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-      } else {
-        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-      }
-    });
-
-    return complaints;
-  }, [baseComplaints, filters]);
-
   // Determine which complaints to display
   const displayComplaints = React.useMemo(() => {
     if (useSearch && searchResults) {
       // Use search results
       return searchResults.complaints;
     } else {
-      // Use filtered mock data with pagination
+      // Use base complaints with pagination (filtering is now done server-side for lecturers/admins)
       const itemsPerPage = 5;
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
-      return filteredComplaints.slice(startIndex, endIndex);
+      return baseComplaints.slice(startIndex, endIndex);
     }
-  }, [useSearch, searchResults, filteredComplaints, currentPage]);
+  }, [useSearch, searchResults, baseComplaints, currentPage]);
 
   // Calculate pagination info
   const itemsPerPage = 5;
   const totalPages =
     useSearch && searchResults
       ? searchResults.totalPages
-      : Math.ceil(filteredComplaints.length / itemsPerPage);
+      : Math.ceil(baseComplaints.length / itemsPerPage);
 
   // Simulate loading state on page change
   const handlePageChange = (page: number) => {
@@ -359,8 +362,8 @@ function ComplaintsPageContent() {
     setIsExporting(true);
 
     try {
-      // Export all filtered complaints (not just current page)
-      const complaintsToExport = filteredComplaints.map((complaint) => ({
+      // Export all base complaints (not just current page)
+      const complaintsToExport = baseComplaints.map((complaint) => ({
         ...complaint,
         student: complaint.student || null,
         assigned_user: complaint.assigned_user || null,
@@ -399,7 +402,7 @@ function ComplaintsPageContent() {
 
     try {
       // Get selected complaints
-      const selectedComplaints = filteredComplaints.filter((complaint) =>
+      const selectedComplaints = baseComplaints.filter((complaint) =>
         selectedIds.has(complaint.id)
       );
 
@@ -456,7 +459,7 @@ function ComplaintsPageContent() {
 
   // Select all complaints on current page
   const handleSelectAll = () => {
-    const allIds = new Set(filteredComplaints.map((c) => c.id));
+    const allIds = new Set(baseComplaints.map((c) => c.id));
     setSelectedIds(allIds);
   };
 
@@ -728,6 +731,8 @@ function ComplaintsPageContent() {
           isExporting={isExporting}
           selectionMode={selectionMode}
           onToggleSelectionMode={handleToggleSelectionMode}
+          onRefresh={handleRefresh}
+          isRefreshing={complaintsLoading}
         />
 
         {/* Search Bar */}
@@ -807,7 +812,7 @@ function ComplaintsPageContent() {
         <Suspense fallback={null}>
           <BulkActionBar
             selectedCount={selectedIds.size}
-            totalCount={filteredComplaints.length}
+            totalCount={baseComplaints.length}
             isExporting={isExporting}
             exportProgress={exportProgress}
             exportMessage={exportMessage}
@@ -870,9 +875,13 @@ function ComplaintsPageContent() {
 // Wrap with Suspense to handle useSearchParams
 export default function ComplaintsPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-    </div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
+      }
+    >
       <ComplaintsPageContent />
     </Suspense>
   );

@@ -56,6 +56,14 @@ async function updateUserRoleImpl(
     throw new Error(error.message || 'Failed to update user role');
   }
 
+  // Invalidate role cache when user role changes
+  // This ensures middleware uses fresh role on next request
+  if (typeof window === 'undefined') {
+    // Only run on server-side
+    const { invalidateRoleCache } = await import('@/lib/role-cache');
+    invalidateRoleCache(userId);
+  }
+
   return data;
 }
 

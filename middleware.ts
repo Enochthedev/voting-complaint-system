@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { validateCsrfRequest } from '@/lib/csrf';
 import { updateSession } from '@/lib/supabase/middleware';
+import { getRoleFromCache, setRoleInCache } from '@/lib/role-cache';
 
 /**
  * Next.js Middleware for Route Protection and Role-Based Access Control
@@ -136,20 +137,43 @@ export async function middleware(request: NextRequest) {
     const requiredRoles = getRequiredRoles(pathname);
 
     if (requiredRoles) {
-      // Get user role from the public.users table via RPC or direct query
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+      let userRole: string | null = null;
 
-      if (userError || !userData) {
-        console.error('Error fetching user role:', userError);
-        // Redirect to login if we can't verify role
-        return NextResponse.redirect(new URL('/login?error=role_verification_failed', request.url));
+      // PERFORMANCE OPTIMIZATION: Multi-layer role fetching strategy
+      // 1. Try in-memory cache first (fastest - no I/O)
+      userRole = getRoleFromCache(user.id);
+
+      if (!userRole) {
+        // 2. Try to get role from JWT metadata (fast - already in memory)
+        if (user.app_metadata?.role) {
+          userRole = user.app_metadata.role;
+        } else if (user.user_metadata?.role) {
+          userRole = user.user_metadata.role;
+        }
+
+        // 3. Fall back to database query (slowest - requires I/O)
+        // This only happens on first request or after cache expiry (5 min)
+        if (!userRole) {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          if (userError || !userData) {
+            console.error('Error fetching user role:', userError);
+            // Redirect to login if we can't verify role
+            return NextResponse.redirect(new URL('/login?error=role_verification_failed', request.url));
+          }
+
+          userRole = userData.role;
+        }
+
+        // Cache the role for future requests (5 minute TTL)
+        if (userRole) {
+          setRoleInCache(user.id, userRole);
+        }
       }
-
-      const userRole = userData.role;
 
       // Check if user has required role
       if (!hasAccess(userRole, requiredRoles)) {

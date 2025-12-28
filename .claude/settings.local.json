@@ -5,7 +5,8 @@
       "Bash(grep:*)",
       "Bash(cat:*)",
       "Bash(tee:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

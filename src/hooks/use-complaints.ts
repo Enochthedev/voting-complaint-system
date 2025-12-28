@@ -18,6 +18,9 @@ import {
   bulkChangeStatus,
   bulkAddTags,
 } from '@/lib/api/complaints';
+import { useToast } from '@/components/ui/toast';
+import { ValidationError } from '@/lib/validation';
+import { TimeoutError } from '@/lib/timeout';
 
 /**
  * Query Keys for Complaints
@@ -25,7 +28,7 @@ import {
  */
 export const complaintKeys = {
   all: ['complaints'] as const,
-  lists: () => [...complaintKeys.all, 'list'] as const,
+  lists: (filters?: any) => [...complaintKeys.all, 'list', filters] as const,
   list: (filters: string) => [...complaintKeys.lists(), { filters }] as const,
   details: () => [...complaintKeys.all, 'detail'] as const,
   detail: (id: string) => [...complaintKeys.details(), id] as const,
@@ -71,12 +74,22 @@ export function useUserComplaintStats(userId: string) {
 }
 
 /**
- * Hook to fetch all complaints (for lecturers/admins)
+ * Hook to fetch all complaints (for lecturers/admins) with optional filtering
  */
-export function useAllComplaints() {
+export function useAllComplaints(filters?: {
+  status?: string[];
+  category?: string[];
+  priority?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  tags?: string[];
+  assignedTo?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}) {
   return useQuery({
-    queryKey: complaintKeys.lists(),
-    queryFn: getAllComplaints,
+    queryKey: complaintKeys.lists(filters),
+    queryFn: () => getAllComplaints(filters),
   });
 }
 
@@ -118,9 +131,57 @@ export function useUserAverageRating(userId: string) {
  */
 export function useCreateComplaint() {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   return useMutation({
     mutationFn: createComplaint,
+    onMutate: async (newComplaint: any) => {
+      // Cancel outgoing refetches
+      const queryKey = newComplaint.is_draft
+        ? complaintKeys.userDrafts(newComplaint.student_id)
+        : complaintKeys.user(newComplaint.student_id);
+
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData(queryKey);
+
+      // Optimistically update
+      queryClient.setQueryData(queryKey, (old: any) => {
+        if (!Array.isArray(old)) return old;
+
+        const optimisticComplaint = {
+          ...newComplaint,
+          id: `temp-${Date.now()}`,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        return [optimisticComplaint, ...old];
+      });
+
+      return { previousData, queryKey };
+    },
+    onError: (err: any, variables: any, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+      }
+
+      // Show error toast with appropriate message
+      let errorMessage = 'Failed to create complaint. Please try again.';
+
+      if (err instanceof ValidationError) {
+        errorMessage = err.getUserMessage();
+      } else if (err instanceof TimeoutError) {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage, 'Error Creating Complaint');
+      console.error('Create complaint error:', err);
+    },
     onSuccess: (data, variables: any) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: complaintKeys.all });
@@ -142,18 +203,73 @@ export function useCreateComplaint() {
  */
 export function useUpdateComplaint() {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: any }) => updateComplaint(id, updates),
+    onMutate: async ({ id, updates }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: complaintKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: complaintKeys.all });
+
+      // Snapshot previous values
+      const previousDetail = queryClient.getQueryData(complaintKeys.detail(id));
+      const previousLists = queryClient.getQueryData(complaintKeys.lists());
+
+      // Optimistically update detail view
+      queryClient.setQueryData(complaintKeys.detail(id), (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          ...updates,
+          updated_at: new Date().toISOString(),
+        };
+      });
+
+      // Optimistically update list views
+      queryClient.setQueriesData({ queryKey: complaintKeys.all }, (old: any) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((complaint: any) =>
+          complaint.id === id
+            ? { ...complaint, ...updates, updated_at: new Date().toISOString() }
+            : complaint
+        );
+      });
+
+      return { previousDetail, previousLists, id };
+    },
+    onError: (err: any, variables, context) => {
+      // Rollback on error
+      if (context?.previousDetail) {
+        queryClient.setQueryData(complaintKeys.detail(context.id), context.previousDetail);
+      }
+      if (context?.previousLists) {
+        queryClient.setQueryData(complaintKeys.lists(), context.previousLists);
+      }
+
+      // Show error toast
+      let errorMessage = 'Failed to update complaint. Please try again.';
+
+      if (err instanceof ValidationError) {
+        errorMessage = err.getUserMessage();
+      } else if (err instanceof TimeoutError) {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage, 'Error Updating Complaint');
+      console.error('Update complaint error:', err);
+    },
     onSuccess: (data) => {
       // Invalidate the specific complaint
       queryClient.invalidateQueries({ queryKey: complaintKeys.detail(data.id) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: complaintKeys.lists() });
       queryClient.invalidateQueries({ queryKey: complaintKeys.user(data.student_id) });
       queryClient.invalidateQueries({ queryKey: complaintKeys.userStats(data.student_id) });
-      
+
       // If it was a draft that got submitted, invalidate drafts
       if (data.is_draft === false) {
         queryClient.invalidateQueries({ queryKey: complaintKeys.userDrafts(data.student_id) });
@@ -167,9 +283,47 @@ export function useUpdateComplaint() {
  */
 export function useDeleteComplaint() {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   return useMutation({
     mutationFn: deleteComplaint,
+    onMutate: async (id: string) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: complaintKeys.all });
+
+      // Snapshot previous values
+      const previousLists = queryClient.getQueryData(complaintKeys.lists());
+      const previousDetail = queryClient.getQueryData(complaintKeys.detail(id));
+
+      // Optimistically remove from all lists
+      queryClient.setQueriesData({ queryKey: complaintKeys.all }, (old: any) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((complaint: any) => complaint.id !== id);
+      });
+
+      return { previousLists, previousDetail, id };
+    },
+    onError: (err: any, id, context) => {
+      // Rollback on error
+      if (context?.previousLists) {
+        queryClient.setQueryData(complaintKeys.lists(), context.previousLists);
+      }
+      if (context?.previousDetail) {
+        queryClient.setQueryData(complaintKeys.detail(id), context.previousDetail);
+      }
+
+      // Show error toast
+      let errorMessage = 'Failed to delete complaint. Please try again.';
+
+      if (err instanceof TimeoutError) {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage, 'Error Deleting Complaint');
+      console.error('Delete complaint error:', err);
+    },
     onSuccess: (_, id) => {
       // Invalidate all complaint queries
       queryClient.invalidateQueries({ queryKey: complaintKeys.all });
@@ -184,12 +338,19 @@ export function useReopenComplaint() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, justification, userId }: { id: string; justification: string; userId: string }) =>
-      reopenComplaint(id, justification, userId),
+    mutationFn: ({
+      id,
+      justification,
+      userId,
+    }: {
+      id: string;
+      justification: string;
+      userId: string;
+    }) => reopenComplaint(id, justification, userId),
     onSuccess: (data) => {
       // Invalidate the specific complaint
       queryClient.invalidateQueries({ queryKey: complaintKeys.detail(data.id) });
-      
+
       // Invalidate lists and stats
       queryClient.invalidateQueries({ queryKey: complaintKeys.lists() });
       queryClient.invalidateQueries({ queryKey: complaintKeys.user(data.student_id) });
@@ -219,12 +380,12 @@ export function useSubmitRating() {
     onSuccess: (data, variables) => {
       // Invalidate the complaint detail
       queryClient.invalidateQueries({ queryKey: complaintKeys.detail(variables.complaintId) });
-      
+
       // Invalidate rating status
       queryClient.invalidateQueries({
         queryKey: complaintKeys.hasRated(variables.complaintId, variables.studentId),
       });
-      
+
       // Invalidate user's average rating
       queryClient.invalidateQueries({ queryKey: complaintKeys.userRating(variables.studentId) });
     },

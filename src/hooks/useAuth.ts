@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
@@ -16,71 +17,28 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    loadUser();
+  // Track latest loadUser request to prevent race conditions
+  const loadUserRequestId = useRef(0);
 
-    // Subscribe to auth changes
-    // Using singleton supabase client
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
-      if (event === 'SIGNED_IN' && session) {
-        await loadUser();
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        router.push('/login');
-      } else if (event === 'TOKEN_REFRESHED') {
-        await loadUser();
-      } else if (event === 'USER_UPDATED') {
-        await loadUser();
-      }
-    });
+  // Define loadUser before useEffect so it can be called
+  const loadUser = useCallback(async () => {
+    // FIX: Prevent race conditions by tracking request IDs
+    // Increment request ID and capture it for this specific request
+    const currentRequestId = ++loadUserRequestId.current;
 
-    // Set up automatic session refresh check every 5 minutes
-    const refreshInterval = setInterval(
-      async () => {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (session) {
-          // Check if session is about to expire (within 10 minutes)
-          const expiresAt = session.expires_at ? session.expires_at * 1000 : 0;
-          const now = Date.now();
-          const timeUntilExpiry = expiresAt - now;
-
-          // If session expires in less than 10 minutes, refresh it
-          if (timeUntilExpiry < 10 * 60 * 1000) {
-            const { error } = await supabase.auth.refreshSession();
-            if (error) {
-              console.error('Failed to refresh session:', error);
-              // Session expired, redirect to login
-              setUser(null);
-              router.push('/login');
-            }
-          }
-        } else {
-          // No session, redirect to login
-          setUser(null);
-          router.push('/login');
-        }
-      },
-      5 * 60 * 1000
-    ); // Check every 5 minutes
-
-    return () => {
-      subscription.unsubscribe();
-      clearInterval(refreshInterval);
-    };
-  }, [router]);
-
-  const loadUser = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
       const authUser = await getCurrentUser();
+
+      // Only update state if this is still the latest request
+      if (currentRequestId !== loadUserRequestId.current) {
+        console.log('Ignoring stale loadUser request');
+        return;
+      }
 
       if (!authUser) {
         setUser(null);
@@ -94,6 +52,12 @@ export function useAuth() {
         data: { session },
       } = await supabase.auth.getSession();
 
+      // Check again if this is still the latest request
+      if (currentRequestId !== loadUserRequestId.current) {
+        console.log('Ignoring stale loadUser request after auth check');
+        return;
+      }
+
       // Fetch user details from database to get role
       const {
         data: userData,
@@ -105,14 +69,18 @@ export function useAuth() {
         .eq('id', authUser.id)
         .maybeSingle(); // Use maybeSingle instead of single to avoid errors if not found
 
+      // Final check if this is still the latest request
+      if (currentRequestId !== loadUserRequestId.current) {
+        console.log('Ignoring stale loadUser request after DB fetch');
+        return;
+      }
+
       if (dbError) {
         console.error('❌ Error fetching user data:', dbError);
 
-        // Don't clear user if we already have one - just log the error
-        if (!user) {
-          setError('Failed to load user data');
-          setUser(null);
-        }
+        // Clear user state on database error to prevent stale data
+        setError('Failed to load user data');
+        setUser(null);
         setIsLoading(false);
         return;
       }
@@ -120,11 +88,9 @@ export function useAuth() {
       if (!userData) {
         console.error('❌ User not found in database:', authUser.id);
 
-        // Don't clear user if we already have one
-        if (!user) {
-          setError('User profile not found');
-          setUser(null);
-        }
+        // Clear user state if not found in database
+        setError('User profile not found');
+        setUser(null);
         setIsLoading(false);
         return;
       }
@@ -133,15 +99,73 @@ export function useAuth() {
     } catch (err) {
       console.error('Error loading user:', err);
 
-      // Don't clear user if we already have one - prevents blank page
-      if (!user) {
+      // Only update state if this is still the latest request
+      if (currentRequestId === loadUserRequestId.current) {
+        // Clear user state on error to prevent displaying stale data
         setError('Failed to load user');
         setUser(null);
       }
     } finally {
-      setIsLoading(false);
+      // Only update loading state if this is still the latest request
+      if (currentRequestId === loadUserRequestId.current) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, []); // Empty dependencies - function is stable
+
+  useEffect(() => {
+    loadUser();
+
+    // Subscribe to auth changes
+    // Using singleton supabase client
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+      if (event === 'SIGNED_IN' && session) {
+        await loadUser();
+        // Invalidate all queries when user signs in to fetch fresh data
+        queryClient.invalidateQueries();
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        // Clear all cached queries when user signs out
+        queryClient.clear();
+        router.push('/login');
+      } else if (event === 'TOKEN_REFRESHED') {
+        // FIX: Check current session instead of relying on stale closure
+        // Only reload user if we don't have an active session with user data
+        const {
+          data: { session: currentSession },
+        } = await supabase.auth.getSession();
+
+        if (currentSession && currentSession.user) {
+          // Check if we have user data loaded
+          // This prevents unnecessary reloads when user is already loaded
+          const hasUserData = user !== null;
+          if (!hasUserData) {
+            await loadUser();
+          }
+        }
+      } else if (event === 'USER_UPDATED') {
+        await loadUser();
+        // Invalidate queries when user data is updated
+        queryClient.invalidateQueries();
+      }
+    });
+
+    // Note: Removed the 5-minute refresh interval
+    // Session refresh is already handled by:
+    // 1. Supabase client auto-refresh
+    // 2. Middleware on every request
+    // 3. onAuthStateChange TOKEN_REFRESHED event
+    // Having multiple refresh mechanisms can cause conflicts and unnecessary requests
+
+    return () => {
+      subscription.unsubscribe();
+    };
+    // FIX: Added queryClient and loadUser to dependencies
+    // loadUser is wrapped in useCallback with no dependencies, so it's stable
+    // 'user' is intentionally not a dependency to avoid infinite loops in auth state change handler
+  }, [router, queryClient, loadUser]);
 
   const signOut = async () => {
     try {
@@ -152,6 +176,8 @@ export function useAuth() {
         throw error;
       }
       setUser(null);
+      // Clear all cached queries on sign out
+      queryClient.clear();
     } catch (err) {
       console.error('Sign out failed:', err);
       throw err;

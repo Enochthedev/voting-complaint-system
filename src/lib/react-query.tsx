@@ -6,27 +6,31 @@ import { useState, type ReactNode } from 'react';
 
 /**
  * React Query configuration for the Student Complaint System
- * 
+ *
  * Default settings:
- * - staleTime: 5 minutes - Data is considered fresh for 5 minutes
- * - cacheTime: 10 minutes - Unused data is garbage collected after 10 minutes
+ * - staleTime: 1 minute - Data is considered fresh for 1 minute
+ * - gcTime: 10 minutes - Unused data is garbage collected after 10 minutes
  * - refetchOnWindowFocus: true - Refetch when user returns to the tab
- * - retry: 1 - Retry failed requests once
+ * - refetchOnMount: true - Always refetch on component mount for fresh data
+ * - refetchOnReconnect: true - Refetch when network reconnects
+ * - retry: 2 - Retry failed requests twice
  */
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // Data is considered fresh for 5 minutes
-        staleTime: 5 * 60 * 1000,
+        // Data is considered fresh for 1 minute (reduced from 5 for more current data)
+        staleTime: 1 * 60 * 1000,
         // Unused data is garbage collected after 10 minutes
         gcTime: 10 * 60 * 1000,
         // Refetch when user returns to the tab
         refetchOnWindowFocus: true,
-        // Retry failed requests once
-        retry: 1,
-        // Don't refetch on mount if data is fresh
-        refetchOnMount: false,
+        // Retry failed requests twice (improved from once)
+        retry: 2,
+        // Always refetch on mount to ensure fresh data after page refresh
+        refetchOnMount: true,
+        // Refetch when network reconnects
+        refetchOnReconnect: true,
       },
       mutations: {
         // Retry failed mutations once

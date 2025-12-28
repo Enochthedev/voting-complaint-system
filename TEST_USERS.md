@@ -6,24 +6,24 @@ This document contains the login credentials for test users in the Student Compl
 
 ### Admin User
 
-- **Email**: admin@university.edu
-- **Password**: Admin123!
+- **Email**: admin@test.com
+- **Password**: TestPass123!
 - **Role**: Admin
-- **Full Name**: System Administrator
+- **Full Name**: Test Admin
 
 ### Lecturer User
 
-- **Email**: lecturer@university.edu
-- **Password**: Lecturer123!
+- **Email**: lecturer@test.com
+- **Password**: TestPass123!
 - **Role**: Lecturer
-- **Full Name**: Dr. Jane Smith
+- **Full Name**: Test Lecturer
 
 ### Student User
 
-- **Email**: student@university.edu
-- **Password**: Student123!
+- **Email**: student@test.com
+- **Password**: TestPass123!
 - **Role**: Student
-- **Full Name**: John Doe
+- **Full Name**: Test Student
 
 ## Usage Instructions
 
