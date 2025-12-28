@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,14 +41,16 @@ export default function AdminVotesPage() {
   const [expandedVoteId, setExpandedVoteId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (!authLoading && !user && !authError) {
-      router.push('/login');
-      return;
-    }
-    // Only allow lecturers and admins
-    if (user && user.role === 'student') {
-      router.push('/dashboard');
-      return;
+    if (!authLoading) {
+      if (!user && !authError) {
+        router.push('/login');
+        return;
+      }
+      // Only allow lecturers and admins
+      if (user && user.role === 'student') {
+        router.push('/dashboard');
+        return;
+      }
     }
     if (user) {
       loadVotes();

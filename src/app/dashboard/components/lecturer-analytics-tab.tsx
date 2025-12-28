@@ -515,7 +515,7 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Based on {Math.round(keyMetrics.totalComplaints * 0.65)} ratings
+                  Based on available feedback
                 </p>
               </div>
               <div className="text-right">
@@ -530,32 +530,9 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
             {/* Rating Distribution */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold">Rating Distribution</h4>
-              {[
-                { stars: 5, count: 98, percentage: 61 },
-                { stars: 4, count: 42, percentage: 26 },
-                { stars: 3, count: 15, percentage: 9 },
-                { stars: 2, count: 4, percentage: 3 },
-                { stars: 1, count: 2, percentage: 1 },
-              ].map((rating) => (
-                <div key={rating.stars} className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 w-20">
-                    <span className="text-sm font-medium">{rating.stars}</span>
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="h-2 w-full rounded-full bg-secondary">
-                      <div
-                        className="h-full rounded-full bg-yellow-400 transition-all"
-                        style={{ width: `${rating.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 w-24 justify-end">
-                    <span className="text-sm font-medium">{rating.count}</span>
-                    <span className="text-xs text-muted-foreground">({rating.percentage}%)</span>
-                  </div>
-                </div>
-              ))}
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                <p>Detailed rating distribution will be available once student feedback is collected.</p>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -629,7 +606,7 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
                 <Clock className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">18.5h</div>
+                <div className="text-2xl font-bold">{keyMetrics.avgResponseTime}</div>
                 <p className="text-xs text-muted-foreground">From submission to resolution</p>
               </div>
             </div>
@@ -646,7 +623,12 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
                 <AlertCircle className="h-6 w-6 text-orange-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">8</div>
+                <div className="text-2xl font-bold">
+                  {
+                    complaintsByStatus.find((s) => s.status.toLowerCase() === 'escalated')?.count ||
+                    0
+                  }
+                </div>
                 <p className="text-xs text-muted-foreground">Requiring immediate attention</p>
               </div>
             </div>

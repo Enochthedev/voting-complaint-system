@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import * as React from 'react';
 import { lazy, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -10,7 +12,7 @@ import {
   type FilterState,
   type FilterPreset,
 } from '@/components/complaints';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { Complaint, ComplaintTag, ComplaintStatus, User } from '@/types/database.types';
 import { useAuth } from '@/hooks/useAuth';
 import { useComplaintSearch } from '@/hooks/use-complaint-search';
@@ -38,8 +40,9 @@ const BulkTagAdditionModal = lazy(() =>
   import('@/components/complaints').then((mod) => ({ default: mod.BulkTagAdditionModal }))
 );
 
-export default function ComplaintsPage() {
+function ComplaintsPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(false);
   const [useSearch, setUseSearch] = React.useState(false);
@@ -105,6 +108,22 @@ export default function ComplaintsPage() {
     sortBy: 'created_at',
     sortOrder: 'desc',
   });
+
+  // Read URL parameters and set filters on mount
+  React.useEffect(() => {
+    const assignedTo = searchParams.get('assignedTo');
+    const priority = searchParams.get('priority');
+    const status = searchParams.get('status');
+
+    if (assignedTo || priority || status) {
+      setFilters((prev) => ({
+        ...prev,
+        assignedTo: assignedTo || prev.assignedTo,
+        priority: priority ? (priority.split(',') as any) : prev.priority,
+        status: status ? (status.split(',') as ComplaintStatus[]) : prev.status,
+      }));
+    }
+  }, [searchParams]);
 
   // Initialize search hook
   const {
@@ -491,7 +510,6 @@ export default function ComplaintsPage() {
         setBulkActionMessage(
           `Successfully changed status of ${results.success} complaint${results.success === 1 ? '' : 's'}!`
         );
-        console.log(`Successfully changed status of ${results.success} complaint(s)`);
         // In real app, show success toast notification
       }
 
@@ -571,7 +589,6 @@ export default function ComplaintsPage() {
         setBulkActionMessage(
           `Successfully assigned ${results.success} complaint${results.success === 1 ? '' : 's'}!`
         );
-        console.log(`Successfully assigned ${results.success} complaint(s)`);
         // In real app, show success toast notification
       }
 
@@ -649,7 +666,6 @@ export default function ComplaintsPage() {
         setBulkActionMessage(
           `Successfully added tags to ${results.success} complaint${results.success === 1 ? '' : 's'}!`
         );
-        console.log(`Successfully added tags to ${results.success} complaint(s)`);
         // In real app, show success toast notification
       }
 
@@ -848,5 +864,16 @@ export default function ComplaintsPage() {
         </Suspense>
       </div>
     </AppLayout>
+  );
+}
+
+// Wrap with Suspense to handle useSearchParams
+export default function ComplaintsPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+    </div>}>
+      <ComplaintsPageContent />
+    </Suspense>
   );
 }

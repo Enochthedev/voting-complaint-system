@@ -1,7 +1,10 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import * as React from 'react';
 import { lazy, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +29,7 @@ import {
   useToggleTemplateActive,
 } from '@/hooks/use-templates';
 import { useAuth } from '@/hooks/useAuth';
+import { AppLayout } from '@/components/layout/app-layout';
 
 // Lazy load the template form component for better performance
 const TemplateForm = lazy(() =>
@@ -54,7 +58,8 @@ const PRIORITIES: { value: ComplaintPriority; label: string; color: string }[] =
 ];
 
 export default function TemplateManagementPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isLoading: authLoading, error: authError } = useAuth();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filterCategory, setFilterCategory] = React.useState<ComplaintCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = React.useState<'all' | 'active' | 'inactive'>('all');
@@ -63,6 +68,21 @@ export default function TemplateManagementPage() {
   const [deletingTemplate, setDeletingTemplate] = React.useState<ComplaintTemplate | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  // Auth protection
+  React.useEffect(() => {
+    if (!authLoading) {
+      if (!user && !authError) {
+        router.push('/login');
+        return;
+      }
+      // Only allow lecturers and admins
+      if (user && user.role === 'student') {
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [user, authLoading, authError, router]);
 
   // Fetch templates using React Query
   const { data: templates = [], isLoading, error } = useTemplates();
@@ -178,8 +198,24 @@ export default function TemplateManagementPage() {
     );
   };
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Don't render if not authorized
+  if (!user || user.role === 'student') {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <AppLayout>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -438,6 +474,6 @@ export default function TemplateManagementPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   );
 }

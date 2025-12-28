@@ -61,8 +61,6 @@ export default function DraftsPage() {
   }
 
   const handleContinue = (draftId: string) => {
-    // TODO: Navigate to edit page with draft data in Phase 12
-    console.log('Continue editing draft:', draftId);
     router.push(`/complaints/new?draft=${draftId}`);
   };
 
@@ -72,7 +70,6 @@ export default function DraftsPage() {
         // Import the delete function
         const { deleteComplaint } = await import('@/lib/api/complaints');
         await deleteComplaint(draftId);
-        console.log('Deleted draft:', draftId);
         // The useUserDrafts hook will automatically refetch and update the UI
       } catch (error) {
         console.error('Failed to delete draft:', error);

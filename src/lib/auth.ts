@@ -33,8 +33,6 @@ export async function signUp(
   fullName: string
 ): Promise<AuthResponse> {
   try {
-    console.log('Attempting sign up for:', email);
-
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -58,7 +56,6 @@ export async function signUp(
       return { user: null, error };
     }
 
-    console.log('Sign up successful, check email for verification');
     return { user: data.user, error: null };
   } catch (error) {
     console.error('Unexpected sign up error:', error);
@@ -78,8 +75,6 @@ export async function signUp(
  */
 export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
-    console.log('Attempting sign in for:', email);
-
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -101,7 +96,6 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
       return { user: null, error: noSessionError };
     }
 
-    console.log('Sign in successful for user:', data.user?.id);
     return { user: data.user, error: null };
   } catch (error) {
     console.error('Unexpected sign in error:', error);
@@ -126,7 +120,6 @@ export async function signOut(): Promise<AuthError | null> {
       return error;
     }
 
-    console.log('Sign out successful');
     return null;
   } catch (error) {
     console.error('Unexpected sign out error:', error);
@@ -141,7 +134,6 @@ export async function signOut(): Promise<AuthError | null> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    console.log('🔍 Getting current user...');
     const {
       data: { user },
       error,
@@ -152,7 +144,6 @@ export async function getCurrentUser(): Promise<User | null> {
       return null;
     }
 
-    console.log('👤 Current user:', user ? `${user.id} (${user.email})` : 'null');
     return user;
   } catch (error) {
     console.error('❌ Unexpected error fetching user:', error);
@@ -282,7 +273,6 @@ export async function resetPassword(email: string): Promise<AuthError | null> {
       return error;
     }
 
-    console.log('Password reset email sent');
     return null;
   } catch (error) {
     console.error('Unexpected password reset error:', error);
@@ -307,7 +297,6 @@ export async function updatePassword(newPassword: string): Promise<AuthError | n
       return error;
     }
 
-    console.log('Password updated successfully');
     return null;
   } catch (error) {
     console.error('Unexpected password update error:', error);
@@ -321,7 +310,7 @@ export async function updatePassword(newPassword: string): Promise<AuthError | n
  * @param metadata - Metadata to update
  * @returns Error if update fails, null otherwise
  */
-export async function updateUserMetadata(metadata: Record<string, any>): Promise<AuthError | null> {
+export async function updateUserMetadata(metadata: Record<string, unknown>): Promise<AuthError | null> {
   try {
     const { error } = await supabase.auth.updateUser({
       data: metadata,
@@ -332,7 +321,6 @@ export async function updateUserMetadata(metadata: Record<string, any>): Promise
       return error;
     }
 
-    console.log('User metadata updated successfully');
     return null;
   } catch (error) {
     console.error('Unexpected metadata update error:', error);

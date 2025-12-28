@@ -7,14 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Megaphone, Calendar, Plus, Edit, Trash2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { AnnouncementForm, type Announcement } from '@/components/announcements';
-import {
-  createAnnouncement,
-  getAnnouncements,
-  updateAnnouncement,
-  deleteAnnouncement,
-} from '@/lib/api/announcements';
 
 import { useAuth } from '@/hooks/useAuth';
+
+// Prevent server-side rendering issues
+export const dynamic = 'force-dynamic';
 
 export default function AdminAnnouncementsPage() {
   const { user } = useAuth();
@@ -35,6 +32,7 @@ export default function AdminAnnouncementsPage() {
   const loadAnnouncements = async () => {
     try {
       setError(null);
+      const { getAnnouncements } = await import('@/lib/api/announcements');
       const data = await getAnnouncements();
       setAnnouncements(data);
     } catch (err) {
@@ -49,6 +47,7 @@ export default function AdminAnnouncementsPage() {
     try {
       setError(null);
       setIsLoading(true);
+      const { createAnnouncement } = await import('@/lib/api/announcements');
 
       if (!user?.id) {
         setError('You must be logged in to create announcements.');
@@ -79,6 +78,7 @@ export default function AdminAnnouncementsPage() {
     try {
       setError(null);
       setIsLoading(true);
+      const { updateAnnouncement } = await import('@/lib/api/announcements');
 
       const updatedAnnouncement = await updateAnnouncement(editingAnnouncement!.id, {
         title: announcementData.title!,
@@ -112,6 +112,7 @@ export default function AdminAnnouncementsPage() {
     try {
       setDeletingAnnouncementId(announcementId);
       setError(null);
+      const { deleteAnnouncement } = await import('@/lib/api/announcements');
 
       await deleteAnnouncement(announcementId);
 

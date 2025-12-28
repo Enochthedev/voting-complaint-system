@@ -121,10 +121,10 @@ export function useCreateComplaint() {
 
   return useMutation({
     mutationFn: createComplaint,
-    onSuccess: (data, variables) => {
+    onSuccess: (data, variables: any) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: complaintKeys.all });
-      
+
       // If it's a draft, invalidate drafts
       if (variables.is_draft) {
         queryClient.invalidateQueries({ queryKey: complaintKeys.userDrafts(variables.student_id) });

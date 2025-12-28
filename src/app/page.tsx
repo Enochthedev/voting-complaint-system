@@ -13,7 +13,6 @@ export default function Home() {
     // Add a timeout to prevent infinite loading
     const timeout = setTimeout(() => {
       if (!hasRedirected && !isLoading) {
-        console.log('Redirect timeout - forcing redirect to login');
         router.push('/login');
         setHasRedirected(true);
       }
@@ -22,12 +21,10 @@ export default function Home() {
     if (!isLoading && !hasRedirected) {
       // If user is logged in, redirect to dashboard
       if (user) {
-        console.log('User found, redirecting to dashboard');
         router.push('/dashboard');
         setHasRedirected(true);
       } else {
         // If not logged in, redirect to login
-        console.log('No user, redirecting to login');
         router.push('/login');
         setHasRedirected(true);
       }

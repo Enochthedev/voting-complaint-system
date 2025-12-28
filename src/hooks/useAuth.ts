@@ -25,15 +25,12 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
-      console.log('Auth state changed:', event);
-
       if (event === 'SIGNED_IN' && session) {
         await loadUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         router.push('/login');
       } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
         await loadUser();
       } else if (event === 'USER_UPDATED') {
         await loadUser();
@@ -55,7 +52,6 @@ export function useAuth() {
 
           // If session expires in less than 10 minutes, refresh it
           if (timeUntilExpiry < 10 * 60 * 1000) {
-            console.log('Session expiring soon, refreshing...');
             const { error } = await supabase.auth.refreshSession();
             if (error) {
               console.error('Failed to refresh session:', error);
@@ -66,7 +62,6 @@ export function useAuth() {
           }
         } else {
           // No session, redirect to login
-          console.log('No session found, redirecting to login');
           setUser(null);
           router.push('/login');
         }
@@ -85,29 +80,19 @@ export function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      console.log('🔄 Loading user...');
       const authUser = await getCurrentUser();
 
       if (!authUser) {
-        console.log('❌ No auth user found');
         setUser(null);
         setIsLoading(false);
         return;
       }
-
-      console.log('✅ Auth user found:', authUser.id, authUser.email);
 
       // Check current session
       // Using singleton supabase client
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      console.log('🔐 Current session:', session ? 'exists' : 'null');
-      console.log('🔐 Session user:', session?.user?.id);
-      console.log(
-        '🔐 Session expires at:',
-        session?.expires_at ? new Date(session.expires_at * 1000) : 'N/A'
-      );
 
       // Fetch user details from database to get role
       const {
@@ -120,13 +105,8 @@ export function useAuth() {
         .eq('id', authUser.id)
         .maybeSingle(); // Use maybeSingle instead of single to avoid errors if not found
 
-      console.log('📊 Query result - data:', userData, 'error:', dbError, 'count:', count);
-
       if (dbError) {
         console.error('❌ Error fetching user data:', dbError);
-        console.error('❌ Error details:', JSON.stringify(dbError, null, 2));
-        console.error('❌ Error code:', dbError.code);
-        console.error('❌ Error message:', dbError.message);
 
         // Don't clear user if we already have one - just log the error
         if (!user) {
@@ -139,7 +119,6 @@ export function useAuth() {
 
       if (!userData) {
         console.error('❌ User not found in database:', authUser.id);
-        console.error('❌ This might be an RLS policy issue');
 
         // Don't clear user if we already have one
         if (!user) {
@@ -150,7 +129,6 @@ export function useAuth() {
         return;
       }
 
-      console.log('✅ User data loaded:', userData);
       setUser(userData as AuthUser);
     } catch (err) {
       console.error('Error loading user:', err);

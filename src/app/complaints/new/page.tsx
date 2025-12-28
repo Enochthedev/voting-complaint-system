@@ -88,7 +88,7 @@ function NewComplaintPageContent() {
       // Import the API function
       const { createComplaint } = await import('@/lib/api/complaints');
 
-      // Prepare complaint data
+      // Prepare complaint data (without tags - they'll be added separately)
       const complaintData = {
         title: data.title,
         description: data.description,
@@ -98,14 +98,20 @@ function NewComplaintPageContent() {
         is_draft: isDraft,
         student_id: user.id,
         status: isDraft ? 'draft' : 'new',
-        tags: data.tags,
       };
-
-      console.log('Creating complaint:', complaintData);
 
       // Create the complaint
       const result = await createComplaint(complaintData);
-      console.log('✅ Complaint created:', result);
+
+      // Add tags if any were provided
+      if (data.tags && data.tags.length > 0 && result.id) {
+        const { supabase } = await import('@/lib/supabase');
+        const tagInserts = data.tags.map((tag) => ({
+          complaint_id: result.id,
+          tag_name: tag,
+        }));
+        await supabase.from('complaint_tags').insert(tagInserts);
+      }
 
       // Show success message with toast notification
       if (isDraft) {

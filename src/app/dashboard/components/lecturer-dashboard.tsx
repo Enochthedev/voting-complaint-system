@@ -42,9 +42,15 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
     in_progress: 0,
     resolved: 0,
     closed: 0,
+    escalated: 0,
   };
   complaints.forEach((c) => {
-    if (statusCounts[c.status] !== undefined) statusCounts[c.status]++;
+    if (statusCounts[c.status] !== undefined) {
+      statusCounts[c.status]++;
+    } else {
+      // Handle any other statuses
+      statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+    }
   });
 
   // Calculate category distribution
@@ -110,6 +116,12 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
         count: statusCounts.closed,
         percentage: total > 0 ? Math.round((statusCounts.closed / total) * 100) : 0,
         color: 'bg-gray-500',
+      },
+      {
+        status: 'Escalated',
+        count: statusCounts.escalated,
+        percentage: total > 0 ? Math.round((statusCounts.escalated / total) * 100) : 0,
+        color: 'bg-red-500',
       },
     ],
     complaintsByCategory: Object.entries(categoryCounts).map(([category, count]) => ({
@@ -304,7 +316,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
           variant="outline"
           size="sm"
           className="border-teal-300 text-teal-700 hover:bg-teal-50"
-          onClick={() => router.push('/complaints')}
+          onClick={() => router.push(`/complaints?assignedTo=${userId}`)}
         >
           Assigned to Me
           <Badge className="ml-2 bg-teal-500 text-white">{stats.assignedToMe}</Badge>

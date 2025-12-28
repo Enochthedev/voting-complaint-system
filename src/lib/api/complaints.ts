@@ -8,8 +8,6 @@ import type { ComplaintRating } from '@/types/database.types';
  * Optimized: Only select necessary columns for list view
  */
 async function getUserComplaintsImpl(userId: string) {
-  console.log('getUserComplaints called with userId:', userId);
-
   return withTokenRefresh(async () => {
     // Using singleton supabase client
     const { data, error } = await supabase
@@ -33,7 +31,6 @@ async function getUserComplaintsImpl(userId: string) {
       .eq('is_draft', false)
       .order('created_at', { ascending: false });
 
-    console.log('getUserComplaints result:', { data, error });
     if (error) throw error;
     return data;
   });
@@ -46,8 +43,6 @@ export const getUserComplaints = withRateLimit(getUserComplaintsImpl, 'read');
  * Optimized: Only select necessary columns for draft list view
  */
 async function getUserDraftsImpl(userId: string) {
-  console.log('getUserDrafts called with userId:', userId);
-
   // Using singleton supabase client
   const { data, error } = await supabase
     .from('complaints')
@@ -66,7 +61,6 @@ async function getUserDraftsImpl(userId: string) {
     .eq('is_draft', true)
     .order('updated_at', { ascending: false });
 
-  console.log('getUserDrafts result:', { data, error });
   if (error) throw error;
   return data;
 }
@@ -78,7 +72,6 @@ export const getUserDrafts = withRateLimit(getUserDraftsImpl, 'read');
  * Optimized: Use database aggregation instead of client-side filtering
  */
 async function getUserComplaintStatsImpl(userId: string) {
-  console.log('getUserComplaintStats called with userId:', userId);
 
   // Using singleton supabase client
 
@@ -139,7 +132,6 @@ async function getUserComplaintStatsImpl(userId: string) {
     closed: closedResult.count || 0,
   };
 
-  console.log('getUserComplaintStats stats:', stats);
   return stats;
 }
 
@@ -230,14 +222,11 @@ export const getComplaintById = withRateLimit(getComplaintByIdImpl, 'read');
 /**
  * Create a new complaint
  */
-async function createComplaintImpl(complaint: any) {
-  console.log('📝 Creating complaint:', complaint);
-
+async function createComplaintImpl(complaint: unknown) {
   // Check if user is authenticated
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  console.log('🔐 Session check for complaint creation:', session ? 'exists' : 'null');
 
   if (!session) {
     throw new Error('User not authenticated');
@@ -251,7 +240,6 @@ async function createComplaintImpl(complaint: any) {
     throw error;
   }
 
-  console.log('✅ Complaint created successfully:', data);
   return data;
 }
 
