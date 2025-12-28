@@ -14,11 +14,12 @@ export type ComplaintPriority = 'low' | 'medium' | 'high' | 'critical';
 export type ComplaintStatus =
   | 'draft'
   | 'new'
-  | 'opened'
+  | 'open'
   | 'in_progress'
   | 'resolved'
   | 'closed'
-  | 'reopened';
+  | 'reopened'
+  | 'escalated';
 
 export type HistoryAction =
   | 'created'

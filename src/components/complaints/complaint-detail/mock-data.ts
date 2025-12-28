@@ -98,7 +98,7 @@ export function getMockComplaintData(id: string): ComplaintWithRelations {
         complaint_id: id,
         action: 'status_changed',
         old_value: 'new',
-        new_value: 'opened',
+        new_value: 'open',
         performed_by: 'lecturer-456',
         details: null,
         created_at: '2024-11-15T11:00:00Z',
@@ -158,7 +158,7 @@ export function getMockComplaintData(id: string): ComplaintWithRelations {
         id: 'hist-4',
         complaint_id: id,
         action: 'status_changed',
-        old_value: 'opened',
+        old_value: 'open',
         new_value: 'in_progress',
         performed_by: 'lecturer-456',
         details: {

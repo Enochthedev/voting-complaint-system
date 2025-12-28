@@ -16,7 +16,15 @@ export function generateMockComplaints(count: number): (Complaint & {
     'other',
   ] as const;
   const priorities = ['low', 'medium', 'high', 'critical'] as const;
-  const statuses = ['new', 'opened', 'in_progress', 'resolved', 'closed', 'reopened'] as const;
+  const statuses = [
+    'new',
+    'open',
+    'in_progress',
+    'resolved',
+    'closed',
+    'reopened',
+    'escalated',
+  ] as const;
 
   const titles = [
     'Broken Air Conditioning in Lecture Hall',

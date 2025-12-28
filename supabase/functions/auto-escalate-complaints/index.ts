@@ -9,7 +9,7 @@
  * Escalation Logic:
  * 1. Fetch all active escalation rules
  * 2. For each rule, find complaints matching category/priority that:
- *    - Are in 'new' or 'opened' status
+ *    - Are in 'new' or 'open' status
  *    - Have not been escalated yet (escalated_at is null)
  *    - Were created more than hours_threshold ago
  * 3. Escalate matching complaints by:
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
         )
         .eq('category', rule.category)
         .eq('priority', rule.priority)
-        .in('status', ['new', 'opened'])
+        .in('status', ['new', 'open'])
         .lt('created_at', thresholdISO)
         .is('escalated_at', null);
 

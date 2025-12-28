@@ -24,11 +24,12 @@ export type ComplaintPriority = (typeof COMPLAINT_PRIORITIES)[number];
 export const COMPLAINT_STATUSES = [
   'draft',
   'new',
-  'opened',  // Database has 'opened' not 'open'
+  'open',
   'in_progress',
   'resolved',
   'closed',
   'reopened',
+  'escalated',
 ] as const;
 
 export type ComplaintStatus = (typeof COMPLAINT_STATUSES)[number];
@@ -92,7 +93,7 @@ export const PRIORITY_LABELS: Record<ComplaintPriority, string> = {
 export const STATUS_LABELS: Record<ComplaintStatus, string> = {
   draft: 'Draft',
   new: 'New',
-  opened: 'Opened',
+  open: 'Open',
   in_progress: 'In Progress',
   resolved: 'Resolved',
   closed: 'Closed',

@@ -77,11 +77,12 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
   // Calculate status distribution
   const statusCounts: Record<string, number> = {
     new: 0,
-    opened: 0,
+    open: 0,
     in_progress: 0,
     resolved: 0,
     closed: 0,
     reopened: 0,
+    escalated: 0,
   };
 
   allComplaints.forEach((c: any) => {
@@ -98,9 +99,9 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
       color: 'bg-blue-500',
     },
     {
-      status: 'Opened',
-      count: statusCounts.opened,
-      percentage: total > 0 ? Math.round((statusCounts.opened / total) * 100) : 0,
+      status: 'Open',
+      count: statusCounts.open,
+      percentage: total > 0 ? Math.round((statusCounts.open / total) * 100) : 0,
       color: 'bg-yellow-500',
     },
     {
@@ -195,7 +196,7 @@ async function getAnalyticsDataImpl(days: number = 30): Promise<AnalyticsData> {
   // Calculate key metrics
   const resolvedCount = statusCounts.resolved + statusCounts.closed;
   const resolutionRate = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
-  const activeCases = statusCounts.new + statusCounts.opened + statusCounts.in_progress;
+  const activeCases = statusCounts.new + statusCounts.open + statusCounts.in_progress;
 
   // Get satisfaction ratings
   const { data: ratings } = await supabase
