@@ -625,11 +625,11 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
               <div>
                 <div className="text-2xl font-bold">
                   {
-                    complaintsByStatus.find((s) => s.status.toLowerCase() === 'escalated')?.count ||
+                    complaintsByStatus.find((s) => s.status.toLowerCase() === 'reopened')?.count ||
                     0
                   }
                 </div>
-                <p className="text-xs text-muted-foreground">Requiring immediate attention</p>
+                <p className="text-xs text-muted-foreground">Reopened cases</p>
               </div>
             </div>
           </CardContent>

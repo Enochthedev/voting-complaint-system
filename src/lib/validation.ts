@@ -30,16 +30,16 @@ export const ComplaintPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent'
 
 /**
  * Complaint Status Schema
+ * MUST match database enum exactly
  */
 export const ComplaintStatusSchema = z.enum([
   'draft',
   'new',
-  'open',
+  'opened',  // Database has 'opened' not 'open'
   'in_progress',
   'resolved',
   'closed',
   'reopened',
-  'escalated',
 ]);
 
 /**

@@ -71,9 +71,15 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
     notificationsLoading ||
     votesLoading;
 
-  // Log errors for debugging
+  // Log errors for debugging with proper error formatting
   if (statsError) {
-    console.error('Stats error:', statsError);
+    console.error('Stats error:', {
+      message: statsError?.message || 'Unknown error',
+      code: (statsError as any)?.code,
+      details: (statsError as any)?.details,
+      hint: (statsError as any)?.hint,
+      fullError: statsError,
+    });
   }
 
   // Don't show error if we have complaints data - we can calculate stats from that

@@ -42,7 +42,7 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
     in_progress: 0,
     resolved: 0,
     closed: 0,
-    escalated: 0,
+    reopened: 0,
   };
   complaints.forEach((c) => {
     if (statusCounts[c.status] !== undefined) {
@@ -118,10 +118,10 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
         color: 'bg-gray-500',
       },
       {
-        status: 'Escalated',
-        count: statusCounts.escalated,
-        percentage: total > 0 ? Math.round((statusCounts.escalated / total) * 100) : 0,
-        color: 'bg-red-500',
+        status: 'Reopened',
+        count: statusCounts.reopened,
+        percentage: total > 0 ? Math.round((statusCounts.reopened / total) * 100) : 0,
+        color: 'bg-orange-500',
       },
     ],
     complaintsByCategory: Object.entries(categoryCounts).map(([category, count]) => ({
@@ -338,12 +338,12 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         <Button
           variant="outline"
           size="sm"
-          className="border-red-300 text-red-700 hover:bg-red-50"
-          onClick={() => router.push('/complaints?status=escalated')}
+          className="border-orange-300 text-orange-700 hover:bg-orange-50"
+          onClick={() => router.push('/complaints?status=reopened')}
         >
-          Escalated
-          <Badge className="ml-2 bg-red-500 text-white">
-            {allComplaints.filter((c: any) => c.status === 'escalated').length}
+          Reopened
+          <Badge className="ml-2 bg-orange-500 text-white">
+            {allComplaints.filter((c: any) => c.status === 'reopened').length}
           </Badge>
         </Button>
         <Button
