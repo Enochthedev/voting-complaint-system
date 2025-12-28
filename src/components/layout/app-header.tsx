@@ -19,8 +19,8 @@ export function AppHeader({ title, showSearch = true, onMenuClick }: AppHeaderPr
   const { signOut, user } = useAuth();
 
   const handleLogout = async () => {
+    // signOut handles redirect to /login
     await signOut();
-    router.push('/login');
   };
 
   return (

@@ -129,7 +129,13 @@ export function useAuth() {
         setUser(null);
         // Clear all cached queries when user signs out
         queryClient.clear();
-        router.push('/login');
+        // Only redirect if not already on login/register/reset-password pages
+        if (typeof window !== 'undefined') {
+          const pathname = window.location.pathname;
+          if (!pathname.startsWith('/login') && !pathname.startsWith('/register') && !pathname.startsWith('/reset-password')) {
+            router.push('/login');
+          }
+        }
       } else if (event === 'TOKEN_REFRESHED') {
         // FIX: Check current session instead of relying on stale closure
         // Only reload user if we don't have an active session with user data
@@ -169,18 +175,31 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
+      // Clear user state and cache immediately (optimistic)
+      setUser(null);
+      queryClient.clear();
+
       // Using singleton supabase client
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
-        throw error;
+        // Don't throw - still redirect even if server signout fails
+        // The session is already cleared client-side
       }
-      setUser(null);
-      // Clear all cached queries on sign out
-      queryClient.clear();
+
+      // Redirect to login (don't rely on auth state change listener)
+      // The listener also redirects, but this ensures immediate redirect
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     } catch (err) {
       console.error('Sign out failed:', err);
-      throw err;
+      // Don't throw - always clear session and redirect
+      setUser(null);
+      queryClient.clear();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
   };
 

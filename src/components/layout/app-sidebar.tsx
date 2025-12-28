@@ -47,7 +47,7 @@ interface SidebarProps {
 export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   // Get dynamic counts for badges
   const { data: userComplaints = [] } = useUserComplaints(user?.id || '');
@@ -63,16 +63,8 @@ export function AppSidebar({ userRole, userName, userEmail, onClose }: SidebarPr
   ).length;
 
   const handleLogout = async () => {
-    try {
-      // Use real auth logout
-      const { signOut } = await import('@/lib/auth');
-      await signOut();
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Fallback: redirect anyway
-      router.push('/login');
-    }
+    // signOut handles redirect to /login
+    await signOut();
   };
 
   const studentLinks = [
