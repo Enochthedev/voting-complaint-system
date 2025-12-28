@@ -55,15 +55,12 @@ export async function withTokenRefresh<T>(
       throw error;
     }
 
-    // Check if it's an auth error
+    // Check if it's an auth error (401 or specific auth-related error codes)
     const isAuthError =
-      error?.message?.includes('JWT') ||
-      error?.message?.includes('token') ||
-      error?.message?.includes('expired') ||
-      error?.message?.includes('invalid') ||
-      error?.message?.includes('session') ||
+      error?.status === 401 ||
       error?.code === 'PGRST301' || // PostgREST auth error
-      error?.status === 401;
+      (error?.message?.includes('JWT') && !error?.message?.includes('invalid claim')) ||
+      (error?.message?.includes('token') && error?.message?.includes('expired'));
 
     if (isAuthError) {
       console.log('Auth error detected during API call, refreshing session...');

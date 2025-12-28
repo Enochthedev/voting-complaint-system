@@ -10,6 +10,7 @@ import {
   BulkAddTagsSchema,
   RatingSchema,
   ReopenComplaintSchema,
+  DatabaseError,
 } from '@/lib/validation';
 import type { ComplaintRating } from '@/types/database.types';
 
@@ -41,7 +42,7 @@ async function getUserComplaintsImpl(userId: string) {
       .eq('is_draft', false)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message || 'Failed to fetch user complaints', error.code, undefined, error.details, error.hint);
     return data;
   });
 }
@@ -71,7 +72,7 @@ async function getUserDraftsImpl(userId: string) {
     .eq('is_draft', true)
     .order('updated_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) throw new DatabaseError(error.message || 'Failed to fetch user drafts', error.code, undefined, error.details, error.hint);
   return data;
 }
 
@@ -149,19 +150,9 @@ export const getUserComplaintStats = withRateLimit(getUserComplaintStatsImpl, 'r
 /**
  * Fetch all complaints (for lecturers/admins) with optional filtering
  */
-async function getAllComplaintsImpl(filters?: {
-  status?: string[];
-  category?: string[];
-  priority?: string[];
-  dateFrom?: string;
-  dateTo?: string;
-  tags?: string[];
-  assignedTo?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}) {
+async function getAllComplaintsImpl() {
   // Using singleton supabase client
-  let query = supabase
+  const { data, error } = await supabase
     .from('complaints')
     .select(
       `
@@ -171,76 +162,10 @@ async function getAllComplaintsImpl(filters?: {
       complaint_tags(tag_name)
     `
     )
-    .eq('is_draft', false);
+    .eq('is_draft', false)
+    .order('created_at', { ascending: false });
 
-  // Apply filters if provided
-  if (filters) {
-    // Status filter
-    if (filters.status && filters.status.length > 0) {
-      query = query.in('status', filters.status);
-    }
-
-    // Category filter
-    if (filters.category && filters.category.length > 0) {
-      query = query.in('category', filters.category);
-    }
-
-    // Priority filter
-    if (filters.priority && filters.priority.length > 0) {
-      query = query.in('priority', filters.priority);
-    }
-
-    // Date range filter
-    if (filters.dateFrom) {
-      query = query.gte('created_at', filters.dateFrom);
-    }
-    if (filters.dateTo) {
-      // Add time to include the entire day
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999);
-      query = query.lte('created_at', toDate.toISOString());
-    }
-
-    // Assigned to filter
-    if (filters.assignedTo) {
-      query = query.eq('assigned_to', filters.assignedTo);
-    }
-
-    // Sorting
-    const sortBy = filters.sortBy || 'created_at';
-    const sortOrder = filters.sortOrder === 'asc' ? true : false;
-
-    // Handle special sorting cases
-    if (sortBy === 'priority') {
-      // Custom priority ordering in SQL
-      query = query.order('priority', {
-        ascending: sortOrder,
-        // Use CASE statement for custom priority order
-        foreignTable: undefined,
-      });
-    } else if (sortBy === 'status') {
-      query = query.order('status', { ascending: sortOrder });
-    } else {
-      query = query.order(sortBy as any, { ascending: sortOrder });
-    }
-  } else {
-    // Default sorting
-    query = query.order('created_at', { ascending: false });
-  }
-
-  const { data, error } = await query;
-
-  if (error) throw error;
-
-  // Handle tag filtering (requires post-processing since it's a many-to-many relationship)
-  if (filters?.tags && filters.tags.length > 0) {
-    return (
-      data?.filter((complaint) =>
-        complaint.complaint_tags?.some((tag: any) => filters.tags!.includes(tag.tag_name))
-      ) || []
-    );
-  }
-
+  if (error) throw new DatabaseError(error.message || 'Failed to fetch all complaints', error.code, undefined, error.details, error.hint);
   return data;
 }
 
@@ -299,7 +224,7 @@ async function getComplaintByIdImpl(id: string) {
     .eq('id', id)
     .single();
 
-  if (error) throw error;
+  if (error) throw new DatabaseError(error.message || 'Failed to fetch complaint', error.code, undefined, error.details, error.hint);
   return data;
 }
 
@@ -331,7 +256,7 @@ async function createComplaintImpl(complaint: unknown) {
 
     if (error) {
       console.error('❌ Error creating complaint:', error);
-      throw error;
+      throw new DatabaseError(error.message || 'Failed to create complaint', error.code, undefined, error.details, error.hint);
     }
 
     return data;
@@ -348,7 +273,7 @@ async function updateComplaintImpl(id: string, updates: unknown) {
     // Validate input data
     const validatedData = validate(UpdateComplaintSchema, {
       id,
-      ...(typeof updates === 'object' && updates !== null ? updates : {})
+      ...(typeof updates === 'object' && updates !== null ? updates : {}),
     });
 
     // Extract id and get only the update fields
@@ -362,7 +287,7 @@ async function updateComplaintImpl(id: string, updates: unknown) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message || 'Failed to update complaint', error.code, undefined, error.details, error.hint);
     return data;
   });
 }
@@ -377,7 +302,7 @@ async function deleteComplaintImpl(id: string) {
     // Using singleton supabase client
     const { error } = await supabase.from('complaints').delete().eq('id', id).eq('is_draft', true);
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message || 'Failed to delete complaint', error.code, undefined, error.details, error.hint);
   });
 }
 
@@ -597,91 +522,91 @@ async function bulkAssignComplaintsImpl(
       throw new Error('No complaints selected for assignment');
     }
 
-  const results = {
-    success: 0,
-    failed: 0,
-    errors: [] as string[],
-  };
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [] as string[],
+    };
 
-  // Get lecturer details for notifications
-  const { data: lecturer, error: lecturerError } = await supabase
-    .from('users')
-    .select('id, full_name, email')
-    .eq('id', lecturerId)
-    .single();
+    // Get lecturer details for notifications
+    const { data: lecturer, error: lecturerError } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .eq('id', lecturerId)
+      .single();
 
-  if (lecturerError || !lecturer) {
-    throw new Error('Invalid lecturer selected');
-  }
+    if (lecturerError || !lecturer) {
+      throw new Error('Invalid lecturer selected');
+    }
 
-  // Fetch all complaints in one query
-  const { data: complaints, error: fetchError } = await supabase
-    .from('complaints')
-    .select('id, title, assigned_to')
-    .in('id', complaintIds);
+    // Fetch all complaints in one query
+    const { data: complaints, error: fetchError } = await supabase
+      .from('complaints')
+      .select('id, title, assigned_to')
+      .in('id', complaintIds);
 
-  if (fetchError) {
-    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
-  }
+    if (fetchError) {
+      throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
+    }
 
-  if (!complaints || complaints.length === 0) {
-    throw new Error('No valid complaints found');
-  }
+    if (!complaints || complaints.length === 0) {
+      throw new Error('No valid complaints found');
+    }
 
-  const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString();
 
-  // Batch update all complaints
-  const { error: updateError } = await supabase
-    .from('complaints')
-    .update({
-      assigned_to: lecturerId,
-      updated_at: timestamp,
-    })
-    .in('id', complaintIds);
+    // Batch update all complaints
+    const { error: updateError } = await supabase
+      .from('complaints')
+      .update({
+        assigned_to: lecturerId,
+        updated_at: timestamp,
+      })
+      .in('id', complaintIds);
 
-  if (updateError) {
-    throw new Error(`Failed to update complaints: ${updateError.message}`);
-  }
+    if (updateError) {
+      throw new Error(`Failed to update complaints: ${updateError.message}`);
+    }
 
-  // Prepare batch inserts for history and notifications
-  const historyInserts = complaints.map((complaint: any) => ({
-    complaint_id: complaint.id,
-    action: 'assigned',
-    old_value: complaint.assigned_to || 'unassigned',
-    new_value: lecturerId,
-    performed_by: performedBy,
-    details: {
-      lecturer_name: lecturer.full_name,
-      bulk_action: true,
-    },
-  }));
+    // Prepare batch inserts for history and notifications
+    const historyInserts = complaints.map((complaint: any) => ({
+      complaint_id: complaint.id,
+      action: 'assigned',
+      old_value: complaint.assigned_to || 'unassigned',
+      new_value: lecturerId,
+      performed_by: performedBy,
+      details: {
+        lecturer_name: lecturer.full_name,
+        bulk_action: true,
+      },
+    }));
 
-  const notificationInserts = complaints.map((complaint: any) => ({
-    user_id: lecturerId,
-    type: 'complaint_assigned',
-    title: 'New Complaint Assigned',
-    message: `You have been assigned to: "${complaint.title}"`,
-    related_id: complaint.id,
-    is_read: false,
-  }));
+    const notificationInserts = complaints.map((complaint: any) => ({
+      user_id: lecturerId,
+      type: 'complaint_assigned',
+      title: 'New Complaint Assigned',
+      message: `You have been assigned to: "${complaint.title}"`,
+      related_id: complaint.id,
+      is_read: false,
+    }));
 
-  // Batch insert history records
-  const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
+    // Batch insert history records
+    const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
 
-  if (historyError) {
-    console.error('Failed to log history for bulk assignment:', historyError);
-    // Don't fail the operation if history logging fails
-  }
+    if (historyError) {
+      console.error('Failed to log history for bulk assignment:', historyError);
+      // Don't fail the operation if history logging fails
+    }
 
-  // Batch insert notifications
-  const { error: notificationError } = await supabase
-    .from('notifications')
-    .insert(notificationInserts);
+    // Batch insert notifications
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert(notificationInserts);
 
-  if (notificationError) {
-    console.error('Failed to create notifications for bulk assignment:', notificationError);
-    // Don't fail the operation if notification fails
-  }
+    if (notificationError) {
+      console.error('Failed to create notifications for bulk assignment:', notificationError);
+      // Don't fail the operation if notification fails
+    }
 
     results.success = complaints.length;
 
@@ -714,64 +639,64 @@ async function bulkChangeStatusImpl(
       errors: [] as string[],
     };
 
-  // Fetch all complaints in one query
-  const { data: complaints, error: fetchError } = await supabase
-    .from('complaints')
-    .select('id, title, status')
-    .in('id', complaintIds);
+    // Fetch all complaints in one query
+    const { data: complaints, error: fetchError } = await supabase
+      .from('complaints')
+      .select('id, title, status')
+      .in('id', complaintIds);
 
-  if (fetchError) {
-    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
-  }
+    if (fetchError) {
+      throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
+    }
 
-  if (!complaints || complaints.length === 0) {
-    throw new Error('No valid complaints found');
-  }
+    if (!complaints || complaints.length === 0) {
+      throw new Error('No valid complaints found');
+    }
 
-  // Filter out complaints that already have the target status
-  const complaintsToUpdate = complaints.filter((c: any) => c.status !== newStatus);
+    // Filter out complaints that already have the target status
+    const complaintsToUpdate = complaints.filter((c: any) => c.status !== newStatus);
 
-  if (complaintsToUpdate.length === 0) {
-    // All complaints already have the target status
-    results.success = complaints.length;
-    return results;
-  }
+    if (complaintsToUpdate.length === 0) {
+      // All complaints already have the target status
+      results.success = complaints.length;
+      return results;
+    }
 
-  const timestamp = new Date().toISOString();
-  const idsToUpdate = complaintsToUpdate.map((c: any) => c.id);
+    const timestamp = new Date().toISOString();
+    const idsToUpdate = complaintsToUpdate.map((c: any) => c.id);
 
-  // Batch update all complaints
-  const { error: updateError } = await supabase
-    .from('complaints')
-    .update({
-      status: newStatus,
-      updated_at: timestamp,
-    })
-    .in('id', idsToUpdate);
+    // Batch update all complaints
+    const { error: updateError } = await supabase
+      .from('complaints')
+      .update({
+        status: newStatus,
+        updated_at: timestamp,
+      })
+      .in('id', idsToUpdate);
 
-  if (updateError) {
-    throw new Error(`Failed to update complaints: ${updateError.message}`);
-  }
+    if (updateError) {
+      throw new Error(`Failed to update complaints: ${updateError.message}`);
+    }
 
-  // Prepare batch insert for history
-  const historyInserts = complaintsToUpdate.map((complaint: any) => ({
-    complaint_id: complaint.id,
-    action: 'status_changed',
-    old_value: complaint.status,
-    new_value: newStatus,
-    performed_by: performedBy,
-    details: {
-      bulk_action: true,
-    },
-  }));
+    // Prepare batch insert for history
+    const historyInserts = complaintsToUpdate.map((complaint: any) => ({
+      complaint_id: complaint.id,
+      action: 'status_changed',
+      old_value: complaint.status,
+      new_value: newStatus,
+      performed_by: performedBy,
+      details: {
+        bulk_action: true,
+      },
+    }));
 
-  // Batch insert history records
-  const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
+    // Batch insert history records
+    const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
 
-  if (historyError) {
-    console.error('Failed to log history for bulk status change:', historyError);
-    // Don't fail the operation if history logging fails
-  }
+    if (historyError) {
+      console.error('Failed to log history for bulk status change:', historyError);
+      // Don't fail the operation if history logging fails
+    }
 
     results.success = complaints.length;
 
@@ -808,89 +733,91 @@ async function bulkAddTagsImpl(
       errors: [] as string[],
     };
 
-  // Fetch all complaints in one query to verify they exist
-  const { data: complaints, error: fetchError } = await supabase
-    .from('complaints')
-    .select('id, title')
-    .in('id', complaintIds);
+    // Fetch all complaints in one query to verify they exist
+    const { data: complaints, error: fetchError } = await supabase
+      .from('complaints')
+      .select('id, title')
+      .in('id', complaintIds);
 
-  if (fetchError) {
-    throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
-  }
-
-  if (!complaints || complaints.length === 0) {
-    throw new Error('No valid complaints found');
-  }
-
-  // Get all existing tags for these complaints in one query
-  const { data: existingTags, error: existingTagsError } = await supabase
-    .from('complaint_tags')
-    .select('complaint_id, tag_name')
-    .in('complaint_id', complaintIds);
-
-  if (existingTagsError) {
-    throw new Error(`Failed to fetch existing tags: ${existingTagsError.message}`);
-  }
-
-  // Build a map of complaint_id -> Set of existing tag names
-  const existingTagsMap = new Map<string, Set<string>>();
-  (existingTags || []).forEach((tag: any) => {
-    if (!existingTagsMap.has(tag.complaint_id)) {
-      existingTagsMap.set(tag.complaint_id, new Set());
+    if (fetchError) {
+      throw new Error(`Failed to fetch complaints: ${fetchError.message}`);
     }
-    existingTagsMap.get(tag.complaint_id)!.add(tag.tag_name);
-  });
 
-  // Prepare batch inserts for new tags
-  const tagInserts: Array<{ complaint_id: string; tag_name: string }> = [];
-  const historyInserts: Array<unknown> = [];
+    if (!complaints || complaints.length === 0) {
+      throw new Error('No valid complaints found');
+    }
 
-  complaints.forEach((complaint: any) => {
-    const existingTagNames = existingTagsMap.get(complaint.id) || new Set();
-    const newTags = tags.filter((tag: string) => !existingTagNames.has(tag));
+    // Get all existing tags for these complaints in one query
+    const { data: existingTags, error: existingTagsError } = await supabase
+      .from('complaint_tags')
+      .select('complaint_id, tag_name')
+      .in('complaint_id', complaintIds);
 
-    if (newTags.length > 0) {
-      // Add tag inserts
-      newTags.forEach((tag: string) => {
-        tagInserts.push({
-          complaint_id: complaint.id,
-          tag_name: tag,
+    if (existingTagsError) {
+      throw new Error(`Failed to fetch existing tags: ${existingTagsError.message}`);
+    }
+
+    // Build a map of complaint_id -> Set of existing tag names
+    const existingTagsMap = new Map<string, Set<string>>();
+    (existingTags || []).forEach((tag: any) => {
+      if (!existingTagsMap.has(tag.complaint_id)) {
+        existingTagsMap.set(tag.complaint_id, new Set());
+      }
+      existingTagsMap.get(tag.complaint_id)!.add(tag.tag_name);
+    });
+
+    // Prepare batch inserts for new tags
+    const tagInserts: Array<{ complaint_id: string; tag_name: string }> = [];
+    const historyInserts: Array<unknown> = [];
+
+    complaints.forEach((complaint: any) => {
+      const existingTagNames = existingTagsMap.get(complaint.id) || new Set();
+      const newTags = tags.filter((tag: string) => !existingTagNames.has(tag));
+
+      if (newTags.length > 0) {
+        // Add tag inserts
+        newTags.forEach((tag: string) => {
+          tagInserts.push({
+            complaint_id: complaint.id,
+            tag_name: tag,
+          });
         });
-      });
 
-      // Add history insert
-      historyInserts.push({
-        complaint_id: complaint.id,
-        action: 'tags_added',
-        old_value: Array.from(existingTagNames).join(', ') || 'none',
-        new_value: Array.from(existingTagNames).concat(newTags).join(', '),
-        performed_by: performedBy,
-        details: {
-          added_tags: newTags,
-          bulk_action: true,
-        },
-      });
+        // Add history insert
+        historyInserts.push({
+          complaint_id: complaint.id,
+          action: 'tags_added',
+          old_value: Array.from(existingTagNames).join(', ') || 'none',
+          new_value: Array.from(existingTagNames).concat(newTags).join(', '),
+          performed_by: performedBy,
+          details: {
+            added_tags: newTags,
+            bulk_action: true,
+          },
+        });
+      }
+    });
+
+    // Batch insert all new tags
+    if (tagInserts.length > 0) {
+      const { error: insertError } = await supabase.from('complaint_tags').insert(tagInserts);
+
+      if (insertError) {
+        throw new Error(`Failed to insert tags: ${insertError.message}`);
+      }
     }
-  });
 
-  // Batch insert all new tags
-  if (tagInserts.length > 0) {
-    const { error: insertError } = await supabase.from('complaint_tags').insert(tagInserts);
+    // Batch insert history records
+    if (historyInserts.length > 0) {
+      const { error: historyError } = await supabase
+        .from('complaint_history')
+        .insert(historyInserts);
 
-    if (insertError) {
-      throw new Error(`Failed to insert tags: ${insertError.message}`);
+      if (historyError) {
+        console.error('Failed to log history for bulk tag addition:', historyError);
+        // Don't fail the operation if history logging fails
+      }
     }
-  }
-
-  // Batch insert history records
-  if (historyInserts.length > 0) {
-    const { error: historyError } = await supabase.from('complaint_history').insert(historyInserts);
-
-    if (historyError) {
-      console.error('Failed to log history for bulk tag addition:', historyError);
-      // Don't fail the operation if history logging fails
-    }
-  }
 
     results.success = complaints.length;
 

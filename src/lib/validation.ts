@@ -49,24 +49,34 @@ export const UserRoleSchema = z.enum(['student', 'lecturer', 'admin']);
 /**
  * Create Complaint Schema
  */
-export const CreateComplaintSchema = z.object({
-  title: z
-    .string()
-    .min(1, 'Title is required')
-    .max(200, 'Title must be 200 characters or less')
-    .trim(),
-  description: z
-    .string()
-    .min(10, 'Description must be at least 10 characters')
-    .max(5000, 'Description must be 5000 characters or less')
-    .trim(),
-  category: ComplaintCategorySchema,
-  priority: ComplaintPrioritySchema,
-  is_anonymous: z.boolean().default(false),
-  is_draft: z.boolean().default(false),
-  student_id: z.string().uuid('Invalid user ID'),
-  status: ComplaintStatusSchema.default('new'),
-});
+export const CreateComplaintSchema = z
+  .object({
+    title: z.string().max(200, 'Title must be 200 characters or less').trim(),
+    description: z.string().max(5000, 'Description must be 5000 characters or less').trim(),
+    category: z.union([ComplaintCategorySchema, z.literal('')]),
+    priority: z.union([ComplaintPrioritySchema, z.literal('')]),
+    is_anonymous: z.boolean().default(false),
+    is_draft: z.boolean().default(false),
+    student_id: z.string().uuid('Invalid user ID'),
+    status: ComplaintStatusSchema.default('new'),
+  })
+  .refine(
+    (data) => {
+      // For non-drafts, require all fields
+      if (!data.is_draft) {
+        return (
+          data.title.trim().length >= 1 &&
+          data.description.trim().length >= 10 &&
+          data.category !== '' &&
+          data.priority !== ''
+        );
+      }
+      return true;
+    },
+    {
+      message: 'Title, description, category, and priority are required for submitted complaints',
+    }
+  );
 
 /**
  * Update Complaint Schema (all fields optional except ID)
@@ -212,6 +222,22 @@ export const SearchQuerySchema = z.object({
   page: z.number().int().positive().default(1),
   pageSize: z.number().int().min(1).max(100).default(10),
 });
+
+/**
+ * Database Error Class - Preserves Supabase error properties
+ */
+export class DatabaseError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public status?: number,
+    public details?: string,
+    public hint?: string
+  ) {
+    super(message);
+    this.name = 'DatabaseError';
+  }
+}
 
 /**
  * Validation Error Class

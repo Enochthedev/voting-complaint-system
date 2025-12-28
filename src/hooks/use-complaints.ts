@@ -19,7 +19,7 @@ import {
   bulkAddTags,
 } from '@/lib/api/complaints';
 import { useToast } from '@/components/ui/toast';
-import { ValidationError } from '@/lib/validation';
+import { ValidationError, DatabaseError } from '@/lib/validation';
 import { TimeoutError } from '@/lib/timeout';
 
 /**
@@ -28,7 +28,7 @@ import { TimeoutError } from '@/lib/timeout';
  */
 export const complaintKeys = {
   all: ['complaints'] as const,
-  lists: (filters?: any) => [...complaintKeys.all, 'list', filters] as const,
+  lists: () => [...complaintKeys.all, 'list'] as const,
   list: (filters: string) => [...complaintKeys.lists(), { filters }] as const,
   details: () => [...complaintKeys.all, 'detail'] as const,
   detail: (id: string) => [...complaintKeys.details(), id] as const,
@@ -74,22 +74,12 @@ export function useUserComplaintStats(userId: string) {
 }
 
 /**
- * Hook to fetch all complaints (for lecturers/admins) with optional filtering
+ * Hook to fetch all complaints (for lecturers/admins)
  */
-export function useAllComplaints(filters?: {
-  status?: string[];
-  category?: string[];
-  priority?: string[];
-  dateFrom?: string;
-  dateTo?: string;
-  tags?: string[];
-  assignedTo?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}) {
+export function useAllComplaints() {
   return useQuery({
-    queryKey: complaintKeys.lists(filters),
-    queryFn: () => getAllComplaints(filters),
+    queryKey: complaintKeys.lists(),
+    queryFn: getAllComplaints,
   });
 }
 
@@ -175,6 +165,8 @@ export function useCreateComplaint() {
         errorMessage = err.getUserMessage();
       } else if (err instanceof TimeoutError) {
         errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err instanceof DatabaseError) {
+        errorMessage = err.details || err.message || 'Database error occurred';
       } else if (err?.message) {
         errorMessage = err.message;
       }
@@ -254,6 +246,8 @@ export function useUpdateComplaint() {
         errorMessage = err.getUserMessage();
       } else if (err instanceof TimeoutError) {
         errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err instanceof DatabaseError) {
+        errorMessage = err.details || err.message || 'Database error occurred';
       } else if (err?.message) {
         errorMessage = err.message;
       }
@@ -317,6 +311,8 @@ export function useDeleteComplaint() {
 
       if (err instanceof TimeoutError) {
         errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err instanceof DatabaseError) {
+        errorMessage = err.details || err.message || 'Database error occurred';
       } else if (err?.message) {
         errorMessage = err.message;
       }
