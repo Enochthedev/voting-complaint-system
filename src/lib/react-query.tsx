@@ -19,10 +19,11 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // Data is considered fresh for 1 minute (reduced from 5 for more current data)
-        staleTime: 1 * 60 * 1000,
-        // Unused data is garbage collected after 10 minutes
-        gcTime: 10 * 60 * 1000,
+        // CRITICAL: Set staleTime to 0 to always fetch fresh data
+        // This ensures browser refresh always loads new data
+        staleTime: 0,
+        // Unused data is garbage collected after 5 minutes
+        gcTime: 5 * 60 * 1000,
         // Refetch when user returns to the tab
         refetchOnWindowFocus: true,
         // Retry failed requests with exponential backoff
@@ -35,8 +36,9 @@ function makeQueryClient() {
           return failureCount < 2;
         },
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-        // Always refetch on mount to ensure fresh data after page refresh
-        refetchOnMount: true,
+        // CRITICAL: Always refetch on mount, even if data exists
+        // This ensures page refresh loads fresh data
+        refetchOnMount: 'always',
         // Refetch when network reconnects
         refetchOnReconnect: true,
         // CRITICAL: Don't throw errors to error boundaries by default

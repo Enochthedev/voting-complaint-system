@@ -117,13 +117,19 @@ function NewComplaintPageContent() {
       // Show success message with toast notification
       if (isDraft) {
         toast.success('Your draft has been saved successfully!', 'Draft Saved');
-        router.push('/complaints/drafts');
+        // Small delay to ensure mutation completes and cache invalidates
+        setTimeout(() => {
+          // Use window.location for full page reload to ensure fresh data
+          window.location.href = '/complaints/drafts';
+        }, 150);
       } else {
         toast.success(
           'Your complaint has been submitted and will be reviewed by our team.',
           'Complaint Submitted'
         );
-        router.push('/dashboard');
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 150);
       }
     } catch (error) {
       console.error('Submission error:', error);
