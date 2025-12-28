@@ -175,17 +175,13 @@ export function useCreateComplaint() {
       console.error('Create complaint error:', err);
     },
     onSuccess: (data, variables: any) => {
-      // Invalidate relevant queries
+      // Invalidate all complaint queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: complaintKeys.all });
 
-      // If it's a draft, invalidate drafts
-      if (variables.is_draft) {
-        queryClient.invalidateQueries({ queryKey: complaintKeys.userDrafts(variables.student_id) });
-      } else {
-        // If it's a submitted complaint, invalidate user complaints and stats
-        queryClient.invalidateQueries({ queryKey: complaintKeys.user(variables.student_id) });
-        queryClient.invalidateQueries({ queryKey: complaintKeys.userStats(variables.student_id) });
-      }
+      // Always invalidate both drafts and complaints to handle status changes
+      queryClient.invalidateQueries({ queryKey: complaintKeys.userDrafts(variables.student_id) });
+      queryClient.invalidateQueries({ queryKey: complaintKeys.user(variables.student_id) });
+      queryClient.invalidateQueries({ queryKey: complaintKeys.userStats(variables.student_id) });
     },
   });
 }

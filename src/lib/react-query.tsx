@@ -25,16 +25,30 @@ function makeQueryClient() {
         gcTime: 10 * 60 * 1000,
         // Refetch when user returns to the tab
         refetchOnWindowFocus: true,
-        // Retry failed requests twice (improved from once)
-        retry: 2,
+        // Retry failed requests with exponential backoff
+        retry: (failureCount, error: any) => {
+          // Don't retry on 4xx errors (client errors)
+          if (error?.status >= 400 && error?.status < 500) {
+            return false;
+          }
+          // Retry up to 2 times for other errors
+          return failureCount < 2;
+        },
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
         // Always refetch on mount to ensure fresh data after page refresh
         refetchOnMount: true,
         // Refetch when network reconnects
         refetchOnReconnect: true,
+        // CRITICAL: Don't throw errors to error boundaries by default
+        // This prevents one failed query from breaking the entire page
+        throwOnError: false,
       },
       mutations: {
-        // Retry failed mutations once
-        retry: 1,
+        // Don't retry mutations by default (they might have side effects)
+        retry: false,
+        // Don't throw mutation errors to error boundaries
+        // Handle them in onError callbacks instead
+        throwOnError: false,
       },
     },
   });
