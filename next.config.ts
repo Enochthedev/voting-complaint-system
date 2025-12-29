@@ -93,8 +93,8 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in",
               // Fonts: allow self and Google Fonts
               "font-src 'self' https://fonts.gstatic.com",
-              // Connect: allow self and Supabase API
-              "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in",
+              // Connect: allow self, Supabase API, and Google Analytics
+              "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://www.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
               // Media: allow self and Supabase storage
               "media-src 'self' https://*.supabase.co https://*.supabase.in",
               // Objects: disallow plugins like Flash
