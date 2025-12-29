@@ -15,14 +15,12 @@ export interface FilterState {
 export type SortOption = 'created_at' | 'updated_at' | 'priority' | 'status' | 'title';
 
 export const STATUS_OPTIONS: Array<{ value: ComplaintStatus; label: string }> = [
-  { value: 'draft', label: 'Draft' },
   { value: 'new', label: 'New' },
-  { value: 'open', label: 'Open' },
+  { value: 'opened', label: 'Opened' },
   { value: 'in_progress', label: 'In Progress' },
   { value: 'resolved', label: 'Resolved' },
   { value: 'closed', label: 'Closed' },
   { value: 'reopened', label: 'Reopened' },
-  { value: 'escalated', label: 'Escalated' },
 ];
 
 export const CATEGORY_OPTIONS: Array<{ value: ComplaintCategory; label: string }> = [

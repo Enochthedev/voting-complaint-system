@@ -151,14 +151,13 @@ function ComplaintsPageContent() {
             break;
           case 'status':
             const statusOrder: Record<string, number> = {
-              draft: 0,
               new: 1,
-              open: 2,
+              opened: 2,
               in_progress: 3,
               resolved: 4,
               closed: 5,
               reopened: 6,
-              escalated: 7,
+              draft: 7,
             };
             aValue = statusOrder[a.status] || 0;
             bValue = statusOrder[b.status] || 0;
@@ -183,7 +182,7 @@ function ComplaintsPageContent() {
     }
     // For lecturers/admins, client-side filtering is applied below
     return (allComplaints || []) as any[];
-  }, [userRole, userComplaints, allComplaints, filters]);
+  }, [userRole, userComplaints, allComplaints]);
 
   const complaintsLoading = userRole === 'student' ? userComplaintsLoading : allComplaintsLoading;
 
