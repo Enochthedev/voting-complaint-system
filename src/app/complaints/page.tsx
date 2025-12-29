@@ -75,6 +75,19 @@ function ComplaintsPageContent() {
   const userRole = user?.role || 'student';
   const userId = user?.id || '';
 
+  // Filter state - must be declared before baseComplaints useMemo
+  const [filters, setFilters] = React.useState<FilterState>({
+    status: [],
+    category: [],
+    priority: [],
+    dateFrom: '',
+    dateTo: '',
+    tags: [],
+    assignedTo: '',
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  });
+
   // Fetch complaints based on user role
   const {
     data: allComplaints,
@@ -182,7 +195,7 @@ function ComplaintsPageContent() {
     }
     // For lecturers/admins, client-side filtering is applied below
     return (allComplaints || []) as any[];
-  }, [userRole, userComplaints, allComplaints]);
+  }, [userRole, userComplaints, allComplaints, filters]);
 
   const complaintsLoading = userRole === 'student' ? userComplaintsLoading : allComplaintsLoading;
 
@@ -200,19 +213,6 @@ function ComplaintsPageContent() {
       router.push('/login');
     }
   }, [user, authLoading, authError, router]);
-
-  // Filter state
-  const [filters, setFilters] = React.useState<FilterState>({
-    status: [],
-    category: [],
-    priority: [],
-    dateFrom: '',
-    dateTo: '',
-    tags: [],
-    assignedTo: '',
-    sortBy: 'created_at',
-    sortOrder: 'desc',
-  });
 
   // Read URL parameters and set filters on mount
   React.useEffect(() => {
