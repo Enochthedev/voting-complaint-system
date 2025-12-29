@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import { withTokenRefresh } from '@/lib/api-wrapper';
+import { withMonitoring } from '@/lib/api/standardization/monitoring-wrapper';
 import {
   validate,
   CreateComplaintSchema,
@@ -42,7 +43,14 @@ async function getUserComplaintsImpl(userId: string) {
       .eq('is_draft', false)
       .order('created_at', { ascending: false });
 
-    if (error) throw new DatabaseError(error.message || 'Failed to fetch user complaints', error.code, undefined, error.details, error.hint);
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to fetch user complaints',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
     return data;
   });
 }
@@ -72,7 +80,14 @@ async function getUserDraftsImpl(userId: string) {
     .eq('is_draft', true)
     .order('updated_at', { ascending: false });
 
-  if (error) throw new DatabaseError(error.message || 'Failed to fetch user drafts', error.code, undefined, error.details, error.hint);
+  if (error)
+    throw new DatabaseError(
+      error.message || 'Failed to fetch user drafts',
+      error.code,
+      undefined,
+      error.details,
+      error.hint
+    );
   return data;
 }
 
@@ -165,7 +180,14 @@ async function getAllComplaintsImpl() {
     .eq('is_draft', false)
     .order('created_at', { ascending: false });
 
-  if (error) throw new DatabaseError(error.message || 'Failed to fetch all complaints', error.code, undefined, error.details, error.hint);
+  if (error)
+    throw new DatabaseError(
+      error.message || 'Failed to fetch all complaints',
+      error.code,
+      undefined,
+      error.details,
+      error.hint
+    );
   return data;
 }
 
@@ -224,7 +246,14 @@ async function getComplaintByIdImpl(id: string) {
     .eq('id', id)
     .single();
 
-  if (error) throw new DatabaseError(error.message || 'Failed to fetch complaint', error.code, undefined, error.details, error.hint);
+  if (error)
+    throw new DatabaseError(
+      error.message || 'Failed to fetch complaint',
+      error.code,
+      undefined,
+      error.details,
+      error.hint
+    );
   return data;
 }
 
@@ -256,7 +285,13 @@ async function createComplaintImpl(complaint: unknown) {
 
     if (error) {
       console.error('❌ Error creating complaint:', error);
-      throw new DatabaseError(error.message || 'Failed to create complaint', error.code, undefined, error.details, error.hint);
+      throw new DatabaseError(
+        error.message || 'Failed to create complaint',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
     }
 
     return data;
@@ -287,7 +322,14 @@ async function updateComplaintImpl(id: string, updates: unknown) {
       .select()
       .single();
 
-    if (error) throw new DatabaseError(error.message || 'Failed to update complaint', error.code, undefined, error.details, error.hint);
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to update complaint',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
     return data;
   });
 }
@@ -302,7 +344,14 @@ async function deleteComplaintImpl(id: string) {
     // Using singleton supabase client
     const { error } = await supabase.from('complaints').delete().eq('id', id).eq('is_draft', true);
 
-    if (error) throw new DatabaseError(error.message || 'Failed to delete complaint', error.code, undefined, error.details, error.hint);
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to delete complaint',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
   });
 }
 

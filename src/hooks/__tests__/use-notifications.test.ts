@@ -1,41 +1,59 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
+import { renderHook } from '@/lib/__tests__/test-utils';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useNotifications } from '../use-notifications';
 import { supabase } from '@/lib/supabase';
 import * as notificationsApi from '@/lib/api/notifications';
 import { useToast } from '@/components/ui/toast';
 
 // Mock dependencies
-jest.mock('@/lib/supabase');
-jest.mock('@/lib/api/notifications');
-jest.mock('@/components/ui/toast');
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getUser: vi.fn(),
+    },
+    channel: vi.fn(),
+    removeChannel: vi.fn(),
+  },
+}));
+vi.mock('@/lib/api/notifications');
+vi.mock('@/components/ui/toast');
+vi.mock('@/lib/realtime-manager', () => ({
+  realtimeManager: {
+    subscribe: vi.fn(),
+    unsubscribe: vi.fn(),
+    onConnectionStateChange: vi.fn(),
+    retryConnection: vi.fn(),
+  },
+}));
 
 describe('useNotifications - Connection Error Handling', () => {
   const mockToast = {
-    success: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    warning: jest.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
   };
 
   const mockChannel = {
-    on: jest.fn().mockReturnThis(),
-    subscribe: jest.fn(),
+    on: vi.fn().mockReturnThis(),
+    subscribe: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useToast as jest.Mock).mockReturnValue(mockToast);
-    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (useToast as any).mockReturnValue({ toast: mockToast });
+    (supabase.auth.getUser as any).mockResolvedValue({
       data: { user: { id: 'test-user-id' } },
       error: null,
     });
-    (supabase.channel as jest.Mock).mockReturnValue(mockChannel);
-    (supabase.removeChannel as jest.Mock).mockResolvedValue({ status: 'ok', error: null });
-    (notificationsApi.fetchNotifications as jest.Mock).mockResolvedValue([]);
+    (supabase.channel as any).mockReturnValue(mockChannel);
+    (supabase.removeChannel as any).mockResolvedValue({ status: 'ok', error: null });
+    (notificationsApi.fetchNotifications as any).mockResolvedValue([]);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should handle CHANNEL_ERROR status and show error toast', async () => {
@@ -57,7 +75,7 @@ describe('useNotifications - Connection Error Handling', () => {
   });
 
   it('should handle TIMED_OUT status and attempt retry', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
       setTimeout(() => callback('TIMED_OUT'), 0);
@@ -74,7 +92,7 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Fast-forward time to trigger retry
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     // Verify retry was attempted
@@ -82,11 +100,11 @@ describe('useNotifications - Connection Error Handling', () => {
       expect(supabase.channel).toHaveBeenCalledTimes(2);
     });
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should handle CLOSED status and attempt reconnection', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
       setTimeout(() => callback('CLOSED'), 0);
@@ -101,7 +119,7 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Fast-forward time to trigger reconnection
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     // Verify reconnection was attempted
@@ -109,7 +127,7 @@ describe('useNotifications - Connection Error Handling', () => {
       expect(supabase.channel).toHaveBeenCalledTimes(2);
     });
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should successfully connect and reset retry count', async () => {
@@ -159,7 +177,7 @@ describe('useNotifications - Connection Error Handling', () => {
   });
 
   it('should use exponential backoff for retries', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     let callCount = 0;
     mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
@@ -177,7 +195,7 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // First retry after 1 second
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     await waitFor(() => {
@@ -186,7 +204,7 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Second retry after 2 seconds
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     await waitFor(() => {
@@ -195,18 +213,18 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Third retry after 4 seconds
     act(() => {
-      jest.advanceTimersByTime(4000);
+      vi.advanceTimersByTime(4000);
     });
 
     await waitFor(() => {
       expect(callCount).toBe(4);
     });
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should stop retrying after max retries', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     let callCount = 0;
     mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
@@ -225,7 +243,7 @@ describe('useNotifications - Connection Error Handling', () => {
     // Advance through all retries (5 retries max)
     for (let i = 0; i < 5; i++) {
       act(() => {
-        jest.advanceTimersByTime(Math.pow(2, i) * 1000);
+        vi.advanceTimersByTime(Math.pow(2, i) * 1000);
       });
 
       await waitFor(() => {
@@ -235,7 +253,7 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Advance time further - should not retry anymore
     act(() => {
-      jest.advanceTimersByTime(60000);
+      vi.advanceTimersByTime(60000);
     });
 
     // Should still be at 6 total attempts (1 initial + 5 retries)
@@ -244,11 +262,11 @@ describe('useNotifications - Connection Error Handling', () => {
     // Verify error toast was shown
     expect(mockToast.error).toHaveBeenCalled();
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should clean up channel and timeout on unmount', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     mockChannel.subscribe.mockImplementation((callback: (status: string) => void) => {
       setTimeout(() => callback('CHANNEL_ERROR'), 0);
@@ -266,17 +284,17 @@ describe('useNotifications - Connection Error Handling', () => {
 
     // Advance time
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Verify channel was removed
     expect(supabase.removeChannel).toHaveBeenCalled();
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should handle authentication errors gracefully', async () => {
-    (supabase.auth.getUser as jest.Mock).mockResolvedValue({
+    (supabase.auth.getUser as any).mockResolvedValue({
       data: { user: null },
       error: new Error('Not authenticated'),
     });

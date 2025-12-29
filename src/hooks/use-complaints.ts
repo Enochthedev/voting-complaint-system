@@ -21,6 +21,11 @@ import {
 import { useToast } from '@/components/ui/toast';
 import { ValidationError, DatabaseError } from '@/lib/validation';
 import { TimeoutError } from '@/lib/timeout';
+import {
+  useMonitoredQuery,
+  useMonitoredMutation,
+  useMonitoredHookUsage,
+} from './use-monitored-hooks';
 
 /**
  * Query Keys for Complaints
@@ -44,22 +49,30 @@ export const complaintKeys = {
  * Hook to fetch user's complaints
  */
 export function useUserComplaints(userId: string) {
-  return useQuery({
+  useMonitoredHookUsage('useUserComplaints', { userId });
+
+  const queryResult = useQuery({
     queryKey: complaintKeys.user(userId),
     queryFn: () => getUserComplaints(userId),
     enabled: !!userId,
   });
+
+  return useMonitoredQuery(queryResult, 'getUserComplaints', 'complaints', { userId });
 }
 
 /**
  * Hook to fetch user's draft complaints
  */
 export function useUserDrafts(userId: string) {
-  return useQuery({
+  useMonitoredHookUsage('useUserDrafts', { userId });
+
+  const queryResult = useQuery({
     queryKey: complaintKeys.userDrafts(userId),
     queryFn: () => getUserDrafts(userId),
     enabled: !!userId,
   });
+
+  return useMonitoredQuery(queryResult, 'getUserDrafts', 'complaints', { userId });
 }
 
 /**
@@ -123,7 +136,9 @@ export function useCreateComplaint() {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  return useMutation({
+  useMonitoredHookUsage('useCreateComplaint');
+
+  const mutationResult = useMutation({
     mutationFn: createComplaint,
     onMutate: async (newComplaint: any) => {
       // Cancel outgoing refetches
@@ -184,6 +199,8 @@ export function useCreateComplaint() {
       queryClient.invalidateQueries({ queryKey: complaintKeys.userStats(variables.student_id) });
     },
   });
+
+  return useMonitoredMutation(mutationResult, 'createComplaint', 'complaints');
 }
 
 /**

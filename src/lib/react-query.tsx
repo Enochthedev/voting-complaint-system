@@ -3,56 +3,33 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState, type ReactNode } from 'react';
+import {
+  createEnhancedQueryClient,
+  globalCacheManager,
+} from './api/standardization/enhanced-cache';
 
 /**
  * React Query configuration for the Student Complaint System
  *
- * Default settings:
- * - staleTime: 1 minute - Data is considered fresh for 1 minute
- * - gcTime: 10 minutes - Unused data is garbage collected after 10 minutes
- * - refetchOnWindowFocus: true - Refetch when user returns to the tab
- * - refetchOnMount: true - Always refetch on component mount for fresh data
- * - refetchOnReconnect: true - Refetch when network reconnects
- * - retry: 2 - Retry failed requests twice
+ * Enhanced with:
+ * - Intelligent cache policies based on data type
+ * - Persistent storage for offline support
+ * - Smart garbage collection
+ * - Request deduplication and batching
+ * - Performance monitoring
  */
 function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // CRITICAL: Set staleTime to 0 to always fetch fresh data
-        // This ensures browser refresh always loads new data
-        staleTime: 0,
-        // Unused data is garbage collected after 5 minutes
-        gcTime: 5 * 60 * 1000,
-        // Refetch when user returns to the tab
-        refetchOnWindowFocus: true,
-        // Retry failed requests with exponential backoff
-        retry: (failureCount, error: any) => {
-          // Don't retry on 4xx errors (client errors)
-          if (error?.status >= 400 && error?.status < 500) {
-            return false;
-          }
-          // Retry up to 2 times for other errors
-          return failureCount < 2;
-        },
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-        // CRITICAL: Always refetch on mount, even if data exists
-        // This ensures page refresh loads fresh data
-        refetchOnMount: 'always',
-        // Refetch when network reconnects
-        refetchOnReconnect: true,
-        // CRITICAL: Don't throw errors to error boundaries by default
-        // This prevents one failed query from breaking the entire page
-        throwOnError: false,
-      },
-      mutations: {
-        // Don't retry mutations by default (they might have side effects)
-        retry: false,
-        // Don't throw mutation errors to error boundaries
-        // Handle them in onError callbacks instead
-        throwOnError: false,
-      },
-    },
+  // Use enhanced cache manager for better performance
+  return createEnhancedQueryClient({
+    ttl: 5 * 60 * 1000, // 5 minutes default
+    maxSize: 1000,
+    strategy: 'lru',
+    persistentStorage: true,
+    storageKey: 'complaint-system-cache',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    intelligentGC: true,
+    gcInterval: 5 * 60 * 1000, // 5 minutes
+    memoryThreshold: 50 * 1024 * 1024, // 50MB
   });
 }
 
@@ -75,7 +52,7 @@ interface ReactQueryProviderProps {
 
 /**
  * React Query Provider Component
- * 
+ *
  * Wraps the application with React Query context and provides:
  * - Automatic caching of API requests
  * - Background refetching
