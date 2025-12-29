@@ -1,6 +1,7 @@
 import type { ComplaintTemplate } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
+import { DatabaseError } from '@/lib/validation';
 
 /**
  * Complaint Templates API functions
@@ -26,7 +27,7 @@ async function getTemplatesImpl(options?: {
   const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch templates');
+    throw new DatabaseError(error.message || 'Failed to fetch templates', error.code, undefined, error.details, error.hint);
   }
 
   return data || [];
@@ -45,7 +46,7 @@ async function getTemplateByIdImpl(templateId: string): Promise<ComplaintTemplat
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch template');
+    throw new DatabaseError(error.message || 'Failed to fetch template', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -66,7 +67,7 @@ async function createTemplateImpl(
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to create template');
+    throw new DatabaseError(error.message || 'Failed to create template', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -89,7 +90,7 @@ async function updateTemplateImpl(
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to update template');
+    throw new DatabaseError(error.message || 'Failed to update template', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -104,7 +105,7 @@ async function deleteTemplateImpl(templateId: string): Promise<void> {
   const { error } = await supabase.from('complaint_templates').delete().eq('id', templateId);
 
   if (error) {
-    throw new Error(error.message || 'Failed to delete template');
+    throw new DatabaseError(error.message || 'Failed to delete template', error.code, undefined, error.details, error.hint);
   }
 }
 

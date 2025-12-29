@@ -1,6 +1,7 @@
 import type { Vote, VoteResponse } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
+import { DatabaseError } from '@/lib/validation';
 
 /**
  * Vote API functions
@@ -17,7 +18,7 @@ async function createVoteImpl(voteData: Omit<Vote, 'id' | 'created_at'>): Promis
   const { data, error } = await supabase.from('votes').insert(voteData).select().single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to create vote');
+    throw new DatabaseError(error.message || 'Failed to create vote', error.code, undefined, error.details, error.hint);
   }
 
   // Note: Vote notifications are created automatically via database trigger
@@ -47,7 +48,7 @@ async function getVotesImpl(options?: { isActive?: boolean; createdBy?: string }
   const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch votes');
+    throw new DatabaseError(error.message || 'Failed to fetch votes', error.code, undefined, error.details, error.hint);
   }
 
   return data || [];
@@ -64,7 +65,7 @@ async function getVoteByIdImpl(voteId: string): Promise<Vote | null> {
   const { data, error } = await supabase.from('votes').select('*').eq('id', voteId).maybeSingle();
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch vote');
+    throw new DatabaseError(error.message || 'Failed to fetch vote', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -90,7 +91,7 @@ async function updateVoteImpl(
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to update vote');
+    throw new DatabaseError(error.message || 'Failed to update vote', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -106,7 +107,7 @@ async function deleteVoteImpl(voteId: string): Promise<void> {
   const { error } = await supabase.from('votes').delete().eq('id', voteId);
 
   if (error) {
-    throw new Error(error.message || 'Failed to delete vote');
+    throw new DatabaseError(error.message || 'Failed to delete vote', error.code, undefined, error.details, error.hint);
   }
 
   // Note: Associated vote_responses are automatically deleted via CASCADE foreign key
@@ -142,9 +143,9 @@ async function submitVoteResponseImpl(
   if (error) {
     // Check if error is due to unique constraint violation (duplicate vote)
     if (error.code === '23505' && error.message.includes('vote_responses_vote_id_student_id_key')) {
-      throw new Error('You have already voted on this poll');
+      throw new DatabaseError('You have already voted on this poll', error.code, 409, error.details, error.hint);
     }
-    throw new Error(error.message || 'Failed to submit vote');
+    throw new DatabaseError(error.message || 'Failed to submit vote', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -161,7 +162,7 @@ async function getVoteResponsesImpl(voteId: string): Promise<VoteResponse[]> {
   const { data, error } = await supabase.from('vote_responses').select('*').eq('vote_id', voteId);
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch vote responses');
+    throw new DatabaseError(error.message || 'Failed to fetch vote responses', error.code, undefined, error.details, error.hint);
   }
 
   return data || [];
@@ -205,7 +206,7 @@ async function getVoteResultsImpl(voteId: string): Promise<Record<string, number
     .eq('vote_id', voteId);
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch vote results');
+    throw new DatabaseError(error.message || 'Failed to fetch vote results', error.code, undefined, error.details, error.hint);
   }
 
   const results: Record<string, number> = {};

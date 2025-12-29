@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import type { User } from '@/types/database.types';
+import { DatabaseError } from '@/lib/validation';
 
 /**
  * Get all users (admin only)
@@ -13,7 +14,7 @@ async function getAllUsersImpl(): Promise<User[]> {
 
   if (error) {
     console.error('Error fetching users:', error);
-    throw new Error(error.message || 'Failed to fetch users');
+    throw new DatabaseError(error.message || 'Failed to fetch users', error.code, undefined, error.details, error.hint);
   }
 
   return data || [];
@@ -29,7 +30,7 @@ async function getUserByIdImpl(userId: string): Promise<User | null> {
 
   if (error) {
     console.error('Error fetching user:', error);
-    throw new Error(error.message || 'Failed to fetch user');
+    throw new DatabaseError(error.message || 'Failed to fetch user', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -53,7 +54,7 @@ async function updateUserRoleImpl(
 
   if (error) {
     console.error('Error updating user role:', error);
-    throw new Error(error.message || 'Failed to update user role');
+    throw new DatabaseError(error.message || 'Failed to update user role', error.code, undefined, error.details, error.hint);
   }
 
   // Invalidate role cache when user role changes

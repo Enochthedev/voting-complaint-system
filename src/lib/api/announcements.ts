@@ -1,6 +1,7 @@
 import type { Announcement } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
+import { DatabaseError } from '@/lib/validation';
 
 /**
  * Announcement API functions
@@ -23,7 +24,7 @@ async function createAnnouncementImpl(
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to create announcement');
+    throw new DatabaseError(error.message || 'Failed to create announcement', error.code, undefined, error.details, error.hint);
   }
 
   // Note: Announcement notifications are created automatically via database trigger
@@ -56,7 +57,7 @@ async function getAnnouncementsImpl(options?: {
   const { data, error } = await query;
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch announcements');
+    throw new DatabaseError(error.message || 'Failed to fetch announcements', error.code, undefined, error.details, error.hint);
   }
 
   return data || [];
@@ -77,7 +78,7 @@ async function getAnnouncementByIdImpl(announcementId: string): Promise<Announce
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message || 'Failed to fetch announcement');
+    throw new DatabaseError(error.message || 'Failed to fetch announcement', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -106,7 +107,7 @@ async function updateAnnouncementImpl(
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Failed to update announcement');
+    throw new DatabaseError(error.message || 'Failed to update announcement', error.code, undefined, error.details, error.hint);
   }
 
   return data;
@@ -122,7 +123,7 @@ async function deleteAnnouncementImpl(announcementId: string): Promise<void> {
   const { error } = await supabase.from('announcements').delete().eq('id', announcementId);
 
   if (error) {
-    throw new Error(error.message || 'Failed to delete announcement');
+    throw new DatabaseError(error.message || 'Failed to delete announcement', error.code, undefined, error.details, error.hint);
   }
 }
 
