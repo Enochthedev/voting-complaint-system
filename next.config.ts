@@ -85,8 +85,8 @@ const nextConfig: NextConfig = {
             value: [
               // Default: only allow same-origin content
               "default-src 'self'",
-              // Scripts: allow self, inline scripts (for Next.js), and eval (for development)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              // Scripts: allow self, inline scripts (for Next.js), eval (for development), and blob URIs
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
               // Styles: allow self, inline styles, and Google Fonts
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               // Images: allow self, data URIs, blob URIs, and Supabase storage
