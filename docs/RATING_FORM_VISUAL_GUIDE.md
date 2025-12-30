@@ -32,42 +32,49 @@ This guide provides a visual description of the rating form components implement
 ### Star Rating States
 
 #### Unselected (Default)
+
 ```
 ☆ ☆ ☆ ☆ ☆
 ```
+
 - Empty star outlines
 - Gray color (muted-foreground)
 
 #### Hover State (3 stars)
+
 ```
 ★ ★ ★ ☆ ☆
 ```
+
 - First 3 stars filled with yellow
 - Hovered star scales up slightly
 - Label shows: "Neutral"
 
 #### Selected State (4 stars)
+
 ```
 ★ ★ ★ ★ ☆
 ```
+
 - First 4 stars filled with yellow
 - Label shows: "Satisfied"
 - Stars remain filled after click
 
 ### Rating Labels
 
-| Stars | Label              |
-|-------|--------------------|
-| 0     | Select a rating    |
-| 1     | Very Dissatisfied  |
-| 2     | Dissatisfied       |
-| 3     | Neutral            |
-| 4     | Satisfied          |
-| 5     | Very Satisfied     |
+| Stars | Label             |
+| ----- | ----------------- |
+| 0     | Select a rating   |
+| 1     | Very Dissatisfied |
+| 2     | Dissatisfied      |
+| 3     | Neutral           |
+| 4     | Satisfied         |
+| 5     | Very Satisfied    |
 
 ### Validation States
 
 #### Error State (No Rating Selected)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  How satisfied are you with the resolution?         │
@@ -81,6 +88,7 @@ This guide provides a visual description of the rating form components implement
 ```
 
 #### Loading State
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  ★ ★ ★ ★ ☆                                         │
@@ -136,16 +144,19 @@ This guide provides a visual description of the rating form components implement
 ## Responsive Behavior
 
 ### Desktop (≥1024px)
+
 - Full width within container
 - Stars: 40px (h-10 w-10)
 - Comfortable spacing between elements
 
 ### Tablet (768px - 1023px)
+
 - Maintains full layout
 - Stars: 40px (h-10 w-10)
 - Buttons stack horizontally
 
 ### Mobile (<768px)
+
 - Full width
 - Stars: 32px (h-8 w-8) - slightly smaller
 - Buttons may stack vertically on very small screens
@@ -154,6 +165,7 @@ This guide provides a visual description of the rating form components implement
 ## Accessibility Features
 
 ### ARIA Labels
+
 ```html
 <button aria-label="Rate 1 stars">
   <Star />
@@ -161,12 +173,14 @@ This guide provides a visual description of the rating form components implement
 ```
 
 ### Keyboard Navigation
+
 - Tab through stars (left to right)
 - Enter/Space to select rating
 - Tab to feedback textarea
 - Tab to buttons
 
 ### Screen Reader Announcements
+
 - "Rate 1 stars" through "Rate 5 stars"
 - "Additional Feedback (Optional)"
 - Current rating level announced on selection
@@ -175,6 +189,7 @@ This guide provides a visual description of the rating form components implement
 ## Color Scheme
 
 ### Light Mode
+
 - Stars (unselected): `text-muted-foreground` (gray)
 - Stars (selected): `fill-yellow-400 text-yellow-400`
 - Background: `bg-card`
@@ -182,6 +197,7 @@ This guide provides a visual description of the rating form components implement
 - Error: `text-destructive`
 
 ### Dark Mode
+
 - Stars (unselected): `text-muted-foreground` (lighter gray)
 - Stars (selected): `fill-yellow-400 text-yellow-400` (same)
 - Background: `bg-card` (dark)
@@ -191,25 +207,31 @@ This guide provides a visual description of the rating form components implement
 ## Interactive States
 
 ### Star Hover Effect
+
 ```css
 transition-all duration-200 hover:scale-110
 ```
+
 - Smooth scale animation
 - 200ms duration
 - Scales to 110% on hover
 
 ### Focus State
+
 ```css
 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
 ```
+
 - 2px ring around focused star
 - Primary color
 - 2px offset for visibility
 
 ### Disabled State
+
 ```css
 cursor-not-allowed opacity-50
 ```
+
 - 50% opacity
 - Cursor shows not-allowed icon
 - No hover effects
@@ -217,33 +239,35 @@ cursor-not-allowed opacity-50
 ## Usage Examples
 
 ### Example 1: After Complaint Resolution
+
 ```tsx
 // Show prompt when complaint status changes to "resolved"
-{complaint.status === 'resolved' && !hasRated && (
-  <RatingPrompt
-    complaintId={complaint.id}
-    complaintTitle={complaint.title}
-    onSubmit={handleSubmitRating}
-    onDismiss={handleDismissPrompt}
-  />
-)}
+{
+  complaint.status === 'resolved' && !hasRated && (
+    <RatingPrompt
+      complaintId={complaint.id}
+      complaintTitle={complaint.title}
+      onSubmit={handleSubmitRating}
+      onDismiss={handleDismissPrompt}
+    />
+  );
+}
 ```
 
 ### Example 2: Standalone Rating Page
+
 ```tsx
 // Dedicated rating page
 <div className="container max-w-2xl">
   <h1>Rate Your Experience</h1>
   <Card className="p-6">
-    <RatingForm
-      onSubmit={handleSubmitRating}
-      onCancel={() => router.back()}
-    />
+    <RatingForm onSubmit={handleSubmitRating} onCancel={() => router.back()} />
   </Card>
 </div>
 ```
 
 ### Example 3: Compact Form (No Feedback)
+
 ```tsx
 // Quick rating without feedback
 <RatingForm
@@ -257,6 +281,7 @@ cursor-not-allowed opacity-50
 ## Demo Page
 
 Visit `/demo/rating-form` to see:
+
 1. Full RatingPrompt with dismiss functionality
 2. Standalone RatingForm with all features
 3. Compact form (stars only)
@@ -284,6 +309,7 @@ Visit `/demo/rating-form` to see:
 ## Browser Compatibility
 
 Tested and working on:
+
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
@@ -299,6 +325,7 @@ Tested and working on:
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 - Half-star ratings (0.5 increments)
 - Custom star icons/colors
 - Animation on rating selection

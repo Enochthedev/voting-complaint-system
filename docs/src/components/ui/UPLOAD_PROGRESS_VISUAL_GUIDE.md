@@ -3,6 +3,7 @@
 ## Component States
 
 ### 1. Uploading State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 📄 document.pdf                                    ⟳ 45%    │
@@ -14,6 +15,7 @@
 ```
 
 **Features:**
+
 - Animated spinner icon (⟳)
 - Progress percentage in top right
 - "Uploading..." text
@@ -21,6 +23,7 @@
 - File name, size, and type displayed
 
 ### 2. Completed State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 📄 document.pdf                                    ✓        │
@@ -29,11 +32,13 @@
 ```
 
 **Features:**
+
 - Green checkmark icon (✓)
 - No progress bar
 - File moves to "Selected Files" section after brief delay
 
 ### 3. Error State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 📄 document.pdf                                    ⚠        │
@@ -44,6 +49,7 @@
 ```
 
 **Features:**
+
 - Red alert icon (⚠)
 - Error message displayed below file info
 - File remains in upload progress section
@@ -109,6 +115,7 @@ The progress bar smoothly animates from 0% to 100%:
 ```
 
 **Animation Details:**
+
 - Smooth CSS transition (300ms ease-out)
 - Updates in real-time as progress changes
 - Dark mode compatible colors
@@ -116,6 +123,7 @@ The progress bar smoothly animates from 0% to 100%:
 ## Color Scheme
 
 ### Light Mode
+
 - **Progress Bar**: Dark gray (#18181b)
 - **Background**: Light gray (#e4e4e7)
 - **Success Icon**: Green (#16a34a)
@@ -123,6 +131,7 @@ The progress bar smoothly animates from 0% to 100%:
 - **Spinner**: Gray (#52525b)
 
 ### Dark Mode
+
 - **Progress Bar**: Light gray (#fafafa)
 - **Background**: Dark gray (#27272a)
 - **Success Icon**: Green (#22c55e)
@@ -132,11 +141,13 @@ The progress bar smoothly animates from 0% to 100%:
 ## Responsive Behavior
 
 ### Desktop (≥640px)
+
 - Full width layout
 - Side-by-side file info and actions
 - Larger icons and text
 
 ### Mobile (<640px)
+
 - Stacked layout
 - Smaller icons
 - Touch-friendly tap targets
@@ -145,22 +156,25 @@ The progress bar smoothly animates from 0% to 100%:
 ## Accessibility Features
 
 ### ARIA Attributes
+
 ```html
-<div 
+<div
   role="progressbar"
   aria-valuenow="45"
   aria-valuemin="0"
   aria-valuemax="100"
   aria-label="Upload progress: 45%"
->
+></div>
 ```
 
 ### Screen Reader Announcements
+
 - "Uploading document.pdf, 45% complete"
 - "Upload completed for document.pdf"
 - "Upload failed for document.pdf: Network error"
 
 ### Keyboard Navigation
+
 - Tab through file items
 - Enter/Space to remove files
 - Focus indicators visible

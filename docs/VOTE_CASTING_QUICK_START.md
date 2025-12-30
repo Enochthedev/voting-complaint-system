@@ -9,12 +9,14 @@ The vote casting functionality for students is **fully implemented and working**
 ### 1. Two Ways to Vote
 
 **Option A: From Vote Listing Page** (`/votes`)
+
 - View all active votes in a list
 - Select an option directly on the listing page
 - Submit vote without navigating away
 - See success message and "Voted" badge
 
 **Option B: From Vote Detail Page** (`/votes/[id]`)
+
 - Click on any vote to see full details
 - View complete description and metadata
 - Select an option and submit
@@ -52,6 +54,7 @@ Can view results
 ### 4. Validation Rules
 
 The system prevents voting when:
+
 - ❌ Student has already voted on this poll
 - ❌ Vote is inactive
 - ❌ Vote has closed (past closing date)
@@ -61,11 +64,13 @@ The system prevents voting when:
 ### 5. Files Modified/Created
 
 **Core Implementation:**
+
 - `src/app/votes/[id]/page.tsx` - Vote detail page with casting UI
 - `src/app/votes/page.tsx` - Vote listing page with inline voting
 - `src/lib/api/votes.ts` - API functions (already had submitVoteResponse)
 
 **Documentation:**
+
 - `docs/VOTE_CASTING_IMPLEMENTATION.md` - Comprehensive documentation
 - `docs/VOTE_CASTING_QUICK_START.md` - This file
 
@@ -74,6 +79,7 @@ The system prevents voting when:
 ### Manual Test Steps
 
 1. **Start the development server:**
+
    ```bash
    npm run dev
    ```
@@ -120,6 +126,7 @@ const vote = await getVoteById(voteId);
 ## UI Components
 
 ### Vote Listing Card
+
 - Shows vote title and description
 - Displays radio buttons for options
 - Submit button with loading state
@@ -127,6 +134,7 @@ const vote = await getVoteById(voteId);
 - "View Results" button after voting
 
 ### Vote Detail Page
+
 - Full vote information
 - Metadata (posted date, closing date, vote count)
 - Radio button selection
@@ -146,6 +154,7 @@ When connecting to real Supabase:
 ## Success Criteria Met
 
 From Task 7.1:
+
 - ✅ Implement vote casting (student)
 - ✅ Enforce one vote per student per poll
 - ✅ Show vote results (lecturer)
@@ -167,6 +176,7 @@ From Task 7.1:
 ## Summary
 
 The vote casting feature is production-ready with:
+
 - ✅ Complete implementation
 - ✅ Comprehensive validation
 - ✅ Error handling

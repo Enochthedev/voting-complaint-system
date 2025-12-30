@@ -1,11 +1,13 @@
 # Bulk Action Confirmation Modal - Quick Reference
 
 ## Overview
+
 Confirmation modals have been added to all bulk actions in the complaints page to prevent accidental operations on multiple complaints.
 
 ## Implementation Details
 
 ### Component
+
 **File**: `src/components/complaints/bulk-action-confirmation-modal.tsx`
 
 ### Usage Pattern
@@ -46,6 +48,7 @@ const handleBulkAction = () => {
 ## Bulk Actions with Confirmation
 
 ### 1. Bulk Status Change
+
 **Trigger**: Click "Change Status" → Select status from dropdown
 **Confirmation**: Shows before changing status
 **Action**: Updates status of all selected complaints
@@ -62,6 +65,7 @@ const handleBulkStatusChange = (status: ComplaintStatus) => {
 ```
 
 ### 2. Bulk Assignment
+
 **Trigger**: Click "Assign" button
 **Confirmation**: Shows before opening assignment dialog
 **Action**: Opens assignment modal after confirmation
@@ -81,6 +85,7 @@ const handleBulkAssignment = () => {
 ```
 
 ### 3. Bulk Tag Addition
+
 **Trigger**: Click "Add Tags" button
 **Confirmation**: Shows before opening tag addition dialog
 **Action**: Opens tag addition modal after confirmation
@@ -100,6 +105,7 @@ const handleBulkTagAddition = () => {
 ```
 
 ### 4. Bulk Export
+
 **Trigger**: Click "Export" → "Export as CSV"
 **Confirmation**: Shows before exporting
 **Action**: Exports selected complaints to CSV file
@@ -117,22 +123,23 @@ const handleBulkExport = () => {
 
 ## Modal Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `open` | `boolean` | Yes | Controls modal visibility |
-| `onOpenChange` | `(open: boolean) => void` | Yes | Callback when modal is closed |
-| `title` | `string` | Yes | Modal title |
-| `description` | `string` | Yes | Action description |
-| `itemCount` | `number` | Yes | Number of items affected |
-| `actionType` | `'default' \| 'destructive'` | No | Button styling (default: 'default') |
-| `confirmText` | `string` | No | Confirm button text (default: 'Confirm') |
-| `cancelText` | `string` | No | Cancel button text (default: 'Cancel') |
-| `onConfirm` | `() => void` | Yes | Callback when confirmed |
-| `isLoading` | `boolean` | No | Shows loading state (default: false) |
+| Prop           | Type                         | Required | Description                              |
+| -------------- | ---------------------------- | -------- | ---------------------------------------- |
+| `open`         | `boolean`                    | Yes      | Controls modal visibility                |
+| `onOpenChange` | `(open: boolean) => void`    | Yes      | Callback when modal is closed            |
+| `title`        | `string`                     | Yes      | Modal title                              |
+| `description`  | `string`                     | Yes      | Action description                       |
+| `itemCount`    | `number`                     | Yes      | Number of items affected                 |
+| `actionType`   | `'default' \| 'destructive'` | No       | Button styling (default: 'default')      |
+| `confirmText`  | `string`                     | No       | Confirm button text (default: 'Confirm') |
+| `cancelText`   | `string`                     | No       | Cancel button text (default: 'Cancel')   |
+| `onConfirm`    | `() => void`                 | Yes      | Callback when confirmed                  |
+| `isLoading`    | `boolean`                    | No       | Shows loading state (default: false)     |
 
 ## Features
 
 ### ✅ Implemented
+
 - Confirmation for all bulk actions
 - Clear display of affected item count
 - Singular/plural form handling
@@ -143,6 +150,7 @@ const handleBulkExport = () => {
 - Proper focus management
 
 ### 🎨 Visual Design
+
 - Orange warning icon (AlertCircle)
 - Highlighted count section
 - Consistent with design system
@@ -150,6 +158,7 @@ const handleBulkExport = () => {
 - Responsive layout
 
 ### ♿ Accessibility
+
 - ARIA labels
 - Keyboard navigation
 - Focus trap
@@ -180,13 +189,16 @@ const handleBulkExport = () => {
 ## Best Practices
 
 ### When to Use Confirmation Modals
+
 ✅ **Use for**:
+
 - Bulk operations affecting multiple items
 - Irreversible actions
 - Actions with significant impact
 - Operations that modify data
 
 ❌ **Don't use for**:
+
 - Single item operations (use inline confirmation)
 - Read-only operations (like viewing)
 - Easily reversible actions
@@ -195,6 +207,7 @@ const handleBulkExport = () => {
 ### Writing Good Confirmation Messages
 
 **Title**: Short, action-oriented
+
 ```typescript
 ✅ "Change Status"
 ✅ "Export Complaints"
@@ -203,6 +216,7 @@ const handleBulkExport = () => {
 ```
 
 **Description**: Clear, specific, informative
+
 ```typescript
 ✅ "Are you sure you want to change the status of the selected complaints to 'Resolved'?"
 ✅ "You are about to export 5 complaints to CSV. This will download a file to your computer."
@@ -226,15 +240,19 @@ const handleBulkExport = () => {
 ## Common Issues and Solutions
 
 ### Issue: Modal doesn't close after action
+
 **Solution**: Ensure `setShowConfirmationModal(false)` is called in the action handler
 
 ### Issue: Wrong item count displayed
+
 **Solution**: Verify `selectedIds.size` is passed correctly to `itemCount` prop
 
 ### Issue: Action executes without confirmation
+
 **Solution**: Check that the handler sets up confirmation config before showing modal
 
 ### Issue: Multiple modals stack
+
 **Solution**: Ensure only one modal is open at a time by checking state before opening
 
 ## Related Files
@@ -256,6 +274,7 @@ const handleBulkExport = () => {
 ## Support
 
 For questions or issues:
+
 1. Check the visual test guide: `docs/BULK_ACTION_CONFIRMATION_MODAL_VISUAL_TEST.md`
 2. Review the component implementation
 3. Check browser console for errors

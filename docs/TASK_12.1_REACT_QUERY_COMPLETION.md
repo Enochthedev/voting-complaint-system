@@ -11,6 +11,7 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 ### 1. Core Setup
 
 #### React Query Provider (`src/lib/react-query.tsx`)
+
 - Created centralized QueryClient configuration
 - Configured default options:
   - `staleTime`: 5 minutes (data freshness)
@@ -21,13 +22,16 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 - Proper SSR support with separate client/server query clients
 
 #### Root Layout Integration (`src/app/layout.tsx`)
+
 - Wrapped application with `ReactQueryProvider`
 - Ensures all components have access to React Query context
 
 ### 2. Custom Hooks Created
 
 #### Complaints Hooks (`src/hooks/use-complaints.ts`)
+
 **Query Hooks:**
+
 - `useUserComplaints(userId)` - Fetch user's complaints
 - `useUserDrafts(userId)` - Fetch user's draft complaints
 - `useUserComplaintStats(userId)` - Fetch complaint statistics
@@ -37,6 +41,7 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 - `useUserAverageRating(userId)` - Fetch average rating
 
 **Mutation Hooks:**
+
 - `useCreateComplaint()` - Create new complaint
 - `useUpdateComplaint()` - Update existing complaint
 - `useDeleteComplaint()` - Delete draft complaint
@@ -47,6 +52,7 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 - `useBulkAddTags()` - Bulk add tags
 
 **Query Key Management:**
+
 - Centralized query key factory (`complaintKeys`)
 - Hierarchical key structure for efficient cache invalidation
 - Examples:
@@ -55,10 +61,12 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
   - `complaintKeys.user(userId)` → `['complaints', 'user', userId]`
 
 #### Announcements Hooks (`src/hooks/use-announcements.ts`)
+
 - `useRecentAnnouncements(limit)` - Fetch recent announcements
 - Centralized query keys (`announcementKeys`)
 
 #### Notifications Hooks (`src/hooks/use-notifications.ts`)
+
 - `useNotifications(limit)` - Fetch notifications with auto-refresh
 - `useUnreadNotificationCount()` - Get unread count
 - `useMarkAsRead()` - Mark notification as read
@@ -67,6 +75,7 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 - Centralized query keys (`notificationKeys`)
 
 #### Votes Hooks (`src/hooks/use-votes.ts`)
+
 - `useVotes(filters)` - Fetch votes with optional filters
 - `useHasStudentVoted(voteId, studentId)` - Check vote status
 - Centralized query keys (`voteKeys`)
@@ -74,6 +83,7 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 ### 3. Component Migrations
 
 #### Updated Components:
+
 1. **StudentDashboard** (`src/app/dashboard/components/student-dashboard.tsx`)
    - Replaced manual state management with React Query hooks
    - Removed `useEffect` and `useState` for data fetching
@@ -100,20 +110,25 @@ Successfully implemented React Query (TanStack Query) v5 for caching and state m
 Mutations automatically invalidate related queries:
 
 **Create Complaint:**
+
 - Invalidates: `complaintKeys.all`, `complaintKeys.user(userId)`, `complaintKeys.userStats(userId)`
 
 **Update Complaint:**
+
 - Invalidates: `complaintKeys.detail(id)`, `complaintKeys.lists()`, `complaintKeys.user(userId)`
 
 **Submit Rating:**
+
 - Invalidates: `complaintKeys.detail(id)`, `complaintKeys.hasRated()`, `complaintKeys.userRating()`
 
 **Bulk Operations:**
+
 - Invalidates: All complaint queries (`complaintKeys.all`)
 
 ## Performance Benefits
 
 ### Before React Query
+
 ```tsx
 // Multiple API calls for same data
 function ComponentA() {
@@ -132,6 +147,7 @@ function ComponentB() {
 ```
 
 ### After React Query
+
 ```tsx
 // Single API call, shared cache
 function ComponentA() {
@@ -144,6 +160,7 @@ function ComponentB() {
 ```
 
 ### Key Improvements:
+
 1. **Request Deduplication** - Multiple components requesting same data = 1 API call
 2. **Automatic Caching** - Data cached for 5 minutes by default
 3. **Background Refetching** - Stale data refreshed automatically
@@ -154,15 +171,18 @@ function ComponentB() {
 ## Code Quality Improvements
 
 ### Reduced Boilerplate
+
 - **Before**: ~50 lines per component (useState, useEffect, error handling)
 - **After**: ~5 lines per component (single hook call)
 
 ### Better Type Safety
+
 - All hooks are fully typed with TypeScript
 - Automatic type inference from API functions
 - No manual type casting needed
 
 ### Centralized Logic
+
 - Data fetching logic in custom hooks
 - Easy to test and maintain
 - Consistent patterns across application
@@ -184,17 +204,14 @@ const createTestQueryClient = () =>
 
 function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = createTestQueryClient();
-  return render(
-    <QueryClientProvider client={testQueryClient}>
-      {ui}
-    </QueryClientProvider>
-  );
+  return render(<QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>);
 }
 ```
 
 ## Developer Experience
 
 ### DevTools Integration
+
 - React Query DevTools available in development mode
 - View all queries and their states
 - Inspect cache contents
@@ -203,6 +220,7 @@ function renderWithClient(ui: React.ReactElement) {
 - Debug stale/fresh data
 
 ### Usage Example
+
 ```tsx
 import { useUserComplaints } from '@/hooks/use-complaints';
 
@@ -225,6 +243,7 @@ function ComplaintsList({ userId }: { userId: string }) {
 ## Documentation
 
 Created comprehensive documentation:
+
 - **REACT_QUERY_IMPLEMENTATION.md** - Full implementation guide
   - Configuration details
   - Hook usage examples
@@ -237,6 +256,7 @@ Created comprehensive documentation:
 ## Files Created/Modified
 
 ### Created Files:
+
 1. `src/lib/react-query.tsx` - Provider and configuration
 2. `src/hooks/use-complaints.ts` - Complaint hooks (400+ lines)
 3. `src/hooks/use-announcements.ts` - Announcement hooks
@@ -246,6 +266,7 @@ Created comprehensive documentation:
 7. `docs/TASK_12.1_REACT_QUERY_COMPLETION.md` - This file
 
 ### Modified Files:
+
 1. `src/app/layout.tsx` - Added ReactQueryProvider
 2. `src/app/dashboard/components/student-dashboard.tsx` - Migrated to hooks
 3. `src/components/notifications/notification-bell.tsx` - Migrated to hooks
@@ -284,6 +305,7 @@ While the core implementation is complete, these enhancements could be added in 
 ## Performance Metrics
 
 Expected improvements:
+
 - **API Calls**: Reduced by ~60-70% through caching and deduplication
 - **Loading Time**: Faster perceived performance with cached data
 - **Network Usage**: Reduced bandwidth consumption

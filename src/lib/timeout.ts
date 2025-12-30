@@ -9,7 +9,10 @@
  * Timeout Error Class
  */
 export class TimeoutError extends Error {
-  constructor(message: string, public timeoutMs: number) {
+  constructor(
+    message: string,
+    public timeoutMs: number
+  ) {
     super(message);
     this.name = 'TimeoutError';
   }
@@ -99,8 +102,6 @@ export const TIMEOUT_CONFIG = {
 /**
  * Get timeout for operation type
  */
-export function getTimeoutForOperation(
-  operationType: keyof typeof TIMEOUT_CONFIG
-): number {
+export function getTimeoutForOperation(operationType: keyof typeof TIMEOUT_CONFIG): number {
   return TIMEOUT_CONFIG[operationType] || TIMEOUT_CONFIG.default;
 }

@@ -9,6 +9,7 @@ This directory contains components for the voting system, allowing lecturers to 
 A comprehensive form component for creating and editing voting polls.
 
 **Features:**
+
 - Title and description fields with validation
 - Dynamic vote options (minimum 2, can add more)
 - Optional complaint linking
@@ -19,16 +20,18 @@ A comprehensive form component for creating and editing voting polls.
 - Error handling
 
 **Props:**
+
 ```typescript
 interface VoteFormProps {
-  vote?: Vote | null;           // Existing vote for editing (optional)
-  onSave: (vote: Partial<Vote>) => void;  // Callback when form is submitted
-  onCancel: () => void;         // Callback when form is cancelled
-  isLoading?: boolean;          // Loading state for async operations
+  vote?: Vote | null; // Existing vote for editing (optional)
+  onSave: (vote: Partial<Vote>) => void; // Callback when form is submitted
+  onCancel: () => void; // Callback when form is cancelled
+  isLoading?: boolean; // Loading state for async operations
 }
 ```
 
 **Usage:**
+
 ```tsx
 import { VoteForm } from '@/components/votes';
 
@@ -43,17 +46,12 @@ function CreateVotePage() {
     router.push('/admin/votes');
   };
 
-  return (
-    <VoteForm
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isLoading={false}
-    />
-  );
+  return <VoteForm onSave={handleSave} onCancel={handleCancel} isLoading={false} />;
 }
 ```
 
 **Validation Rules:**
+
 - Title: 5-200 characters, required
 - Description: 10-1000 characters, required
 - Options: Minimum 2 options, each max 200 characters, must be unique
@@ -61,6 +59,7 @@ function CreateVotePage() {
 
 **Data Structure:**
 The form outputs vote data in the following format:
+
 ```typescript
 {
   title: string;
@@ -79,6 +78,7 @@ The form outputs vote data in the following format:
 Page for creating new votes. Uses the VoteForm component with mock data handling.
 
 **Features:**
+
 - Form validation
 - Success/error alerts
 - Auto-redirect after successful creation
@@ -89,6 +89,7 @@ Page for creating new votes. Uses the VoteForm component with mock data handling
 Listing page for all votes with empty state and create button.
 
 **Features:**
+
 - Empty state with call-to-action
 - Navigation to create page
 - Placeholder for vote list (to be implemented in future tasks)
@@ -96,6 +97,7 @@ Listing page for all votes with empty state and create button.
 ## Future Enhancements
 
 The following features will be implemented in subsequent tasks:
+
 - Vote submission (save to database)
 - Vote listing with filters
 - Vote detail page
@@ -107,6 +109,7 @@ The following features will be implemented in subsequent tasks:
 ## Design Patterns
 
 This component follows the established design patterns in the application:
+
 - Uses design tokens (CSS variables) for theming
 - Follows the same form structure as ComplaintForm and TemplateForm
 - Implements comprehensive validation

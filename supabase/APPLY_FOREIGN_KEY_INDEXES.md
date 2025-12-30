@@ -18,6 +18,7 @@
 ### Step 3: Verify Success
 
 You should see:
+
 ```
 Success. No rows returned
 ```
@@ -61,6 +62,7 @@ If you see an error like "relation already exists", the migration was already ap
 ## Next Steps
 
 After applying this migration:
+
 - ✅ All foreign keys are indexed
 - ✅ Database is optimized for JOIN performance
 - ⏭️ Continue with Task 2.1: Set Up Supabase Auth

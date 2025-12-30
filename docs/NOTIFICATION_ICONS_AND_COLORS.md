@@ -14,45 +14,47 @@ This document describes the implementation of notification icons and colors by t
 
 Each notification type now has a distinct icon:
 
-| Notification Type | Icon | Description |
-|------------------|------|-------------|
-| `comment_added` | MessageSquare | New comment on complaint |
-| `complaint_assigned` | UserPlus | Complaint assigned to lecturer |
-| `complaint_escalated` | TrendingUp | Complaint escalated |
-| `complaint_opened` | FileText | Complaint opened by lecturer |
-| `new_complaint` | FileText | New complaint submitted |
-| `feedback_received` | MessageSquare | Feedback received on complaint |
-| `status_changed` | AlertCircle | Complaint status changed |
-| `complaint_reopened` | AlertCircle | Complaint reopened |
-| `new_announcement` | Bell | New announcement posted |
-| `new_vote` | FileText | New vote available |
+| Notification Type     | Icon          | Description                    |
+| --------------------- | ------------- | ------------------------------ |
+| `comment_added`       | MessageSquare | New comment on complaint       |
+| `complaint_assigned`  | UserPlus      | Complaint assigned to lecturer |
+| `complaint_escalated` | TrendingUp    | Complaint escalated            |
+| `complaint_opened`    | FileText      | Complaint opened by lecturer   |
+| `new_complaint`       | FileText      | New complaint submitted        |
+| `feedback_received`   | MessageSquare | Feedback received on complaint |
+| `status_changed`      | AlertCircle   | Complaint status changed       |
+| `complaint_reopened`  | AlertCircle   | Complaint reopened             |
+| `new_announcement`    | Bell          | New announcement posted        |
+| `new_vote`            | FileText      | New vote available             |
 
 ### 2. Color Coding by Notification Type
 
 Each notification type has a distinct color scheme:
 
-| Notification Type | Color | Visual Purpose |
-|------------------|-------|----------------|
-| `complaint_escalated` | Red | Urgent/Critical attention |
-| `complaint_assigned` | Blue | Assignment/Action required |
-| `feedback_received` | Green | Positive/Response received |
-| `comment_added` | Green | Communication/Discussion |
-| `complaint_opened` | Purple | New activity |
-| `new_complaint` | Purple | New submission |
-| `status_changed` | Orange | Status update |
-| `complaint_reopened` | Yellow | Reopened/Attention needed |
-| `new_announcement` | Indigo | Information |
-| `new_vote` | Cyan | Participation requested |
+| Notification Type     | Color  | Visual Purpose             |
+| --------------------- | ------ | -------------------------- |
+| `complaint_escalated` | Red    | Urgent/Critical attention  |
+| `complaint_assigned`  | Blue   | Assignment/Action required |
+| `feedback_received`   | Green  | Positive/Response received |
+| `comment_added`       | Green  | Communication/Discussion   |
+| `complaint_opened`    | Purple | New activity               |
+| `new_complaint`       | Purple | New submission             |
+| `status_changed`      | Orange | Status update              |
+| `complaint_reopened`  | Yellow | Reopened/Attention needed  |
+| `new_announcement`    | Indigo | Information                |
+| `new_vote`            | Cyan   | Participation requested    |
 
 ### 3. Visual Implementation
 
 #### Notification Dropdown
+
 - Icons displayed with color coding
 - Compact view with icon, title, message, and timestamp
 - Unread indicator (blue dot)
 - Grouped by notification type with collapsible sections
 
 #### Notifications Page
+
 - Icons displayed in colored circular backgrounds
 - Full-page view with expanded details
 - Background color with 10% opacity for visual distinction
@@ -61,21 +63,25 @@ Each notification type has a distinct color scheme:
 ## Files Modified
 
 ### 1. `src/components/notifications/notification-dropdown.tsx`
+
 - Updated `getNotificationIcon()` to include all notification types
 - Updated `getNotificationColor()` to include all notification types with distinct colors
 - Icons and colors applied to notification items
 
 ### 2. `src/app/notifications/page.tsx`
+
 - Updated `getNotificationIcon()` to match dropdown implementation
 - Updated `getNotificationColor()` to include background colors
 - Applied colors to notification group headers with circular icon backgrounds
 
 ### 3. `src/lib/api/notifications-mock.ts` (NEW)
+
 - Created mock notification data covering all 10 notification types
 - Provides realistic test data for UI development
 - Includes various timestamps to test relative time display
 
 ### 4. `src/lib/api/notifications.ts`
+
 - Added mock data toggle for development phase
 - Integrated mock API functions
 - Maintains real API implementation for Phase 12
@@ -100,6 +106,7 @@ The implementation includes comprehensive mock data with examples of all notific
 ## Visual Examples
 
 ### Notification Dropdown
+
 ```
 ┌─────────────────────────────────────┐
 │ Notifications              [5]      │
@@ -117,6 +124,7 @@ The implementation includes comprehensive mock data with examples of all notific
 ```
 
 ### Notifications Page
+
 ```
 ┌─────────────────────────────────────────┐
 │ Escalations                    [1 unread]│
@@ -131,6 +139,7 @@ The implementation includes comprehensive mock data with examples of all notific
 ## Color Accessibility
 
 All colors have been chosen to:
+
 - Provide clear visual distinction between notification types
 - Maintain readability in both light and dark modes
 - Follow semantic color conventions (red=urgent, green=positive, etc.)
@@ -148,6 +157,7 @@ To test the implementation:
 ## Future Enhancements (Phase 12)
 
 When connecting to real API:
+
 - Set `USE_MOCK_DATA = false` in `src/lib/api/notifications.ts`
 - Real-time updates via Supabase subscriptions
 - Actual notification creation from database triggers

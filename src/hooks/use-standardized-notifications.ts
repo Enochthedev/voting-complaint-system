@@ -18,10 +18,7 @@ import {
 } from '@/lib/api/standardized-notifications';
 import { useToast } from '@/components/ui/toast';
 import { StandardizedErrorHandler } from '@/lib/api/standardization/error-handler';
-import type {
-  StandardApiResponse,
-  PaginatedApiResponse,
-} from '@/lib/api/standardization/types';
+import type { StandardApiResponse, PaginatedApiResponse } from '@/lib/api/standardization/types';
 import { ErrorType } from '@/lib/api/standardization/types';
 import type { Notification } from '@/types/database.types';
 

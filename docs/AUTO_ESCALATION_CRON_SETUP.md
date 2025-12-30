@@ -5,6 +5,7 @@ This document explains how to set up and manage the hourly cron job that automat
 ## Overview
 
 The auto-escalation system uses:
+
 - **Supabase Edge Function**: `auto-escalate-complaints` (processes escalation logic)
 - **pg_cron Extension**: Schedules the function to run every hour
 - **pg_net Extension**: Makes HTTP requests from Postgres to invoke the Edge Function
@@ -59,17 +60,18 @@ select vault.update_secret(
 Check that the cron job was created successfully:
 
 ```sql
-select 
-  jobid, 
-  jobname, 
-  schedule, 
-  active, 
-  command 
-from cron.job 
+select
+  jobid,
+  jobname,
+  schedule,
+  active,
+  command
+from cron.job
 where jobname = 'auto-escalate-complaints-hourly';
 ```
 
 Expected output:
+
 - **jobname**: `auto-escalate-complaints-hourly`
 - **schedule**: `0 * * * *` (every hour at minute 0)
 - **active**: `true`
@@ -89,7 +91,7 @@ where jobname = 'auto-escalate-complaints-hourly';
 
 ```sql
 -- View recent job runs
-select 
+select
   runid,
   jobid,
   status,
@@ -98,8 +100,8 @@ select
   end_time
 from cron.job_run_details
 where jobid = (
-  select jobid 
-  from cron.job 
+  select jobid
+  from cron.job
   where jobname = 'auto-escalate-complaints-hourly'
 )
 order by start_time desc
@@ -187,7 +189,7 @@ The `pg_net` extension stores HTTP responses in the `net._http_response` table:
 
 ```sql
 -- View recent Edge Function responses
-select 
+select
   id,
   status_code,
   content,
@@ -202,7 +204,7 @@ limit 10;
 
 ```sql
 -- Find failed requests
-select 
+select
   id,
   status_code,
   error_msg,
@@ -217,7 +219,7 @@ order by created desc;
 
 ```sql
 -- View recent escalations
-select 
+select
   ch.complaint_id,
   c.title,
   ch.action,
@@ -238,11 +240,13 @@ limit 20;
 ### Job Not Running
 
 1. **Check if the job is active:**
+
    ```sql
    select active from cron.job where jobname = 'auto-escalate-complaints-hourly';
    ```
 
 2. **Check for errors in job runs:**
+
    ```sql
    select status, return_message
    from cron.job_run_details
@@ -259,11 +263,13 @@ limit 20;
 ### Edge Function Not Being Called
 
 1. **Check Vault secrets are set:**
+
    ```sql
    select name from vault.secrets where name in ('project_url', 'anon_key');
    ```
 
 2. **Verify pg_net extension is enabled:**
+
    ```sql
    select * from pg_extension where extname = 'pg_net';
    ```
@@ -276,14 +282,16 @@ limit 20;
 ### No Complaints Being Escalated
 
 1. **Check if there are active escalation rules:**
+
    ```sql
    select * from escalation_rules where is_active = true;
    ```
 
 2. **Check if there are complaints that meet escalation criteria:**
+
    ```sql
    -- Example: Check for complaints older than 24 hours
-   select 
+   select
      id,
      title,
      category,
@@ -308,6 +316,7 @@ limit 20;
 ## Local Development
 
 For local development, the migration uses default values:
+
 - **Project URL**: `http://host.docker.internal:54321`
 - **Anon Key**: Default Supabase local development key
 

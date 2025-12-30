@@ -3,6 +3,7 @@
 ## Test Scenario: Bulk Status Change with Progress
 
 ### Setup
+
 1. Navigate to `/complaints` page
 2. Ensure you're logged in as a lecturer or admin
 3. Have at least 10 complaints visible in the list
@@ -10,6 +11,7 @@
 ### Test Steps
 
 #### 1. Select Multiple Complaints
+
 ```
 ✓ Click checkboxes on 10 complaints
 ✓ Verify bulk action bar appears at bottom of screen
@@ -17,6 +19,7 @@
 ```
 
 #### 2. Trigger Bulk Status Change
+
 ```
 ✓ Click "Change Status" button in bulk action bar
 ✓ Select "In Progress" from dropdown
@@ -25,6 +28,7 @@
 ```
 
 #### 3. Observe Progress Indicator
+
 ```
 Expected Visual Sequence:
 
@@ -52,6 +56,7 @@ Expected Visual Sequence:
 ```
 
 #### 4. Verify Completion
+
 ```
 ✓ Progress bar disappears after ~500ms
 ✓ Selection is cleared (no complaints selected)
@@ -64,12 +69,14 @@ Expected Visual Sequence:
 ### Test Steps
 
 #### 1. Select Complaints
+
 ```
 ✓ Select 5 complaints
 ✓ Bulk action bar appears
 ```
 
 #### 2. Trigger Assignment
+
 ```
 ✓ Click "Assign" button
 ✓ Confirmation modal appears
@@ -78,6 +85,7 @@ Expected Visual Sequence:
 ```
 
 #### 3. Complete Assignment
+
 ```
 ✓ Select a lecturer from dropdown
 ✓ Click "Assign" button in modal
@@ -85,6 +93,7 @@ Expected Visual Sequence:
 ```
 
 #### 4. Observe Progress
+
 ```
 Expected Visual Sequence:
 
@@ -115,12 +124,14 @@ Expected Visual Sequence:
 ### Test Steps
 
 #### 1. Select Complaints
+
 ```
 ✓ Select 8 complaints
 ✓ Bulk action bar appears
 ```
 
 #### 2. Trigger Tag Addition
+
 ```
 ✓ Click "Add Tags" button
 ✓ Confirmation modal appears
@@ -129,6 +140,7 @@ Expected Visual Sequence:
 ```
 
 #### 3. Add Tags
+
 ```
 ✓ Enter tags: "urgent", "facilities"
 ✓ Click "Add Tags" button in modal
@@ -136,6 +148,7 @@ Expected Visual Sequence:
 ```
 
 #### 4. Observe Progress
+
 ```
 Expected Visual Sequence:
 
@@ -164,6 +177,7 @@ Expected Visual Sequence:
 ## Visual Elements to Verify
 
 ### Progress Bar Component
+
 ```
 ┌─────────────────────────────────────────────┐
 │ Adding 2 tags to 8 complaints...      45%  │
@@ -172,6 +186,7 @@ Expected Visual Sequence:
 ```
 
 **Elements:**
+
 - Label text (left): Current operation message
 - Percentage (right): Numeric progress value
 - Progress bar: Blue fill showing completion
@@ -180,6 +195,7 @@ Expected Visual Sequence:
 ### Bulk Action Bar States
 
 #### Normal State (No Progress)
+
 ```
 ┌──────────────────────────────────────────────────────────┐
 │ 5 complaints selected • Select none                      │
@@ -189,6 +205,7 @@ Expected Visual Sequence:
 ```
 
 #### With Progress
+
 ```
 ┌──────────────────────────────────────────────────────────┐
 │ 5 complaints selected • Select none                      │
@@ -205,6 +222,7 @@ Expected Visual Sequence:
 ## Edge Cases to Test
 
 ### 1. Single Complaint
+
 ```
 ✓ Select 1 complaint
 ✓ Trigger any bulk action
@@ -213,6 +231,7 @@ Expected Visual Sequence:
 ```
 
 ### 2. Large Selection (50+ complaints)
+
 ```
 ✓ Select 50 complaints
 ✓ Trigger bulk status change
@@ -221,6 +240,7 @@ Expected Visual Sequence:
 ```
 
 ### 3. Rapid Action Attempts
+
 ```
 ✓ Select complaints
 ✓ Trigger bulk action
@@ -230,6 +250,7 @@ Expected Visual Sequence:
 ```
 
 ### 4. Multiple Progress Types
+
 ```
 ✓ Export progress and bulk action progress are separate
 ✓ Only one should show at a time
@@ -239,6 +260,7 @@ Expected Visual Sequence:
 ## Accessibility Checks
 
 ### Keyboard Navigation
+
 ```
 ✓ Tab through action buttons
 ✓ Enter/Space to activate
@@ -246,6 +268,7 @@ Expected Visual Sequence:
 ```
 
 ### Screen Reader
+
 ```
 ✓ Progress percentage announced
 ✓ Status messages read aloud
@@ -253,6 +276,7 @@ Expected Visual Sequence:
 ```
 
 ### Visual Indicators
+
 ```
 ✓ Progress bar has sufficient contrast
 ✓ Percentage text is readable
@@ -262,6 +286,7 @@ Expected Visual Sequence:
 ## Performance Checks
 
 ### Animation Smoothness
+
 ```
 ✓ Progress bar fills smoothly (no jumps)
 ✓ Transitions use CSS animations
@@ -269,6 +294,7 @@ Expected Visual Sequence:
 ```
 
 ### State Management
+
 ```
 ✓ Progress state cleared after completion
 ✓ No memory leaks from intervals/timeouts
@@ -289,15 +315,19 @@ Expected Visual Sequence:
 ## Common Issues and Solutions
 
 ### Issue: Progress bar doesn't appear
+
 **Solution:** Check that `isBulkActionLoading` is set to `true`
 
 ### Issue: Progress stuck at certain percentage
+
 **Solution:** Verify async operations are completing properly
 
 ### Issue: Buttons not disabled during progress
+
 **Solution:** Check `isAnyActionInProgress` flag is working
 
 ### Issue: Progress bar doesn't disappear
+
 **Solution:** Ensure state is cleared in finally block
 
 ## Related Documentation

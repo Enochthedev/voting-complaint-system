@@ -1,11 +1,13 @@
 # Notification Grouping Implementation
 
 ## Overview
+
 Implemented notification grouping by type in both the notification dropdown and the full notifications page.
 
 ## Changes Made
 
 ### 1. Updated `notification-dropdown.tsx`
+
 - Added `getNotificationTypeLabel()` function to provide user-friendly labels for each notification type
 - Added `groupNotificationsByType()` function to organize notifications into groups
 - Created `NotificationGroup` component with:
@@ -16,9 +18,11 @@ Implemented notification grouping by type in both the notification dropdown and 
   - All notifications within each group displayed when expanded
 
 ### 2. Updated `notification-bell.tsx`
+
 - No changes needed - continues to work with the updated dropdown
 
 ### 3. Updated `use-notifications.ts` hook
+
 - Enhanced mock data to include diverse notification types:
   - Comments (2 notifications)
   - Feedback (2 notifications)
@@ -30,6 +34,7 @@ Implemented notification grouping by type in both the notification dropdown and 
 - Total of 10 notifications with 6 unread to demonstrate grouping
 
 ### 4. Updated `notifications/page.tsx`
+
 - Migrated from custom mock data to use `useNotifications` hook
 - Added notification grouping with collapsible cards
 - Each group displays as a Card with:
@@ -44,7 +49,9 @@ Implemented notification grouping by type in both the notification dropdown and 
 ## Features
 
 ### Notification Groups
+
 Notifications are grouped by the following types:
+
 - **Comments** - Green icon, for comment_added notifications
 - **Assignments** - Blue icon, for complaint_assigned notifications
 - **Escalations** - Red icon, for complaint_escalated notifications
@@ -57,6 +64,7 @@ Notifications are grouped by the following types:
 - **Votes** - for new_vote notifications
 
 ### User Experience
+
 1. **Dropdown View**:
    - Compact grouped view in dropdown menu
    - Shows group headers with counts
@@ -71,6 +79,7 @@ Notifications are grouped by the following types:
    - Same expand/collapse and mark-as-read functionality
 
 ### Visual Indicators
+
 - Unread notifications have a blue dot indicator
 - Unread count badge on each group header
 - Different colors for different notification types
@@ -78,7 +87,9 @@ Notifications are grouped by the following types:
 - Smooth transitions for expand/collapse
 
 ## Testing
+
 To test the implementation:
+
 1. Navigate to the dashboard or any page with the notification bell
 2. Click the notification bell to open the dropdown
 3. Observe notifications grouped by type (Comments, Feedback, Status Changes, etc.)
@@ -88,6 +99,7 @@ To test the implementation:
 7. Visit `/notifications` page to see full-page grouped view
 
 ## Future Enhancements (Phase 12)
+
 - Connect to real Supabase notifications table
 - Real-time updates via Supabase Realtime
 - Persistent expand/collapse state

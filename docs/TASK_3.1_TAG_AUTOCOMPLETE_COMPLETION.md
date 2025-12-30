@@ -1,7 +1,9 @@
 # Task 3.1: Tag Input with Autocomplete - Implementation Summary
 
 ## Overview
+
 Implemented an autocomplete tag input feature for the complaint submission form that allows users to:
+
 - Search and select from existing popular tags
 - Create new custom tags
 - Navigate suggestions using keyboard (Arrow keys, Enter, Escape)
@@ -12,29 +14,34 @@ Implemented an autocomplete tag input feature for the complaint submission form 
 ### Features Implemented
 
 #### 1. **Autocomplete Dropdown**
+
 - Shows up to 8 filtered suggestions based on user input
 - Filters out tags that are already added to the complaint
 - Case-insensitive search across all popular tags
 - Automatically hides when no matches are found
 
 #### 2. **Keyboard Navigation**
+
 - **Enter**: Add the currently highlighted suggestion or create a new tag
 - **Arrow Down**: Navigate to the next suggestion
 - **Arrow Up**: Navigate to the previous suggestion
 - **Escape**: Close the suggestions dropdown
 
 #### 3. **Mouse Interaction**
+
 - Click on any suggestion to add it
 - Hover over suggestions to highlight them
 - Click outside to close the dropdown
 
 #### 4. **Visual Feedback**
+
 - Active suggestion is highlighted with a different background color
 - Shows a hint when user is about to create a new tag
 - Displays all added tags as removable chips
 - Accessible ARIA attributes for screen readers
 
 #### 5. **Mock Data (UI-First Development)**
+
 - Uses 20 popular tags for autocomplete suggestions:
   - wifi-issues, classroom, assignment, grading, schedule
   - equipment, parking, library, cafeteria, registration
@@ -46,6 +53,7 @@ Implemented an autocomplete tag input feature for the complaint submission form 
 #### File: `src/components/complaints/complaint-form.tsx`
 
 **New State Variables:**
+
 ```typescript
 const [showSuggestions, setShowSuggestions] = React.useState(false);
 const [filteredSuggestions, setFilteredSuggestions] = React.useState<string[]>([]);
@@ -55,19 +63,37 @@ const suggestionsRef = React.useRef<HTMLDivElement>(null);
 ```
 
 **Popular Tags Array:**
+
 ```typescript
 const popularTags = React.useMemo(
   () => [
-    'wifi-issues', 'classroom', 'assignment', 'grading', 'schedule',
-    'equipment', 'parking', 'library', 'cafeteria', 'registration',
-    'exam', 'professor', 'course-material', 'lab', 'software',
-    'hardware', 'accessibility', 'safety', 'cleanliness', 'noise',
+    'wifi-issues',
+    'classroom',
+    'assignment',
+    'grading',
+    'schedule',
+    'equipment',
+    'parking',
+    'library',
+    'cafeteria',
+    'registration',
+    'exam',
+    'professor',
+    'course-material',
+    'lab',
+    'software',
+    'hardware',
+    'accessibility',
+    'safety',
+    'cleanliness',
+    'noise',
   ],
   []
 );
 ```
 
 **Key Functions:**
+
 1. **Filter Effect**: Automatically filters suggestions based on input
 2. **Click Outside Handler**: Closes dropdown when clicking outside
 3. **handleAddTag**: Adds tag from suggestion or creates new one
@@ -77,18 +103,21 @@ const popularTags = React.useMemo(
 ### UI Components
 
 #### Autocomplete Dropdown
+
 - Positioned absolutely below the input field
 - Z-index of 10 to appear above other elements
 - Max height of 60 (15rem) with scrolling for many suggestions
 - Styled with border, shadow, and proper dark mode support
 
 #### Tag Input Field
+
 - Includes helpful placeholder text
 - Shows autocomplete="off" to prevent browser autocomplete
 - ARIA attributes for accessibility (aria-autocomplete, aria-controls, aria-expanded)
 - Focus management to keep dropdown open when needed
 
 #### Tag Chips
+
 - Display added tags as removable pills
 - Each tag has a remove button (×)
 - Disabled state when form is submitting
@@ -116,11 +145,13 @@ const popularTags = React.useMemo(
 ### Testing Considerations
 
 The implementation follows the UI-first development approach:
+
 - Uses mock data for popular tags
 - No database queries during UI development
 - Ready for Phase 12 API integration
 
 **Future Integration (Phase 12):**
+
 ```typescript
 // Replace mock popularTags with real database query
 const { data: existingTags } = await supabase
@@ -129,12 +160,13 @@ const { data: existingTags } = await supabase
   .order('created_at', { ascending: false })
   .limit(100);
 
-const popularTags = [...new Set(existingTags.map(t => t.tag_name))];
+const popularTags = [...new Set(existingTags.map((t) => t.tag_name))];
 ```
 
 ## User Experience
 
 ### Adding Tags Flow
+
 1. User starts typing in the tag input field
 2. Autocomplete dropdown appears with matching suggestions
 3. User can:
@@ -146,6 +178,7 @@ const popularTags = [...new Set(existingTags.map(t => t.tag_name))];
 5. User can remove tags by clicking the × button
 
 ### Visual States
+
 - **Empty**: Input field with placeholder text
 - **Typing**: Dropdown appears with filtered suggestions
 - **No Matches**: Hint shows user can create new tag

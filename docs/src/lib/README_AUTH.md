@@ -5,9 +5,11 @@ This directory contains the authentication and authorization logic for the Stude
 ## Files
 
 ### `auth.ts`
+
 Client-side authentication helpers for use in Client Components.
 
 **Key Functions:**
+
 - `signUp()` - Register new users
 - `signIn()` - Authenticate users
 - `signOut()` - Sign out current user
@@ -20,27 +22,33 @@ Client-side authentication helpers for use in Client Components.
 - `onAuthStateChange()` - Subscribe to auth changes
 
 ### `auth-server.ts`
+
 Server-side authentication helpers for Server Components, API routes, and Server Actions.
 
 **Key Functions:**
+
 - All client functions with `Server` suffix
 - `requireAuthServer()` - Require authentication (throws if not authenticated)
 - `requireRoleServer()` - Require specific role (throws if not authorized)
 - `requireLecturerOrAdminServer()` - Require elevated permissions
 
 ### `supabase.ts`
+
 Supabase client configuration with auth settings.
 
 **Configuration:**
+
 - Session persistence enabled
 - Auto token refresh enabled
 - PKCE flow for security
 - Custom storage key
 
 ### `supabase-server.ts`
+
 Server-side Supabase client with cookie-based session management.
 
 ### `supabase-utils.ts`
+
 Legacy utility functions (deprecated - use `auth.ts` instead).
 
 ## Usage
@@ -53,12 +61,7 @@ Legacy utility functions (deprecated - use `auth.ts` instead).
 import { signUp, signIn, getCurrentUser } from '@/lib/auth';
 
 // Sign up
-const { user, error } = await signUp(
-  'user@example.com',
-  'Password123',
-  'John Doe',
-  'student'
-);
+const { user, error } = await signUp('user@example.com', 'Password123', 'John Doe', 'student');
 
 // Sign in
 const { user, error } = await signIn('user@example.com', 'Password123');
@@ -91,6 +94,7 @@ The system supports three roles:
 3. **admin** - Full system access including escalation rules
 
 Roles are stored in:
+
 - `auth.users.user_metadata.role` (Supabase Auth)
 - `public.users.role` (Application database)
 
@@ -111,6 +115,7 @@ if (permissions.canManageComplaints) {
 ```
 
 Available permissions:
+
 - `canViewAllComplaints`
 - `canManageComplaints`
 - `canCreateVotes`
@@ -123,18 +128,21 @@ Available permissions:
 ## Security
 
 ### Password Requirements
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
 - At least one number
 
 ### Session Management
+
 - Sessions stored in HTTP-only cookies
 - Auto-refresh enabled
 - 1 hour session duration (configurable)
 - 30 day refresh token duration
 
 ### Best Practices
+
 1. Always use server-side functions for sensitive operations
 2. Validate roles on both client and server
 3. Use `requireAuthServer()` for protected routes
@@ -158,6 +166,7 @@ node scripts/test-auth-functions.js
 ## Environment Variables
 
 Required:
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key

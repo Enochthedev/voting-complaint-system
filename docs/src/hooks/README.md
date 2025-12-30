@@ -11,6 +11,7 @@ Manages file upload state and provides functions for uploading attachments to co
 **Location**: `use-attachment-upload.ts`
 
 **Features**:
+
 - Upload single or multiple files
 - Track upload progress for each file
 - Manage uploaded attachments
@@ -18,6 +19,7 @@ Manages file upload state and provides functions for uploading attachments to co
 - Remove uploaded attachments
 
 **Usage**:
+
 ```typescript
 import { useAttachmentUpload } from '@/hooks/use-attachment-upload';
 
@@ -47,6 +49,7 @@ function MyComponent() {
 ```
 
 **See Also**:
+
 - `src/lib/attachment-upload.ts` - Core upload functions
 - `docs/ATTACHMENT_UPLOAD_QUICK_START.md` - Quick start guide
 - `docs/ATTACHMENT_UPLOAD_IMPLEMENTATION.md` - Detailed documentation
@@ -91,7 +94,7 @@ export function useMyHook(param: string): UseMyHookReturn {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Fetch data
       const result = await fetchSomething(param);
@@ -146,8 +149,8 @@ export function useFormState<T>(initialState: T) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const updateField = (field: keyof T, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: '' }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
   const reset = () => {
@@ -168,14 +171,18 @@ export function useRealtimeNotifications(userId: string) {
   useEffect(() => {
     const subscription = supabase
       .channel('notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${userId}`,
-      }, (payload) => {
-        setNotifications(prev => [payload.new, ...prev]);
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new, ...prev]);
+        }
+      )
       .subscribe();
 
     return () => {

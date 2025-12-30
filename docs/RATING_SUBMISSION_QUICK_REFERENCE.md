@@ -12,8 +12,8 @@ try {
   const rating = await submitRating(
     'complaint-id',
     'student-id',
-    5,  // rating (1-5)
-    'Great service!'  // optional feedback
+    5, // rating (1-5)
+    'Great service!' // optional feedback
   );
   console.log('Rating submitted:', rating);
 } catch (error) {
@@ -39,7 +39,7 @@ import { RatingPrompt } from '@/components/complaints/rating-prompt';
     await submitRating(complaint.id, userId, rating, feedbackText);
   }}
   onDismiss={() => setShowPrompt(false)}
-/>
+/>;
 ```
 
 ## For Users
@@ -67,13 +67,13 @@ import { RatingPrompt } from '@/components/complaints/rating-prompt';
 
 ## Error Messages
 
-| Error | Meaning | Solution |
-|-------|---------|----------|
-| "Rating must be between 1 and 5" | Invalid rating value | Select 1-5 stars |
-| "Can only rate resolved complaints" | Complaint not resolved yet | Wait for resolution |
-| "Only the complaint owner can rate" | Not your complaint | Can only rate your own complaints |
-| "You have already rated this complaint" | Duplicate rating attempt | Rating already submitted |
-| "Failed to submit rating" | Network/server error | Try again later |
+| Error                                   | Meaning                    | Solution                          |
+| --------------------------------------- | -------------------------- | --------------------------------- |
+| "Rating must be between 1 and 5"        | Invalid rating value       | Select 1-5 stars                  |
+| "Can only rate resolved complaints"     | Complaint not resolved yet | Wait for resolution               |
+| "Only the complaint owner can rate"     | Not your complaint         | Can only rate your own complaints |
+| "You have already rated this complaint" | Duplicate rating attempt   | Rating already submitted          |
+| "Failed to submit rating"               | Network/server error       | Try again later                   |
 
 ## Database Schema
 
@@ -90,19 +90,22 @@ created_at      TIMESTAMP
 ## RLS Policies
 
 ### Insert Policy
+
 Students can only rate their own resolved complaints:
+
 - Must be authenticated
 - Must be the complaint owner
 - Complaint must be resolved
 
 ### Select Policy
+
 - Students can view their own ratings
 - Lecturers and admins can view all ratings
 
 ## Related Files
 
 - **API**: `src/lib/api/complaints.ts`
-- **Components**: 
+- **Components**:
   - `src/components/complaints/rating-prompt.tsx`
   - `src/components/complaints/rating-form.tsx`
 - **Detail View**: `src/components/complaints/complaint-detail/index.tsx`
@@ -111,11 +114,13 @@ Students can only rate their own resolved complaints:
 ## Validation Rules
 
 ### Client-Side
+
 - Rating selection required
 - Feedback text max 500 characters
 - Form disabled during submission
 
 ### Server-Side
+
 - Rating must be 1-5 (database constraint)
 - Complaint must exist and be resolved
 - Only complaint owner can rate
@@ -136,7 +141,9 @@ Students can only rate their own resolved complaints:
 ## Common Issues
 
 ### Rating Prompt Not Showing
+
 **Possible Causes**:
+
 - Complaint not resolved yet
 - Already rated this complaint
 - Prompt was dismissed (check localStorage)
@@ -145,7 +152,9 @@ Students can only rate their own resolved complaints:
 **Solution**: Check complaint status and rating history
 
 ### Rating Submission Fails
+
 **Possible Causes**:
+
 - Network connection issue
 - Database constraint violation
 - Invalid rating value

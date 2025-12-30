@@ -43,10 +43,12 @@ The system provides clear, actionable error messages:
 ### 5. Visual Indicators
 
 #### Notification Bell
+
 - Shows a yellow warning dot when connection has issues (only when no unread notifications)
 - Maintains normal unread badge when notifications are present
 
 #### Notification Dropdown
+
 - Displays a connection status banner at the top when not connected
 - Shows appropriate color coding:
   - **Blue**: Connecting
@@ -64,8 +66,8 @@ const {
   unreadCount,
   isLoading,
   error,
-  connectionState,      // NEW: Connection state tracking
-  retryConnection,      // NEW: Manual retry function
+  connectionState, // NEW: Connection state tracking
+  retryConnection, // NEW: Manual retry function
   markAsRead,
   markAllAsRead,
   refreshNotifications,
@@ -93,6 +95,7 @@ Attempting Connection: connecting
 ### Error Handling Scenarios
 
 #### 1. Channel Error
+
 ```typescript
 status === 'CHANNEL_ERROR'
 → Set connectionState to 'error'
@@ -102,6 +105,7 @@ status === 'CHANNEL_ERROR'
 ```
 
 #### 2. Connection Timeout
+
 ```typescript
 status === 'TIMED_OUT'
 → Set connectionState to 'error'
@@ -111,6 +115,7 @@ status === 'TIMED_OUT'
 ```
 
 #### 3. Unexpected Closure
+
 ```typescript
 status === 'CLOSED'
 → Set connectionState to 'disconnected'
@@ -119,6 +124,7 @@ status === 'CLOSED'
 ```
 
 #### 4. Authentication Error
+
 ```typescript
 authError || !user
 → Set connectionState to 'error'
@@ -139,12 +145,14 @@ This prevents memory leaks and ensures clean component lifecycle management.
 ## User Experience
 
 ### Normal Operation
+
 1. User opens the app
 2. Connection establishes automatically
 3. Real-time notifications work seamlessly
 4. No error indicators shown
 
 ### Connection Issue
+
 1. Network issue occurs
 2. Connection fails
 3. Yellow warning indicator appears on bell (if no unread notifications)
@@ -152,6 +160,7 @@ This prevents memory leaks and ensures clean component lifecycle management.
 5. User can continue using the app (notifications still work via polling)
 
 ### Manual Recovery
+
 1. User notices connection issue
 2. Opens notification dropdown
 3. Sees connection status banner with "Retry" button
@@ -205,14 +214,14 @@ The test file `src/hooks/__tests__/use-notifications-connection-errors.test.ts` 
 You can adjust retry behavior by modifying these constants in `use-notifications.ts`:
 
 ```typescript
-const maxRetries = 5;           // Maximum retry attempts
-const baseRetryDelay = 1000;    // Base delay in milliseconds (1 second)
+const maxRetries = 5; // Maximum retry attempts
+const baseRetryDelay = 1000; // Base delay in milliseconds (1 second)
 ```
 
 ### Exponential Backoff Formula
 
 ```typescript
-delay = Math.min(baseRetryDelay * Math.pow(2, retryCount), 30000)
+delay = Math.min(baseRetryDelay * Math.pow(2, retryCount), 30000);
 ```
 
 This ensures delays don't exceed 30 seconds.
@@ -237,17 +246,20 @@ Potential improvements for future iterations:
 ## Troubleshooting
 
 ### Connection keeps failing
+
 - Check Supabase project status
 - Verify network connectivity
 - Check browser console for detailed errors
 - Verify Supabase Realtime is enabled for the project
 
 ### Retry button doesn't work
+
 - Check browser console for errors
 - Verify authentication is valid
 - Try refreshing the page
 
 ### No error indicator shown
+
 - Connection may be working normally
 - Check `connectionState` in React DevTools
 - Verify error conditions are actually occurring

@@ -18,24 +18,24 @@ The CSV export feature allows users to export all complaints that match the curr
 
 The exported CSV file includes the following columns:
 
-| Column | Description |
-|--------|-------------|
-| ID | Unique complaint identifier |
-| Title | Complaint title |
-| Status | Current status (New, Opened, In Progress, Resolved, etc.) |
-| Priority | Priority level (Low, Medium, High, Critical) |
-| Category | Complaint category (Academic, Facilities, etc.) |
-| Submitted By | Student name or "Anonymous" |
-| Assigned To | Assigned lecturer/admin name or "Unassigned" |
-| Tags | Semicolon-separated list of tags |
-| Created Date | Date and time complaint was created |
-| Updated Date | Date and time complaint was last updated |
-| Opened Date | Date and time complaint was opened (if applicable) |
-| Resolved Date | Date and time complaint was resolved (if applicable) |
-| Escalation Level | Current escalation level (0 if not escalated) |
-| Is Anonymous | Yes/No indicator |
-| Is Draft | Yes/No indicator |
-| Description | Complaint description (HTML tags stripped) |
+| Column           | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| ID               | Unique complaint identifier                               |
+| Title            | Complaint title                                           |
+| Status           | Current status (New, Opened, In Progress, Resolved, etc.) |
+| Priority         | Priority level (Low, Medium, High, Critical)              |
+| Category         | Complaint category (Academic, Facilities, etc.)           |
+| Submitted By     | Student name or "Anonymous"                               |
+| Assigned To      | Assigned lecturer/admin name or "Unassigned"              |
+| Tags             | Semicolon-separated list of tags                          |
+| Created Date     | Date and time complaint was created                       |
+| Updated Date     | Date and time complaint was last updated                  |
+| Opened Date      | Date and time complaint was opened (if applicable)        |
+| Resolved Date    | Date and time complaint was resolved (if applicable)      |
+| Escalation Level | Current escalation level (0 if not escalated)             |
+| Is Anonymous     | Yes/No indicator                                          |
+| Is Draft         | Yes/No indicator                                          |
+| Description      | Complaint description (HTML tags stripped)                |
 
 ### 3. CSV Special Character Handling
 
@@ -49,6 +49,7 @@ The export utility properly handles CSV special characters:
 ### 4. File Naming
 
 Exported files are automatically named with:
+
 - Current date (YYYY-MM-DD format)
 - Active status filters (if any)
 - Timestamp for uniqueness
@@ -106,14 +107,18 @@ Students see a "New Complaint" button instead of the export button, as they typi
 Exports a list of complaints to CSV format with all default fields.
 
 **Parameters:**
+
 - `complaints`: Array of complaint objects with details
 - `filename` (optional): Custom filename for the export
 
 **Example:**
+
 ```typescript
 import { exportComplaintsToCSV } from '@/lib/export';
 
-const complaints = [/* ... */];
+const complaints = [
+  /* ... */
+];
 exportComplaintsToCSV(complaints, 'my_complaints.csv');
 ```
 
@@ -122,15 +127,19 @@ exportComplaintsToCSV(complaints, 'my_complaints.csv');
 Exports complaints with custom field selection.
 
 **Parameters:**
+
 - `complaints`: Array of complaint objects
 - `fields`: Object specifying which fields to include
 - `filename` (optional): Custom filename
 
 **Example:**
+
 ```typescript
 import { exportComplaintsToCSVCustom } from '@/lib/export';
 
-const complaints = [/* ... */];
+const complaints = [
+  /* ... */
+];
 const fields = {
   id: true,
   title: true,
@@ -193,6 +202,7 @@ The CSV export feature is compatible with:
 - Opera (latest)
 
 The feature uses standard Web APIs:
+
 - `Blob` for file creation
 - `URL.createObjectURL()` for download links
 - `document.createElement()` for triggering downloads

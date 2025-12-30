@@ -1,6 +1,7 @@
 # Notifications Table - Summary
 
 ## Overview
+
 The notifications table has been created to support in-app notifications for the Student Complaint Resolution System. This table enables real-time notification delivery to users when various events occur in the system.
 
 ## Files Created
@@ -116,16 +117,14 @@ Expected output: All checks should show "✓ PASS"
 ### Creating a Notification (via application code)
 
 ```typescript
-const { data, error } = await supabase
-  .from('notifications')
-  .insert({
-    user_id: userId,
-    type: 'complaint_opened',
-    title: 'Your complaint has been opened',
-    message: 'A lecturer has opened your complaint: "Issue with lab equipment"',
-    related_id: complaintId,
-    is_read: false
-  });
+const { data, error } = await supabase.from('notifications').insert({
+  user_id: userId,
+  type: 'complaint_opened',
+  title: 'Your complaint has been opened',
+  message: 'A lecturer has opened your complaint: "Issue with lab equipment"',
+  related_id: complaintId,
+  is_read: false,
+});
 ```
 
 ### Fetching User Notifications
@@ -159,7 +158,7 @@ const channel = supabase
       event: 'INSERT',
       schema: 'public',
       table: 'notifications',
-      filter: `user_id=eq.${userId}`
+      filter: `user_id=eq.${userId}`,
     },
     (payload) => {
       console.log('New notification:', payload.new);
@@ -172,11 +171,13 @@ const channel = supabase
 ## Dependencies
 
 This migration requires:
+
 - ✅ Migration 001: `create_users_table_extension.sql` (for users table reference)
 
 ## Next Steps
 
 After applying this migration:
+
 - [ ] Create votes and vote_responses tables (Task 1.2 - next sub-task)
 - [ ] Create announcements table (Task 1.2 - next sub-task)
 - [ ] Implement notification triggers (Task 6.1)
@@ -186,16 +187,21 @@ After applying this migration:
 ## Troubleshooting
 
 ### Error: "type notification_type already exists"
+
 The migration was already applied. You can skip this migration or drop the type first:
+
 ```sql
 DROP TYPE IF EXISTS notification_type CASCADE;
 ```
+
 Then re-run the migration.
 
 ### Error: "relation public.users does not exist"
+
 You need to apply migration 001 first (create_users_table_extension.sql).
 
 ### Notifications not appearing in real-time
+
 1. Check that Realtime is enabled in Supabase Dashboard > Database > Replication
 2. Verify the notifications table is enabled for Realtime
 3. Check that your subscription filter is correct

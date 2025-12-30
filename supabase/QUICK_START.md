@@ -27,9 +27,9 @@ const { data, error } = await supabase.auth.signUp({
   options: {
     data: {
       role: 'student',
-      full_name: 'Test User'
-    }
-  }
+      full_name: 'Test User',
+    },
+  },
 });
 
 // Profile is automatically created in public.users!
@@ -45,13 +45,14 @@ SELECT * FROM public.users LIMIT 5;
 SELECT enum_range(NULL::user_role);
 
 -- Check triggers
-SELECT trigger_name FROM information_schema.triggers 
+SELECT trigger_name FROM information_schema.triggers
 WHERE event_object_table = 'users';
 ```
 
 ## What's Next?
 
 After this migration:
+
 - [ ] Create complaints table
 - [ ] Create complaint-related tables
 - [ ] Set up indexes
@@ -62,12 +63,15 @@ See `docs/DATABASE_SETUP.md` for detailed documentation.
 ## Troubleshooting
 
 **Error: "type user_role already exists"**
+
 - The migration was already applied. Skip or drop the type first.
 
 **Error: "permission denied"**
+
 - Make sure you're using the SQL Editor in Supabase Dashboard with proper permissions.
 
 **Profile not created on signup?**
+
 - Check if trigger exists: `SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';`
 - Re-run the migration if needed.
 

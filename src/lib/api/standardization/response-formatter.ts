@@ -2,16 +2,16 @@
  * Response formatting utilities for API standardization
  */
 
-import type { 
-  ApiResponse, 
-  ApiError, 
-  ResponseMetadata, 
+import type {
+  ApiResponse,
+  ApiError,
+  ResponseMetadata,
   PaginationInfo,
   StandardApiResponse,
   StandardApiError,
   ResponseMeta,
   PaginatedApiResponse,
-  ErrorType
+  ErrorType,
 } from './types';
 import { ApiResponseWrapper } from './response-wrapper';
 

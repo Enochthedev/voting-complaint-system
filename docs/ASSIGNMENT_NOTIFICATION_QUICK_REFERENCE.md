@@ -8,13 +8,13 @@ Automatically creates a notification when a complaint is assigned or reassigned 
 
 ## Trigger Details
 
-| Property | Value |
-|----------|-------|
+| Property         | Value                               |
+| ---------------- | ----------------------------------- |
 | **Trigger Name** | `notify_on_complaint_status_change` |
-| **Function** | `notify_student_on_status_change()` |
-| **Table** | `complaints` |
-| **Event** | `AFTER UPDATE` |
-| **Status** | ✅ Enabled |
+| **Function**     | `notify_student_on_status_change()` |
+| **Table**        | `complaints`                        |
+| **Event**        | `AFTER UPDATE`                      |
+| **Status**       | ✅ Enabled                          |
 
 ## When It Fires
 
@@ -39,10 +39,7 @@ Automatically creates a notification when a complaint is assigned or reassigned 
 ### Assign a Complaint
 
 ```typescript
-await supabase
-  .from('complaints')
-  .update({ assigned_to: lecturerId })
-  .eq('id', complaintId);
+await supabase.from('complaints').update({ assigned_to: lecturerId }).eq('id', complaintId);
 // Notification automatically created ✅
 ```
 
@@ -65,6 +62,7 @@ node scripts/verify-assignment-notification-trigger.js
 ```
 
 Expected output:
+
 - ✅ Assignment notification created
 - ✅ Reassignment notification created
 - ✅ History entry logged
@@ -79,14 +77,14 @@ Expected output:
 
 ```sql
 -- Assign a complaint
-UPDATE complaints 
+UPDATE complaints
 SET assigned_to = 'your-lecturer-uuid'
 WHERE id = 'your-complaint-uuid';
 
 -- Check notification
-SELECT * FROM notifications 
-WHERE type = 'assignment' 
-ORDER BY created_at DESC 
+SELECT * FROM notifications
+WHERE type = 'assignment'
+ORDER BY created_at DESC
 LIMIT 1;
 ```
 

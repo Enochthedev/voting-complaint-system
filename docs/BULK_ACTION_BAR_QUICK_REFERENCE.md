@@ -11,7 +11,6 @@ import { BulkActionBar } from '@/components/complaints';
   selectedCount={selectedIds.size}
   totalCount={totalComplaints}
   userRole={userRole}
-  
   // Export
   isExporting={isExporting}
   exportProgress={exportProgress}
@@ -19,16 +18,14 @@ import { BulkActionBar } from '@/components/complaints';
   onExport={handleBulkExport}
   onExportWithAttachments={handleExportWithAttachments}
   hasAttachments={hasAttachments}
-  
   // Selection
   onSelectAll={handleSelectAll}
   onClearSelection={handleClearSelection}
-  
   // Bulk Actions (Lecturer/Admin only)
   onBulkStatusChange={handleBulkStatusChange}
   onBulkAssignment={handleBulkAssignment}
   onBulkTagAddition={handleBulkTagAddition}
-/>
+/>;
 ```
 
 ### BulkActionConfirmationModal
@@ -47,7 +44,7 @@ import { BulkActionConfirmationModal } from '@/components/complaints';
   cancelText="Cancel"
   onConfirm={handleConfirm}
   isLoading={isLoading}
-/>
+/>;
 ```
 
 ### BulkAssignmentModal
@@ -61,11 +58,11 @@ import { BulkAssignmentModal } from '@/components/complaints';
   itemCount={selectedIds.size}
   availableLecturers={[
     { id: '1', name: 'Dr. Smith' },
-    { id: '2', name: 'Prof. Johnson' }
+    { id: '2', name: 'Prof. Johnson' },
   ]}
   onConfirm={(lecturerId) => handleAssign(lecturerId)}
   isLoading={isLoading}
-/>
+/>;
 ```
 
 ### BulkTagAdditionModal
@@ -80,7 +77,7 @@ import { BulkTagAdditionModal } from '@/components/complaints';
   availableTags={['urgent', 'wifi', 'facilities']}
   onConfirm={(tags) => handleAddTags(tags)}
   isLoading={isLoading}
-/>
+/>;
 ```
 
 ## State Management Pattern
@@ -163,12 +160,12 @@ const performBulkStatusChange = async (status: ComplaintStatus) => {
   try {
     // API call
     await updateComplaintStatuses(Array.from(selectedIds), status);
-    
+
     // Clear selection
     setSelectedIds(new Set());
     setSelectionMode(false);
     setShowConfirmationModal(false);
-    
+
     // Show success
     toast.success('Status changed successfully');
   } catch (error) {
@@ -185,13 +182,15 @@ const performBulkStatusChange = async (status: ComplaintStatus) => {
 const isLecturerOrAdmin = userRole === 'lecturer' || userRole === 'admin';
 
 // In BulkActionBar, actions are conditionally rendered:
-{isLecturerOrAdmin && (
-  <>
-    <Button onClick={handleBulkStatusChange}>Change Status</Button>
-    <Button onClick={handleBulkAssignment}>Assign</Button>
-    <Button onClick={handleBulkTagAddition}>Add Tags</Button>
-  </>
-)}
+{
+  isLecturerOrAdmin && (
+    <>
+      <Button onClick={handleBulkStatusChange}>Change Status</Button>
+      <Button onClick={handleBulkAssignment}>Assign</Button>
+      <Button onClick={handleBulkTagAddition}>Add Tags</Button>
+    </>
+  );
+}
 ```
 
 ## API Integration Template
@@ -200,20 +199,20 @@ const isLecturerOrAdmin = userRole === 'lecturer' || userRole === 'admin';
 // Example: Bulk Status Change API Integration
 const performBulkStatusChange = async (status: ComplaintStatus) => {
   setIsBulkActionLoading(true);
-  
+
   try {
     const complaintIds = Array.from(selectedIds);
-    
+
     // 1. Update complaint statuses
     const { data, error } = await supabase
       .from('complaints')
       .update({ status, updated_at: new Date().toISOString() })
       .in('id', complaintIds);
-    
+
     if (error) throw error;
-    
+
     // 2. Log in history
-    const historyEntries = complaintIds.map(id => ({
+    const historyEntries = complaintIds.map((id) => ({
       complaint_id: id,
       action: 'status_changed',
       old_value: null, // Get from current state
@@ -221,12 +220,12 @@ const performBulkStatusChange = async (status: ComplaintStatus) => {
       changed_by: currentUser.id,
       created_at: new Date().toISOString(),
     }));
-    
+
     await supabase.from('complaint_history').insert(historyEntries);
-    
+
     // 3. Send notifications
     await supabase.from('notifications').insert(
-      complaintIds.map(id => ({
+      complaintIds.map((id) => ({
         user_id: getComplaintOwnerId(id),
         type: 'status_changed',
         title: 'Complaint Status Updated',
@@ -234,18 +233,17 @@ const performBulkStatusChange = async (status: ComplaintStatus) => {
         related_complaint_id: id,
       }))
     );
-    
+
     // 4. Refresh data
     await refreshComplaints();
-    
+
     // 5. Clear selection
     setSelectedIds(new Set());
     setSelectionMode(false);
     setShowConfirmationModal(false);
-    
+
     // 6. Show success
     toast.success(`Status changed for ${complaintIds.length} complaints`);
-    
   } catch (error) {
     console.error('Bulk status change failed:', error);
     toast.error('Failed to change status. Please try again.');
@@ -274,7 +272,7 @@ useEffect(() => {
       }
     }
   };
-  
+
   window.addEventListener('keydown', handleKeyPress);
   return () => window.removeEventListener('keydown', handleKeyPress);
 }, []);
@@ -306,15 +304,19 @@ useEffect(() => {
 ## Common Issues
 
 ### Issue: Selection not clearing after action
+
 **Solution**: Ensure you call `setSelectedIds(new Set())` after successful operations
 
 ### Issue: Modal not closing after action
+
 **Solution**: Set modal state to closed in the success handler
 
 ### Issue: Actions available to students
+
 **Solution**: Check `userRole` prop is passed correctly to BulkActionBar
 
 ### Issue: Progress not updating
+
 **Solution**: Ensure `exportProgress` and `exportMessage` state is updated during operation
 
 ## Files Modified/Created

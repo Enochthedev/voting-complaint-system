@@ -29,6 +29,7 @@ export default function DashboardPage() {
 ```
 
 #### Props:
+
 - `children`: Components to render if authorized
 - `allowedRoles`: Optional array of roles that can access this route
 - `redirectTo`: Optional custom redirect path (defaults to `/auth/login`)
@@ -41,10 +42,10 @@ import { useProtectedRoute } from '@/components/auth/protected-route';
 
 function MyComponent() {
   const { isLoading, user, isAuthorized, error } = useProtectedRoute(['lecturer']);
-  
+
   if (isLoading) return <div>Loading...</div>;
   if (!isAuthorized) return <div>Not authorized</div>;
-  
+
   return <div>Protected content</div>;
 }
 ```
@@ -72,7 +73,7 @@ import { Loading } from '@/components/ui/loading';
 ```tsx
 import { LoadingSkeleton } from '@/components/ui/loading';
 
-<LoadingSkeleton className="h-20 w-full" />
+<LoadingSkeleton className="h-20 w-full" />;
 ```
 
 #### Loading Spinner:
@@ -80,7 +81,7 @@ import { LoadingSkeleton } from '@/components/ui/loading';
 ```tsx
 import { LoadingSpinner } from '@/components/ui/loading';
 
-<LoadingSpinner size="sm" />
+<LoadingSpinner size="sm" />;
 ```
 
 ### 3. Error Boundary
@@ -96,7 +97,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 <ErrorBoundary onError={(error, errorInfo) => console.error(error)}>
   <YourComponent />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 #### Error Display Component:
@@ -108,7 +109,7 @@ import { ErrorDisplay } from '@/components/ui/error-boundary';
   title="Failed to load data"
   message="Could not fetch complaints. Please try again."
   onRetry={() => refetch()}
-/>
+/>;
 ```
 
 ### 4. Toast Notifications
@@ -126,23 +127,23 @@ import { useToast } from '@/components/ui/toast';
 
 function MyComponent() {
   const toast = useToast();
-  
+
   const handleSuccess = () => {
     toast.success('Operation completed successfully!');
   };
-  
+
   const handleError = () => {
     toast.error('Something went wrong', 'Error');
   };
-  
+
   const handleInfo = () => {
     toast.info('New notification received');
   };
-  
+
   const handleWarning = () => {
     toast.warning('Please review your input');
   };
-  
+
   return <button onClick={handleSuccess}>Show Toast</button>;
 }
 ```
@@ -171,10 +172,7 @@ try {
 ```tsx
 import { handleAsync } from '@/lib/error-handler';
 
-const [data, error] = await handleAsync(
-  fetchComplaints(),
-  'Failed to fetch complaints'
-);
+const [data, error] = await handleAsync(fetchComplaints(), 'Failed to fetch complaints');
 
 if (error) {
   toast.error(error.message);
@@ -213,11 +211,13 @@ try {
 All authentication pages now include:
 
 ### Loading States:
+
 - Button loading indicators with spinner
 - Disabled form inputs during submission
 - Loading text feedback
 
 ### Error Handling:
+
 - Field-level validation errors
 - Form-level error messages
 - Network error handling
@@ -227,6 +227,7 @@ All authentication pages now include:
 ### Features:
 
 #### Login Form:
+
 - Email and password validation
 - Show/hide password toggle
 - Loading state during sign-in
@@ -235,6 +236,7 @@ All authentication pages now include:
 - Success redirect handling
 
 #### Register Form:
+
 - Full name, email, password validation
 - Role selection (student, lecturer, admin)
 - Password strength requirements
@@ -243,12 +245,14 @@ All authentication pages now include:
 - Success message with email verification prompt
 
 #### Forgot Password Form:
+
 - Email validation
 - Loading state during request
 - Success message with instructions
 - Option to resend email
 
 #### Reset Password Form:
+
 - New password validation
 - Password strength requirements
 - Confirm password matching
@@ -262,6 +266,7 @@ All authentication pages now include:
 The middleware now includes:
 
 ### Features:
+
 - Session refresh on every request
 - Automatic redirect to login for unauthenticated users
 - Redirect authenticated users away from auth pages
@@ -270,6 +275,7 @@ The middleware now includes:
 - Graceful error handling to prevent app breakage
 
 ### Protected Routes:
+
 - All routes except `/`, `/auth/*` require authentication
 - Auth callback and reset-password pages allow authenticated access
 - Unauthenticated users are redirected to login with return URL
@@ -290,11 +296,7 @@ const handleSubmit = async () => {
   }
 };
 
-return (
-  <Button disabled={isLoading}>
-    {isLoading ? <LoadingSpinner /> : 'Submit'}
-  </Button>
-);
+return <Button disabled={isLoading}>{isLoading ? <LoadingSpinner /> : 'Submit'}</Button>;
 ```
 
 ### 2. Handle Errors Gracefully
@@ -348,6 +350,7 @@ When testing components with loading and error states:
 ## Future Enhancements
 
 Potential improvements:
+
 - Add progress indicators for long operations
 - Implement optimistic UI updates
 - Add offline detection and handling

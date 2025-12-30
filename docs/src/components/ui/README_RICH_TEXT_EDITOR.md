@@ -28,13 +28,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 function MyForm() {
   const [content, setContent] = useState('');
 
-  return (
-    <RichTextEditor
-      value={content}
-      onChange={setContent}
-      placeholder="Start typing..."
-    />
-  );
+  return <RichTextEditor value={content} onChange={setContent} placeholder="Start typing..." />;
 }
 ```
 
@@ -63,24 +57,20 @@ function MyForm() {
 ### Disabled State
 
 ```tsx
-<RichTextEditor
-  value={content}
-  onChange={setContent}
-  disabled={isSubmitting}
-/>
+<RichTextEditor value={content} onChange={setContent} disabled={isSubmitting} />
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `string` | - | HTML content of the editor (required) |
-| `onChange` | `(value: string) => void` | - | Callback when content changes (required) |
-| `placeholder` | `string` | `"Start typing..."` | Placeholder text when empty |
-| `disabled` | `boolean` | `false` | Whether the editor is disabled |
-| `maxLength` | `number` | - | Maximum character count (optional) |
-| `error` | `boolean` | `false` | Whether to show error styling |
-| `className` | `string` | `""` | Additional CSS classes |
+| Prop          | Type                      | Default             | Description                              |
+| ------------- | ------------------------- | ------------------- | ---------------------------------------- |
+| `value`       | `string`                  | -                   | HTML content of the editor (required)    |
+| `onChange`    | `(value: string) => void` | -                   | Callback when content changes (required) |
+| `placeholder` | `string`                  | `"Start typing..."` | Placeholder text when empty              |
+| `disabled`    | `boolean`                 | `false`             | Whether the editor is disabled           |
+| `maxLength`   | `number`                  | -                   | Maximum character count (optional)       |
+| `error`       | `boolean`                 | `false`             | Whether to show error styling            |
+| `className`   | `string`                  | `""`                | Additional CSS classes                   |
 
 ## Toolbar Buttons
 

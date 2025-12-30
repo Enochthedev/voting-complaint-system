@@ -22,7 +22,10 @@ export const getUserComplaintsStandardized = withMonitoring(
       const data = await legacyComplaints.getUserComplaints(userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as unknown as StandardApiResponse<any[]>;
+      return migrationWrapper.wrapSupabaseResponse({
+        data: null,
+        error,
+      }) as unknown as StandardApiResponse<any[]>;
     }
   },
   {

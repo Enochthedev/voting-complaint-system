@@ -87,12 +87,7 @@ function ComplaintsPage() {
     sortOrder: 'desc',
   });
 
-  return (
-    <FilterPanel
-      filters={filters}
-      onFiltersChange={setFilters}
-    />
-  );
+  return <FilterPanel filters={filters} onFiltersChange={setFilters} />;
 }
 ```
 
@@ -175,10 +170,7 @@ function ComplaintsPage() {
 
       {/* Complaint List - Main Content */}
       <div className="lg:col-span-3">
-        <ComplaintList
-          complaints={complaints}
-          isLoading={isLoading}
-        />
+        <ComplaintList complaints={complaints} isLoading={isLoading} />
       </div>
     </div>
   );
@@ -189,16 +181,16 @@ function ComplaintsPage() {
 
 ### FilterPanelProps
 
-| Prop | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `filters` | `FilterState` | Yes | - | Current filter state |
-| `onFiltersChange` | `(filters: FilterState) => void` | Yes | - | Callback when filters change |
-| `onSavePreset` | `(name: string, filters: FilterState) => void` | No | - | Callback to save filter preset |
-| `availableTags` | `string[]` | No | `[]` | List of available tags to filter by |
-| `availableLecturers` | `Array<{ id: string; name: string }>` | No | `[]` | List of lecturers to filter by |
-| `isCollapsible` | `boolean` | No | `true` | Whether the panel can be collapsed |
-| `defaultCollapsed` | `boolean` | No | `false` | Initial collapsed state |
-| `className` | `string` | No | - | Additional CSS classes |
+| Prop                 | Type                                           | Required | Default | Description                         |
+| -------------------- | ---------------------------------------------- | -------- | ------- | ----------------------------------- |
+| `filters`            | `FilterState`                                  | Yes      | -       | Current filter state                |
+| `onFiltersChange`    | `(filters: FilterState) => void`               | Yes      | -       | Callback when filters change        |
+| `onSavePreset`       | `(name: string, filters: FilterState) => void` | No       | -       | Callback to save filter preset      |
+| `availableTags`      | `string[]`                                     | No       | `[]`    | List of available tags to filter by |
+| `availableLecturers` | `Array<{ id: string; name: string }>`          | No       | `[]`    | List of lecturers to filter by      |
+| `isCollapsible`      | `boolean`                                      | No       | `true`  | Whether the panel can be collapsed  |
+| `defaultCollapsed`   | `boolean`                                      | No       | `false` | Initial collapsed state             |
+| `className`          | `string`                                       | No       | -       | Additional CSS classes              |
 
 ### FilterState Interface
 
@@ -231,15 +223,13 @@ Individual filter chip component for displaying active filters.
 ```tsx
 import { FilterChip } from '@/components/complaints/filter-panel';
 
-<FilterChip
-  label="Status: New"
-  onRemove={() => removeFilter('status', 'new')}
-/>
+<FilterChip label="Status: New" onRemove={() => removeFilter('status', 'new')} />;
 ```
 
 ## Styling
 
 The component uses Tailwind CSS for styling and supports:
+
 - Light and dark modes
 - Responsive design
 - Custom color schemes via Tailwind configuration
@@ -281,21 +271,16 @@ function ComplaintsPage() {
   // Update URL when filters change
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
-    
+
     const params = new URLSearchParams();
     if (newFilters.status.length) params.set('status', newFilters.status.join(','));
     if (newFilters.category.length) params.set('category', newFilters.category.join(','));
     // ... other filters
-    
+
     router.push(`?${params.toString()}`);
   };
 
-  return (
-    <FilterPanel
-      filters={filters}
-      onFiltersChange={handleFiltersChange}
-    />
-  );
+  return <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />;
 }
 ```
 
@@ -306,7 +291,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 function ComplaintsPage() {
   const [filters, setFilters] = useState<FilterState>({...});
-  
+
   // Debounce API calls
   const debouncedFetch = useDebouncedCallback(
     (filters: FilterState) => {

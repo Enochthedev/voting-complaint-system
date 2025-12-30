@@ -58,6 +58,7 @@ When a new notification arrives:
 ### Toast Types
 
 The implementation uses the `info` toast type for all notifications. This provides:
+
 - Blue color scheme
 - Info icon
 - 5-second duration

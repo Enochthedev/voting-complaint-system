@@ -56,13 +56,14 @@ CREATE TABLE escalation_rules (
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE,
-  
+
   CONSTRAINT hours_threshold_positive CHECK (hours_threshold > 0),
   CONSTRAINT unique_active_category_priority UNIQUE (category, priority, is_active)
 );
 ```
 
 **Fields:**
+
 - `category`: Complaint category this rule applies to (academic, facilities, etc.)
 - `priority`: Complaint priority this rule applies to (low, medium, high, critical)
 - `hours_threshold`: Number of hours before escalation triggers
@@ -78,12 +79,14 @@ escalation_level INTEGER DEFAULT 0,
 ```
 
 **Fields:**
+
 - `escalated_at`: Timestamp when the complaint was first escalated
 - `escalation_level`: Number of times the complaint has been escalated (increments with each escalation)
 
 ## Edge Function
 
 ### Location
+
 `supabase/functions/auto-escalate-complaints/index.ts`
 
 ### Key Features
@@ -100,14 +103,14 @@ escalation_level INTEGER DEFAULT 0,
 // Pseudo-code
 for each active escalation rule:
   threshold_time = now - rule.hours_threshold
-  
+
   complaints = find complaints where:
     - category = rule.category
     - priority = rule.priority
     - status IN ('new', 'opened')
     - created_at < threshold_time
     - escalated_at IS NULL
-  
+
   for each complaint:
     - Set escalated_at = now
     - Increment escalation_level
@@ -137,6 +140,7 @@ supabase functions list
 ### Environment Variables
 
 The following variables are automatically available in Supabase Edge Functions:
+
 - `SUPABASE_URL`: Your project URL
 - `SUPABASE_SERVICE_ROLE_KEY`: Service role key for admin access
 
@@ -159,7 +163,7 @@ name: Auto-Escalate Complaints
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Every hour
+    - cron: '0 * * * *' # Every hour
   workflow_dispatch:
 
 jobs:
@@ -176,6 +180,7 @@ jobs:
 ### Option 3: External Cron Service
 
 Use services like:
+
 - **Vercel Cron Jobs**
 - **AWS EventBridge**
 - **Google Cloud Scheduler**
@@ -212,6 +217,7 @@ VALUES (
 #### Via Admin UI
 
 The admin interface (Task 10.1) provides a UI for managing escalation rules:
+
 - Create new rules
 - Edit existing rules
 - Enable/disable rules
@@ -220,6 +226,7 @@ The admin interface (Task 10.1) provides a UI for managing escalation rules:
 ### Rule Priority
 
 When multiple rules could apply to a complaint:
+
 - Only the first matching rule is applied
 - Rules are processed in the order they're stored
 - Once escalated, a complaint won't be escalated again (escalated_at is set)
@@ -257,6 +264,7 @@ node scripts/test-auto-escalation.js
 ```
 
 This script:
+
 1. Creates a test escalation rule
 2. Creates a test complaint (backdated)
 3. Invokes the edge function
@@ -297,7 +305,7 @@ supabase functions logs auto-escalate-complaints --since 1h
 #### Check Escalated Complaints
 
 ```sql
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -317,7 +325,7 @@ LIMIT 20;
 #### Check Escalation History
 
 ```sql
-SELECT 
+SELECT
   ch.created_at,
   c.title,
   c.category,
@@ -336,7 +344,7 @@ LIMIT 20;
 #### Check Active Rules
 
 ```sql
-SELECT 
+SELECT
   er.id,
   er.category,
   er.priority,
@@ -354,7 +362,7 @@ ORDER BY er.category, er.priority;
 
 ```sql
 -- Check what would be escalated if function ran now
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -365,8 +373,8 @@ SELECT
   er.hours_threshold,
   u.full_name as would_escalate_to
 FROM complaints c
-JOIN escalation_rules er ON 
-  c.category = er.category AND 
+JOIN escalation_rules er ON
+  c.category = er.category AND
   c.priority = er.priority AND
   er.is_active = true
 LEFT JOIN users u ON er.escalate_to = u.id
@@ -391,6 +399,7 @@ ORDER BY c.created_at;
 **Symptoms**: No complaints are being escalated
 
 **Checks**:
+
 1. Verify cron job is configured and running
 2. Check function logs for errors
 3. Verify function is deployed: `supabase functions list`
@@ -401,6 +410,7 @@ ORDER BY c.created_at;
 **Symptoms**: Function runs but doesn't escalate anything
 
 **Checks**:
+
 1. Verify active escalation rules exist
 2. Check if complaints match rule criteria
 3. Verify complaints are old enough (past threshold)
@@ -408,7 +418,7 @@ ORDER BY c.created_at;
 
 ```sql
 -- Debug query
-SELECT 
+SELECT
   COUNT(*) as eligible_complaints,
   c.category,
   c.priority
@@ -430,6 +440,7 @@ GROUP BY c.category, c.priority;
 **Symptoms**: Complaints escalate but users don't receive notifications
 
 **Checks**:
+
 1. Check notifications table for entries
 2. Verify user_id in notifications matches escalate_to
 3. Check RLS policies on notifications table

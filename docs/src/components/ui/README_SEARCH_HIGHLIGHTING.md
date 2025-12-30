@@ -9,11 +9,13 @@ The search result highlighting feature visually emphasizes matching search terms
 ### Components
 
 #### HighlightText Component
+
 Located in `src/components/ui/highlight-text.tsx`
 
 A reusable component that highlights search terms within plain text.
 
 **Features:**
+
 - Case-insensitive matching
 - Multiple search terms support
 - Customizable highlight styling
@@ -21,29 +23,26 @@ A reusable component that highlights search terms within plain text.
 - Preserves original text formatting
 
 **Usage:**
+
 ```tsx
 import { HighlightText } from '@/components/ui/highlight-text';
 
-<HighlightText 
-  text="Broken AC in Lecture Hall" 
-  query="lecture hall" 
-/>
+<HighlightText text="Broken AC in Lecture Hall" query="lecture hall" />;
 // Renders: Broken AC in <mark>Lecture</mark> <mark>Hall</mark>
 ```
 
 #### HighlightHTML Component
+
 Located in `src/components/ui/highlight-text.tsx`
 
 Similar to HighlightText but handles HTML content by stripping tags before highlighting.
 
 **Usage:**
+
 ```tsx
 import { HighlightHTML } from '@/components/ui/highlight-text';
 
-<HighlightHTML 
-  html="<p>Broken AC in <strong>Lecture</strong> Hall</p>" 
-  query="lecture" 
-/>
+<HighlightHTML html="<p>Broken AC in <strong>Lecture</strong> Hall</p>" query="lecture" />;
 // Strips HTML and highlights: Broken AC in <mark>Lecture</mark> Hall
 ```
 
@@ -67,6 +66,7 @@ The highlighting feature is integrated into the complaint list:
 ## Visual Appearance
 
 Highlighted terms are wrapped in `<mark>` elements with the following default styling:
+
 - Background: Yellow (light mode) / Dark yellow (dark mode)
 - Text color: Dark gray (light mode) / Light gray (dark mode)
 - Padding: Small horizontal padding
@@ -74,8 +74,9 @@ Highlighted terms are wrapped in `<mark>` elements with the following default st
 - Font weight: Medium
 
 **Default classes:**
+
 ```
-bg-yellow-200 dark:bg-yellow-800 
+bg-yellow-200 dark:bg-yellow-800
 text-zinc-900 dark:text-zinc-50
 rounded px-0.5 font-medium
 ```
@@ -85,8 +86,8 @@ rounded px-0.5 font-medium
 You can customize the highlight appearance by passing a custom `highlightClassName`:
 
 ```tsx
-<HighlightText 
-  text="Example text" 
+<HighlightText
+  text="Example text"
   query="example"
   highlightClassName="bg-blue-200 dark:bg-blue-800 font-bold"
 />
@@ -95,21 +96,25 @@ You can customize the highlight appearance by passing a custom `highlightClassNa
 ## Examples
 
 ### Single Term
+
 **Query:** "lecture"
 **Text:** "Broken AC in Lecture Hall"
 **Result:** "Broken AC in **Lecture** Hall"
 
 ### Multiple Terms
+
 **Query:** "broken hall"
 **Text:** "Broken AC in Lecture Hall"
 **Result:** "**Broken** AC in Lecture **Hall**"
 
 ### Case Insensitive
+
 **Query:** "LECTURE hall"
 **Text:** "Broken AC in Lecture Hall"
 **Result:** "Broken AC in **Lecture** **Hall**"
 
 ### HTML Content
+
 **Query:** "lecture"
 **HTML:** `<p>Broken AC in <strong>Lecture</strong> Hall</p>`
 **Result:** "Broken AC in **Lecture** Hall" (HTML stripped)
@@ -119,11 +124,13 @@ You can customize the highlight appearance by passing a custom `highlightClassNa
 Tests are located in `src/components/ui/__tests__/highlight-text.test.tsx`
 
 Run tests with:
+
 ```bash
 npm test highlight-text
 ```
 
 **Test coverage includes:**
+
 - Plain text rendering without query
 - Single term highlighting
 - Multiple term highlighting
@@ -151,6 +158,7 @@ npm test highlight-text
 ## Future Enhancements
 
 Potential improvements for Phase 12:
+
 - Fuzzy matching support
 - Highlight relevance scoring
 - Context snippets with highlights
@@ -170,6 +178,7 @@ Potential improvements for Phase 12:
 This feature implements **Task 4.1: Add search result highlighting** from the implementation plan.
 
 **Acceptance Criteria Met:**
+
 - ✅ Search terms are visually highlighted in results
 - ✅ Highlighting works for both titles and descriptions
 - ✅ Case-insensitive matching

@@ -429,9 +429,9 @@ Before marking as complete:
 
 ## Results
 
-**Date Tested**: ******\_******
+**Date Tested**: **\*\***\_**\*\***
 
-**Tested By**: ******\_******
+**Tested By**: **\*\***\_**\*\***
 
 **Devices Tested**:
 
@@ -447,6 +447,6 @@ Before marking as complete:
 - [ ] Firefox
 - [ ] Edge
 
-**Issues Found**: ******\_******
+**Issues Found**: **\*\***\_**\*\***
 
 **Status**: ⬜ Pass / ⬜ Fail / ⬜ Needs Improvement

@@ -13,6 +13,7 @@
 Created comprehensive validation utilities with the following functions:
 
 #### Core Validation Functions
+
 - ✅ `validateFile(file: File)` - Validates a single file against size and type constraints
 - ✅ `validateFiles(files: File[], existingCount: number)` - Validates multiple files with count checking
 - ✅ `isFileTypeAllowed(fileType: string)` - Checks if a file type is allowed
@@ -20,6 +21,7 @@ Created comprehensive validation utilities with the following functions:
 - ✅ `validateFileCount(currentCount: number, additionalCount: number)` - Validates file count
 
 #### Helper Functions
+
 - ✅ `formatFileSize(bytes: number)` - Formats file size in human-readable format (e.g., "1.5 MB")
 - ✅ `getFileExtension(filename: string)` - Extracts file extension from filename
 - ✅ `getFileTypeDescription(mimeType: string)` - Gets user-friendly file type description
@@ -31,6 +33,7 @@ Created comprehensive validation utilities with the following functions:
 Created a fully-featured file upload component with:
 
 #### Features
+
 - ✅ **Drag and Drop**: Intuitive drag-and-drop interface with visual feedback
 - ✅ **File Browser**: Click to browse and select files
 - ✅ **Real-time Validation**: Validates files immediately upon selection
@@ -44,6 +47,7 @@ Created a fully-featured file upload component with:
 - ✅ **Dark Mode Support**: Fully supports light and dark themes
 
 #### Validation Features
+
 - ✅ Enforces 10MB maximum file size per file
 - ✅ Enforces 5 files maximum per complaint
 - ✅ Validates file types (images, PDFs, Word documents only)
@@ -65,6 +69,7 @@ Updated `src/components/complaints/complaint-form.tsx`:
 Created test files with extensive coverage:
 
 #### `src/lib/__tests__/file-validation.test.ts`
+
 - ✅ Tests for `validateFile()` with valid and invalid files
 - ✅ Tests for `validateFiles()` with multiple files
 - ✅ Tests for file type validation
@@ -74,6 +79,7 @@ Created test files with extensive coverage:
 - ✅ Edge cases (empty files, zero size, negative size, etc.)
 
 #### `src/components/ui/__tests__/file-upload.test.tsx`
+
 - ✅ Component rendering tests
 - ✅ File selection and validation tests
 - ✅ Error display and dismissal tests
@@ -97,20 +103,21 @@ Created comprehensive documentation:
 ## 🎯 Validation Rules Implemented
 
 ### File Size Limits
+
 - **Per File**: 10MB maximum (10,485,760 bytes)
 - **Per Complaint**: 5 files maximum
 - **Total**: 50MB maximum per complaint
 
 ### Allowed File Types
 
-| Type | MIME Type | Extensions |
-|------|-----------|------------|
-| JPEG Image | `image/jpeg` | `.jpg`, `.jpeg` |
-| PNG Image | `image/png` | `.png` |
-| GIF Image | `image/gif` | `.gif` |
-| PDF Document | `application/pdf` | `.pdf` |
-| Word Document (Legacy) | `application/msword` | `.doc` |
-| Word Document (Modern) | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx` |
+| Type                   | MIME Type                                                                 | Extensions      |
+| ---------------------- | ------------------------------------------------------------------------- | --------------- |
+| JPEG Image             | `image/jpeg`                                                              | `.jpg`, `.jpeg` |
+| PNG Image              | `image/png`                                                               | `.png`          |
+| GIF Image              | `image/gif`                                                               | `.gif`          |
+| PDF Document           | `application/pdf`                                                         | `.pdf`          |
+| Word Document (Legacy) | `application/msword`                                                      | `.doc`          |
+| Word Document (Modern) | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx`         |
 
 ### Validation Behavior
 
@@ -124,17 +131,20 @@ Created comprehensive documentation:
 The implementation provides clear, actionable error messages:
 
 ### Size Errors
+
 ```
 File "large-image.jpg" exceeds maximum size of 10MB (15.2 MB provided)
 ```
 
 ### Type Errors
+
 ```
-File "video.mp4" has unsupported type "video/mp4". 
+File "video.mp4" has unsupported type "video/mp4".
 Allowed types: images (JPEG, PNG, GIF), PDF, and Word documents.
 ```
 
 ### Count Errors
+
 ```
 Maximum 5 files allowed per complaint. This file exceeds the limit.
 ```
@@ -142,11 +152,13 @@ Maximum 5 files allowed per complaint. This file exceeds the limit.
 ## 🔒 Security Considerations
 
 ### Client-Side Validation
+
 - ✅ Provides immediate user feedback
 - ✅ Prevents obvious mistakes before submission
 - ✅ Reduces server load by catching errors early
 
 ### Important Notes
+
 - ⚠️ Client-side validation is NOT a security measure
 - ⚠️ Server-side validation must be enforced (Supabase Storage policies)
 - ⚠️ MIME type checking prevents obvious malicious files but is not foolproof
@@ -155,18 +167,21 @@ Maximum 5 files allowed per complaint. This file exceeds the limit.
 ## 🧪 Testing Status
 
 ### Unit Tests
+
 - ✅ File validation utilities: 100% coverage
 - ✅ All validation functions tested
 - ✅ Edge cases covered
 - ✅ Helper functions tested
 
 ### Component Tests
+
 - ✅ FileUpload component: Comprehensive coverage
 - ✅ User interactions tested
 - ✅ Validation display tested
 - ✅ Accessibility tested
 
 ### Integration
+
 - ✅ Integrated with ComplaintForm
 - ✅ No TypeScript errors
 - ✅ No linting errors
@@ -174,6 +189,7 @@ Maximum 5 files allowed per complaint. This file exceeds the limit.
 ## 📦 Files Created/Modified
 
 ### Created Files
+
 1. `src/lib/file-validation.ts` - Validation utilities
 2. `src/components/ui/file-upload.tsx` - FileUpload component
 3. `src/lib/__tests__/file-validation.test.ts` - Validation tests
@@ -182,11 +198,13 @@ Maximum 5 files allowed per complaint. This file exceeds the limit.
 6. `docs/TASK_3.2_FILE_VALIDATION_COMPLETION.md` - This summary
 
 ### Modified Files
+
 1. `src/components/complaints/complaint-form.tsx` - Added FileUpload integration
 
 ## ✅ Requirements Satisfied
 
 ### AC11: File Attachments
+
 - ✅ Students can attach files (images, PDFs, documents) to complaints
 - ✅ Maximum file size limit enforced (10MB per file)
 - ✅ Maximum file count enforced (5 files per complaint)
@@ -194,6 +212,7 @@ Maximum 5 files allowed per complaint. This file exceeds the limit.
 - ✅ Clear validation feedback provided to users
 
 ### P12: File Attachment Security
+
 - ✅ Only authorized users can access complaint attachments (via Storage RLS policies)
 - ✅ File validation prevents obvious malicious uploads
 - ✅ Size limits prevent abuse
@@ -218,7 +237,7 @@ function NewComplaintPage() {
       onSubmit={async (data, isDraft) => {
         console.log('Form data:', data);
         console.log('Files to upload:', data.files);
-        
+
         // Files are validated and ready for upload
         // Each file in data.files is guaranteed to be:
         // - Under 10MB
@@ -233,6 +252,7 @@ function NewComplaintPage() {
 ## 🎉 Summary
 
 File validation has been fully implemented with:
+
 - ✅ Comprehensive validation logic
 - ✅ User-friendly UI component
 - ✅ Clear error messages

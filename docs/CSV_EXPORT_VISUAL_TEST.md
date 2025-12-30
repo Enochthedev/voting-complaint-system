@@ -15,6 +15,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 1: Basic Export (All Complaints)
 
 **Steps:**
+
 1. Log in as a lecturer or admin
 2. Navigate to `/complaints`
 3. Ensure no filters are applied (or clear all filters)
@@ -22,6 +23,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 5. Wait for the download to complete
 
 **Expected Results:**
+
 - ✅ A CSV file is downloaded with a name like `complaints_2024-11-25.csv`
 - ✅ The button shows "Exporting..." briefly during the export
 - ✅ The file opens successfully in your spreadsheet application
@@ -29,6 +31,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 - ✅ The CSV has 16 columns with proper headers
 
 **Verify Columns:**
+
 - ID
 - Title
 - Status
@@ -49,12 +52,14 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 2: Export with Status Filter
 
 **Steps:**
+
 1. Navigate to `/complaints`
 2. Apply a status filter (e.g., select "New" and "Opened")
 3. Click "Export CSV"
 4. Open the downloaded file
 
 **Expected Results:**
+
 - ✅ File name includes the filter: `complaints_2024-11-25_new-opened.csv`
 - ✅ Only complaints with "New" or "Opened" status are included
 - ✅ All other complaints are excluded
@@ -62,6 +67,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 3: Export with Multiple Filters
 
 **Steps:**
+
 1. Navigate to `/complaints`
 2. Apply multiple filters:
    - Status: "In Progress"
@@ -71,6 +77,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 4. Open the downloaded file
 
 **Expected Results:**
+
 - ✅ Only complaints matching ALL filters are included
 - ✅ File name reflects the status filter
 - ✅ Data is accurate and complete
@@ -78,6 +85,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 4: Special Characters Handling
 
 **Steps:**
+
 1. Create or find a complaint with special characters:
    - Title with quotes: `Test "Quote" Complaint`
    - Description with commas: `This is a test, with commas`
@@ -86,6 +94,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 3. Open in a spreadsheet application
 
 **Expected Results:**
+
 - ✅ Quotes are properly escaped (doubled)
 - ✅ Commas don't break the CSV structure
 - ✅ Fields with special characters are wrapped in quotes
@@ -94,12 +103,14 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 5: HTML Stripping
 
 **Steps:**
+
 1. Create or find a complaint with HTML in the description:
    - Example: `<p>This is <strong>bold</strong> text</p>`
 2. Export the complaints
 3. Open the CSV and check the Description column
 
 **Expected Results:**
+
 - ✅ HTML tags are removed
 - ✅ Plain text remains: "This is bold text"
 - ✅ No `<p>`, `<strong>`, or other HTML tags visible
@@ -107,11 +118,13 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 6: Anonymous Complaints
 
 **Steps:**
+
 1. Create or find an anonymous complaint
 2. Export the complaints
 3. Check the "Submitted By" column
 
 **Expected Results:**
+
 - ✅ Anonymous complaints show "Anonymous" in the Submitted By column
 - ✅ No student name or email is revealed
 - ✅ "Is Anonymous" column shows "Yes"
@@ -119,11 +132,13 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 7: Tags Export
 
 **Steps:**
+
 1. Create or find complaints with multiple tags
 2. Export the complaints
 3. Check the "Tags" column
 
 **Expected Results:**
+
 - ✅ Multiple tags are separated by semicolons (`;`)
 - ✅ Example: `urgent; facilities; wifi`
 - ✅ Complaints without tags show an empty cell
@@ -131,10 +146,12 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 8: Date Formatting
 
 **Steps:**
+
 1. Export complaints with various dates
 2. Check all date columns
 
 **Expected Results:**
+
 - ✅ Dates are formatted consistently: `MM/DD/YYYY, HH:MM AM/PM`
 - ✅ Example: `11/25/2024, 02:30 PM`
 - ✅ Null dates show as empty cells
@@ -143,10 +160,12 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 9: Empty Export
 
 **Steps:**
+
 1. Apply filters that result in no complaints
 2. Click "Export CSV"
 
 **Expected Results:**
+
 - ✅ Console shows warning: "No complaints to export"
 - ✅ No file is downloaded
 - ✅ No error is displayed to the user
@@ -154,11 +173,13 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 10: Large Dataset
 
 **Steps:**
+
 1. Ensure you have 50+ complaints in the system
 2. Export all complaints
 3. Open the CSV file
 
 **Expected Results:**
+
 - ✅ Export completes quickly (< 2 seconds)
 - ✅ All complaints are included
 - ✅ File opens without issues
@@ -167,32 +188,39 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 11: Role-Based Export
 
 **As Student:**
+
 1. Log in as a student
 2. Navigate to `/complaints`
 
 **Expected Results:**
+
 - ✅ No "Export CSV" button is visible
 - ✅ Only "New Complaint" button is shown
 
 **As Lecturer:**
+
 1. Log in as a lecturer
 2. Navigate to `/complaints`
 
 **Expected Results:**
+
 - ✅ "Export CSV" button is visible
 - ✅ Export includes all complaints (not just assigned ones)
 
 **As Admin:**
+
 1. Log in as an admin
 2. Navigate to `/complaints`
 
 **Expected Results:**
+
 - ✅ "Export CSV" button is visible
 - ✅ Export includes all complaints in the system
 
 ### Test 12: Assigned Lecturer Display
 
 **Steps:**
+
 1. Create complaints with different assignment states:
    - Unassigned complaint
    - Complaint assigned to a lecturer
@@ -201,6 +229,7 @@ This guide helps you manually test the CSV export functionality for complaint li
 3. Check the "Assigned To" column
 
 **Expected Results:**
+
 - ✅ Unassigned complaints show "Unassigned"
 - ✅ Assigned complaints show the lecturer/admin name
 - ✅ Names are properly formatted
@@ -208,11 +237,13 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 13: Escalation Data
 
 **Steps:**
+
 1. Create or find an escalated complaint
 2. Export the complaints
 3. Check the "Escalation Level" column
 
 **Expected Results:**
+
 - ✅ Non-escalated complaints show `0`
 - ✅ Escalated complaints show the correct level (1, 2, 3, etc.)
 - ✅ Escalation level is a number, not text
@@ -220,11 +251,13 @@ This guide helps you manually test the CSV export functionality for complaint li
 ### Test 14: Draft Complaints
 
 **Steps:**
+
 1. Create a draft complaint
 2. As a lecturer, export all complaints
 3. Check the "Is Draft" column
 
 **Expected Results:**
+
 - ✅ Draft complaints show "Yes" in the Is Draft column
 - ✅ Submitted complaints show "No"
 - ✅ Draft status is clearly indicated
@@ -239,6 +272,7 @@ Test the export functionality in different browsers:
 - [ ] Opera (latest)
 
 **Expected Results:**
+
 - ✅ Export works in all browsers
 - ✅ File downloads correctly
 - ✅ No console errors
@@ -253,6 +287,7 @@ Open the exported CSV in different applications:
 - [ ] Apple Numbers
 
 **Expected Results:**
+
 - ✅ File opens without errors
 - ✅ All columns are properly separated
 - ✅ Special characters display correctly
@@ -263,6 +298,7 @@ Open the exported CSV in different applications:
 ### Issue: CSV opens with garbled text
 
 **Solution:** The file encoding might not be recognized. Try:
+
 1. Open the file in a text editor
 2. Save with UTF-8 encoding
 3. Re-open in spreadsheet application
@@ -270,6 +306,7 @@ Open the exported CSV in different applications:
 ### Issue: All data appears in one column
 
 **Solution:** The spreadsheet application might not recognize commas as delimiters. Try:
+
 1. Use "Import" or "Open" with delimiter options
 2. Specify comma as the delimiter
 3. Ensure proper CSV import settings
@@ -277,12 +314,14 @@ Open the exported CSV in different applications:
 ### Issue: Quotes appear doubled
 
 **Solution:** This is correct CSV escaping. The spreadsheet application should handle this automatically. If not:
+
 1. Check the import settings
 2. Ensure "Text qualifier" is set to double quote (")
 
 ### Issue: Dates not recognized
 
 **Solution:** Date format might not match locale settings. Try:
+
 1. Select the date column
 2. Format as "Date" or "Date/Time"
 3. Adjust format to match your locale

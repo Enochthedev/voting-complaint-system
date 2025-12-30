@@ -15,11 +15,12 @@ The trigger function `update_complaint_search_vector()` has been successfully cr
 **Purpose:** Automatically updates the `search_vector` column with a weighted full-text search vector whenever a complaint is inserted or updated.
 
 **Implementation:**
+
 ```sql
 CREATE OR REPLACE FUNCTION public.update_complaint_search_vector()
 RETURNS TRIGGER AS $
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B');
   RETURN NEW;
@@ -63,6 +64,7 @@ The numbers indicate word positions, and the letters (A, B) indicate weights.
 **Trigger Name:** `update_complaints_search_vector`
 
 **Trigger Definition:**
+
 ```sql
 CREATE TRIGGER update_complaints_search_vector
   BEFORE INSERT OR UPDATE ON public.complaints
@@ -79,19 +81,21 @@ CREATE TRIGGER update_complaints_search_vector
 The search functionality is optimized with a GIN (Generalized Inverted Index):
 
 ```sql
-CREATE INDEX IF NOT EXISTS idx_complaints_search_vector 
+CREATE INDEX IF NOT EXISTS idx_complaints_search_vector
 ON public.complaints USING GIN(search_vector);
 ```
 
 This index enables fast full-text search queries like:
+
 ```sql
-SELECT * FROM complaints 
+SELECT * FROM complaints
 WHERE search_vector @@ to_tsquery('english', 'broken & projector');
 ```
 
 ## Usage Examples
 
 ### Example 1: Simple Search
+
 ```sql
 -- Find complaints mentioning "harassment"
 SELECT id, title, description
@@ -100,6 +104,7 @@ WHERE search_vector @@ to_tsquery('english', 'harassment');
 ```
 
 ### Example 2: Multi-word Search (AND)
+
 ```sql
 -- Find complaints about "broken projector"
 SELECT id, title, description
@@ -108,6 +113,7 @@ WHERE search_vector @@ to_tsquery('english', 'broken & projector');
 ```
 
 ### Example 3: Multi-word Search (OR)
+
 ```sql
 -- Find complaints about "projector" OR "screen"
 SELECT id, title, description
@@ -116,11 +122,12 @@ WHERE search_vector @@ to_tsquery('english', 'projector | screen');
 ```
 
 ### Example 4: Ranked Search Results
+
 ```sql
 -- Search with relevance ranking (title matches rank higher)
-SELECT 
-  id, 
-  title, 
+SELECT
+  id,
+  title,
   description,
   ts_rank(search_vector, to_tsquery('english', 'broken & projector')) as rank
 FROM complaints
@@ -129,6 +136,7 @@ ORDER BY rank DESC;
 ```
 
 ### Example 5: Prefix Search
+
 ```sql
 -- Find complaints with words starting with "harass"
 SELECT id, title, description
@@ -139,8 +147,9 @@ WHERE search_vector @@ to_tsquery('english', 'harass:*');
 ## Verification Steps
 
 ### Step 1: Verify Function Exists
+
 ```sql
-SELECT 
+SELECT
   routine_name,
   routine_type,
   data_type
@@ -150,6 +159,7 @@ WHERE routine_schema = 'public'
 ```
 
 **Expected Result:**
+
 ```
 routine_name                    | routine_type | data_type
 --------------------------------|--------------|----------
@@ -157,6 +167,7 @@ update_complaint_search_vector  | FUNCTION     | trigger
 ```
 
 ### Step 2: Verify Trigger Exists
+
 ```sql
 SELECT
   trigger_name,
@@ -171,6 +182,7 @@ WHERE event_object_schema = 'public'
 ```
 
 **Expected Result:**
+
 ```
 trigger_name                    | event_manipulation | event_object_table | action_timing
 --------------------------------|--------------------|-------------------|---------------
@@ -179,13 +191,14 @@ update_complaints_search_vector | UPDATE             | complaints        | BEFOR
 ```
 
 ### Step 3: Test Trigger Functionality
+
 ```sql
 -- Insert a test complaint
 INSERT INTO complaints (
-  title, 
-  description, 
-  category, 
-  priority, 
+  title,
+  description,
+  category,
+  priority,
   status
 ) VALUES (
   'Test complaint about broken equipment',
@@ -199,6 +212,7 @@ INSERT INTO complaints (
 **Expected Result:** The `search_vector` column should be automatically populated with a tsvector.
 
 ### Step 4: Verify Search Works
+
 ```sql
 -- Search for the test complaint
 SELECT id, title, description
@@ -220,7 +234,7 @@ async function searchComplaints(searchQuery) {
     .select('id, title, description, category, priority, status, created_at')
     .textSearch('search_vector', searchQuery, {
       type: 'websearch',
-      config: 'english'
+      config: 'english',
     })
     .order('created_at', { ascending: false })
     .limit(20);
@@ -234,7 +248,7 @@ async function searchComplaints(searchQuery) {
 ```javascript
 async function searchComplaintsRanked(searchQuery) {
   const { data, error } = await supabase.rpc('search_complaints', {
-    search_query: searchQuery
+    search_query: searchQuery,
   });
 
   return data;
@@ -250,7 +264,7 @@ async function searchComplaintsRanked(searchQuery) {
 // ) AS $
 // BEGIN
 //   RETURN QUERY
-//   SELECT 
+//   SELECT
 //     c.id,
 //     c.title,
 //     c.description,
@@ -278,6 +292,7 @@ async function searchComplaintsRanked(searchQuery) {
 ## Acceptance Criteria
 
 ✅ **AC13: Search and Advanced Filtering**
+
 - Full-text search across complaint titles and descriptions
 - Search results are relevant and ranked by importance
 - Title matches rank higher than description matches

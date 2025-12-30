@@ -1,7 +1,7 @@
 /**
  * Test script for complaint triggers
  * This script tests that the triggers on the complaints table work correctly
- * 
+ *
  * Run with: node scripts/test-complaint-triggers.js
  */
 
@@ -19,13 +19,13 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function testTriggers() {
   console.log('🧪 Testing Complaint Triggers\n');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   try {
     // Step 1: Check if trigger functions exist
@@ -43,13 +43,13 @@ async function testTriggers() {
           'update_complaint_search_vector'
         )
         ORDER BY proname;
-      `
+      `,
     });
 
     if (funcError) {
       console.log('⚠️  Could not query functions directly. Checking via triggers...');
     } else {
-      console.log('✅ Found trigger functions:', functions?.map(f => f.function_name).join(', '));
+      console.log('✅ Found trigger functions:', functions?.map((f) => f.function_name).join(', '));
     }
 
     // Step 2: Check if triggers exist on complaints table
@@ -72,8 +72,8 @@ async function testTriggers() {
       email_confirm: true,
       user_metadata: {
         role: 'student',
-        full_name: 'Test Student'
-      }
+        full_name: 'Test Student',
+      },
     });
 
     if (authError) {
@@ -85,14 +85,12 @@ async function testTriggers() {
     console.log('✅ Created test student:', studentId);
 
     // Insert user into public.users table
-    const { error: userInsertError } = await supabase
-      .from('users')
-      .insert({
-        id: studentId,
-        email: testEmail,
-        role: 'student',
-        full_name: 'Test Student'
-      });
+    const { error: userInsertError } = await supabase.from('users').insert({
+      id: studentId,
+      email: testEmail,
+      role: 'student',
+      full_name: 'Test Student',
+    });
 
     if (userInsertError) {
       console.log('⚠️  User may already exist in users table');
@@ -101,15 +99,16 @@ async function testTriggers() {
     // Step 4: Create a test lecturer user
     console.log('\n📋 Step 4: Creating test lecturer user...');
     const lecturerEmail = `test-lecturer-${Date.now()}@example.com`;
-    const { data: lecturerAuthData, error: lecturerAuthError } = await supabase.auth.admin.createUser({
-      email: lecturerEmail,
-      password: 'TestPassword123!',
-      email_confirm: true,
-      user_metadata: {
-        role: 'lecturer',
-        full_name: 'Test Lecturer'
-      }
-    });
+    const { data: lecturerAuthData, error: lecturerAuthError } =
+      await supabase.auth.admin.createUser({
+        email: lecturerEmail,
+        password: 'TestPassword123!',
+        email_confirm: true,
+        user_metadata: {
+          role: 'lecturer',
+          full_name: 'Test Lecturer',
+        },
+      });
 
     if (lecturerAuthError) {
       console.error('❌ Failed to create test lecturer:', lecturerAuthError.message);
@@ -120,14 +119,12 @@ async function testTriggers() {
     console.log('✅ Created test lecturer:', lecturerId);
 
     // Insert lecturer into public.users table
-    const { error: lecturerInsertError } = await supabase
-      .from('users')
-      .insert({
-        id: lecturerId,
-        email: lecturerEmail,
-        role: 'lecturer',
-        full_name: 'Test Lecturer'
-      });
+    const { error: lecturerInsertError } = await supabase.from('users').insert({
+      id: lecturerId,
+      email: lecturerEmail,
+      role: 'lecturer',
+      full_name: 'Test Lecturer',
+    });
 
     if (lecturerInsertError) {
       console.log('⚠️  Lecturer may already exist in users table');
@@ -145,7 +142,7 @@ async function testTriggers() {
         description: 'This is a test complaint to verify triggers work correctly.',
         category: 'academic',
         priority: 'medium',
-        status: 'new'
+        status: 'new',
       })
       .select()
       .single();
@@ -158,7 +155,7 @@ async function testTriggers() {
     console.log('✅ Created complaint:', complaint.id);
 
     // Wait a moment for triggers to fire
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Step 6: Check if history entry was created (log_complaint_creation trigger)
     console.log('\n📋 Step 6: Checking complaint history (creation log)...');
@@ -199,7 +196,7 @@ async function testTriggers() {
       .update({
         status: 'opened',
         opened_at: new Date().toISOString(),
-        opened_by: lecturerId
+        opened_by: lecturerId,
       })
       .eq('id', complaint.id);
 
@@ -211,7 +208,7 @@ async function testTriggers() {
     console.log('✅ Updated complaint status to "opened"');
 
     // Wait for triggers
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Step 9: Check if status change was logged
     console.log('\n📋 Step 9: Checking status change history...');
@@ -224,7 +221,12 @@ async function testTriggers() {
     if (statusHistoryError) {
       console.error('❌ Failed to query status history:', statusHistoryError.message);
     } else if (statusHistory && statusHistory.length > 0) {
-      console.log('✅ Status change logged:', statusHistory[0].old_value, '->', statusHistory[0].new_value);
+      console.log(
+        '✅ Status change logged:',
+        statusHistory[0].old_value,
+        '->',
+        statusHistory[0].new_value
+      );
     } else {
       console.log('⚠️  No status change history found');
     }
@@ -260,7 +262,7 @@ async function testTriggers() {
     }
 
     // Wait for triggers
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Step 12: Check assignment history
     console.log('\n📋 Step 12: Checking assignment history...');
@@ -309,7 +311,6 @@ async function testTriggers() {
     console.log('\n' + '='.repeat(50));
     console.log('✅ Trigger testing complete!');
     console.log('='.repeat(50));
-
   } catch (error) {
     console.error('\n❌ Test failed with error:', error.message);
     console.error(error);
@@ -317,10 +318,12 @@ async function testTriggers() {
 }
 
 // Run the tests
-testTriggers().then(() => {
-  console.log('\n✅ All tests completed');
-  process.exit(0);
-}).catch(error => {
-  console.error('\n❌ Test suite failed:', error);
-  process.exit(1);
-});
+testTriggers()
+  .then(() => {
+    console.log('\n✅ All tests completed');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('\n❌ Test suite failed:', error);
+    process.exit(1);
+  });

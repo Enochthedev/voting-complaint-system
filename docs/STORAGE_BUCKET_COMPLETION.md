@@ -8,6 +8,7 @@
 ## What Was Done
 
 ### 1. Created Setup Script
+
 - **File**: `scripts/setup-storage-bucket.js`
 - **Purpose**: Automated script to create and configure the storage bucket
 - **Features**:
@@ -18,6 +19,7 @@
   - Detailed logging and error handling
 
 ### 2. Created Storage RLS Policies
+
 - **File**: `supabase/storage-rls-policies.sql`
 - **Purpose**: Row Level Security policies for access control
 - **Policies Created**:
@@ -26,6 +28,7 @@
   - `Delete own attachments` - Users can delete their own attachments
 
 ### 3. Created Documentation
+
 - **File**: `docs/STORAGE_SETUP.md`
 - **Purpose**: Comprehensive guide for storage setup and usage
 - **Contents**:
@@ -36,6 +39,7 @@
   - Security considerations
 
 ### 4. Executed Bucket Creation
+
 - **Bucket Name**: `complaint-attachments`
 - **Status**: Successfully created and verified
 - **Configuration**:

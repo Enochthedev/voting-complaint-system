@@ -3,16 +3,19 @@
 ## Task Status: ✅ COMPLETED
 
 ## Overview
+
 The comments/discussion thread feature has been successfully implemented in the Complaint Detail View. This feature allows students and lecturers to engage in threaded discussions about complaints.
 
 ## Implementation Details
 
 ### Component: CommentsSection
+
 **Location**: `src/components/complaints/complaint-detail-view.tsx` (lines ~750-850)
 
 ### Features Implemented
 
 #### 1. Comment Display
+
 - ✅ Displays all comments in chronological order
 - ✅ Shows user avatar (initial letter in colored circle)
 - ✅ Displays user's full name
@@ -21,12 +24,14 @@ The comments/discussion thread feature has been successfully implemented in the 
 - ✅ Visual indicator for internal notes (lecturer-only)
 
 #### 2. Comment Metadata
+
 - ✅ User identification with avatar and name
 - ✅ Timestamp with relative time formatting
 - ✅ "Internal" badge for lecturer-only notes
 - ✅ Proper attribution to users
 
 #### 3. Add Comment Form
+
 - ✅ Multi-line textarea for comment input
 - ✅ Placeholder text: "Add a comment..."
 - ✅ Submit button with proper states:
@@ -37,10 +42,12 @@ The comments/discussion thread feature has been successfully implemented in the 
 - ✅ Clears textarea after successful submission
 
 #### 4. Empty State
+
 - ✅ Shows friendly message when no comments exist
 - ✅ Message: "No comments yet. Be the first to comment!"
 
 #### 5. Visual Design
+
 - ✅ Rounded card design for each comment
 - ✅ Subtle background colors (zinc-50/zinc-900)
 - ✅ Proper spacing and padding
@@ -49,7 +56,9 @@ The comments/discussion thread feature has been successfully implemented in the 
 - ✅ Hover effects and transitions
 
 ### Mock Data
+
 The component includes comprehensive mock data demonstrating:
+
 - 3 sample comments
 - Mix of student and lecturer comments
 - Various timestamps
@@ -83,6 +92,7 @@ function CommentsSection({
 ## Acceptance Criteria Coverage
 
 ### AC15: Follow-up and Discussion System
+
 - ✅ Students can add follow-up comments to their complaints
 - ✅ Lecturers can reply to comments, creating a discussion thread
 - ✅ Comments are timestamped and attributed to users
@@ -92,6 +102,7 @@ function CommentsSection({
 ## UI-First Development Approach
 
 Following the project's UI-first development strategy:
+
 - ✅ Complete UI implementation with mock data
 - ✅ All visual states implemented (empty, populated, loading)
 - ✅ Form interactions fully functional
@@ -99,6 +110,7 @@ Following the project's UI-first development strategy:
 - ⏳ API integration deferred to Phase 12
 
 ### Mock Implementation
+
 ```typescript
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -126,6 +138,7 @@ The CommentsSection is integrated into the main ComplaintDetailView:
 ```
 
 ### Layout Position
+
 - Located in the main content area (left column)
 - Positioned after Description and Attachments sections
 - Part of the two-column responsive layout
@@ -133,6 +146,7 @@ The CommentsSection is integrated into the main ComplaintDetailView:
 ## Testing
 
 ### Manual Testing Checklist
+
 - ✅ Comments display correctly with user info
 - ✅ Timestamps show relative time
 - ✅ Internal notes show "Internal" badge
@@ -145,7 +159,9 @@ The CommentsSection is integrated into the main ComplaintDetailView:
 - ✅ Dark mode styling works correctly
 
 ### Visual Testing
+
 A visual demo document has been created:
+
 - **File**: `src/components/complaints/__tests__/comments-section-visual-demo.md`
 - Contains detailed feature documentation
 - Includes ASCII art mockups
@@ -156,27 +172,31 @@ A visual demo document has been created:
 When implementing real API integration in Phase 12:
 
 1. **Comment Submission**
+
    ```typescript
-   const { data, error } = await supabase
-     .from('complaint_comments')
-     .insert({
-       complaint_id: complaintId,
-       user_id: userId,
-       comment: newComment,
-       is_internal: false,
-     });
+   const { data, error } = await supabase.from('complaint_comments').insert({
+     complaint_id: complaintId,
+     user_id: userId,
+     comment: newComment,
+     is_internal: false,
+   });
    ```
 
 2. **Real-time Updates**
+
    ```typescript
    supabase
      .channel('comments')
-     .on('postgres_changes', {
-       event: 'INSERT',
-       schema: 'public',
-       table: 'complaint_comments',
-       filter: `complaint_id=eq.${complaintId}`
-     }, handleNewComment)
+     .on(
+       'postgres_changes',
+       {
+         event: 'INSERT',
+         schema: 'public',
+         table: 'complaint_comments',
+         filter: `complaint_id=eq.${complaintId}`,
+       },
+       handleNewComment
+     )
      .subscribe();
    ```
 
@@ -193,41 +213,49 @@ When implementing real API integration in Phase 12:
 ## Related Files
 
 ### Implementation
+
 - `src/components/complaints/complaint-detail-view.tsx` - Main component
 - `src/types/database.types.ts` - Type definitions
 
 ### Documentation
+
 - `src/components/complaints/__tests__/comments-section-visual-demo.md` - Visual demo
 - `.kiro/specs/student-complaint-system/requirements.md` - Requirements (AC15)
 - `.kiro/specs/student-complaint-system/design.md` - Design specifications
 
 ### Database
+
 - `supabase/migrations/006_create_complaint_comments_table.sql` - Table schema
 - `supabase/migrations/022_fix_complaint_comments_rls.sql` - RLS policies
 
 ## Dependencies
 
 ### UI Components
+
 - `Button` - Submit button
 - `Loading` - Loading states (not used in comments yet)
 - `Alert` - Error messages (not used in comments yet)
 
 ### Icons (lucide-react)
+
 - `MessageSquare` - Comments icon (used in timeline)
 
 ### Utilities
+
 - `formatRelativeTime()` - Timestamp formatting
 - `cn()` - Class name utility
 
 ## Performance Considerations
 
 ### Current Implementation
+
 - ✅ Efficient rendering with React keys
 - ✅ Controlled form inputs
 - ✅ Proper state management
 - ✅ No unnecessary re-renders
 
 ### Future Optimizations (Phase 12)
+
 - Implement pagination for large comment threads
 - Add virtual scrolling for 100+ comments
 - Optimize real-time subscription
@@ -245,6 +273,7 @@ When implementing real API integration in Phase 12:
 ## Browser Compatibility
 
 Tested and working in:
+
 - ✅ Chrome/Edge (Chromium)
 - ✅ Firefox
 - ✅ Safari

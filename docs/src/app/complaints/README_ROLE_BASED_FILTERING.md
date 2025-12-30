@@ -29,9 +29,7 @@ const filteredComplaints = React.useMemo(() => {
     return MOCK_COMPLAINTS;
   } else {
     // Students see only their own complaints
-    return MOCK_COMPLAINTS.filter(
-      (complaint) => complaint.student_id === userId
-    );
+    return MOCK_COMPLAINTS.filter((complaint) => complaint.student_id === userId);
   }
 }, [userRole, userId]);
 ```
@@ -39,18 +37,21 @@ const filteredComplaints = React.useMemo(() => {
 ### Role-Specific Behavior
 
 #### Student Role
+
 - **Sees**: Only complaints where `student_id` matches their user ID
-- **Does NOT see**: 
+- **Does NOT see**:
   - Complaints from other students
   - Anonymous complaints from other students
 - **UI**: Shows "My Complaints" title and "New Complaint" button
 
 #### Lecturer Role
+
 - **Sees**: All complaints from all students
 - **Includes**: Anonymous complaints (student identity hidden)
 - **UI**: Shows "All Complaints" title, no "New Complaint" button
 
 #### Admin Role
+
 - **Sees**: All complaints from all students
 - **Includes**: Anonymous complaints (student identity hidden)
 - **UI**: Shows "All Complaints" title, no "New Complaint" button

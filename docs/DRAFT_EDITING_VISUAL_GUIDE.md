@@ -3,6 +3,7 @@
 ## User Journey: Editing a Draft Complaint
 
 ### Step 1: View Drafts List
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Draft Complaints                                           │
@@ -27,10 +28,12 @@
 ```
 
 ### Step 2: Click "Continue" Button
+
 **Action**: User clicks "Continue" on first draft
 **Navigation**: `/complaints/new?draft=draft-1`
 
 ### Step 3: Loading State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Edit Draft Complaint                                       │
@@ -43,6 +46,7 @@
 ```
 
 ### Step 4: Form Populated with Draft Data
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Edit Draft Complaint                                       │
@@ -94,26 +98,33 @@
 ```
 
 ### Step 5a: User Modifies and Saves as Draft
+
 **User Actions**:
+
 - Changes priority from "Medium" to "High"
 - Adds tag "urgent"
 - Clicks "Save as Draft"
 
 **Result**:
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  ✓ Draft Saved                                              │
 │  Your draft has been updated successfully!                  │
 └─────────────────────────────────────────────────────────────┘
 ```
+
 **Navigation**: Redirects to `/complaints/drafts`
 
 ### Step 5b: User Completes and Submits
+
 **User Actions**:
+
 - Ensures all required fields are filled
 - Clicks "Submit Complaint"
 
 **Result**:
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  ✓ Complaint Submitted                                      │
@@ -121,6 +132,7 @@
 │  our team.                                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
+
 **Navigation**: Redirects to `/dashboard`
 
 ## Technical Flow Diagram
@@ -183,12 +195,14 @@
 ## Code Flow
 
 ### 1. URL Detection
+
 ```typescript
 const searchParams = useSearchParams();
 const draftId = searchParams.get('draft'); // 'draft-1' or null
 ```
 
 ### 2. Draft Loading
+
 ```typescript
 React.useEffect(() => {
   if (draftId) {
@@ -203,6 +217,7 @@ React.useEffect(() => {
 ```
 
 ### 3. Form Initialization
+
 ```typescript
 <ComplaintForm
   onSubmit={handleSubmit}
@@ -213,6 +228,7 @@ React.useEffect(() => {
 ```
 
 ### 4. Submit Handler
+
 ```typescript
 const handleSubmit = async (data, isDraft) => {
   if (draftId) {
@@ -222,19 +238,21 @@ const handleSubmit = async (data, isDraft) => {
     // Create new draft/complaint
     console.log('Creating new:', data);
   }
-  
+
   // Show appropriate success message
-  const message = draftId && isDraft
-    ? 'Your draft has been updated successfully!'
-    : isDraft
-    ? 'Your draft has been saved successfully!'
-    : 'Your complaint has been submitted...';
+  const message =
+    draftId && isDraft
+      ? 'Your draft has been updated successfully!'
+      : isDraft
+        ? 'Your draft has been saved successfully!'
+        : 'Your complaint has been submitted...';
 };
 ```
 
 ## State Management
 
 ### Initial State (New Complaint)
+
 ```typescript
 {
   title: '',
@@ -248,6 +266,7 @@ const handleSubmit = async (data, isDraft) => {
 ```
 
 ### Initial State (Editing Draft)
+
 ```typescript
 {
   title: 'WiFi connectivity issues in library',
@@ -263,6 +282,7 @@ const handleSubmit = async (data, isDraft) => {
 ## Validation Differences
 
 ### Saving as Draft (Update)
+
 ```typescript
 // Lenient validation
 if (isDraft) {
@@ -274,6 +294,7 @@ if (isDraft) {
 ```
 
 ### Submitting Complaint
+
 ```typescript
 // Strict validation
 if (!isDraft) {
@@ -288,6 +309,7 @@ if (!isDraft) {
 ## Error Handling
 
 ### Draft Not Found
+
 ```
 User clicks Continue on draft-999
 → Load attempt fails
@@ -296,6 +318,7 @@ User clicks Continue on draft-999
 ```
 
 ### Network Error
+
 ```
 User clicks Save as Draft
 → API call fails
@@ -304,6 +327,7 @@ User clicks Save as Draft
 ```
 
 ### Validation Error
+
 ```
 User clicks Submit with incomplete form
 → Validation fails
@@ -314,10 +338,10 @@ User clicks Submit with incomplete form
 
 ## Success Messages
 
-| Scenario | Message |
-|----------|---------|
-| New draft created | "Your draft has been saved successfully!" |
-| Existing draft updated | "Your draft has been updated successfully!" |
+| Scenario                     | Message                                                               |
+| ---------------------------- | --------------------------------------------------------------------- |
+| New draft created            | "Your draft has been saved successfully!"                             |
+| Existing draft updated       | "Your draft has been updated successfully!"                           |
 | Draft submitted as complaint | "Your complaint has been submitted and will be reviewed by our team." |
 
 ## Navigation Flow
@@ -352,8 +376,12 @@ Current implementation uses mock data that mirrors the database structure:
 
 ```typescript
 const mockDrafts: Record<string, ComplaintFormData> = {
-  'draft-1': { /* ... */ },
-  'draft-2': { /* ... */ },
+  'draft-1': {
+    /* ... */
+  },
+  'draft-2': {
+    /* ... */
+  },
 };
 ```
 
@@ -371,7 +399,9 @@ const { data } = await supabase
 // Update draft
 await supabase
   .from('complaints')
-  .update({ /* ... */ })
+  .update({
+    /* ... */
+  })
   .eq('id', draftId);
 ```
 

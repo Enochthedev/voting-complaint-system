@@ -62,11 +62,12 @@ export const getUserComplaints = withRateLimit(getUserComplaintsImpl, 'read');
  * Optimized: Only select necessary columns for draft list view
  */
 async function getUserDraftsImpl(userId: string) {
-  // Using singleton supabase client
-  const { data, error } = await supabase
-    .from('complaints')
-    .select(
-      `
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
+    const { data, error } = await supabase
+      .from('complaints')
+      .select(
+        `
       id,
       title,
       description,
@@ -75,20 +76,21 @@ async function getUserDraftsImpl(userId: string) {
       created_at,
       updated_at
     `
-    )
-    .eq('student_id', userId)
-    .eq('is_draft', true)
-    .order('updated_at', { ascending: false });
+      )
+      .eq('student_id', userId)
+      .eq('is_draft', true)
+      .order('updated_at', { ascending: false });
 
-  if (error)
-    throw new DatabaseError(
-      error.message || 'Failed to fetch user drafts',
-      error.code,
-      undefined,
-      error.details,
-      error.hint
-    );
-  return data;
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to fetch user drafts',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    return data;
+  });
 }
 
 export const getUserDrafts = withRateLimit(getUserDraftsImpl, 'read');
@@ -98,66 +100,68 @@ export const getUserDrafts = withRateLimit(getUserDraftsImpl, 'read');
  * Optimized: Use database aggregation instead of client-side filtering
  */
 async function getUserComplaintStatsImpl(userId: string) {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  // Use Promise.all to run all count queries in parallel
-  const [totalResult, newResult, openResult, inProgressResult, resolvedResult, closedResult] =
-    await Promise.all([
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false),
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false)
-        .eq('status', 'new'),
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false)
-        .eq('status', 'opened'),
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false)
-        .eq('status', 'in_progress'),
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false)
-        .eq('status', 'resolved'),
-      supabase
-        .from('complaints')
-        .select('*', { count: 'exact', head: true })
-        .eq('student_id', userId)
-        .eq('is_draft', false)
-        .eq('status', 'closed'),
-    ]);
+    // Use Promise.all to run all count queries in parallel
+    const [totalResult, newResult, openResult, inProgressResult, resolvedResult, closedResult] =
+      await Promise.all([
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false),
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false)
+          .eq('status', 'new'),
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false)
+          .eq('status', 'opened'),
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false)
+          .eq('status', 'in_progress'),
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false)
+          .eq('status', 'resolved'),
+        supabase
+          .from('complaints')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', userId)
+          .eq('is_draft', false)
+          .eq('status', 'closed'),
+      ]);
 
-  // Check for errors
-  if (totalResult.error) throw totalResult.error;
-  if (newResult.error) throw newResult.error;
-  if (openResult.error) throw openResult.error;
-  if (inProgressResult.error) throw inProgressResult.error;
-  if (resolvedResult.error) throw resolvedResult.error;
-  if (closedResult.error) throw closedResult.error;
+    // Check for errors
+    if (totalResult.error) throw totalResult.error;
+    if (newResult.error) throw newResult.error;
+    if (openResult.error) throw openResult.error;
+    if (inProgressResult.error) throw inProgressResult.error;
+    if (resolvedResult.error) throw resolvedResult.error;
+    if (closedResult.error) throw closedResult.error;
 
-  const stats = {
-    total: totalResult.count || 0,
-    new: newResult.count || 0,
-    opened: openResult.count || 0,
-    in_progress: inProgressResult.count || 0,
-    resolved: resolvedResult.count || 0,
-    closed: closedResult.count || 0,
-  };
+    const stats = {
+      total: totalResult.count || 0,
+      new: newResult.count || 0,
+      opened: openResult.count || 0,
+      in_progress: inProgressResult.count || 0,
+      resolved: resolvedResult.count || 0,
+      closed: closedResult.count || 0,
+    };
 
-  return stats;
+    return stats;
+  });
 }
 
 export const getUserComplaintStats = withRateLimit(getUserComplaintStatsImpl, 'read');
@@ -166,29 +170,31 @@ export const getUserComplaintStats = withRateLimit(getUserComplaintStatsImpl, 'r
  * Fetch all complaints (for lecturers/admins) with optional filtering
  */
 async function getAllComplaintsImpl() {
-  // Using singleton supabase client
-  const { data, error } = await supabase
-    .from('complaints')
-    .select(
-      `
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
+    const { data, error } = await supabase
+      .from('complaints')
+      .select(
+        `
       *,
       student:users!complaints_student_id_fkey(id, full_name, email),
       assigned_user:users!complaints_assigned_to_fkey(id, full_name, email),
       complaint_tags(tag_name)
     `
-    )
-    .eq('is_draft', false)
-    .order('created_at', { ascending: false });
+      )
+      .eq('is_draft', false)
+      .order('created_at', { ascending: false });
 
-  if (error)
-    throw new DatabaseError(
-      error.message || 'Failed to fetch all complaints',
-      error.code,
-      undefined,
-      error.details,
-      error.hint
-    );
-  return data;
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to fetch all complaints',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    return data;
+  });
 }
 
 export const getAllComplaints = withRateLimit(getAllComplaintsImpl, 'read');
@@ -197,11 +203,12 @@ export const getAllComplaints = withRateLimit(getAllComplaintsImpl, 'read');
  * Fetch a single complaint by ID
  */
 async function getComplaintByIdImpl(id: string) {
-  // Using singleton supabase client
-  const { data, error } = await supabase
-    .from('complaints')
-    .select(
-      `
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
+    const { data, error } = await supabase
+      .from('complaints')
+      .select(
+        `
       *,
       student:users!complaints_student_id_fkey(id, full_name, email),
       assigned_user:users!complaints_assigned_to_fkey(id, full_name, email),
@@ -242,19 +249,20 @@ async function getComplaintByIdImpl(id: string) {
         created_at
       )
     `
-    )
-    .eq('id', id)
-    .single();
+      )
+      .eq('id', id)
+      .single();
 
-  if (error)
-    throw new DatabaseError(
-      error.message || 'Failed to fetch complaint',
-      error.code,
-      undefined,
-      error.details,
-      error.hint
-    );
-  return data;
+    if (error)
+      throw new DatabaseError(
+        error.message || 'Failed to fetch complaint',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    return data;
+  });
 }
 
 export const getComplaintById = withRateLimit(getComplaintByIdImpl, 'read');
@@ -497,21 +505,23 @@ export const submitRating = withRateLimit(submitRatingImpl, 'write');
  * Check if a complaint has been rated by a student
  */
 async function hasRatedComplaintImpl(complaintId: string, studentId: string): Promise<boolean> {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  const { data, error } = await supabase
-    .from('complaint_ratings')
-    .select('id')
-    .eq('complaint_id', complaintId)
-    .eq('student_id', studentId)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from('complaint_ratings')
+      .select('id')
+      .eq('complaint_id', complaintId)
+      .eq('student_id', studentId)
+      .maybeSingle();
 
-  if (error) {
-    console.error('Error checking rating status:', error);
-    return false;
-  }
+    if (error) {
+      console.error('Error checking rating status:', error);
+      return false;
+    }
 
-  return !!data;
+    return !!data;
+  });
 }
 
 export const hasRatedComplaint = withRateLimit(hasRatedComplaintImpl, 'read');
@@ -522,34 +532,36 @@ export const hasRatedComplaint = withRateLimit(hasRatedComplaintImpl, 'read');
  * Optimized: Use a single query with join instead of two separate queries
  */
 async function getUserAverageRatingImpl(userId: string): Promise<number | null> {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  // Use a single query with join to get ratings for user's resolved complaints
-  const { data: ratings, error: ratingsError } = await supabase
-    .from('complaint_ratings')
-    .select(
-      `
+    // Use a single query with join to get ratings for user's resolved complaints
+    const { data: ratings, error: ratingsError } = await supabase
+      .from('complaint_ratings')
+      .select(
+        `
       rating,
       complaint:complaints!inner(student_id, status)
     `
-    )
-    .eq('complaint.student_id', userId)
-    .eq('complaint.status', 'resolved');
+      )
+      .eq('complaint.student_id', userId)
+      .eq('complaint.status', 'resolved');
 
-  if (ratingsError) {
-    console.error('Error fetching ratings:', ratingsError);
-    return null;
-  }
+    if (ratingsError) {
+      console.error('Error fetching ratings:', ratingsError);
+      return null;
+    }
 
-  if (!ratings || ratings.length === 0) {
-    return null; // No ratings yet
-  }
+    if (!ratings || ratings.length === 0) {
+      return null; // No ratings yet
+    }
 
-  // Calculate average
-  const sum = ratings.reduce((acc: number, r: any) => acc + Number(r.rating), 0);
-  const average = sum / ratings.length;
+    // Calculate average
+    const sum = ratings.reduce((acc: number, r: any) => acc + Number(r.rating), 0);
+    const average = sum / ratings.length;
 
-  return Math.round(average * 10) / 10; // Round to 1 decimal place
+    return Math.round(average * 10) / 10; // Round to 1 decimal place
+  });
 }
 
 export const getUserAverageRating = withRateLimit(getUserAverageRatingImpl, 'read');

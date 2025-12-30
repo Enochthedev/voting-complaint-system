@@ -23,19 +23,23 @@ This document provides a visual reference for all timeline action icons.
 ### Icon Differentiation
 
 **Assignment Actions:**
+
 - `assigned` uses **UserPlus** (👤+) - indicates adding a new assignee
 - `reassigned` uses **User** (👤) - indicates changing the assignee
 
 **Communication Actions:**
+
 - Both `comment_added` and `feedback_added` use **MessageSquare** (💬)
 - These are semantically similar (both are communication)
 
 **Status Actions:**
+
 - `status_changed` uses **Clock** (⏰) - indicates time-based progression
 - `reopened` uses **AlertCircle** (⚠️) - indicates attention needed
 - `escalated` uses **TrendingUp** (📈) - indicates priority increase
 
 **Content Actions:**
+
 - `created` uses **FileText** (📄) - document creation
 - `tags_added` uses **Tag** (🏷️) - categorization
 - `rated` uses **Star** (⭐) - satisfaction rating
@@ -73,6 +77,7 @@ This document provides a visual reference for all timeline action icons.
 ### Color Scheme
 
 All icons use the design system colors:
+
 - Icon color: `text-muted-foreground`
 - Background: `bg-muted`
 - Border: Implicit from rounded container
@@ -130,12 +135,14 @@ export function getActionIcon(action: string): React.ReactNode {
 ### Browser Compatibility
 
 Icons are from Lucide React library, which supports:
+
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
 - Mobile browsers
 
 All icons render as SVG, ensuring:
+
 - Crisp display at any resolution
 - Proper scaling
 - Accessibility support

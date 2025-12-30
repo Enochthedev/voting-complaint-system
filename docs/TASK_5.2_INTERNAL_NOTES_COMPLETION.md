@@ -20,7 +20,7 @@ Added role-based filtering to the `CommentsSection` component:
 // Internal notes are only visible to lecturers and admins
 const visibleComments = React.useMemo(() => {
   if (!localComments) return [];
-  
+
   // Filter out internal notes for students
   const filtered = localComments.filter((comment) => {
     // Lecturers and admins can see all comments
@@ -30,7 +30,7 @@ const visibleComments = React.useMemo(() => {
     // Students can only see non-internal comments
     return !comment.is_internal;
   });
-  
+
   // Sort in chronological order (oldest first)
   return filtered.sort((a, b) => {
     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -39,6 +39,7 @@ const visibleComments = React.useMemo(() => {
 ```
 
 **Key Features:**
+
 - ✅ Students can only see non-internal comments
 - ✅ Lecturers and admins can see all comments including internal notes
 - ✅ Comments maintain chronological order (Property P19)
@@ -69,6 +70,7 @@ The `CommentInput` component already had the internal toggle feature implemented
 ```
 
 **Key Features:**
+
 - ✅ Checkbox to mark comment as internal
 - ✅ Only shown when `showInternalToggle={true}`
 - ✅ Info alert when internal is selected
@@ -89,6 +91,7 @@ Internal comments display with a yellow "Internal" badge:
 ```
 
 **Key Features:**
+
 - ✅ Clear visual distinction for internal notes
 - ✅ Yellow badge stands out from regular comments
 - ✅ Only visible to lecturers and admins
@@ -111,6 +114,7 @@ Added example internal notes to the mock data:
 ```
 
 **Key Features:**
+
 - ✅ Demonstrates internal notes in UI
 - ✅ Shows filtering behavior
 - ✅ Provides realistic test data
@@ -133,6 +137,7 @@ const handleAddInternalNote = () => {
 ```
 
 **Key Features:**
+
 - ✅ Button only visible to lecturers and admins
 - ✅ Scrolls to comment input when clicked
 - ✅ Focuses textarea for immediate typing
@@ -185,22 +190,27 @@ Created comprehensive visual documentation showing:
 ### AC15: Follow-up and Discussion System
 
 ✅ **Lecturers can add internal notes to complaints**
+
 - CommentInput component has internal toggle
 - Only shown to lecturers and admins
 
 ✅ **Internal notes are marked with a badge**
+
 - Yellow "Internal" badge displayed
 - Clear visual distinction
 
 ✅ **Students cannot see internal notes**
+
 - Filtering logic removes internal notes for students
 - Comment count reflects only visible comments
 
 ✅ **Lecturers and admins can see all comments**
+
 - No filtering applied for lecturer/admin roles
 - All comments including internal notes visible
 
 ✅ **Comments are displayed in chronological order**
+
 - Sorting by created_at timestamp
 - Validates Design Property P19
 
@@ -209,6 +219,7 @@ Created comprehensive visual documentation showing:
 ### Property P19: Comment Thread Ordering
 
 ✅ **Comments are always displayed in chronological order**
+
 ```typescript
 return filtered.sort((a, b) => {
   return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -225,7 +236,7 @@ export interface ComplaintComment {
   complaint_id: string;
   user_id: string;
   comment: string;
-  is_internal: boolean;  // ✅ Already exists
+  is_internal: boolean; // ✅ Already exists
   created_at: string;
   updated_at: string;
 }
@@ -355,18 +366,23 @@ Internal notes are filtered out!
 ## Use Cases
 
 ### Use Case 1: Coordinating Response
+
 Lecturer adds internal note: "Need to check with department head before responding."
 
 ### Use Case 2: Escalation Discussion
+
 Admin adds internal note: "This complaint requires legal review."
 
 ### Use Case 3: Resource Allocation
+
 Lecturer adds internal note: "Budget approved for this repair."
 
 ### Use Case 4: Pattern Recognition
+
 Lecturer adds internal note: "Third complaint about this issue this month."
 
 ### Use Case 5: Sensitive Information
+
 Lecturer adds internal note: "Student has documented disability accommodation."
 
 ## Conclusion

@@ -31,7 +31,6 @@ Enhanced bulk export functionality:
   - All attachments organized by complaint
   - Progress tracking
   - Automatic ZIP packaging
-  
 - **`exportSingleComplaintWithAttachments()`**: Exports a single complaint with all its data and attachments
 
 #### Export Structure
@@ -57,25 +56,28 @@ complaints_bulk_export_[timestamp].zip
 Updated export button with dropdown menu:
 
 **Export Options**:
+
 - **Export as PDF**: Generates PDF report only
 - **Export Attachments**: Downloads all attachments as ZIP (if available)
 - **Export Complete Package**: Creates ZIP with PDF + attachments
 
 **Features**:
+
 - Progress tracking with status messages
 - Error handling and user feedback
 - Conditional display based on attachment availability
 - Simple button mode (without dropdown) for basic use cases
 
 **Usage**:
+
 ```tsx
 // With dropdown menu (default)
 <ExportComplaintButton complaint={complaint} />
 
 // Simple button without dropdown
-<ExportComplaintButton 
-  complaint={complaint} 
-  showDropdown={false} 
+<ExportComplaintButton
+  complaint={complaint}
+  showDropdown={false}
 />
 ```
 
@@ -84,10 +86,12 @@ Updated export button with dropdown menu:
 Updated bulk action bar with attachment export support:
 
 **New Props**:
+
 - `onExportWithAttachments`: Callback for exporting with attachments
 - `hasAttachments`: Whether selected complaints have attachments
 
 **Features**:
+
 - Shows "Export with Attachments" button when applicable
 - Maintains existing CSV export functionality
 - Conditional rendering based on attachment availability
@@ -97,12 +101,14 @@ Updated bulk action bar with attachment export support:
 ### Dependencies
 
 Added dependencies:
+
 - `jszip`: For creating ZIP archives
 - `@types/jszip`: TypeScript definitions
 
 ### File Storage
 
 Attachments are stored in Supabase Storage:
+
 - Bucket: `complaint-attachments`
 - Path structure: `{complaintId}/{timestamp}-{filename}`
 
@@ -122,7 +128,7 @@ await bulkExportComplaints(complaints, {
   includeAttachments: true,
   onProgress: (current, total, message) => {
     console.log(`${current}/${total}: ${message}`);
-  }
+  },
 });
 ```
 
@@ -146,7 +152,7 @@ await exportSingleComplaintWithAttachments(complaint, {
   includeCSV: false,
   onProgress: (current, total, message) => {
     setProgress(message);
-  }
+  },
 });
 ```
 
@@ -161,7 +167,7 @@ await bulkExportComplaints(selectedComplaints, {
   includeCSV: true,
   onProgress: (current, total, message) => {
     setProgress(`${current}/${total}: ${message}`);
-  }
+  },
 });
 ```
 
@@ -170,13 +176,9 @@ await bulkExportComplaints(selectedComplaints, {
 ```typescript
 import { exportComplaintAttachments } from '@/lib/export';
 
-await exportComplaintAttachments(
-  complaintId,
-  attachments,
-  (current, total) => {
-    setProgress(`Downloading ${current}/${total} attachments...`);
-  }
-);
+await exportComplaintAttachments(complaintId, attachments, (current, total) => {
+  setProgress(`Downloading ${current}/${total} attachments...`);
+});
 ```
 
 ## UI Integration
@@ -282,22 +284,26 @@ When complaints are selected in the list view:
 ## Related Files
 
 ### Core Implementation
+
 - `src/lib/export/attachment-export.ts` - Attachment download utilities
 - `src/lib/export/bulk-export.ts` - Bulk export with attachments
 - `src/lib/export/pdf-export.ts` - PDF generation (updated)
 - `src/lib/export/index.ts` - Export utilities index
 
 ### UI Components
+
 - `src/components/complaints/export-complaint-button.tsx` - Export button with dropdown
 - `src/components/complaints/bulk-action-bar.tsx` - Bulk action bar with attachment export
 
 ### Dependencies
+
 - `src/lib/attachment-upload.ts` - Attachment storage utilities
 - `src/types/database.types.ts` - Type definitions
 
 ## Validation
 
 This implementation validates:
+
 - ✅ **AC20**: Export functionality for complaints
 - ✅ **P20**: Export data integrity (all data preserved)
 - ✅ Task 8.3: Include attachments in exports

@@ -11,6 +11,7 @@ The vote casting functionality allows students to participate in polls created b
 #### 1. Vote Casting Interface (`src/app/votes/[id]/page.tsx`)
 
 **Student View - Before Voting:**
+
 - ✅ Display vote title, description, and metadata
 - ✅ Show all available options as radio buttons
 - ✅ Highlight selected option with visual feedback
@@ -19,6 +20,7 @@ The vote casting functionality allows students to participate in polls created b
 - ✅ Submit button with loading state
 
 **Student View - After Voting:**
+
 - ✅ Display success message
 - ✅ Show vote results with percentages and bar charts
 - ✅ Display total vote count
@@ -26,6 +28,7 @@ The vote casting functionality allows students to participate in polls created b
 - ✅ Prevent re-voting
 
 **Lecturer View:**
+
 - ✅ Always show live results
 - ✅ Display "Live Results" badge for active votes
 - ✅ Show total participation count
@@ -33,12 +36,14 @@ The vote casting functionality allows students to participate in polls created b
 #### 2. API Layer (`src/lib/api/votes.ts`)
 
 **Core Functions:**
+
 - ✅ `submitVoteResponse()` - Submit a vote with validation
 - ✅ `hasStudentVoted()` - Check if student already voted
 - ✅ `getVoteResults()` - Get aggregated vote results
 - ✅ `getVoteById()` - Fetch vote details
 
 **Validation Rules:**
+
 1. ✅ Prevent duplicate voting (one vote per student per poll)
 2. ✅ Verify vote exists
 3. ✅ Verify vote is active
@@ -48,6 +53,7 @@ The vote casting functionality allows students to participate in polls created b
 #### 3. Error Handling
 
 **User-Friendly Error Messages:**
+
 - ✅ "You have already voted on this poll" - Duplicate vote attempt
 - ✅ "Vote not found" - Invalid vote ID
 - ✅ "This vote is no longer active" - Inactive vote
@@ -58,6 +64,7 @@ The vote casting functionality allows students to participate in polls created b
 #### 4. User Experience Features
 
 **Visual Feedback:**
+
 - ✅ Radio button selection with hover states
 - ✅ Selected option highlighted with primary color
 - ✅ Loading spinner during submission
@@ -66,6 +73,7 @@ The vote casting functionality allows students to participate in polls created b
 - ✅ Disabled state for buttons during submission
 
 **Results Display:**
+
 - ✅ Percentage calculation for each option
 - ✅ Animated progress bars
 - ✅ Vote count per option
@@ -73,6 +81,7 @@ The vote casting functionality allows students to participate in polls created b
 - ✅ Responsive layout
 
 **Status Indicators:**
+
 - ✅ "Voted" badge (green) - Student has voted
 - ✅ "Closed" badge (gray) - Vote has closed
 - ✅ "Inactive" badge (gray) - Vote is inactive
@@ -81,17 +90,20 @@ The vote casting functionality allows students to participate in polls created b
 #### 5. Business Logic
 
 **Vote Eligibility:**
+
 ```typescript
 const canVote = vote && !hasVoted && !isVoteClosed(vote) && vote.is_active;
 ```
 
 A student can vote if:
+
 - ✅ Vote exists
 - ✅ Student hasn't voted yet
 - ✅ Vote hasn't closed
 - ✅ Vote is active
 
 **Results Visibility:**
+
 - ✅ Students see results after voting
 - ✅ Lecturers always see results
 - ✅ Results hidden until student votes (prevents bias)
@@ -113,12 +125,12 @@ const handleSubmitVote = async () => {
 
   try {
     await submitVoteResponse(voteId, mockStudentId, selectedOption);
-    
+
     // Update state
     setHasVoted(true);
     setSelectedOption('');
     setSuccessMessage('Your vote has been submitted successfully!');
-    
+
     // Load results after voting
     const voteResults = await getVoteResults(voteId);
     setResults(voteResults);
@@ -190,6 +202,7 @@ export async function submitVoteResponse(
 ### Manual Testing Checklist
 
 **As a Student:**
+
 - [x] Navigate to /votes and select a vote
 - [x] Select an option and submit
 - [x] Verify success message appears
@@ -200,6 +213,7 @@ export async function submitVoteResponse(
 - [x] Try voting on an inactive vote (should be prevented)
 
 **As a Lecturer:**
+
 - [x] Navigate to /votes/[id]
 - [x] Verify results are visible immediately
 - [x] Verify "Live Results" badge shows for active votes
@@ -210,6 +224,7 @@ export async function submitVoteResponse(
 Test file: `src/lib/api/__tests__/votes.test.ts`
 
 **Test Coverage:**
+
 - ✅ Allow student to cast a vote
 - ✅ Prevent duplicate voting
 - ✅ Track voting status correctly
@@ -221,6 +236,7 @@ Test file: `src/lib/api/__tests__/votes.test.ts`
 ## UI Screenshots
 
 ### Before Voting
+
 ```
 ┌─────────────────────────────────────────┐
 │ ← Back to Votes                         │
@@ -242,6 +258,7 @@ Test file: `src/lib/api/__tests__/votes.test.ts`
 ```
 
 ### After Voting
+
 ```
 ┌─────────────────────────────────────────┐
 │ ← Back to Votes                         │
@@ -288,12 +305,14 @@ When connecting to real Supabase API in Phase 12:
 ### Database Considerations
 
 **vote_responses table:**
+
 - Unique constraint on (vote_id, student_id) to prevent duplicates
 - Foreign key to votes table
 - Foreign key to users table
 - Index on vote_id for fast lookups
 
 **RLS Policies:**
+
 - Students can insert their own responses
 - Students can view results after voting
 - Lecturers can view all results
@@ -320,6 +339,7 @@ From Task 7.1 in tasks.md:
 ## Summary
 
 The vote casting functionality is **fully implemented and working**. Students can:
+
 - View active votes
 - Select an option
 - Submit their vote

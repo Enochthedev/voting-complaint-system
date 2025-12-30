@@ -1,11 +1,13 @@
 # Role-Based Filtering - Visual Guide
 
 ## Overview
+
 This guide demonstrates how the complaint list page adapts based on user role.
 
 ## Student View
 
 ### What Students See
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  My Complaints                          [+ New Complaint]    │
@@ -45,6 +47,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ```
 
 ### Key Features
+
 - ✅ Shows only complaints created by the logged-in student
 - ✅ Displays "My Complaints" as the page title
 - ✅ Shows "New Complaint" button
@@ -55,6 +58,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ## Lecturer View
 
 ### What Lecturers See
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  All Complaints                                              │
@@ -101,6 +105,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ```
 
 ### Key Features
+
 - ✅ Shows ALL complaints from ALL students
 - ✅ Displays "All Complaints" as the page title
 - ✅ Shows anonymous complaints (with [Anonymous] badge)
@@ -111,6 +116,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ## Admin View
 
 ### What Admins See
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  All Complaints                                              │
@@ -123,6 +129,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ```
 
 ### Key Features
+
 - ✅ Shows ALL complaints from ALL students (same as lecturer)
 - ✅ Displays "All Complaints" as the page title
 - ✅ Shows anonymous complaints
@@ -165,6 +172,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ## Data Flow
 
 ### Student Request
+
 ```
 1. User logs in as student
 2. getMockUser() returns { id: 'mock-student-id', role: 'student' }
@@ -175,6 +183,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ```
 
 ### Lecturer Request
+
 ```
 1. User logs in as lecturer
 2. getMockUser() returns { id: 'mock-lecturer-id', role: 'lecturer' }
@@ -187,21 +196,25 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ## Testing Scenarios
 
 ### Scenario 1: Student with Multiple Complaints
+
 - **User**: student@test.com
 - **Expected**: See 4 complaints (IDs: 1, 3, 5, 8)
 - **Verify**: All complaints have student_id = 'mock-student-id'
 
 ### Scenario 2: Student with No Complaints
+
 - **User**: New student (not in mock data)
 - **Expected**: Empty state with message "No complaints to display..."
 - **Verify**: Empty list, no errors
 
 ### Scenario 3: Lecturer Viewing All
+
 - **User**: lecturer@test.com
 - **Expected**: See all 8 complaints
 - **Verify**: Includes anonymous complaints (ID: 2, 7)
 
 ### Scenario 4: Admin Viewing All
+
 - **User**: admin@test.com
 - **Expected**: See all 8 complaints (same as lecturer)
 - **Verify**: Includes complaints from all students
@@ -209,6 +222,7 @@ This guide demonstrates how the complaint list page adapts based on user role.
 ## Privacy Protection
 
 ### Anonymous Complaints
+
 ```
 Complaint ID: 2
 student_id: null
@@ -224,6 +238,7 @@ Lecturer View:
 ```
 
 ### Other Students' Complaints
+
 ```
 Complaint ID: 4
 student_id: 'student-2'
@@ -248,6 +263,7 @@ const filteredComplaints = React.useMemo(() => {
 ```
 
 This ensures:
+
 - ✅ Efficient filtering
 - ✅ No unnecessary re-renders
 - ✅ Smooth pagination

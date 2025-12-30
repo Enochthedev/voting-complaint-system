@@ -222,7 +222,7 @@ Query the database to see escalation history:
 
 ```sql
 -- View all escalated complaints
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -236,7 +236,7 @@ WHERE c.escalated_at IS NOT NULL
 ORDER BY c.escalated_at DESC;
 
 -- View escalation history entries
-SELECT 
+SELECT
   ch.created_at,
   c.title,
   ch.action,
@@ -253,11 +253,13 @@ ORDER BY ch.created_at DESC;
 ### Function Not Escalating Complaints
 
 1. **Check Active Rules**: Ensure there are active escalation rules
+
    ```sql
    SELECT * FROM escalation_rules WHERE is_active = true;
    ```
 
 2. **Check Eligible Complaints**: Verify complaints match rule criteria
+
    ```sql
    SELECT id, title, category, priority, status, created_at, escalated_at
    FROM complaints
@@ -274,6 +276,7 @@ ORDER BY ch.created_at DESC;
 ### Permission Errors
 
 Ensure the service role key has proper permissions:
+
 - Read access to `escalation_rules` table
 - Read/write access to `complaints` table
 - Write access to `notifications` table

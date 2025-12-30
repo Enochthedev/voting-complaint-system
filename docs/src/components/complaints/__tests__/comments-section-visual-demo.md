@@ -1,11 +1,13 @@
 # Comments Section - Visual Demo
 
 ## Overview
+
 The Comments/Discussion section is fully implemented in the ComplaintDetailView component and displays a threaded discussion between students and lecturers.
 
 ## Features Implemented
 
 ### 1. Comment Display
+
 - ✅ Shows all comments in chronological order
 - ✅ Each comment displays:
   - User avatar (initial letter in circle)
@@ -15,12 +17,14 @@ The Comments/Discussion section is fully implemented in the ComplaintDetailView 
   - Internal note indicator (for lecturer-only comments)
 
 ### 2. Comment Styling
+
 - ✅ Comments are displayed in rounded cards with subtle background
 - ✅ Internal notes have a yellow "Internal" badge
 - ✅ Responsive layout that works on mobile and desktop
 - ✅ Dark mode support
 
 ### 3. Add Comment Form
+
 - ✅ Textarea for entering new comments
 - ✅ Placeholder text: "Add a comment..."
 - ✅ Submit button with loading state
@@ -28,21 +32,27 @@ The Comments/Discussion section is fully implemented in the ComplaintDetailView 
 - ✅ Form clears after submission
 
 ### 4. Empty State
+
 - ✅ Shows message "No comments yet. Be the first to comment!" when no comments exist
 
 ## Component Location
+
 - **File**: `src/components/complaints/complaint-detail-view.tsx`
 - **Component**: `CommentsSection`
 - **Lines**: ~750-850
 
 ## Mock Data
+
 The component currently uses mock data for UI development (following UI-first approach):
+
 - 3 sample comments showing conversation between student and lecturer
 - Demonstrates both student and lecturer comments
 - Shows relative timestamps
 
 ## API Integration (Phase 12)
+
 The following will be implemented in Phase 12:
+
 - Real comment submission to Supabase
 - Real-time comment updates via Supabase Realtime
 - Notification creation when comments are added
@@ -52,6 +62,7 @@ The following will be implemented in Phase 12:
 ## Acceptance Criteria Coverage
 
 ### AC15: Follow-up and Discussion System
+
 - ✅ Students can add follow-up comments to their complaints (UI ready)
 - ✅ Lecturers can reply to comments, creating a discussion thread (UI ready)
 - ⏳ All participants receive notifications for new comments (Phase 12)
@@ -59,7 +70,9 @@ The following will be implemented in Phase 12:
 - ✅ Visual distinction for internal notes
 
 ## Testing
+
 To test the comments section:
+
 1. Navigate to any complaint detail page
 2. Scroll to the "Discussion" section
 3. View existing comments with user info and timestamps
@@ -69,6 +82,7 @@ To test the comments section:
 ## Screenshots/Visual Reference
 
 ### Comment Display
+
 ```
 ┌─────────────────────────────────────────────────┐
 │ Discussion (3)                                  │
@@ -97,11 +111,13 @@ To test the comments section:
 ```
 
 ## Related Components
+
 - `ComplaintDetailView` - Main container
 - `TimelineSection` - Shows history of actions
 - `AttachmentsSection` - Shows file attachments
 
 ## Notes
+
 - The component follows the UI-first development approach
 - Mock data is used for demonstration
 - Real API integration deferred to Phase 12

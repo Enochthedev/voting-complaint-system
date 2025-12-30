@@ -7,6 +7,7 @@ The tag filter functionality allows users to filter complaints by selecting one 
 ## Implementation Details
 
 ### Location
+
 - **Component**: `src/components/complaints/filter-panel.tsx`
 - **Usage**: `src/app/complaints/page.tsx`
 - **Tests**: `src/components/complaints/__tests__/tag-filter.test.tsx`
@@ -14,6 +15,7 @@ The tag filter functionality allows users to filter complaints by selecting one 
 ### Features
 
 #### 1. Tag Extraction
+
 The system automatically extracts all unique tags from complaints:
 
 ```typescript
@@ -29,6 +31,7 @@ const availableTags = React.useMemo(() => {
 ```
 
 #### 2. Tag Filter UI
+
 The FilterPanel displays tags as checkboxes in a scrollable section:
 
 ```typescript
@@ -50,20 +53,20 @@ The FilterPanel displays tags as checkboxes in a scrollable section:
 ```
 
 #### 3. Tag Filtering Logic
+
 Complaints are filtered using OR logic (any matching tag):
 
 ```typescript
 // Apply tag filter
 if (filters.tags.length > 0) {
   complaints = complaints.filter((complaint) =>
-    complaint.complaint_tags?.some((tag) =>
-      filters.tags.includes(tag.tag_name)
-    )
+    complaint.complaint_tags?.some((tag) => filters.tags.includes(tag.tag_name))
   );
 }
 ```
 
 #### 4. Active Tag Chips
+
 Selected tags appear as removable chips:
 
 ```typescript
@@ -79,6 +82,7 @@ Selected tags appear as removable chips:
 ## User Experience
 
 ### For Students
+
 1. Navigate to the complaints page
 2. View the filter panel on the left sidebar
 3. Expand the "Tags" section
@@ -87,11 +91,13 @@ Selected tags appear as removable chips:
 6. Remove tags by clicking the X on the chip or unchecking the box
 
 ### For Lecturers/Admins
+
 Same experience as students, but with access to all complaints and additional tags from all students.
 
 ## Example Tags
 
 Based on the mock data, available tags include:
+
 - `air-conditioning`
 - `lecture-hall`
 - `urgent`
@@ -115,13 +121,17 @@ Based on the mock data, available tags include:
 ## Filter Behavior
 
 ### Single Tag Selection
+
 Selecting "wifi" will show only complaints tagged with "wifi".
 
 ### Multiple Tag Selection
+
 Selecting "wifi" AND "urgent" will show complaints that have EITHER tag (OR logic).
 
 ### Combining with Other Filters
+
 Tag filters work seamlessly with other filters:
+
 - Status filters
 - Category filters
 - Priority filters
@@ -133,16 +143,19 @@ All filters are applied using AND logic between filter types, but OR logic withi
 ## Technical Notes
 
 ### Performance
+
 - Tags are extracted once and memoized
 - Filtering is performed client-side for instant feedback
 - Scrollable tag list handles large numbers of tags efficiently
 
 ### Accessibility
+
 - Checkboxes are keyboard accessible
 - Labels are properly associated with inputs
 - Screen readers can navigate the filter panel
 
 ### Responsive Design
+
 - Filter panel collapses on mobile devices
 - Tag list scrolls when there are many tags
 - Chips wrap to multiple lines as needed
@@ -164,6 +177,7 @@ The tag filter functionality is tested in `tag-filter.test.tsx`:
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 - Tag autocomplete when creating complaints
 - Tag popularity indicators
 - Tag categories or grouping
@@ -183,6 +197,7 @@ Potential improvements for future iterations:
 ## Acceptance Criteria
 
 This implementation satisfies:
+
 - **AC13**: Search and Advanced Filtering
   - ✅ Filter by tags
   - ✅ Active filters displayed as removable chips

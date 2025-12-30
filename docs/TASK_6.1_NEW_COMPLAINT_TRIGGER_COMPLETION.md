@@ -17,6 +17,7 @@ Created a database trigger that automatically notifies all lecturers and admins 
 **Migration**: `add_missing_complaint_insert_triggers`
 
 **Components**:
+
 - ✅ Trigger: `notify_on_new_complaint`
 - ✅ Function: `notify_lecturers_on_new_complaint()`
 - ✅ Additional triggers: `log_complaint_creation_trigger`, `complaint_status_change_trigger`
@@ -24,6 +25,7 @@ Created a database trigger that automatically notifies all lecturers and admins 
 ### 2. Notification Type Enum
 
 Added missing notification type values to the `notification_type` enum:
+
 - `new_complaint` ✅
 - `complaint_opened` ✅
 - `complaint_assigned` ✅
@@ -35,6 +37,7 @@ Added missing notification type values to the `notification_type` enum:
 Created comprehensive test script: `scripts/test-new-complaint-notification.js`
 
 **Test Coverage**:
+
 - ✅ Verifies all lecturers/admins receive notifications
 - ✅ Verifies notification content is correct
 - ✅ Verifies draft complaints don't trigger notifications
@@ -44,6 +47,7 @@ Created comprehensive test script: `scripts/test-new-complaint-notification.js`
 ### 4. Documentation
 
 Created comprehensive documentation:
+
 - ✅ `docs/NEW_COMPLAINT_NOTIFICATION_TRIGGER.md` - Full documentation
 - ✅ `docs/NEW_COMPLAINT_NOTIFICATION_QUICK_REFERENCE.md` - Quick reference
 - ✅ `docs/TASK_6.1_NEW_COMPLAINT_TRIGGER_COMPLETION.md` - This summary
@@ -96,13 +100,13 @@ When a new complaint is submitted:
 
 ### Triggers on Complaints Table
 
-| Trigger Name | Function | Event | Condition | Status |
-|--------------|----------|-------|-----------|--------|
-| `notify_on_new_complaint` | `notify_lecturers_on_new_complaint()` | INSERT | status='new' AND is_draft=false | ✅ Enabled |
-| `log_complaint_creation_trigger` | `log_complaint_creation()` | INSERT | is_draft=false | ✅ Enabled |
-| `complaint_status_change_trigger` | `log_complaint_status_change()` | UPDATE | status changed | ✅ Enabled |
-| `notify_on_complaint_status_change` | `notify_student_on_status_change()` | UPDATE | - | ✅ Enabled |
-| `log_complaint_assignment_trigger` | `log_complaint_assignment()` | UPDATE | assigned_to changed | ✅ Enabled |
+| Trigger Name                        | Function                              | Event  | Condition                       | Status     |
+| ----------------------------------- | ------------------------------------- | ------ | ------------------------------- | ---------- |
+| `notify_on_new_complaint`           | `notify_lecturers_on_new_complaint()` | INSERT | status='new' AND is_draft=false | ✅ Enabled |
+| `log_complaint_creation_trigger`    | `log_complaint_creation()`            | INSERT | is_draft=false                  | ✅ Enabled |
+| `complaint_status_change_trigger`   | `log_complaint_status_change()`       | UPDATE | status changed                  | ✅ Enabled |
+| `notify_on_complaint_status_change` | `notify_student_on_status_change()`   | UPDATE | -                               | ✅ Enabled |
+| `log_complaint_assignment_trigger`  | `log_complaint_assignment()`          | UPDATE | assigned_to changed             | ✅ Enabled |
 
 ## Requirements Satisfied
 
@@ -114,6 +118,7 @@ This implementation satisfies:
 ## Files Created/Modified
 
 ### Created Files
+
 1. `supabase/migrations/[timestamp]_add_missing_complaint_insert_triggers.sql`
 2. `scripts/test-new-complaint-notification.js`
 3. `docs/NEW_COMPLAINT_NOTIFICATION_TRIGGER.md`
@@ -121,6 +126,7 @@ This implementation satisfies:
 5. `docs/TASK_6.1_NEW_COMPLAINT_TRIGGER_COMPLETION.md`
 
 ### Modified Files
+
 - None (all changes were new additions)
 
 ## Verification Steps
@@ -128,13 +134,15 @@ This implementation satisfies:
 To verify the trigger is working:
 
 1. **Check trigger exists**:
+
    ```sql
-   SELECT tgname, tgenabled 
-   FROM pg_trigger 
+   SELECT tgname, tgenabled
+   FROM pg_trigger
    WHERE tgname = 'notify_on_new_complaint';
    ```
 
 2. **Run test script**:
+
    ```bash
    node scripts/test-new-complaint-notification.js
    ```
@@ -149,9 +157,11 @@ To verify the trigger is working:
 This task is part of Phase 6: Notifications and Real-time Features
 
 **Completed**:
+
 - ✅ Task 6.1: Create trigger for new complaint notification (lecturer)
 
 **Remaining**:
+
 - ⏳ Task 6.1: Create trigger for comment added notification
 - ⏳ Task 6.1: Create trigger for assignment notification
 - ⏳ Task 6.1: Create trigger for escalation notification
@@ -176,6 +186,7 @@ This task is part of Phase 6: Notifications and Real-time Features
 ## Success Criteria
 
 ✅ All success criteria met:
+
 - Trigger fires on new complaint submission
 - All lecturers and admins receive notifications
 - Notification content is accurate

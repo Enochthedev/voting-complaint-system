@@ -7,6 +7,7 @@ The `TemplateForm` component provides a comprehensive form for creating and edit
 ## Features
 
 ### 1. Basic Template Information
+
 - **Title**: Required field with character limit (3-200 characters)
 - **Description**: Required field with character limit (10-1000 characters)
 - **Category**: Dropdown selection from predefined categories
@@ -14,6 +15,7 @@ The `TemplateForm` component provides a comprehensive form for creating and edit
 - **Active Status**: Toggle to control template visibility to students
 
 ### 2. Custom Fields Management
+
 - **Add Fields**: Dynamically add custom fields to the template
 - **Remove Fields**: Delete fields that are no longer needed
 - **Field Configuration**:
@@ -24,11 +26,11 @@ The `TemplateForm` component provides a comprehensive form for creating and edit
   - **Required**: Mark field as mandatory
 
 ### 3. Validation
+
 - **Title Validation**:
   - Required
   - Minimum 3 characters
   - Maximum 200 characters
-  
 - **Description Validation**:
   - Required
   - Minimum 10 characters
@@ -40,6 +42,7 @@ The `TemplateForm` component provides a comprehensive form for creating and edit
   - No duplicate field names allowed
 
 ### 4. User Experience
+
 - Real-time character counters
 - Inline error messages
 - Loading states during submission
@@ -80,12 +83,12 @@ import { TemplateForm } from '@/components/complaints/template-form';
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `template` | `ComplaintTemplate \| null` | No | Existing template to edit (omit for new template) |
-| `onSave` | `(template: Partial<ComplaintTemplate>) => void` | Yes | Callback when form is submitted |
-| `onCancel` | `() => void` | Yes | Callback when form is cancelled |
-| `isLoading` | `boolean` | No | Shows loading state (default: false) |
+| Prop        | Type                                             | Required | Description                                       |
+| ----------- | ------------------------------------------------ | -------- | ------------------------------------------------- |
+| `template`  | `ComplaintTemplate \| null`                      | No       | Existing template to edit (omit for new template) |
+| `onSave`    | `(template: Partial<ComplaintTemplate>) => void` | Yes      | Callback when form is submitted                   |
+| `onCancel`  | `() => void`                                     | Yes      | Callback when form is cancelled                   |
+| `isLoading` | `boolean`                                        | No       | Shows loading state (default: false)              |
 
 ## Template Data Structure
 
@@ -145,31 +148,38 @@ The form outputs a template object with the following structure:
 ## Field Types
 
 ### Text
+
 Single-line text input for short responses.
 
 ### Textarea
+
 Multi-line text input for longer descriptions.
 
 ### Number
+
 Numeric input with validation.
 
 ### Date
+
 Date picker for date-related fields.
 
 ## Validation Rules
 
 ### Field Name Format
+
 - Must be lowercase
 - Can only contain letters and underscores
 - No spaces or special characters
 - Must be unique within the template
 
 Example valid names:
+
 - `room_number`
 - `equipment_name`
 - `issue_date`
 
 Example invalid names:
+
 - `Room Number` (uppercase)
 - `room-number` (hyphen)
 - `room number` (space)
@@ -187,6 +197,7 @@ The form is integrated into the template management page at `/admin/templates`:
 ## Styling
 
 The component uses:
+
 - Tailwind CSS for styling
 - Dark mode support
 - Responsive grid layouts

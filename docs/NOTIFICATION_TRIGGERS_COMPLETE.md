@@ -1,11 +1,13 @@
 # Complete Notification Triggers Reference
 
 ## Overview
+
 All notification triggers have been successfully implemented and tested in the Student Complaint Resolution System.
 
 ## Implemented Triggers
 
 ### 1. New Complaint Notification ✅
+
 - **Table**: `complaints`
 - **Trigger**: `notify_on_new_complaint`
 - **Function**: `notify_lecturers_on_new_complaint()`
@@ -16,28 +18,30 @@ All notification triggers have been successfully implemented and tested in the S
 - **Migration**: `017_create_complaint_triggers.sql`
 
 ### 2. Complaint Opened/Status Change Notification ✅
+
 - **Table**: `complaints`
 - **Trigger**: `notify_on_complaint_status_change`
 - **Function**: `notify_student_on_status_change()`
-- **When**: 
+- **When**:
   - Complaint status changes from 'new' to 'opened'
   - Complaint status changes to 'in_progress' or 'resolved'
   - Complaint is assigned to a lecturer
-- **Who Gets Notified**: 
+- **Who Gets Notified**:
   - Student (for status changes)
   - Assigned lecturer (for assignments)
-- **Notification Types**: 
+- **Notification Types**:
   - `'complaint_update'` (status changes)
   - `'assignment'` (assignments)
 - **Messages**:
   - "A lecturer has opened your complaint: [title]"
   - "Your complaint '[title]' is now [status]"
   - "You have been assigned complaint: [title]"
-- **Migrations**: 
+- **Migrations**:
   - `017_create_complaint_triggers.sql`
   - `029_fix_assignment_notification_type.sql`
 
 ### 3. Feedback Received Notification ✅
+
 - **Table**: `feedback`
 - **Trigger**: `notify_on_feedback_received`
 - **Function**: `notify_student_on_feedback()`
@@ -48,11 +52,12 @@ All notification triggers have been successfully implemented and tested in the S
 - **Migration**: `030_create_feedback_notification_trigger.sql`
 
 ### 4. Comment Added Notification ✅
+
 - **Table**: `complaint_comments`
 - **Trigger**: `notify_on_comment_added`
 - **Function**: `notify_users_on_comment()`
 - **When**: Comment is added to a complaint (non-internal)
-- **Who Gets Notified**: 
+- **Who Gets Notified**:
   - Student (if not the commenter)
   - Assigned lecturer (if not the commenter)
   - Other lecturers/admins who have commented (if not the commenter)
@@ -64,10 +69,11 @@ All notification triggers have been successfully implemented and tested in the S
 - **Migration**: `031_create_comment_notification_trigger.sql`
 
 ### 5. Escalation Notification ✅
+
 - **Table**: `complaints`
 - **Trigger**: `notify_on_complaint_escalation`
 - **Function**: `notify_user_on_escalation()`
-- **When**: 
+- **When**:
   - Complaint is escalated (escalated_at set)
   - Escalation level increases (re-escalation)
 - **Who Gets Notified**: User assigned to handle the escalated complaint
@@ -76,6 +82,7 @@ All notification triggers have been successfully implemented and tested in the S
 - **Migration**: `032_create_escalation_notification_trigger.sql`
 
 ### 6. New Vote Notification ✅ **NEW**
+
 - **Table**: `votes`
 - **Trigger**: `notify_on_new_vote`
 - **Function**: `notify_students_on_new_vote()`
@@ -106,15 +113,15 @@ CREATE TYPE notification_type AS ENUM (
 
 ## Trigger Status Summary
 
-| Trigger | Table | Status | Tested | Migration |
-|---------|-------|--------|--------|-----------|
-| New Complaint | complaints | ✅ Enabled | ✅ Yes | 017 |
-| Status Change | complaints | ✅ Enabled | ✅ Yes | 017, 029 |
-| Assignment | complaints | ✅ Enabled | ✅ Yes | 017, 029 |
-| Feedback | feedback | ✅ Enabled | ✅ Yes | 030 |
-| Comment | complaint_comments | ✅ Enabled | ✅ Yes | 031 |
-| Escalation | complaints | ✅ Enabled | ✅ Yes | 032 |
-| New Vote | votes | ✅ Enabled | ✅ Yes | 033 |
+| Trigger       | Table              | Status     | Tested | Migration |
+| ------------- | ------------------ | ---------- | ------ | --------- |
+| New Complaint | complaints         | ✅ Enabled | ✅ Yes | 017       |
+| Status Change | complaints         | ✅ Enabled | ✅ Yes | 017, 029  |
+| Assignment    | complaints         | ✅ Enabled | ✅ Yes | 017, 029  |
+| Feedback      | feedback           | ✅ Enabled | ✅ Yes | 030       |
+| Comment       | complaint_comments | ✅ Enabled | ✅ Yes | 031       |
+| Escalation    | complaints         | ✅ Enabled | ✅ Yes | 032       |
+| New Vote      | votes              | ✅ Enabled | ✅ Yes | 033       |
 
 ## Test Scripts
 
@@ -173,6 +180,7 @@ All triggers have corresponding test scripts:
 ## Security
 
 All trigger functions use `SECURITY DEFINER` to ensure:
+
 - Notifications can be created even if user doesn't have direct INSERT permission
 - Proper authorization checks are performed within the function
 - RLS policies on notifications table ensure users only see their own notifications
@@ -189,11 +197,13 @@ All trigger functions use `SECURITY DEFINER` to ensure:
 ### Adding New Notification Types
 
 1. Add new value to `notification_type` enum:
+
    ```sql
    ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'new_type';
    ```
 
 2. Create trigger function:
+
    ```sql
    CREATE OR REPLACE FUNCTION notify_on_event()
    RETURNS TRIGGER AS $$
@@ -205,6 +215,7 @@ All trigger functions use `SECURITY DEFINER` to ensure:
    ```
 
 3. Create trigger:
+
    ```sql
    CREATE TRIGGER trigger_name
      AFTER INSERT/UPDATE ON table_name
@@ -218,13 +229,14 @@ All trigger functions use `SECURITY DEFINER` to ensure:
 ### Monitoring
 
 Check trigger health:
+
 ```sql
 -- List all notification triggers
-SELECT 
+SELECT
   c.relname AS table_name,
   t.tgname AS trigger_name,
   p.proname AS function_name,
-  CASE 
+  CASE
     WHEN t.tgenabled = 'O' THEN 'Enabled'
     WHEN t.tgenabled = 'D' THEN 'Disabled'
   END AS status
@@ -250,6 +262,7 @@ ORDER BY c.relname, t.tgname;
 ✅ **ALL NOTIFICATION TRIGGERS IMPLEMENTED AND TESTED**
 
 All required notification triggers for Phase 6 (Task 6.1) and Phase 7 (Task 7.1) are now complete:
+
 - ✅ New complaint notification
 - ✅ Complaint opened notification
 - ✅ Assignment notification

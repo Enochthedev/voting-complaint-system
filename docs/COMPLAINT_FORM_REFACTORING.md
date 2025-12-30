@@ -70,7 +70,9 @@ export default function EditComplaintPage({ complaint }) {
 ## Components
 
 ### FormFields
+
 Renders all core form inputs:
+
 - Anonymous submission toggle
 - Title input with character count
 - Category dropdown
@@ -78,21 +80,27 @@ Renders all core form inputs:
 - Description rich text editor
 
 ### TagInput
+
 Provides tag management with:
+
 - Autocomplete suggestions
 - Keyboard navigation
 - Tag chips with remove buttons
 - Create new tags
 
 ### TemplateSelector
+
 Allows users to:
+
 - Browse available templates
 - Preview template details
 - Apply template to form
 - Clear selected template
 
 ### FormActions
+
 Provides action buttons:
+
 - Cancel (optional)
 - Save as Draft
 - Submit Complaint
@@ -196,7 +204,7 @@ describe('Form Validation', () => {
       tags: [],
       files: [],
     };
-    
+
     const errors = validateForm(formData, false);
     expect(errors.title).toBeDefined();
     expect(errors.description).toBeDefined();
@@ -209,21 +217,25 @@ describe('Form Validation', () => {
 ## Benefits
 
 ### Maintainability
+
 - Each file has a single responsibility
 - Easy to locate and fix bugs
 - Reduced cognitive load
 
 ### Testability
+
 - Components can be tested in isolation
 - Validation logic is separate and testable
 - Mock data separated for easy testing
 
 ### Reusability
+
 - TagInput can be used in other forms
 - Validation functions can be shared
 - Template utilities are reusable
 
 ### Performance
+
 - Better code splitting
 - Can optimize individual components
 - Easier to add React.memo
@@ -242,6 +254,7 @@ No changes needed in consuming components.
 ## Future Enhancements
 
 Potential improvements:
+
 - Add form field validation on blur
 - Add autosave for drafts
 - Add template search/filter

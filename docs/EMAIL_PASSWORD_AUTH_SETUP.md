@@ -110,6 +110,7 @@ node scripts/configure-auth.js
 ```
 
 Expected output:
+
 - ✓ All environment variables set
 - ✓ Supabase connection successful
 - ✓ Users table exists and accessible
@@ -124,6 +125,7 @@ node scripts/test-email-auth.js
 ```
 
 Expected output:
+
 - ✓ Sign up successful
 - ✓ User metadata (role and full name) stored correctly
 - ✓ Sign in successful
@@ -240,7 +242,12 @@ requireLecturerOrAdminServer(): Promise<User>
 ```typescript
 import { signUp, validatePassword, isValidEmail } from '@/lib/auth';
 
-async function handleSignUp(email: string, password: string, fullName: string, role: 'student' | 'lecturer') {
+async function handleSignUp(
+  email: string,
+  password: string,
+  fullName: string,
+  role: 'student' | 'lecturer'
+) {
   // Validate email
   if (!isValidEmail(email)) {
     return { error: 'Invalid email format' };
@@ -296,14 +303,14 @@ export default function ProtectedPage() {
   useEffect(() => {
     async function checkAuth() {
       const user = await getCurrentUser();
-      
+
       if (!user) {
         router.push('/login');
         return;
       }
 
       const role = await getUserRole();
-      
+
       // Check if user has required role
       if (role !== 'lecturer' && role !== 'admin') {
         router.push('/unauthorized');
@@ -337,12 +344,8 @@ export async function GET(request: NextRequest) {
 
     // User is authenticated and has required role
     return NextResponse.json({ data: 'Protected data' });
-
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }
 ```
@@ -355,7 +358,8 @@ export async function GET(request: NextRequest) {
 
 ### Issue: "Email not confirmed"
 
-**Solution**: 
+**Solution**:
+
 1. Go to Supabase Dashboard > Authentication > Providers
 2. Click on Email provider
 3. Disable "Confirm email" for development
@@ -364,11 +368,13 @@ export async function GET(request: NextRequest) {
 ### Issue: "Invalid login credentials"
 
 **Possible causes**:
+
 - Wrong email or password
 - User doesn't exist
 - Email not confirmed (if confirmation is enabled)
 
-**Solution**: 
+**Solution**:
+
 - Verify credentials
 - Check if user exists in Supabase Dashboard > Authentication > Users
 - Confirm email if confirmation is enabled
@@ -376,6 +382,7 @@ export async function GET(request: NextRequest) {
 ### Issue: Session not persisting
 
 **Solution**:
+
 - Check that cookies are enabled in browser
 - Verify `NEXT_PUBLIC_APP_URL` is set correctly
 - Check browser console for errors
@@ -383,6 +390,7 @@ export async function GET(request: NextRequest) {
 ### Issue: Role not set correctly
 
 **Solution**:
+
 - Verify the trigger is working: Check `public.users` table
 - Ensure role is passed correctly in `signUp()` function
 - Check user metadata in Supabase Dashboard > Authentication > Users
@@ -454,6 +462,7 @@ After completing email/password authentication setup:
 ## Support
 
 For issues or questions:
+
 - Check Supabase Dashboard logs
 - Review browser console errors
 - Check server logs

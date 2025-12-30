@@ -7,12 +7,14 @@ The `FileUpload` component provides a comprehensive file upload interface with d
 ## Features
 
 ### ✅ File Validation
+
 - **Size Validation**: Enforces 10MB maximum per file
 - **Type Validation**: Only allows specific file types (images, PDFs, Word documents)
 - **Count Validation**: Limits to 5 files per complaint
 - **Real-time Feedback**: Shows validation errors immediately
 
 ### ✅ User Interface
+
 - **Drag and Drop**: Intuitive drag-and-drop file upload
 - **File Browser**: Click to browse and select files
 - **File Previews**: Shows thumbnails for images, icons for documents
@@ -20,6 +22,7 @@ The `FileUpload` component provides a comprehensive file upload interface with d
 - **Error Messages**: Clear, actionable error messages
 
 ### ✅ Accessibility
+
 - Keyboard navigation support
 - ARIA labels and roles
 - Screen reader friendly
@@ -42,7 +45,7 @@ function MyForm() {
         setFiles([...files, ...newFiles]);
       }}
       onFileRemove={(fileToRemove) => {
-        setFiles(files.filter(f => f !== fileToRemove));
+        setFiles(files.filter((f) => f !== fileToRemove));
       }}
     />
   );
@@ -70,14 +73,14 @@ function ComplaintPage() {
 
 ### Allowed File Types
 
-| Type | MIME Type | Extensions |
-|------|-----------|------------|
-| JPEG Image | `image/jpeg` | `.jpg`, `.jpeg` |
-| PNG Image | `image/png` | `.png` |
-| GIF Image | `image/gif` | `.gif` |
-| PDF Document | `application/pdf` | `.pdf` |
-| Word Document (Legacy) | `application/msword` | `.doc` |
-| Word Document (Modern) | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx` |
+| Type                   | MIME Type                                                                 | Extensions      |
+| ---------------------- | ------------------------------------------------------------------------- | --------------- |
+| JPEG Image             | `image/jpeg`                                                              | `.jpg`, `.jpeg` |
+| PNG Image              | `image/png`                                                               | `.png`          |
+| GIF Image              | `image/gif`                                                               | `.gif`          |
+| PDF Document           | `application/pdf`                                                         | `.pdf`          |
+| Word Document (Legacy) | `application/msword`                                                      | `.doc`          |
+| Word Document (Modern) | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx`         |
 
 ### Size Limits
 
@@ -97,6 +100,7 @@ function ComplaintPage() {
 The component uses validation utilities from `@/lib/file-validation.ts`:
 
 ### `validateFile(file: File)`
+
 Validates a single file against size and type constraints.
 
 ```typescript
@@ -109,6 +113,7 @@ if (result.valid) {
 ```
 
 ### `validateFiles(files: File[], existingCount: number)`
+
 Validates multiple files considering existing file count.
 
 ```typescript
@@ -118,6 +123,7 @@ console.log('Invalid files:', result.invalid);
 ```
 
 ### `formatFileSize(bytes: number)`
+
 Formats file size in human-readable format.
 
 ```typescript
@@ -126,6 +132,7 @@ formatFileSize(1536); // "1.5 KB"
 ```
 
 ### `isFileTypeAllowed(mimeType: string)`
+
 Checks if a file type is allowed.
 
 ```typescript
@@ -145,14 +152,14 @@ The component provides clear, actionable error messages:
 
 ### `FileUploadProps`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `onFilesSelected` | `(files: File[]) => void` | - | Callback when valid files are selected |
-| `onFileRemove` | `(file: File) => void` | - | Callback when a file is removed |
-| `files` | `File[]` | `[]` | Currently selected files |
-| `maxFiles` | `number` | `5` | Maximum number of files allowed |
-| `disabled` | `boolean` | `false` | Whether the component is disabled |
-| `className` | `string` | `''` | Additional CSS classes |
+| Prop              | Type                      | Default | Description                            |
+| ----------------- | ------------------------- | ------- | -------------------------------------- |
+| `onFilesSelected` | `(files: File[]) => void` | -       | Callback when valid files are selected |
+| `onFileRemove`    | `(file: File) => void`    | -       | Callback when a file is removed        |
+| `files`           | `File[]`                  | `[]`    | Currently selected files               |
+| `maxFiles`        | `number`                  | `5`     | Maximum number of files allowed        |
+| `disabled`        | `boolean`                 | `false` | Whether the component is disabled      |
+| `className`       | `string`                  | `''`    | Additional CSS classes                 |
 
 ## Styling
 
@@ -175,6 +182,7 @@ Comprehensive tests are available in `__tests__/file-upload.test.tsx`:
 - ✅ Accessibility features
 
 Run tests with:
+
 ```bash
 npm test src/components/ui/__tests__/file-upload.test.tsx
 ```
@@ -187,13 +195,13 @@ When submitting the form, files should be uploaded to Supabase Storage:
 async function uploadFiles(complaintId: string, files: File[]) {
   for (const file of files) {
     const filePath = `${complaintId}/${file.name}`;
-    
+
     const { data, error } = await supabase.storage
       .from('complaint-attachments')
       .upload(filePath, file);
-    
+
     if (error) throw error;
-    
+
     // Store metadata in database
     await supabase.from('complaint_attachments').insert({
       complaint_id: complaintId,
@@ -233,6 +241,7 @@ async function uploadFiles(complaintId: string, files: File[]) {
 ## Support
 
 For issues or questions about file upload functionality, refer to:
+
 - [Storage Setup Documentation](../../../docs/STORAGE_SETUP.md)
 - [Storage Bucket Completion](../../../docs/STORAGE_BUCKET_COMPLETION.md)
 - [Requirements Document](.kiro/specs/student-complaint-system/requirements.md) - AC11

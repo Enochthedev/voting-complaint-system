@@ -1,24 +1,30 @@
 # Search Autocomplete Feature - Visual Demo
 
 ## Overview
+
 The search bar now includes intelligent autocomplete suggestions that help users find complaints quickly.
 
 ## Features Implemented
 
 ### 1. Intelligent Suggestions
+
 The autocomplete provides suggestions from three sources:
+
 - **Complaint Titles**: Matching complaint titles (prioritized if they start with the query)
 - **Common Terms**: Frequently searched keywords (wifi, grading, parking, etc.)
 - **Tags**: Tags from existing complaints
 
 ### 2. Suggestion Prioritization
+
 Suggestions are ordered by relevance:
+
 1. Titles that start with the search query (highest priority)
 2. Titles that contain the search query
 3. Common search terms
 4. Matching tags
 
 ### 3. User Experience
+
 - Suggestions appear after typing 2+ characters
 - Keyboard navigation support (Arrow Up/Down, Enter, Escape)
 - Click to select a suggestion
@@ -29,41 +35,55 @@ Suggestions are ordered by relevance:
 ## Example Usage
 
 ### Typing "air"
+
 Suggestions shown:
+
 - "Broken Air Conditioning in Lecture Hall A" (title match)
 - "air conditioning" (common term)
 
 ### Typing "wifi"
+
 Suggestions shown:
+
 - "Library WiFi Connection Issues" (title match)
 - "wifi" (tag match)
 
 ### Typing "park"
+
 Suggestions shown:
+
 - "Parking Lot Safety Issues" (title match)
 - "parking" (common term)
 
 ### Typing "grad"
+
 Suggestions shown:
+
 - "Unfair Grading in CS101" (title match)
 - "grading" (common term, tag match)
 
 ### Typing "class"
+
 Suggestions shown:
+
 - "Classroom Projector Not Working" (title match)
 - "classroom" (common term, tag match)
 
 ## Technical Implementation
 
 ### Mock Data (Phase 3-11)
+
 Currently using mock suggestions from `search-mock.ts`:
+
 - Simulates 100ms network delay
 - Filters from predefined complaint titles
 - Includes common search terms
 - Extracts tags from mock complaints
 
 ### Real Implementation (Phase 12)
+
 Will query Supabase database:
+
 ```typescript
 // Query complaint titles
 const { data } = await supabase

@@ -327,6 +327,7 @@ Badge:            Red 500 (#EF4444)
 ## Best Practices
 
 ### Do's ✅
+
 - Keep notification messages concise (< 100 chars)
 - Use relative timestamps for recent notifications
 - Show unread indicator clearly
@@ -335,6 +336,7 @@ Badge:            Red 500 (#EF4444)
 - Auto-mark as read when clicked
 
 ### Don'ts ❌
+
 - Don't show too many notifications at once (limit to 50)
 - Don't use absolute timestamps for recent items
 - Don't make notifications too tall (keep < 100px)
@@ -345,6 +347,7 @@ Badge:            Red 500 (#EF4444)
 ## Testing Checklist
 
 Visual Testing:
+
 - [ ] Bell icon displays correctly
 - [ ] Badge shows correct count
 - [ ] Dropdown opens/closes smoothly
@@ -357,6 +360,7 @@ Visual Testing:
 - [ ] Loading state displays correctly
 
 Interaction Testing:
+
 - [ ] Click bell opens dropdown
 - [ ] Click outside closes dropdown
 - [ ] Click notification navigates correctly
@@ -366,12 +370,14 @@ Interaction Testing:
 - [ ] Scrolling works for many notifications
 
 Responsive Testing:
+
 - [ ] Works on desktop (1920px)
 - [ ] Works on tablet (768px)
 - [ ] Works on mobile (375px)
 - [ ] Dropdown doesn't overflow viewport
 
 Accessibility Testing:
+
 - [ ] Keyboard navigation works
 - [ ] Screen reader announces correctly
 - [ ] Focus indicators visible

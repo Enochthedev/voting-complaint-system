@@ -77,16 +77,18 @@ async function uploadAttachment(
   complaintId: string,
   userId: string,
   onProgress?: (progress: number) => void
-): Promise<UploadResult>
+): Promise<UploadResult>;
 ```
 
 **Parameters:**
+
 - `file`: The file to upload
 - `complaintId`: ID of the complaint this attachment belongs to
 - `userId`: ID of the user uploading the file
 - `onProgress`: Optional callback for progress updates (0-100)
 
 **Returns:**
+
 ```typescript
 {
   success: boolean;
@@ -96,12 +98,10 @@ async function uploadAttachment(
 ```
 
 **Example:**
+
 ```typescript
-const result = await uploadAttachment(
-  file,
-  'complaint-123',
-  'user-456',
-  (progress) => console.log(`Upload progress: ${progress}%`)
+const result = await uploadAttachment(file, 'complaint-123', 'user-456', (progress) =>
+  console.log(`Upload progress: ${progress}%`)
 );
 
 if (result.success) {
@@ -121,7 +121,7 @@ async function uploadMultipleAttachments(
   complaintId: string,
   userId: string,
   onProgress?: (fileIndex: number, progress: number) => void
-): Promise<UploadResult[]>
+): Promise<UploadResult[]>;
 ```
 
 ### getAttachmentUrl()
@@ -129,13 +129,11 @@ async function uploadMultipleAttachments(
 Generates a signed URL for downloading an attachment.
 
 ```typescript
-async function getAttachmentUrl(
-  filePath: string,
-  expiresIn?: number
-): Promise<string | null>
+async function getAttachmentUrl(filePath: string, expiresIn?: number): Promise<string | null>;
 ```
 
 **Parameters:**
+
 - `filePath`: Storage path of the file
 - `expiresIn`: URL expiration time in seconds (default: 3600 = 1 hour)
 
@@ -147,7 +145,7 @@ Deletes an attachment from both storage and database.
 async function deleteAttachment(
   attachmentId: string,
   filePath: string
-): Promise<{ success: boolean; error?: string }>
+): Promise<{ success: boolean; error?: string }>;
 ```
 
 ### getComplaintAttachments()
@@ -155,9 +153,7 @@ async function deleteAttachment(
 Retrieves all attachments for a complaint.
 
 ```typescript
-async function getComplaintAttachments(
-  complaintId: string
-): Promise<ComplaintAttachment[] | null>
+async function getComplaintAttachments(complaintId: string): Promise<ComplaintAttachment[] | null>;
 ```
 
 ### downloadAttachment()
@@ -165,9 +161,7 @@ async function getComplaintAttachments(
 Downloads an attachment file as a Blob.
 
 ```typescript
-async function downloadAttachment(
-  filePath: string
-): Promise<Blob | null>
+async function downloadAttachment(filePath: string): Promise<Blob | null>;
 ```
 
 ## React Hook Usage
@@ -176,17 +170,18 @@ async function downloadAttachment(
 
 ```typescript
 const {
-  uploadProgress,      // Array of upload progress for each file
+  uploadProgress, // Array of upload progress for each file
   uploadedAttachments, // Array of successfully uploaded attachments
-  isUploading,         // Boolean indicating if upload is in progress
-  uploadFiles,         // Function to upload files
-  removeAttachment,    // Function to remove an uploaded attachment
-  clearProgress,       // Function to clear progress (keeps attachments)
-  reset,               // Function to reset all state
+  isUploading, // Boolean indicating if upload is in progress
+  uploadFiles, // Function to upload files
+  removeAttachment, // Function to remove an uploaded attachment
+  clearProgress, // Function to clear progress (keeps attachments)
+  reset, // Function to reset all state
 } = useAttachmentUpload();
 ```
 
 **Example:**
+
 ```typescript
 function MyComponent() {
   const { uploadFiles, uploadProgress, uploadedAttachments } = useAttachmentUpload();
@@ -234,6 +229,7 @@ The implementation includes comprehensive error handling:
 ### Row Level Security (RLS)
 
 The `complaint_attachments` table has RLS policies that:
+
 - Allow students to insert attachments for their own complaints
 - Allow lecturers/admins to view all attachments
 - Prevent unauthorized access to attachment metadata
@@ -241,6 +237,7 @@ The `complaint_attachments` table has RLS policies that:
 ### Storage Policies
 
 The `complaint-attachments` bucket has policies that:
+
 - Allow students to upload to their own complaint folders
 - Allow lecturers/admins to access all attachments
 - Prevent public access to files
@@ -265,6 +262,7 @@ The `complaint-attachments` bucket has policies that:
 To switch from mock to real implementation in Phase 12:
 
 1. Update imports in components:
+
 ```typescript
 // Change from:
 import { uploadAttachment } from '@/lib/attachment-upload-mock';
@@ -274,6 +272,7 @@ import { uploadAttachment } from '@/lib/attachment-upload';
 ```
 
 2. Replace mock user/complaint IDs with real values from auth context:
+
 ```typescript
 // Change from:
 const MOCK_USER_ID = 'mock-user-id';
@@ -346,6 +345,7 @@ const complaintId = complaint.id;
 ## Support
 
 For questions or issues related to attachment upload:
+
 1. Check this documentation
 2. Review the example implementation in `complaint-form-with-upload.tsx`
 3. Verify RLS policies are correctly applied

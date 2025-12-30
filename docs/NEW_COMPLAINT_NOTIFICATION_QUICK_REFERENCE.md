@@ -6,23 +6,25 @@ Database trigger that automatically notifies all lecturers and admins when a stu
 
 ## Key Details
 
-| Property | Value |
-|----------|-------|
-| **Trigger Name** | `notify_on_new_complaint` |
-| **Function** | `notify_lecturers_on_new_complaint()` |
-| **Event** | AFTER INSERT on `complaints` |
-| **Condition** | `status = 'new' AND is_draft = false` |
-| **Recipients** | All users with role `lecturer` or `admin` |
-| **Notification Type** | `new_complaint` |
+| Property              | Value                                     |
+| --------------------- | ----------------------------------------- |
+| **Trigger Name**      | `notify_on_new_complaint`                 |
+| **Function**          | `notify_lecturers_on_new_complaint()`     |
+| **Event**             | AFTER INSERT on `complaints`              |
+| **Condition**         | `status = 'new' AND is_draft = false`     |
+| **Recipients**        | All users with role `lecturer` or `admin` |
+| **Notification Type** | `new_complaint`                           |
 
 ## When It Fires
 
 ✅ **DOES trigger** when:
+
 - A new complaint is inserted with `status = 'new'`
 - The complaint has `is_draft = false`
 - Example: Student submits a complaint form
 
 ❌ **DOES NOT trigger** when:
+
 - A draft complaint is saved (`is_draft = true`)
 - A complaint is created with status other than 'new'
 - A complaint is updated (only INSERT events)
@@ -48,8 +50,8 @@ node scripts/test-new-complaint-notification.js
 
 ```sql
 -- Check if trigger exists
-SELECT tgname, tgenabled 
-FROM pg_trigger 
+SELECT tgname, tgenabled
+FROM pg_trigger
 WHERE tgname = 'notify_on_new_complaint';
 
 -- Check recent notifications

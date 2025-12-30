@@ -19,7 +19,7 @@ Run these commands to reset passwords:
 # Reset student password
 supabase auth users reset-password student@test.com --password password123
 
-# Reset lecturer password  
+# Reset lecturer password
 supabase auth users reset-password lecturer@test.com --password password123
 
 # Reset admin password
@@ -53,7 +53,7 @@ Check that users exist and have passwords:
 
 ```sql
 SELECT id, email, email_confirmed_at, encrypted_password IS NOT NULL as has_password
-FROM auth.users 
+FROM auth.users
 WHERE email IN ('student@test.com', 'lecturer@test.com', 'admin@test.com')
 ORDER BY email;
 ```

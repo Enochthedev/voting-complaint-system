@@ -7,6 +7,7 @@ The escalation notification system is fully implemented and functional.
 ## What Was Implemented
 
 ### 1. Database Trigger for Escalation Notifications
+
 **File**: `supabase/migrations/032_create_escalation_notification_trigger.sql`
 
 A PostgreSQL trigger that automatically creates notifications when complaints are escalated:
@@ -23,20 +24,24 @@ CREATE TRIGGER notify_on_complaint_escalation
 ```
 
 **Trigger Behavior**:
+
 - Fires when `escalated_at` changes from NULL to a timestamp (first escalation)
 - Fires when `escalation_level` increases (re-escalation)
 - Creates a notification for the `assigned_to` user
 - Includes complaint details in the notification message
 
 ### 2. Edge Function Integration
+
 **File**: `supabase/functions/auto-escalate-complaints/index.ts`
 
 Updated the auto-escalation edge function to:
+
 - Remove manual notification creation (preventing duplicates)
 - Rely on the database trigger to create notifications automatically
 - Added comment explaining the trigger handles notification creation
 
 **Before** (duplicate notifications):
+
 ```typescript
 // Update complaint
 await supabase.from('complaints').update({ escalated_at, escalation_level, assigned_to });
@@ -46,6 +51,7 @@ await supabase.from('notifications').insert({ ... });
 ```
 
 **After** (trigger handles it):
+
 ```typescript
 // Update complaint - trigger will create notification automatically
 await supabase.from('complaints').update({ escalated_at, escalation_level, assigned_to });
@@ -54,9 +60,11 @@ console.log(`Notification will be created automatically by database trigger`);
 ```
 
 ### 3. Testing
+
 **File**: `scripts/test-escalation-notification-trigger.js`
 
 Comprehensive test script that verifies:
+
 - ✅ Notification created on first escalation
 - ✅ Notification sent to correct user (assigned_to)
 - ✅ Notification has correct type (`complaint_escalated`)
@@ -65,6 +73,7 @@ Comprehensive test script that verifies:
 - ✅ Notification is marked as unread by default
 
 **Test Results**:
+
 ```
 ✅ Escalation notification created successfully!
    - Title: Complaint escalated to you
@@ -83,14 +92,18 @@ Comprehensive test script that verifies:
 ### Escalation Flow
 
 1. **Escalation Trigger** (Manual or Automatic):
+
    ```typescript
    // Manual escalation by lecturer
-   await supabase.from('complaints').update({
-     escalated_at: new Date().toISOString(),
-     escalation_level: 1,
-     assigned_to: lecturerId
-   }).eq('id', complaintId);
-   
+   await supabase
+     .from('complaints')
+     .update({
+       escalated_at: new Date().toISOString(),
+       escalation_level: 1,
+       assigned_to: lecturerId,
+     })
+     .eq('id', complaintId);
+
    // OR automatic escalation by edge function
    // (runs hourly via cron job)
    ```
@@ -122,12 +135,14 @@ Comprehensive test script that verifies:
 ## Integration Points
 
 ### Related Components
+
 - **Escalation Rules**: `escalation_rules` table defines when to escalate
 - **Auto-Escalation Function**: Edge function that applies escalation rules
 - **Notification System**: Displays escalation notifications to users
 - **Complaint History**: Escalation events logged separately
 
 ### Database Tables
+
 - **Source**: `complaints` table (UPDATE trigger)
 - **Target**: `notifications` table (INSERT)
 - **Reference**: `users` table (assigned_to user)
@@ -135,11 +150,13 @@ Comprehensive test script that verifies:
 ## Security & Privacy
 
 ### Permissions
+
 - Function runs with `SECURITY DEFINER` for proper notification creation
 - `GRANT EXECUTE` on function to `authenticated` role
 - RLS policies ensure users only see their own notifications
 
 ### Privacy
+
 - Only the assigned user receives the escalation notification
 - Notification includes complaint details but respects RLS policies
 - Anonymous complaints maintain student privacy
@@ -147,6 +164,7 @@ Comprehensive test script that verifies:
 ## Requirements Satisfied
 
 ### Acceptance Criteria
+
 - ✅ **AC21**: Auto-Escalation System
   - Escalation triggers notifications to higher authority
   - Escalation events tracked via notifications
@@ -156,6 +174,7 @@ Comprehensive test script that verifies:
   - Integrated with Supabase Realtime
 
 ### Correctness Properties
+
 - ✅ **P4**: Notification Delivery
   - Notifications created automatically on escalation
   - Delivered to correct user (assigned_to)
@@ -167,12 +186,14 @@ Comprehensive test script that verifies:
 ## Files Modified/Created
 
 ### Created
+
 - `supabase/migrations/032_create_escalation_notification_trigger.sql` - Database trigger
 - `scripts/test-escalation-notification-trigger.js` - Test script
 - `docs/ESCALATION_NOTIFICATION_TRIGGER.md` - Documentation
 - `docs/TASK_10.2_ESCALATION_NOTIFICATION_COMPLETE.md` - This file
 
 ### Modified
+
 - `supabase/functions/auto-escalate-complaints/index.ts` - Removed duplicate notification creation
 - `.kiro/specs/tasks.md` - Marked task as complete
 
@@ -187,6 +208,7 @@ Comprehensive test script that verifies:
 ## Usage Examples
 
 ### Manual Escalation
+
 ```typescript
 // Escalate a complaint to a specific user
 const { data, error } = await supabase
@@ -194,7 +216,7 @@ const { data, error } = await supabase
   .update({
     escalated_at: new Date().toISOString(),
     escalation_level: 1,
-    assigned_to: escalationUserId
+    assigned_to: escalationUserId,
   })
   .eq('id', complaintId);
 
@@ -202,13 +224,14 @@ const { data, error } = await supabase
 ```
 
 ### Re-escalation
+
 ```typescript
 // Increase escalation level
 const { data, error } = await supabase
   .from('complaints')
   .update({
     escalation_level: currentLevel + 1,
-    assigned_to: higherAuthorityUserId
+    assigned_to: higherAuthorityUserId,
   })
   .eq('id', complaintId);
 
@@ -216,6 +239,7 @@ const { data, error } = await supabase
 ```
 
 ### Automatic Escalation (Edge Function)
+
 ```typescript
 // Edge function runs hourly via cron job
 // Finds complaints matching escalation rules
@@ -226,33 +250,35 @@ const { data, error } = await supabase
 ## Monitoring
 
 ### Check Escalation Notifications
+
 ```sql
 -- View all escalation notifications
-SELECT * FROM notifications 
-WHERE type = 'complaint_escalated' 
+SELECT * FROM notifications
+WHERE type = 'complaint_escalated'
 ORDER BY created_at DESC;
 
 -- View escalated complaints
-SELECT * FROM complaints 
-WHERE escalated_at IS NOT NULL 
+SELECT * FROM complaints
+WHERE escalated_at IS NOT NULL
 ORDER BY escalated_at DESC;
 
 -- View escalation history
-SELECT * FROM complaint_history 
-WHERE action = 'escalated' 
+SELECT * FROM complaint_history
+WHERE action = 'escalated'
 ORDER BY created_at DESC;
 ```
 
 ### Verify Trigger is Active
+
 ```sql
-SELECT 
+SELECT
   t.tgname AS trigger_name,
   p.proname AS function_name,
   t.tgenabled AS enabled
 FROM pg_trigger t
 JOIN pg_proc p ON t.tgfoid = p.oid
 JOIN pg_class c ON t.tgrelid = c.oid
-WHERE c.relname = 'complaints' 
+WHERE c.relname = 'complaints'
   AND t.tgname = 'notify_on_complaint_escalation';
 ```
 

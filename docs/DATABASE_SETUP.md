@@ -40,9 +40,9 @@ Run this query in the SQL Editor to verify the users table was created:
 
 ```sql
 -- Check if users table exists
-SELECT table_name, column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'users' 
+SELECT table_name, column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'users'
 AND table_schema = 'public'
 ORDER BY ordinal_position;
 ```
@@ -55,14 +55,14 @@ You should see columns: id, email, role, full_name, created_at, updated_at
 
 Extends the Supabase `auth.users` table with application-specific fields.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key, references auth.users(id) |
-| `email` | TEXT | User's email address |
-| `role` | user_role | User role: 'student', 'lecturer', or 'admin' |
-| `full_name` | TEXT | User's full name for display |
-| `created_at` | TIMESTAMP | When the user was created |
-| `updated_at` | TIMESTAMP | Last update timestamp |
+| Column       | Type      | Description                                  |
+| ------------ | --------- | -------------------------------------------- |
+| `id`         | UUID      | Primary key, references auth.users(id)       |
+| `email`      | TEXT      | User's email address                         |
+| `role`       | user_role | User role: 'student', 'lecturer', or 'admin' |
+| `full_name`  | TEXT      | User's full name for display                 |
+| `created_at` | TIMESTAMP | When the user was created                    |
+| `updated_at` | TIMESTAMP | Last update timestamp                        |
 
 ### Enum: `user_role`
 
@@ -96,6 +96,7 @@ When a new user signs up via Supabase Auth, a trigger automatically creates thei
 **Trigger**: `on_auth_user_created`
 
 The trigger reads metadata from the signup:
+
 - `role` from `raw_user_meta_data->>'role'` (defaults to 'student')
 - `full_name` from `raw_user_meta_data->>'full_name'`
 
@@ -120,9 +121,9 @@ const { data, error } = await supabase.auth.signUp({
   options: {
     data: {
       role: 'student',
-      full_name: 'Test Student'
-    }
-  }
+      full_name: 'Test Student',
+    },
+  },
 });
 ```
 
@@ -140,11 +141,7 @@ Try accessing the users table with different authentication contexts:
 
 ```javascript
 // As the user themselves - should work
-const { data: ownProfile } = await supabase
-  .from('users')
-  .select('*')
-  .eq('id', userId)
-  .single();
+const { data: ownProfile } = await supabase.from('users').select('*').eq('id', userId).single();
 
 // As a student trying to view another user - should fail
 const { data: otherProfile } = await supabase
@@ -155,9 +152,7 @@ const { data: otherProfile } = await supabase
 // Expected: null or error due to RLS
 
 // As a lecturer - should work
-const { data: allUsers } = await supabase
-  .from('users')
-  .select('*');
+const { data: allUsers } = await supabase.from('users').select('*');
 // Expected: Returns all users if current user is lecturer/admin
 ```
 
@@ -174,9 +169,9 @@ When implementing user registration in your application:
      options: {
        data: {
          role: userRole, // 'student', 'lecturer', or 'admin'
-         full_name: userFullName
-       }
-     }
+         full_name: userFullName,
+       },
+     },
    });
    ```
 3. **Profile is automatically created** by the `on_auth_user_created` trigger
@@ -187,10 +182,12 @@ When implementing user registration in your application:
 ### Issue: Profile not created after signup
 
 **Possible causes:**
+
 1. Trigger not created properly
 2. Insufficient permissions
 
 **Solution:**
+
 - Re-run the migration SQL
 - Check trigger exists: `SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';`
 - Manually create profile if needed:
@@ -207,10 +204,12 @@ When implementing user registration in your application:
 ### Issue: RLS policy blocking access
 
 **Possible causes:**
+
 1. User not authenticated
 2. JWT token doesn't contain correct role information
 
 **Solution:**
+
 - Verify user is logged in: `const { data: { user } } = await supabase.auth.getUser();`
 - Check JWT claims in Supabase Dashboard > Authentication > Users
 - Ensure role is set in user metadata
@@ -218,15 +217,17 @@ When implementing user registration in your application:
 ### Issue: Cannot update user role
 
 **Possible causes:**
+
 1. Role is set during signup and typically shouldn't change
 2. Need admin privileges to change roles
 
 **Solution:**
+
 - For role changes, create an admin function or use Supabase Dashboard
 - Update via SQL Editor:
   ```sql
-  UPDATE public.users 
-  SET role = 'lecturer' 
+  UPDATE public.users
+  SET role = 'lecturer'
   WHERE id = 'user-uuid-here';
   ```
 

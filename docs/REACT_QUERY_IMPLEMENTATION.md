@@ -32,9 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ReactQueryProvider>
-          {children}
-        </ReactQueryProvider>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   );
@@ -55,12 +53,12 @@ export default function RootLayout({ children }) {
 #### Query Hooks
 
 ```tsx
-import { 
-  useUserComplaints, 
-  useUserDrafts, 
+import {
+  useUserComplaints,
+  useUserDrafts,
   useUserComplaintStats,
   useComplaint,
-  useAllComplaints 
+  useAllComplaints,
 } from '@/hooks/use-complaints';
 
 // Fetch user's complaints
@@ -82,12 +80,12 @@ const { data: allComplaints } = useAllComplaints();
 #### Mutation Hooks
 
 ```tsx
-import { 
-  useCreateComplaint, 
-  useUpdateComplaint, 
+import {
+  useCreateComplaint,
+  useUpdateComplaint,
   useDeleteComplaint,
   useReopenComplaint,
-  useSubmitRating 
+  useSubmitRating,
 } from '@/hooks/use-complaints';
 
 // Create complaint
@@ -98,7 +96,7 @@ createMutation.mutate(complaintData, {
   },
   onError: (error) => {
     console.error('Failed to create complaint:', error);
-  }
+  },
 });
 
 // Update complaint
@@ -121,10 +119,10 @@ ratingMutation.mutate({ complaintId, studentId, rating: 5, feedbackText: 'Great!
 #### Bulk Operations
 
 ```tsx
-import { 
-  useBulkAssignComplaints, 
-  useBulkChangeStatus, 
-  useBulkAddTags 
+import {
+  useBulkAssignComplaints,
+  useBulkChangeStatus,
+  useBulkAddTags,
 } from '@/hooks/use-complaints';
 
 // Bulk assign
@@ -152,11 +150,7 @@ const { data: announcements } = useRecentAnnouncements(5);
 ### Notifications Hooks (`src/hooks/use-notifications.ts`)
 
 ```tsx
-import { 
-  useNotifications, 
-  useMarkAsRead, 
-  useMarkAllAsRead 
-} from '@/hooks/use-notifications';
+import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/hooks/use-notifications';
 
 // Fetch notifications (auto-refetches every 2 minutes)
 const { data: notifications } = useNotifications(10);
@@ -236,7 +230,7 @@ export function CreateComplaintForm({ userId }: { userId: string }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     createMutation.mutate(
       {
         title,
@@ -263,10 +257,7 @@ export function CreateComplaintForm({ userId }: { userId: string }) {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Complaint title"
       />
-      <Button 
-        type="submit" 
-        disabled={createMutation.isPending}
-      >
+      <Button type="submit" disabled={createMutation.isPending}>
         {createMutation.isPending ? 'Creating...' : 'Create Complaint'}
       </Button>
     </form>
@@ -309,10 +300,7 @@ export function UpdateComplaintStatus({ complaintId, currentStatus }) {
         // Rollback on error
         onError: (err, variables, context) => {
           if (context?.previousComplaint) {
-            queryClient.setQueryData(
-              complaintKeys.detail(variables.id),
-              context.previousComplaint
-            );
+            queryClient.setQueryData(complaintKeys.detail(variables.id), context.previousComplaint);
           }
         },
       }
@@ -341,10 +329,7 @@ export function ComplaintDetail({ complaintId, userId }) {
   const { data: complaint, isLoading: complaintLoading } = useComplaint(complaintId);
 
   // Second query depends on first
-  const { data: hasRated, isLoading: ratingLoading } = useHasRatedComplaint(
-    complaintId,
-    userId
-  );
+  const { data: hasRated, isLoading: ratingLoading } = useHasRatedComplaint(complaintId, userId);
 
   if (complaintLoading || ratingLoading) {
     return <div>Loading...</div>;
@@ -353,9 +338,7 @@ export function ComplaintDetail({ complaintId, userId }) {
   return (
     <div>
       <h1>{complaint?.title}</h1>
-      {complaint?.status === 'resolved' && !hasRated && (
-        <div>Please rate this complaint</div>
-      )}
+      {complaint?.status === 'resolved' && !hasRated && <div>Please rate this complaint</div>}
     </div>
   );
 }
@@ -367,25 +350,25 @@ Query keys are centralized for better cache management:
 
 ```tsx
 // Complaints
-complaintKeys.all                           // ['complaints']
-complaintKeys.lists()                       // ['complaints', 'list']
-complaintKeys.detail(id)                    // ['complaints', 'detail', id]
-complaintKeys.user(userId)                  // ['complaints', 'user', userId]
-complaintKeys.userDrafts(userId)            // ['complaints', 'drafts', userId]
-complaintKeys.userStats(userId)             // ['complaints', 'stats', userId]
+complaintKeys.all; // ['complaints']
+complaintKeys.lists(); // ['complaints', 'list']
+complaintKeys.detail(id); // ['complaints', 'detail', id]
+complaintKeys.user(userId); // ['complaints', 'user', userId]
+complaintKeys.userDrafts(userId); // ['complaints', 'drafts', userId]
+complaintKeys.userStats(userId); // ['complaints', 'stats', userId]
 
 // Announcements
-announcementKeys.all                        // ['announcements']
-announcementKeys.recent(limit)              // ['announcements', 'list', 'recent', limit]
+announcementKeys.all; // ['announcements']
+announcementKeys.recent(limit); // ['announcements', 'list', 'recent', limit]
 
 // Notifications
-notificationKeys.all                        // ['notifications']
-notificationKeys.recent(limit)              // ['notifications', 'list', 'recent', limit]
+notificationKeys.all; // ['notifications']
+notificationKeys.recent(limit); // ['notifications', 'list', 'recent', limit]
 
 // Votes
-voteKeys.all                                // ['votes']
-voteKeys.list(filters)                      // ['votes', 'list', filters]
-voteKeys.hasVoted(voteId, studentId)        // ['votes', 'hasVoted', voteId, studentId]
+voteKeys.all; // ['votes']
+voteKeys.list(filters); // ['votes', 'list', filters]
+voteKeys.hasVoted(voteId, studentId); // ['votes', 'hasVoted', voteId, studentId]
 ```
 
 ## Cache Invalidation
@@ -394,16 +377,15 @@ Mutations automatically invalidate related queries:
 
 ```tsx
 // When creating a complaint, these are invalidated:
-- complaintKeys.all
-- complaintKeys.user(userId)
-- complaintKeys.userStats(userId)
-- complaintKeys.userDrafts(userId) // if draft
-
-// When updating a complaint, these are invalidated:
-- complaintKeys.detail(id)
-- complaintKeys.lists()
-- complaintKeys.user(userId)
-- complaintKeys.userStats(userId)
+-complaintKeys.all -
+  complaintKeys.user(userId) -
+  complaintKeys.userStats(userId) -
+  complaintKeys.userDrafts(userId) - // if draft
+  // When updating a complaint, these are invalidated:
+  complaintKeys.detail(id) -
+  complaintKeys.lists() -
+  complaintKeys.user(userId) -
+  complaintKeys.userStats(userId);
 ```
 
 ## DevTools
@@ -488,11 +470,7 @@ const createTestQueryClient = () =>
 
 function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = createTestQueryClient();
-  return render(
-    <QueryClientProvider client={testQueryClient}>
-      {ui}
-    </QueryClientProvider>
-  );
+  return render(<QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>);
 }
 ```
 

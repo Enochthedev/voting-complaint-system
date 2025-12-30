@@ -7,11 +7,13 @@ The notification dropdown now includes a filtering feature that allows users to 
 ## Features
 
 ### Filter Button
+
 - Located in the notification dropdown header, next to the "Mark all read" button
 - Shows a filter icon with a badge indicating the number of hidden notification types
 - Clicking toggles the filter panel
 
 ### Filter Panel
+
 - Displays all available notification types as clickable chips
 - Each chip shows:
   - An icon representing the notification type
@@ -20,6 +22,7 @@ The notification dropdown now includes a filtering feature that allows users to 
 - Unselected types are grayed out
 
 ### Quick Actions
+
 - **All**: Selects all notification types (shows all notifications)
 - **None**: Deselects all notification types (hides all notifications)
 
@@ -41,22 +44,26 @@ The following notification types can be filtered:
 ## User Experience
 
 ### Default State
+
 - All notification types are selected by default
 - Users see all their notifications
 
 ### Filtering
+
 1. Click the filter button to open the filter panel
 2. Click on notification type chips to toggle them on/off
 3. The notification list updates immediately to show only selected types
 4. The filter button shows a badge with the count of hidden types
 
 ### Empty States
+
 - **No notifications**: "No notifications - You're all caught up!"
 - **No matches**: "No matching notifications - Try adjusting your filters"
 
 ## Implementation Details
 
 ### State Management
+
 ```typescript
 const [selectedTypes, setSelectedTypes] = React.useState<Set<NotificationType>>(
   new Set(getAllNotificationTypes())
@@ -65,6 +72,7 @@ const [showFilterPanel, setShowFilterPanel] = React.useState(false);
 ```
 
 ### Filtering Logic
+
 ```typescript
 const filteredNotifications = React.useMemo(
   () => notifications.filter((n) => selectedTypes.has(n.type)),
@@ -73,6 +81,7 @@ const filteredNotifications = React.useMemo(
 ```
 
 ### Active Filter Count
+
 ```typescript
 const activeFilterCount = getAllNotificationTypes().length - selectedTypes.size;
 ```

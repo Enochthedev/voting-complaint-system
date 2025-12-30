@@ -25,6 +25,7 @@ This function is triggered after a new feedback entry is inserted:
 - Notification message includes the complaint title
 
 **Key Features:**
+
 - Only notifies if the complaint has a student_id (respects anonymous complaints)
 - Uses `SECURITY DEFINER` to ensure proper permissions
 - Automatically executed by the database
@@ -95,6 +96,7 @@ The feedback addition is also logged in complaint history:
 ## Anonymous Complaints
 
 The trigger respects anonymous complaints:
+
 - If `student_id` is NULL (anonymous complaint), no notification is created
 - This maintains the privacy of anonymous submissions
 
@@ -106,13 +108,17 @@ When combined with Supabase Realtime subscriptions, students will receive instan
 // Frontend subscription (to be implemented in Phase 12)
 supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, handleNewNotification)
-  .subscribe()
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    handleNewNotification
+  )
+  .subscribe();
 ```
 
 ## Testing
@@ -138,7 +144,7 @@ const { data: complaint } = await supabase
     priority: 'medium',
     status: 'new',
     is_anonymous: false,
-    is_draft: false
+    is_draft: false,
   })
   .select()
   .single();
@@ -149,7 +155,7 @@ const { data: feedback } = await supabase
   .insert({
     complaint_id: complaint.id,
     lecturer_id: testLecturerId,
-    content: 'Test feedback content'
+    content: 'Test feedback content',
   })
   .select()
   .single();

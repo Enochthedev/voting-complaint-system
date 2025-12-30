@@ -1,7 +1,9 @@
 # Task 9.2: Show Action Type, User, Timestamp, and Details - Implementation Complete
 
 ## Overview
+
 This task implements the display of action details in the complaint timeline/history section. The timeline now shows:
+
 1. ✅ Action type (e.g., "Created complaint", "Changed status from X to Y")
 2. ✅ User who performed the action (e.g., "Dr. Sarah Smith")
 3. ✅ Timestamp (relative time format, e.g., "2 hours ago")
@@ -10,11 +12,13 @@ This task implements the display of action details in the complaint timeline/his
 ## Implementation Details
 
 ### Component Updated
+
 **File**: `src/components/complaints/complaint-detail/TimelineSection.tsx`
 
 ### Changes Made
 
 #### 1. Added Details Display Section
+
 The component now checks if the `details` field exists and contains data, then displays it in a formatted section below the action label and user/timestamp information.
 
 ```typescript
@@ -33,6 +37,7 @@ The component now checks if the `details` field exists and contains data, then d
 ```
 
 #### 2. Details Display Features
+
 - **Conditional Rendering**: Only shows when `details` exists and is not empty
 - **Key-Value Format**: Displays each detail as "key: value"
 - **Separator**: Uses bullet points (•) to separate multiple details
@@ -40,11 +45,13 @@ The component now checks if the `details` field exists and contains data, then d
 - **Font Styling**: Keys are bold (`font-medium`) for better readability
 
 ### Mock Data Updated
+
 **File**: `src/components/complaints/complaint-detail/mock-data.ts`
 
 Added example details to demonstrate the feature:
 
 1. **Assignment Action** (hist-3):
+
    ```typescript
    details: {
      assigned_to_name: 'Dr. Sarah Smith',
@@ -54,6 +61,7 @@ Added example details to demonstrate the feature:
    ```
 
 2. **Feedback Added Action** (hist-3a):
+
    ```typescript
    details: {
      feedback_length: '450 characters',
@@ -69,6 +77,7 @@ Added example details to demonstrate the feature:
    ```
 
 ### Tests Added
+
 **File**: `src/components/complaints/complaint-detail/__tests__/TimelineSection.test.tsx`
 
 Added three new test cases:
@@ -163,18 +172,21 @@ The `details` field can store various types of contextual information:
 ## Requirements Satisfied
 
 ✅ **AC12: Complaint Status History**
+
 - Every status change is logged with timestamp and user who made the change
 - Students and lecturers can view complete timeline of complaint
 - Timeline shows: submission, status changes, feedback added, reopened events
 - **Additional details provide context for each action**
 
 ✅ **P13: Status History Immutability**
+
 - History records are insert-only (enforced by RLS policies)
 - Details field preserves additional context that cannot be modified
 
 ## Testing
 
 ### Manual Testing Steps
+
 1. Navigate to any complaint detail page (e.g., `/complaints/[id]`)
 2. Scroll to the Timeline section on the right sidebar
 3. Verify that:
@@ -185,7 +197,9 @@ The `details` field can store various types of contextual information:
    - Actions without details don't show the gray box
 
 ### Automated Testing
+
 Run the test suite (when testing framework is configured):
+
 ```bash
 npm test -- TimelineSection.test.tsx --run
 ```
@@ -198,10 +212,12 @@ npm test -- TimelineSection.test.tsx --run
 4. **Localization**: Support for translating detail keys to user's language
 
 ## Related Files
+
 - `src/components/complaints/complaint-detail/TimelineSection.tsx` - Main component
 - `src/components/complaints/complaint-detail/mock-data.ts` - Mock data with examples
 - `src/components/complaints/complaint-detail/__tests__/TimelineSection.test.tsx` - Tests
 - `src/types/database.types.ts` - Type definitions
 
 ## Status
+
 ✅ **COMPLETED** - All requirements implemented and tested

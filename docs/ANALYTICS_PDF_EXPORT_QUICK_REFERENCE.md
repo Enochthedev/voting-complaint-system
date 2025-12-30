@@ -3,19 +3,34 @@
 ## Quick Start
 
 ### Import and Use
+
 ```typescript
 import { exportAnalyticsAsPDF } from '@/lib/utils/export-analytics';
 
 // Prepare your analytics data
 const analyticsData = {
   timePeriod: 'Last 30 days',
-  keyMetrics: { /* ... */ },
-  complaintsByStatus: [ /* ... */ ],
-  complaintsByCategory: [ /* ... */ ],
-  complaintsByPriority: [ /* ... */ ],
-  complaintsOverTime: [ /* ... */ ],
-  lecturerPerformance: [ /* ... */ ],
-  topComplaintTypes: [ /* ... */ ],
+  keyMetrics: {
+    /* ... */
+  },
+  complaintsByStatus: [
+    /* ... */
+  ],
+  complaintsByCategory: [
+    /* ... */
+  ],
+  complaintsByPriority: [
+    /* ... */
+  ],
+  complaintsOverTime: [
+    /* ... */
+  ],
+  lecturerPerformance: [
+    /* ... */
+  ],
+  topComplaintTypes: [
+    /* ... */
+  ],
 };
 
 // Export to PDF
@@ -25,9 +40,10 @@ exportAnalyticsAsPDF(analyticsData);
 ## Data Structure
 
 ### AnalyticsData Interface
+
 ```typescript
 interface AnalyticsData {
-  timePeriod: string;                    // e.g., "Last 30 days"
+  timePeriod: string; // e.g., "Last 30 days"
   keyMetrics: KeyMetrics;
   complaintsByStatus: StatusData[];
   complaintsByCategory: CategoryData[];
@@ -39,74 +55,81 @@ interface AnalyticsData {
 ```
 
 ### Key Metrics
+
 ```typescript
 interface KeyMetrics {
   totalComplaints: number;
-  totalChange: string;              // e.g., "+12%"
-  avgResponseTime: string;          // e.g., "2.4h"
-  responseTimeChange: string;       // e.g., "-15%"
-  resolutionRate: number;           // e.g., 87
-  resolutionRateChange: string;     // e.g., "+5%"
+  totalChange: string; // e.g., "+12%"
+  avgResponseTime: string; // e.g., "2.4h"
+  responseTimeChange: string; // e.g., "-15%"
+  resolutionRate: number; // e.g., 87
+  resolutionRateChange: string; // e.g., "+5%"
   activeCases: number;
-  satisfactionRating: number;       // e.g., 4.2
-  satisfactionChange: string;       // e.g., "+0.3"
+  satisfactionRating: number; // e.g., 4.2
+  satisfactionChange: string; // e.g., "+0.3"
 }
 ```
 
 ### Status Data
+
 ```typescript
 interface StatusData {
-  status: string;        // e.g., "New", "In Progress"
+  status: string; // e.g., "New", "In Progress"
   count: number;
   percentage: number;
-  color: string;         // e.g., "bg-blue-500"
+  color: string; // e.g., "bg-blue-500"
 }
 ```
 
 ### Category Data
+
 ```typescript
 interface CategoryData {
-  category: string;      // e.g., "Academic", "Facilities"
+  category: string; // e.g., "Academic", "Facilities"
   count: number;
   percentage: number;
 }
 ```
 
 ### Priority Data
+
 ```typescript
 interface PriorityData {
-  priority: string;      // e.g., "High", "Critical"
+  priority: string; // e.g., "High", "Critical"
   count: number;
   percentage: number;
-  color: string;         // e.g., "bg-red-600"
+  color: string; // e.g., "bg-red-600"
 }
 ```
 
 ### Time Series Data
+
 ```typescript
 interface TimeSeriesData {
-  date: string;          // e.g., "2025-11-01"
+  date: string; // e.g., "2025-11-01"
   count: number;
-  label: string;         // e.g., "Nov 1"
+  label: string; // e.g., "Nov 1"
 }
 ```
 
 ### Lecturer Data
+
 ```typescript
 interface LecturerData {
   id: string;
   name: string;
   complaintsHandled: number;
-  avgResponseTime: string;    // e.g., "1.8h"
-  resolutionRate: number;     // e.g., 92
+  avgResponseTime: string; // e.g., "1.8h"
+  resolutionRate: number; // e.g., 92
   satisfactionRating: number; // e.g., 4.5
 }
 ```
 
 ### Complaint Type Data
+
 ```typescript
 interface ComplaintTypeData {
-  type: string;          // e.g., "Broken Equipment"
+  type: string; // e.g., "Broken Equipment"
   count: number;
 }
 ```
@@ -128,17 +151,20 @@ The generated PDF includes these sections in order:
 ## Styling
 
 ### Colors
+
 - **Primary Blue**: RGB(59, 130, 246) - Headers and accents
 - **Gray Text**: RGB(100, 100, 100) - Metadata
 - **Black Text**: RGB(0, 0, 0) - Main content
 
 ### Fonts
+
 - **Title**: Helvetica Bold, 24pt
 - **Section Headers**: Helvetica Bold, 14-16pt
 - **Body Text**: Helvetica Normal, 10pt
 - **Metadata**: Helvetica Normal, 8-10pt
 
 ### Layout
+
 - **Page Size**: A4 (210mm × 297mm)
 - **Margins**: 20pt on all sides
 - **Line Width**: 1pt for separator lines
@@ -146,6 +172,7 @@ The generated PDF includes these sections in order:
 ## Common Patterns
 
 ### Adding a New Section
+
 ```typescript
 // 1. Check for page break
 checkPageBreak(60);
@@ -160,7 +187,7 @@ yPosition += 10;
 autoTable(doc, {
   startY: yPosition,
   head: [['Column 1', 'Column 2']],
-  body: data.map(item => [item.field1, item.field2]),
+  body: data.map((item) => [item.field1, item.field2]),
   theme: 'striped',
   styles: { fontSize: 10, cellPadding: 4 },
   headStyles: { fillColor: [59, 130, 246], textColor: 255 },
@@ -172,10 +199,11 @@ yPosition = (doc as any).lastAutoTable.finalY + 15;
 ```
 
 ### Drawing a Simple Chart
+
 ```typescript
 const chartHeight = 60;
 const chartWidth = pageWidth - 2 * margin - 20;
-const maxValue = Math.max(...data.map(d => d.value));
+const maxValue = Math.max(...data.map((d) => d.value));
 
 // Background
 doc.setFillColor(245, 245, 245);
@@ -187,7 +215,7 @@ data.forEach((item, index) => {
   const barWidth = chartWidth / data.length;
   const x = margin + 10 + index * barWidth + barWidth * 0.2;
   const y = yPosition + chartHeight - barHeight - 5;
-  
+
   doc.setFillColor(59, 130, 246);
   doc.rect(x, y, barWidth * 0.6, barHeight, 'F');
 });
@@ -196,16 +224,19 @@ data.forEach((item, index) => {
 ## File Output
 
 ### Filename Format
+
 ```
 analytics-report-YYYY-MM-DD.pdf
 ```
 
 ### Example
+
 ```
 analytics-report-2025-11-25.pdf
 ```
 
 ### File Size
+
 Typical file size: 200-500 KB depending on data volume
 
 ## Browser Compatibility
@@ -213,11 +244,12 @@ Typical file size: 200-500 KB depending on data volume
 ✅ Chrome/Edge (Chromium)  
 ✅ Firefox  
 ✅ Safari  
-✅ Opera  
+✅ Opera
 
 ## Error Handling
 
 The function handles these scenarios:
+
 - Empty data arrays (shows empty tables)
 - Missing optional fields (uses defaults)
 - Long text content (automatic wrapping)
@@ -232,6 +264,7 @@ The function handles these scenarios:
 ## Testing Checklist
 
 Quick verification steps:
+
 - [ ] PDF downloads automatically
 - [ ] Filename includes current date
 - [ ] All sections are present
@@ -244,16 +277,19 @@ Quick verification steps:
 ## Troubleshooting
 
 ### PDF doesn't download
+
 - Check browser console for errors
 - Verify pop-up blocker settings
 - Ensure jsPDF is installed
 
 ### Content is cut off
+
 - Check `checkPageBreak()` calls
 - Verify margin calculations
 - Review content height estimates
 
 ### Tables look wrong
+
 - Check column width settings
 - Verify cell padding values
 - Review alignment settings
@@ -261,12 +297,14 @@ Quick verification steps:
 ## Related Functions
 
 ### CSV Export
+
 ```typescript
 import { exportAnalyticsAsCSV } from '@/lib/utils/export-analytics';
 exportAnalyticsAsCSV(analyticsData);
 ```
 
 ### JSON Export
+
 ```typescript
 import { exportAnalyticsAsJSON } from '@/lib/utils/export-analytics';
 exportAnalyticsAsJSON(analyticsData);
@@ -293,6 +331,7 @@ src/lib/utils/export-analytics.ts
 ## Support
 
 For issues or questions:
+
 1. Check the implementation guide
 2. Review the visual test guide
 3. Verify data structure matches interface

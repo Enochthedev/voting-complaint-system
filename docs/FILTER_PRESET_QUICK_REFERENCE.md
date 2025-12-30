@@ -66,12 +66,14 @@ Filter Preset allows you to save your frequently used filter combinations and qu
 ### Naming Presets
 
 **Good Names:**
+
 - "High Priority Academic" - Descriptive and specific
 - "My Urgent Issues" - Personal and clear
 - "Facilities - Last 7 Days" - Includes timeframe
 - "Unassigned Critical" - Indicates status and priority
 
 **Avoid:**
+
 - "Preset 1" - Not descriptive
 - "Test" - Unclear purpose
 - "asdf" - Meaningless
@@ -79,11 +81,13 @@ Filter Preset allows you to save your frequently used filter combinations and qu
 ### Common Preset Examples
 
 **For Students:**
+
 - "My Open Complaints" - Status: New, Opened, In Progress
 - "My Urgent Issues" - Priority: High, Critical
 - "Recent Submissions" - Date: Last 30 days, Sort: Created Date (Desc)
 
 **For Lecturers:**
+
 - "Daily Review" - Status: New, Priority: High
 - "Assigned to Me" - Assigned To: [Your Name]
 - "Facilities Issues" - Category: Facilities, Status: New, Opened
@@ -91,6 +95,7 @@ Filter Preset allows you to save your frequently used filter combinations and qu
 - "Needs Attention" - Status: New, Opened, Priority: High, Critical
 
 **For Admins:**
+
 - "Critical Alerts" - Priority: Critical, Status: New, Opened
 - "Escalated Complaints" - Escalation Level > 0
 - "Resolved This Month" - Status: Resolved, Date: This month
@@ -99,6 +104,7 @@ Filter Preset allows you to save your frequently used filter combinations and qu
 ### Keyboard Shortcuts
 
 When saving a preset:
+
 - **Enter** - Save the preset
 - **Escape** - Cancel and close input
 
@@ -121,7 +127,8 @@ When saving a preset:
 
 **Cause:** Browser data was cleared or localStorage is disabled
 
-**Solution:** 
+**Solution:**
+
 - Check browser settings for localStorage
 - Ensure you're not in private/incognito mode
 - Re-create the preset
@@ -131,6 +138,7 @@ When saving a preset:
 **Cause:** Corrupted data or browser issue
 
 **Solution:**
+
 - Try refreshing the page
 - Delete and re-create the preset
 - Check browser console for errors
@@ -140,6 +148,7 @@ When saving a preset:
 **Cause:** Browser storage issue
 
 **Solution:**
+
 - Refresh the page and try again
 - Clear browser cache
 - Check browser console for errors
@@ -149,6 +158,7 @@ When saving a preset:
 ### What Gets Saved?
 
 Every aspect of your filter configuration:
+
 - All selected statuses
 - All selected categories
 - All selected priorities
@@ -250,6 +260,7 @@ A: No, only filter settings are saved. Search is separate.
 ## Support
 
 For issues or questions:
+
 1. Check browser console for errors
 2. Verify localStorage is enabled
 3. Try refreshing the page

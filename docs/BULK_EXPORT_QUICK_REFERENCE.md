@@ -7,6 +7,7 @@ Quick reference for the bulk export feature implementation.
 ## Key Components
 
 ### BulkActionBar
+
 ```typescript
 import { BulkActionBar } from '@/components/complaints';
 
@@ -21,6 +22,7 @@ import { BulkActionBar } from '@/components/complaints';
 ```
 
 ### ComplaintList with Selection
+
 ```typescript
 import { ComplaintList } from '@/components/complaints';
 
@@ -34,6 +36,7 @@ import { ComplaintList } from '@/components/complaints';
 ```
 
 ### ComplaintsHeader with Selection Toggle
+
 ```typescript
 import { ComplaintsHeader } from '@/components/complaints';
 
@@ -62,7 +65,7 @@ const handleToggleSelectionMode = () => {
 
 // Select all
 const handleSelectAll = () => {
-  const allIds = new Set(complaints.map(c => c.id));
+  const allIds = new Set(complaints.map((c) => c.id));
   setSelectedIds(allIds);
 };
 
@@ -78,16 +81,14 @@ const handleClearSelection = () => {
 ```typescript
 const handleBulkExport = () => {
   setIsExporting(true);
-  
+
   try {
     // Filter to selected complaints
-    const selectedComplaints = complaints.filter(c => 
-      selectedIds.has(c.id)
-    );
-    
+    const selectedComplaints = complaints.filter((c) => selectedIds.has(c.id));
+
     // Export using existing utility
     exportComplaintsToCSV(selectedComplaints, filename);
-    
+
     // Clean up
     setSelectedIds(new Set());
     setSelectionMode(false);
@@ -102,6 +103,7 @@ const handleBulkExport = () => {
 ## Styling
 
 ### Selected Item
+
 ```typescript
 className={cn(
   'rounded-lg border bg-card p-4',
@@ -110,6 +112,7 @@ className={cn(
 ```
 
 ### Checkbox
+
 ```typescript
 <input
   type="checkbox"
@@ -119,14 +122,16 @@ className={cn(
 ```
 
 ### Bulk Action Bar
+
 ```typescript
 // Fixed positioning at bottom center
-className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform"
+className = 'fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform';
 ```
 
 ## Props Interface
 
 ### BulkActionBarProps
+
 ```typescript
 interface BulkActionBarProps {
   selectedCount: number;
@@ -139,6 +144,7 @@ interface BulkActionBarProps {
 ```
 
 ### ComplaintList Selection Props
+
 ```typescript
 interface ComplaintListProps {
   // ... existing props
@@ -154,21 +160,21 @@ interface ComplaintListProps {
 export default function ComplaintsPage() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  
+
   return (
     <>
       <ComplaintsHeader
         selectionMode={selectionMode}
         onToggleSelectionMode={() => setSelectionMode(!selectionMode)}
       />
-      
+
       <ComplaintList
         complaints={complaints}
         selectionMode={selectionMode}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
       />
-      
+
       <BulkActionBar
         selectedCount={selectedIds.size}
         totalCount={complaints.length}
@@ -193,6 +199,7 @@ export default function ComplaintsPage() {
 ## Common Patterns
 
 ### Toggle Selection
+
 ```typescript
 const handleSelectionToggle = (id: string) => {
   const newSelection = new Set(selectedIds);
@@ -206,13 +213,15 @@ const handleSelectionToggle = (id: string) => {
 ```
 
 ### Check if All Selected
+
 ```typescript
 const allSelected = selectedIds.size === complaints.length;
 ```
 
 ### Get Selected Complaints
+
 ```typescript
-const selectedComplaints = complaints.filter(c => selectedIds.has(c.id));
+const selectedComplaints = complaints.filter((c) => selectedIds.has(c.id));
 ```
 
 ## Accessibility
@@ -239,7 +248,9 @@ expect(selectedIds.size).toBe(complaints.length);
 
 // Test export
 expect(exportComplaintsToCSV).toHaveBeenCalledWith(
-  expect.arrayContaining([/* selected complaints */]),
+  expect.arrayContaining([
+    /* selected complaints */
+  ]),
   expect.stringContaining('complaints_selected_')
 );
 ```
@@ -247,19 +258,23 @@ expect(exportComplaintsToCSV).toHaveBeenCalledWith(
 ## Troubleshooting
 
 ### Selections not persisting across pages
+
 - Ensure `selectedIds` state is at page level, not component level
 - Don't reset state on page change
 
 ### Bulk action bar not appearing
+
 - Check that `selectedIds.size > 0`
 - Verify component is rendered in page
 - Check z-index conflicts
 
 ### Export includes wrong complaints
+
 - Verify filter logic: `complaints.filter(c => selectedIds.has(c.id))`
 - Check that `selectedIds` contains correct IDs
 
 ### Checkboxes not aligned
+
 - Ensure flex layout on parent container
 - Check checkbox margin/padding
 - Verify title container has `flex-1`

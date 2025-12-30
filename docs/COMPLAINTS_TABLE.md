@@ -8,26 +8,26 @@ The `complaints` table is the core table of the Student Complaint Resolution Sys
 
 ### Table: `public.complaints`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `gen_random_uuid()` | Primary key, unique identifier |
-| `student_id` | UUID | Yes | NULL | References `public.users(id)`, null for anonymous |
-| `is_anonymous` | BOOLEAN | No | `false` | Whether complaint is anonymous |
-| `is_draft` | BOOLEAN | No | `false` | Whether complaint is a draft |
-| `title` | TEXT | No | - | Brief title of the complaint |
-| `description` | TEXT | No | - | Detailed description |
-| `category` | complaint_category | No | - | Category enum value |
-| `priority` | complaint_priority | No | `'medium'` | Priority level |
-| `status` | complaint_status | No | `'new'` | Current status |
-| `assigned_to` | UUID | Yes | NULL | References `public.users(id)` |
-| `created_at` | TIMESTAMP WITH TIME ZONE | No | `NOW()` | Creation timestamp |
-| `updated_at` | TIMESTAMP WITH TIME ZONE | No | `NOW()` | Last update timestamp |
-| `opened_at` | TIMESTAMP WITH TIME ZONE | Yes | NULL | When lecturer first opened |
-| `opened_by` | UUID | Yes | NULL | References `public.users(id)` |
-| `resolved_at` | TIMESTAMP WITH TIME ZONE | Yes | NULL | When complaint was resolved |
-| `escalated_at` | TIMESTAMP WITH TIME ZONE | Yes | NULL | When complaint was escalated |
-| `escalation_level` | INTEGER | No | `0` | Number of escalations |
-| `search_vector` | tsvector | Yes | NULL | Full-text search vector |
+| Column             | Type                     | Nullable | Default             | Description                                       |
+| ------------------ | ------------------------ | -------- | ------------------- | ------------------------------------------------- |
+| `id`               | UUID                     | No       | `gen_random_uuid()` | Primary key, unique identifier                    |
+| `student_id`       | UUID                     | Yes      | NULL                | References `public.users(id)`, null for anonymous |
+| `is_anonymous`     | BOOLEAN                  | No       | `false`             | Whether complaint is anonymous                    |
+| `is_draft`         | BOOLEAN                  | No       | `false`             | Whether complaint is a draft                      |
+| `title`            | TEXT                     | No       | -                   | Brief title of the complaint                      |
+| `description`      | TEXT                     | No       | -                   | Detailed description                              |
+| `category`         | complaint_category       | No       | -                   | Category enum value                               |
+| `priority`         | complaint_priority       | No       | `'medium'`          | Priority level                                    |
+| `status`           | complaint_status         | No       | `'new'`             | Current status                                    |
+| `assigned_to`      | UUID                     | Yes      | NULL                | References `public.users(id)`                     |
+| `created_at`       | TIMESTAMP WITH TIME ZONE | No       | `NOW()`             | Creation timestamp                                |
+| `updated_at`       | TIMESTAMP WITH TIME ZONE | No       | `NOW()`             | Last update timestamp                             |
+| `opened_at`        | TIMESTAMP WITH TIME ZONE | Yes      | NULL                | When lecturer first opened                        |
+| `opened_by`        | UUID                     | Yes      | NULL                | References `public.users(id)`                     |
+| `resolved_at`      | TIMESTAMP WITH TIME ZONE | Yes      | NULL                | When complaint was resolved                       |
+| `escalated_at`     | TIMESTAMP WITH TIME ZONE | Yes      | NULL                | When complaint was escalated                      |
+| `escalation_level` | INTEGER                  | No       | `0`                 | Number of escalations                             |
+| `search_vector`    | tsvector                 | Yes      | NULL                | Full-text search vector                           |
 
 ## Enums
 
@@ -83,6 +83,7 @@ CONSTRAINT anonymous_complaint_check CHECK (
 **Purpose**: Ensures anonymous complaints have no student_id to protect privacy.
 
 **Examples**:
+
 - ✅ Valid: `is_anonymous = true, student_id = NULL`
 - ✅ Valid: `is_anonymous = false, student_id = <uuid>`
 - ❌ Invalid: `is_anonymous = true, student_id = <uuid>`
@@ -99,6 +100,7 @@ CONSTRAINT draft_status_check CHECK (
 **Purpose**: Ensures draft complaints have 'draft' status and vice versa.
 
 **Examples**:
+
 - ✅ Valid: `is_draft = true, status = 'draft'`
 - ✅ Valid: `is_draft = false, status = 'new'`
 - ❌ Invalid: `is_draft = true, status = 'new'`
@@ -137,6 +139,7 @@ CONSTRAINT draft_status_check CHECK (
 **Purpose**: Automatically updates the `search_vector` column for full-text search
 
 The search vector combines:
+
 - Title (weight 'A' - highest priority)
 - Description (weight 'B' - medium priority)
 
@@ -152,6 +155,7 @@ The search vector combines:
 ### SELECT Policies
 
 #### "Students view own complaints"
+
 ```sql
 USING (
   student_id = auth.uid() OR
@@ -169,6 +173,7 @@ USING (
 ### INSERT Policies
 
 #### "Students insert complaints"
+
 ```sql
 WITH CHECK (
   EXISTS (
@@ -185,6 +190,7 @@ WITH CHECK (
 ### UPDATE Policies
 
 #### "Students update own drafts"
+
 ```sql
 USING (student_id = auth.uid() AND is_draft = true)
 WITH CHECK (student_id = auth.uid() AND is_draft = true)
@@ -194,6 +200,7 @@ WITH CHECK (student_id = auth.uid() AND is_draft = true)
 **What**: Can only update their own draft complaints
 
 #### "Lecturers update complaints"
+
 ```sql
 USING (
   EXISTS (
@@ -210,6 +217,7 @@ USING (
 ### DELETE Policies
 
 #### "Students delete own drafts"
+
 ```sql
 USING (student_id = auth.uid() AND is_draft = true)
 ```
@@ -232,7 +240,7 @@ const { data, error } = await supabase
     description: 'The air conditioning in the library has been broken for 3 days...',
     category: 'facilities',
     priority: 'high',
-    status: 'new'
+    status: 'new',
   })
   .select()
   .single();
@@ -251,7 +259,7 @@ const { data, error } = await supabase
     description: 'I witnessed inappropriate behavior...',
     category: 'harassment',
     priority: 'critical',
-    status: 'new'
+    status: 'new',
   })
   .select()
   .single();
@@ -270,7 +278,7 @@ const { data, error } = await supabase
     description: 'Will finish later...',
     category: 'academic',
     priority: 'medium',
-    status: 'draft' // Must be 'draft' when is_draft = true
+    status: 'draft', // Must be 'draft' when is_draft = true
   })
   .select()
   .single();
@@ -297,7 +305,7 @@ const { data, error } = await supabase
   .select('*')
   .textSearch('search_vector', 'library air conditioning', {
     type: 'websearch',
-    config: 'english'
+    config: 'english',
   });
 ```
 
@@ -309,7 +317,7 @@ const { data, error } = await supabase
   .update({
     status: 'in_progress',
     opened_at: new Date().toISOString(),
-    opened_by: lecturerId
+    opened_by: lecturerId,
   })
   .eq('id', complaintId)
   .select()
@@ -322,7 +330,7 @@ const { data, error } = await supabase
 const { data, error } = await supabase
   .from('complaints')
   .update({
-    assigned_to: lecturerId
+    assigned_to: lecturerId,
   })
   .eq('id', complaintId)
   .select()
@@ -405,7 +413,7 @@ const validTransitions = {
   in_progress: ['resolved'],
   resolved: ['closed', 'reopened'],
   reopened: ['in_progress'],
-  closed: []
+  closed: [],
 };
 ```
 
@@ -466,6 +474,7 @@ const { data } = await supabase
 ### Issue: Student cannot see their complaint
 
 **Possible causes**:
+
 1. Not authenticated
 2. Complaint is anonymous (student_id is null)
 
@@ -474,16 +483,19 @@ const { data } = await supabase
 ### Issue: Full-text search not working
 
 **Possible causes**:
+
 1. Search vector not populated
 2. Wrong search syntax
 
-**Solution**: 
+**Solution**:
+
 - Verify trigger is working
 - Use `textSearch()` method with proper syntax
 
 ## Related Tables
 
 The complaints table is referenced by:
+
 - `complaint_tags` - Tags for categorization
 - `complaint_attachments` - File attachments
 - `complaint_history` - Audit trail

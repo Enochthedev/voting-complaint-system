@@ -3,6 +3,7 @@
 ## How to Test
 
 1. Start the development server:
+
    ```bash
    cd student-complaint-system
    npm run dev
@@ -13,6 +14,7 @@
 ## What to Verify
 
 ### ✅ Complaint List Display
+
 - [ ] Complaints are displayed in card format
 - [ ] Each card shows title, description preview, and metadata
 - [ ] Status badges are visible with correct colors
@@ -23,6 +25,7 @@
 - [ ] Tags are displayed (max 5 visible, "+X more" for additional)
 
 ### ✅ Status Badge Colors
+
 - [ ] Draft: Gray
 - [ ] New: Blue
 - [ ] Opened: Purple
@@ -32,12 +35,14 @@
 - [ ] Reopened: Orange
 
 ### ✅ Priority Indicators
+
 - [ ] Low: Blue dot
 - [ ] Medium: Yellow dot
 - [ ] High: Orange dot
 - [ ] Critical: Red dot
 
 ### ✅ Pagination
+
 - [ ] Page numbers are displayed correctly
 - [ ] "Previous" button is disabled on first page
 - [ ] "Next" button is disabled on last page
@@ -46,30 +51,38 @@
 - [ ] Smooth scroll to top on page change
 
 ### ✅ Interactive Elements
+
 - [ ] Hover effect on complaint cards
 - [ ] Cards show pointer cursor on hover
 - [ ] "New Complaint" button navigates to form
 
 ### ✅ Responsive Design
+
 - [ ] Mobile view: Simplified pagination
 - [ ] Desktop view: Full pagination controls
 - [ ] Cards adapt to screen size
 - [ ] Tags wrap properly on small screens
 
 ### ✅ Loading State
+
 To test loading state:
+
 1. Click pagination buttons
 2. Observe skeleton loading for 500ms
 3. Verify smooth transition to content
 
 ### ✅ Empty State
+
 To test empty state:
+
 1. Modify mock data to return empty array
 2. Verify empty state message displays
 3. Check icon and text are centered
 
 ### ✅ Error State
+
 To test error state:
+
 1. Pass error prop to component
 2. Verify error message displays
 3. Check error icon and styling
@@ -77,6 +90,7 @@ To test error state:
 ## Mock Data Scenarios
 
 The demo page includes 8 complaints with:
+
 - Various statuses (new, opened, in_progress, resolved)
 - Different priorities (low, medium, high, critical)
 - Multiple categories (facilities, academic, harassment, etc.)
@@ -95,6 +109,7 @@ The demo page includes 8 complaints with:
 ## Browser Testing
 
 Test in:
+
 - [ ] Chrome/Edge
 - [ ] Firefox
 - [ ] Safari

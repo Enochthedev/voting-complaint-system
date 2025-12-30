@@ -226,11 +226,11 @@ If any checks fail, refer to:
 - [ ] Documentation updated
 - [ ] Team notified
 
-**Verified By**: ********\_\_\_********
+**Verified By**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Date**: ********\_\_\_********
+**Date**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Production URL**: ********\_\_\_********
+**Production URL**: **\*\*\*\***\_\_\_**\*\*\*\***
 
 **Scanner Scores**:
 

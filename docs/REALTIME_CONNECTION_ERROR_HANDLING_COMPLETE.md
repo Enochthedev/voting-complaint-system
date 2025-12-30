@@ -36,21 +36,25 @@ const getRetryDelay = (retryCount: number): number => {
 ### 3. Error Scenarios Handled
 
 #### a. CHANNEL_ERROR
+
 - **Trigger**: Supabase channel subscription fails
 - **Action**: Show error toast, attempt retry with backoff
 - **User feedback**: "Failed to connect to real-time notifications"
 
 #### b. TIMED_OUT
+
 - **Trigger**: Connection attempt times out
 - **Action**: Show error toast, attempt retry with backoff
 - **User feedback**: "Real-time connection timed out"
 
 #### c. CLOSED
+
 - **Trigger**: Connection unexpectedly closes
 - **Action**: Attempt reconnection with backoff
 - **User feedback**: Connection status indicator updates
 
 #### d. Authentication Error
+
 - **Trigger**: User not authenticated
 - **Action**: Set error state, don't retry
 - **User feedback**: "Authentication required for real-time updates"
@@ -58,6 +62,7 @@ const getRetryDelay = (retryCount: number): number => {
 ### 4. User Interface Feedback
 
 #### Connection Status Banner
+
 The notification dropdown displays a status banner when connection issues occur:
 
 ```typescript
@@ -79,6 +84,7 @@ The notification dropdown displays a status banner when connection issues occur:
 ```
 
 #### Connection Warning Indicator
+
 The notification bell shows a yellow warning dot when disconnected:
 
 ```typescript
@@ -92,6 +98,7 @@ The notification bell shows a yellow warning dot when disconnected:
 ```
 
 #### Toast Notifications
+
 - **Error**: Red toast with error message and longer duration (7s)
 - **Success**: Green toast when connection is restored
 - **Info**: Blue toast for new notifications
@@ -104,13 +111,13 @@ Users can manually retry the connection at any time:
 const retryConnection = useCallback(() => {
   console.log('Manual retry initiated');
   retryCountRef.current = 0; // Reset retry count
-  
+
   // Clear any pending retry timeout
   if (retryTimeoutRef.current) {
     clearTimeout(retryTimeoutRef.current);
     retryTimeoutRef.current = null;
   }
-  
+
   setupRealtimeSubscription();
 }, [setupRealtimeSubscription]);
 ```
@@ -129,7 +136,7 @@ useEffect(() => {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
-    
+
     // Unsubscribe from channel
     if (channelRef.current) {
       console.log('Unsubscribing from notifications channel');
@@ -203,14 +210,17 @@ useEffect(() => {
 ## Code Locations
 
 ### Hook Implementation
+
 - **File**: `src/hooks/use-notifications.ts`
 - **Lines**: Full implementation with error handling
 
 ### UI Components
+
 - **Notification Bell**: `src/components/notifications/notification-bell.tsx`
 - **Notification Dropdown**: `src/components/notifications/notification-dropdown.tsx`
 
 ### Toast System
+
 - **Toast Provider**: `src/components/ui/toast.tsx`
 - **Layout Integration**: `src/app/layout.tsx`
 
@@ -305,6 +315,7 @@ The implementation includes detailed console logging for debugging:
 **Task 6.3**: Handle connection errors gracefully ✅ **COMPLETE**
 
 All connection error scenarios are now handled with:
+
 - Automatic retry logic with exponential backoff
 - User-friendly error messages
 - Visual feedback in the UI

@@ -1,9 +1,11 @@
 # Vote Casting - Visual Test Guide
 
 ## Purpose
+
 This guide helps you visually verify that the vote casting functionality is working correctly.
 
 ## Test Environment
+
 - **URL**: `http://localhost:3000/votes`
 - **User Role**: Student (mock)
 - **Test Data**: 2 mock votes are pre-loaded
@@ -15,6 +17,7 @@ This guide helps you visually verify that the vote casting functionality is work
 **Navigate to**: `/votes`
 
 **Expected UI Elements:**
+
 - [ ] Page title: "Active Votes"
 - [ ] Subtitle: "Participate in voting polls and share your opinion"
 - [ ] At least 2 vote cards displayed
@@ -28,6 +31,7 @@ This guide helps you visually verify that the vote casting functionality is work
   - [ ] "View Details" button
 
 **Visual States:**
+
 - [ ] Radio buttons have hover effect
 - [ ] Selected radio button is highlighted with primary color
 - [ ] Submit button is disabled when no option selected
@@ -36,10 +40,12 @@ This guide helps you visually verify that the vote casting functionality is work
 ### ✅ Test 2: Casting a Vote (Listing Page)
 
 **Steps:**
+
 1. Select an option by clicking a radio button
 2. Click "Submit Vote"
 
 **Expected Behavior:**
+
 - [ ] Button shows "Submitting..." with disabled state
 - [ ] Green success alert appears: "Your vote has been submitted successfully!"
 - [ ] "Voted" badge appears (green with checkmark)
@@ -48,6 +54,7 @@ This guide helps you visually verify that the vote casting functionality is work
 - [ ] Success message disappears after 3 seconds
 
 **Visual Verification:**
+
 ```
 Before Voting:
 ┌─────────────────────────────────────┐
@@ -80,6 +87,7 @@ After Voting:
 **Navigate to**: `/votes/vote-1` (or click "View Details")
 
 **Expected UI Elements:**
+
 - [ ] "← Back to Votes" button
 - [ ] Vote title (large, bold)
 - [ ] Vote description
@@ -92,6 +100,7 @@ After Voting:
 - [ ] "Submit Vote" button
 
 **Visual States:**
+
 - [ ] Radio buttons have border and hover effect
 - [ ] Selected option has primary border and light background
 - [ ] Submit button is full width
@@ -100,10 +109,12 @@ After Voting:
 ### ✅ Test 4: Casting a Vote (Detail Page)
 
 **Steps:**
+
 1. Select an option
 2. Click "Submit Vote"
 
 **Expected Behavior:**
+
 - [ ] Button shows "Submitting..." with loading spinner
 - [ ] Green success alert appears at top
 - [ ] "Voted" badge appears next to title
@@ -116,6 +127,7 @@ After Voting:
 - [ ] Blue info alert: "Thank you for participating! You can view the results above."
 
 **Visual Verification:**
+
 ```
 Before Voting:
 ┌─────────────────────────────────────┐
@@ -178,15 +190,18 @@ After Voting:
 ### ✅ Test 5: Error Handling
 
 **Test 5a: No Option Selected**
+
 1. Click "Submit Vote" without selecting an option
 2. **Expected**: Red error alert: "Please select an option before submitting"
 
 **Test 5b: Already Voted**
+
 1. Try to vote on a poll you already voted on
 2. **Expected**: Message shows "You have already voted on this poll"
 3. **Expected**: "View Results" button instead of voting form
 
 **Test 5c: Closed Vote**
+
 1. Navigate to a closed vote (if available)
 2. **Expected**: "Closed" badge appears
 3. **Expected**: Cannot vote, shows "This poll has closed" message
@@ -194,16 +209,19 @@ After Voting:
 ### ✅ Test 6: Responsive Design
 
 **Desktop (>1024px):**
+
 - [ ] Vote cards are full width with proper padding
 - [ ] Radio buttons are well-spaced
 - [ ] Results bars are smooth and animated
 
 **Tablet (768px - 1024px):**
+
 - [ ] Layout adjusts properly
 - [ ] All elements remain readable
 - [ ] Buttons are appropriately sized
 
 **Mobile (<768px):**
+
 - [ ] Vote cards stack vertically
 - [ ] Radio buttons are touch-friendly
 - [ ] Buttons are full width
@@ -212,6 +230,7 @@ After Voting:
 ### ✅ Test 7: Color Scheme
 
 **Light Mode:**
+
 - [ ] Primary color (blue) for selected options
 - [ ] Green for success messages and "Voted" badge
 - [ ] Red for error messages
@@ -219,6 +238,7 @@ After Voting:
 - [ ] White/light background for cards
 
 **Dark Mode:**
+
 - [ ] Primary color adjusts for dark background
 - [ ] Success/error colors remain visible
 - [ ] Text contrast is sufficient
@@ -227,12 +247,14 @@ After Voting:
 ### ✅ Test 8: Accessibility
 
 **Keyboard Navigation:**
+
 - [ ] Can tab through radio buttons
 - [ ] Can select options with arrow keys
 - [ ] Can activate submit button with Enter/Space
 - [ ] Focus indicators are visible
 
 **Screen Reader:**
+
 - [ ] Radio buttons have proper labels
 - [ ] Success/error messages are announced
 - [ ] Vote status is communicated
@@ -240,11 +262,13 @@ After Voting:
 ### ✅ Test 9: Multiple Votes
 
 **Steps:**
+
 1. Vote on first poll
 2. Scroll to second poll
 3. Vote on second poll
 
 **Expected:**
+
 - [ ] Each vote is independent
 - [ ] Both show "Voted" badges
 - [ ] Both show success messages
@@ -253,6 +277,7 @@ After Voting:
 ### ✅ Test 10: Navigation Flow
 
 **Test Flow:**
+
 1. Start at `/votes`
 2. Click "View Details" on a vote
 3. Cast vote on detail page
@@ -260,6 +285,7 @@ After Voting:
 5. Verify "Voted" badge shows on listing page
 
 **Expected:**
+
 - [ ] Navigation is smooth
 - [ ] State persists across pages
 - [ ] "Voted" status is consistent
@@ -267,16 +293,19 @@ After Voting:
 ## Common Issues to Check
 
 ### Issue: Vote doesn't submit
+
 - **Check**: Is an option selected?
 - **Check**: Is the vote still active?
 - **Check**: Has the student already voted?
 
 ### Issue: Results don't show
+
 - **Check**: Did the vote submit successfully?
 - **Check**: Is the user a student (not lecturer)?
 - **Check**: Are there any console errors?
 
 ### Issue: UI looks broken
+
 - **Check**: Are all CSS classes loading?
 - **Check**: Is Tailwind CSS configured correctly?
 - **Check**: Are there any browser console errors?
@@ -284,6 +313,7 @@ After Voting:
 ## Success Criteria
 
 All tests pass if:
+
 - ✅ Students can vote from both listing and detail pages
 - ✅ One vote per student is enforced
 - ✅ Success/error messages display correctly
@@ -294,22 +324,26 @@ All tests pass if:
 
 ## Test Results
 
-**Date Tested**: _____________
+**Date Tested**: **\*\***\_**\*\***
 
-**Tested By**: _____________
+**Tested By**: **\*\***\_**\*\***
 
-**Browser**: _____________
+**Browser**: **\*\***\_**\*\***
 
-**Result**: ☐ PASS  ☐ FAIL
+**Result**: ☐ PASS ☐ FAIL
 
 **Notes**:
-_________________________________
-_________________________________
-_________________________________
+
+---
+
+---
+
+---
 
 ## Next Steps
 
 After all tests pass:
+
 1. Mark task as complete in tasks.md
 2. Document any issues found
 3. Proceed to next task in Phase 7

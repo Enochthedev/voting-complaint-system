@@ -64,7 +64,7 @@ A comprehensive form component for creating and editing escalation rules with th
 
 - **Accessibility**
   - Proper label associations
-  - Required field indicators (*)
+  - Required field indicators (\*)
   - Error messages linked to inputs
   - Keyboard navigation support
 
@@ -186,6 +186,7 @@ The form includes intelligent time formatting:
 - Mixed: "X day(s) Y hour(s)"
 
 Examples:
+
 - 2 hours → "2 hours"
 - 24 hours → "1 day"
 - 48 hours → "2 days"
@@ -208,10 +209,12 @@ Provides one-click selection for common time thresholds:
 ## Files Created/Modified
 
 ### Created
+
 - ✅ `src/components/complaints/escalation-rule-form.tsx` (new component)
 - ✅ `docs/TASK_10.1_ESCALATION_RULE_FORM_COMPLETION.md` (this file)
 
 ### Modified
+
 - ✅ `src/app/admin/escalation-rules/page.tsx` (integrated form)
 - ✅ `.kiro/specs/tasks.md` (marked task as completed)
 
@@ -226,6 +229,7 @@ Provides one-click selection for common time thresholds:
 ## Next Steps
 
 The next sub-task in Task 10.1 is:
+
 - **Implement rule listing** (already completed in the main page)
 - **Add rule editing and deletion** (already completed in the main page)
 - **Allow enabling/disabling rules** (already completed in the main page)

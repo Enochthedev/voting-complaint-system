@@ -1,23 +1,27 @@
 # Date Range Filter - Visual Demo
 
 ## Overview
+
 The date range filter allows users to filter complaints by their creation date. Users can specify a "from" date, a "to" date, or both to create a date range.
 
 ## Location
+
 - **Component**: `FilterPanel` in `src/components/complaints/filter-panel.tsx`
 - **Usage**: Complaints page (`src/app/complaints/page.tsx`)
 
 ## Features
 
 ### 1. From Date Filter
+
 - **Purpose**: Filter complaints created on or after a specific date
 - **Input**: Date picker (HTML5 date input)
-- **Behavior**: 
+- **Behavior**:
   - Includes complaints created on the selected date
   - Includes all complaints after the selected date
   - When cleared, removes the from date restriction
 
 ### 2. To Date Filter
+
 - **Purpose**: Filter complaints created on or before a specific date
 - **Input**: Date picker (HTML5 date input)
 - **Behavior**:
@@ -26,6 +30,7 @@ The date range filter allows users to filter complaints by their creation date. 
   - When cleared, removes the to date restriction
 
 ### 3. Date Range Filter
+
 - **Purpose**: Filter complaints within a specific date range
 - **Behavior**:
   - Combines both from and to date filters
@@ -35,6 +40,7 @@ The date range filter allows users to filter complaints by their creation date. 
 ## Visual States
 
 ### Default State
+
 ```
 ┌─────────────────────────────────┐
 │ Date Range                    ▼ │
@@ -52,6 +58,7 @@ The date range filter allows users to filter complaints by their creation date. 
 ```
 
 ### With From Date Selected
+
 ```
 ┌─────────────────────────────────┐
 │ Date Range                    ▼ │
@@ -74,6 +81,7 @@ Active Filters:
 ```
 
 ### With Date Range Selected
+
 ```
 ┌─────────────────────────────────┐
 │ Date Range                    ▼ │
@@ -98,6 +106,7 @@ Active Filters:
 ## User Interactions
 
 ### Selecting a From Date
+
 1. Click on the "From" date input field
 2. Browser's native date picker opens
 3. Select a date
@@ -106,6 +115,7 @@ Active Filters:
 6. Complaint list updates to show only complaints from that date onwards
 
 ### Selecting a To Date
+
 1. Click on the "To" date input field
 2. Browser's native date picker opens
 3. Select a date
@@ -114,6 +124,7 @@ Active Filters:
 6. Complaint list updates to show only complaints up to and including that date
 
 ### Creating a Date Range
+
 1. Select a "From" date
 2. Select a "To" date
 3. Both filters are applied simultaneously
@@ -121,60 +132,66 @@ Active Filters:
 5. Complaint list shows only complaints within the date range
 
 ### Removing Date Filters
+
 **Option 1: Clear individual date**
+
 - Click the × on the active filter chip
 - That specific date filter is removed
 - Complaint list updates
 
 **Option 2: Clear date input**
+
 - Click on the date input field
 - Delete the date value
 - Filter is removed
 
 **Option 3: Clear all filters**
+
 - Click "Clear All" button in filter panel header
 - All filters including date range are removed
 
 ## Filter Logic
 
 ### From Date Logic
+
 ```typescript
 if (filters.dateFrom) {
   const fromDate = new Date(filters.dateFrom);
-  complaints = complaints.filter(
-    (complaint) => new Date(complaint.created_at) >= fromDate
-  );
+  complaints = complaints.filter((complaint) => new Date(complaint.created_at) >= fromDate);
 }
 ```
 
 ### To Date Logic
+
 ```typescript
 if (filters.dateTo) {
   const toDate = new Date(filters.dateTo);
   toDate.setHours(23, 59, 59, 999); // Include the entire day
-  complaints = complaints.filter(
-    (complaint) => new Date(complaint.created_at) <= toDate
-  );
+  complaints = complaints.filter((complaint) => new Date(complaint.created_at) <= toDate);
 }
 ```
 
 ## Use Cases
 
 ### 1. View Recent Complaints
+
 - Set "From" date to 7 days ago
 - Leave "To" date empty
 - See all complaints from the last week
 
 ### 2. View Complaints for a Specific Period
+
 - Set "From" date to start of month
 - Set "To" date to end of month
 - See all complaints for that month
 
 ### 3. View Complaints for a Single Day
+
 - Set both "From" and "To" to the same date
 - See all complaints created on that specific day
 
 ### 4. View Historical Complaints
+
 - Leave "From" date empty
 - Set "To" date to a past date
 - See all complaints up to that date
@@ -195,6 +212,7 @@ if (filters.dateTo) {
 ## Integration with Other Filters
 
 The date range filter works seamlessly with other filters:
+
 - **Status Filter**: Show only "new" complaints from last week
 - **Category Filter**: Show only "facilities" complaints from last month
 - **Priority Filter**: Show only "high" priority complaints from today
@@ -210,6 +228,7 @@ The date range filter works seamlessly with other filters:
 ## Testing
 
 Comprehensive tests cover:
+
 - ✅ No date filter (returns all complaints)
 - ✅ From date only
 - ✅ To date only

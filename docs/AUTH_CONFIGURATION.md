@@ -14,7 +14,7 @@ The system uses email and password authentication with the following configurati
 
 - **Provider**: Email/Password (enabled by default in Supabase)
 - **Email Confirmation**: Recommended to enable in production
-- **Password Requirements**: 
+- **Password Requirements**:
   - Minimum 8 characters
   - At least one uppercase letter
   - At least one lowercase letter
@@ -59,8 +59,8 @@ User metadata is stored in the `auth.users` table and includes:
 
 ```typescript
 {
-  full_name: string;  // User's full name
-  role: 'student' | 'lecturer' | 'admin';  // User's role
+  full_name: string; // User's full name
+  role: 'student' | 'lecturer' | 'admin'; // User's role
 }
 ```
 
@@ -69,6 +69,7 @@ User metadata is stored in the `auth.users` table and includes:
 The system implements role-based access control (RBAC) with three roles:
 
 ### Student
+
 - Can submit complaints
 - Can view their own complaints
 - Can participate in votes
@@ -76,6 +77,7 @@ The system implements role-based access control (RBAC) with three roles:
 - Cannot access lecturer/admin features
 
 ### Lecturer
+
 - All student permissions
 - Can view all complaints
 - Can manage complaints (assign, update status, add feedback)
@@ -83,6 +85,7 @@ The system implements role-based access control (RBAC) with three roles:
 - Can view analytics
 
 ### Admin
+
 - All lecturer permissions
 - Can manage escalation rules
 - Can perform bulk operations
@@ -238,7 +241,7 @@ describe('Authentication', () => {
       'Test User',
       'student'
     );
-    
+
     expect(error).toBeNull();
     expect(user).toBeDefined();
     expect(user?.user_metadata.role).toBe('student');

@@ -45,7 +45,7 @@ function MyPage() {
   };
 
   return (
-    <ComplaintForm 
+    <ComplaintForm
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       initialData={{
@@ -82,6 +82,7 @@ interface ComplaintFormData {
 ### Validation Rules
 
 **For Submission:**
+
 - Title: Required, max 200 characters
 - Description: Required, max 5000 characters
 - Category: Required
@@ -89,17 +90,20 @@ interface ComplaintFormData {
 - Tags: Optional
 
 **For Draft:**
+
 - All fields are optional
 - Length limits still apply if content is provided
 
 ### Current Status
 
 ✅ **Phase 3-11: UI Development**
+
 - Form uses mock data and console logging
 - No actual API calls to Supabase
 - Simulated loading states and delays
 
 🔄 **Phase 12: API Integration (Pending)**
+
 - Will connect to Supabase for real data submission
 - Will implement actual file upload
 - Will add proper error handling from API

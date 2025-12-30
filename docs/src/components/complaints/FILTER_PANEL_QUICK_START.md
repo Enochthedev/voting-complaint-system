@@ -31,10 +31,7 @@ const [filters, setFilters] = useState<FilterState>({
 ### 3. Render the Component
 
 ```tsx
-<FilterPanel
-  filters={filters}
-  onFiltersChange={setFilters}
-/>
+<FilterPanel filters={filters} onFiltersChange={setFilters} />
 ```
 
 ## Complete Example
@@ -196,7 +193,7 @@ function ComplaintsPage() {
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
-    
+
     // Update URL
     const params = new URLSearchParams();
     if (newFilters.status.length) {
@@ -206,16 +203,11 @@ function ComplaintsPage() {
       params.set('category', newFilters.category.join(','));
     }
     // ... other filters
-    
+
     router.push(`?${params.toString()}`);
   };
 
-  return (
-    <FilterPanel
-      filters={filters}
-      onFiltersChange={handleFiltersChange}
-    />
-  );
+  return <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />;
 }
 ```
 
@@ -229,7 +221,7 @@ function ComplaintsPage() {
   const handleSavePreset = (name: string, presetFilters: FilterState) => {
     const newPreset = { name, filters: presetFilters };
     setPresets([...presets, newPreset]);
-    
+
     // Optionally save to local storage or database
     localStorage.setItem('filterPresets', JSON.stringify([...presets, newPreset]));
   };
@@ -245,7 +237,7 @@ function ComplaintsPage() {
         onFiltersChange={setFilters}
         onSavePreset={handleSavePreset}
       />
-      
+
       {/* Preset List */}
       <div className="mt-4">
         {presets.map((preset, index) => (
@@ -261,30 +253,30 @@ function ComplaintsPage() {
 
 ## Props Reference
 
-| Prop | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `filters` | `FilterState` | ✅ | - | Current filter state |
-| `onFiltersChange` | `(filters: FilterState) => void` | ✅ | - | Callback when filters change |
-| `onSavePreset` | `(name: string, filters: FilterState) => void` | ❌ | - | Callback to save preset |
-| `availableTags` | `string[]` | ❌ | `[]` | Available tags |
-| `availableLecturers` | `Array<{id: string, name: string}>` | ❌ | `[]` | Available lecturers |
-| `isCollapsible` | `boolean` | ❌ | `true` | Can collapse panel |
-| `defaultCollapsed` | `boolean` | ❌ | `false` | Initial collapsed state |
-| `className` | `string` | ❌ | - | Additional CSS classes |
+| Prop                 | Type                                           | Required | Default | Description                  |
+| -------------------- | ---------------------------------------------- | -------- | ------- | ---------------------------- |
+| `filters`            | `FilterState`                                  | ✅       | -       | Current filter state         |
+| `onFiltersChange`    | `(filters: FilterState) => void`               | ✅       | -       | Callback when filters change |
+| `onSavePreset`       | `(name: string, filters: FilterState) => void` | ❌       | -       | Callback to save preset      |
+| `availableTags`      | `string[]`                                     | ❌       | `[]`    | Available tags               |
+| `availableLecturers` | `Array<{id: string, name: string}>`            | ❌       | `[]`    | Available lecturers          |
+| `isCollapsible`      | `boolean`                                      | ❌       | `true`  | Can collapse panel           |
+| `defaultCollapsed`   | `boolean`                                      | ❌       | `false` | Initial collapsed state      |
+| `className`          | `string`                                       | ❌       | -       | Additional CSS classes       |
 
 ## FilterState Type
 
 ```typescript
 interface FilterState {
-  status: ComplaintStatus[];           // ['new', 'opened', ...]
-  category: ComplaintCategory[];       // ['academic', 'facilities', ...]
-  priority: ComplaintPriority[];       // ['low', 'high', ...]
-  dateFrom: string;                    // '2024-01-01'
-  dateTo: string;                      // '2024-12-31'
-  tags: string[];                      // ['wifi-issue', 'urgent', ...]
-  assignedTo: string;                  // Lecturer ID
-  sortBy: SortOption;                  // 'created_at' | 'updated_at' | ...
-  sortOrder: 'asc' | 'desc';          // Sort direction
+  status: ComplaintStatus[]; // ['new', 'opened', ...]
+  category: ComplaintCategory[]; // ['academic', 'facilities', ...]
+  priority: ComplaintPriority[]; // ['low', 'high', ...]
+  dateFrom: string; // '2024-01-01'
+  dateTo: string; // '2024-12-31'
+  tags: string[]; // ['wifi-issue', 'urgent', ...]
+  assignedTo: string; // Lecturer ID
+  sortBy: SortOption; // 'created_at' | 'updated_at' | ...
+  sortOrder: 'asc' | 'desc'; // Sort direction
 }
 ```
 
@@ -335,9 +327,11 @@ const initialFilters = savedFilters ? JSON.parse(savedFilters) : defaultFilters;
 ## Demo
 
 To see the filter panel in action, check out:
+
 - `src/components/complaints/__tests__/filter-panel-demo.tsx`
 
 Run the demo:
+
 ```bash
 # Add the demo component to a page and view in browser
 ```

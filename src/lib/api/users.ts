@@ -2,22 +2,31 @@ import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import type { User } from '@/types/database.types';
 import { DatabaseError } from '@/lib/validation';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Get all users (admin only)
  */
 async function getAllUsersImpl(): Promise<User[]> {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .order('created_at', { ascending: false });
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching users:', error);
-    throw new DatabaseError(error.message || 'Failed to fetch users', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      console.error('Error fetching users:', error);
+      throw new DatabaseError(
+        error.message || 'Failed to fetch users',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data || [];
+    return data || [];
+  });
 }
 
 export const getAllUsers = withRateLimit(getAllUsersImpl, 'read');
@@ -26,14 +35,22 @@ export const getAllUsers = withRateLimit(getAllUsersImpl, 'read');
  * Get a single user by ID
  */
 async function getUserByIdImpl(userId: string): Promise<User | null> {
-  const { data, error } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
 
-  if (error) {
-    console.error('Error fetching user:', error);
-    throw new DatabaseError(error.message || 'Failed to fetch user', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      console.error('Error fetching user:', error);
+      throw new DatabaseError(
+        error.message || 'Failed to fetch user',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const getUserById = withRateLimit(getUserByIdImpl, 'read');
@@ -45,27 +62,35 @@ async function updateUserRoleImpl(
   userId: string,
   newRole: 'student' | 'lecturer' | 'admin'
 ): Promise<User> {
-  const { data, error } = await supabase
-    .from('users')
-    .update({ role: newRole, updated_at: new Date().toISOString() })
-    .eq('id', userId)
-    .select()
-    .single();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .update({ role: newRole, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error updating user role:', error);
-    throw new DatabaseError(error.message || 'Failed to update user role', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      console.error('Error updating user role:', error);
+      throw new DatabaseError(
+        error.message || 'Failed to update user role',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  // Invalidate role cache when user role changes
-  // This ensures middleware uses fresh role on next request
-  if (typeof window === 'undefined') {
-    // Only run on server-side
-    const { invalidateRoleCache } = await import('@/lib/role-cache');
-    invalidateRoleCache(userId);
-  }
+    // Invalidate role cache when user role changes
+    // This ensures middleware uses fresh role on next request
+    if (typeof window === 'undefined') {
+      // Only run on server-side
+      const { invalidateRoleCache } = await import('@/lib/role-cache');
+      invalidateRoleCache(userId);
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const updateUserRole = withRateLimit(updateUserRoleImpl, 'write');

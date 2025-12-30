@@ -169,20 +169,20 @@ History Entry Created ✅
 
 ## Action Types and Their Sources
 
-| Action | Source | Trigger/Function | Migration |
-|--------|--------|------------------|-----------|
-| `created` | complaints table | `log_complaint_creation_trigger` | 017 |
-| `status_changed` | complaints table | `complaint_status_change_trigger` | 017 |
-| `assigned` | complaints table | `log_complaint_assignment_trigger` | 017 |
-| `reassigned` | complaints table | `log_complaint_assignment_trigger` | 017 |
-| `feedback_added` | feedback table | `log_feedback_addition_trigger` | 037 ✨ |
-| `comment_added` | complaint_comments table | `log_comment_addition_trigger` | 037 ✨ |
-| `comment_added` (edit) | complaint_comments table | `log_comment_edit_trigger` | 037 ✨ |
-| `comment_added` (delete) | complaint_comments table | `log_comment_deletion_trigger` | 037 ✨ |
-| `reopened` | API function | `reopenComplaint()` | N/A |
-| `rated` | API function | `submitRating()` | N/A |
-| `tags_added` | API function | `bulkAddTags()` | N/A |
-| `escalated` | Future | Not yet implemented | TBD |
+| Action                   | Source                   | Trigger/Function                   | Migration |
+| ------------------------ | ------------------------ | ---------------------------------- | --------- |
+| `created`                | complaints table         | `log_complaint_creation_trigger`   | 017       |
+| `status_changed`         | complaints table         | `complaint_status_change_trigger`  | 017       |
+| `assigned`               | complaints table         | `log_complaint_assignment_trigger` | 017       |
+| `reassigned`             | complaints table         | `log_complaint_assignment_trigger` | 017       |
+| `feedback_added`         | feedback table           | `log_feedback_addition_trigger`    | 037 ✨    |
+| `comment_added`          | complaint_comments table | `log_comment_addition_trigger`     | 037 ✨    |
+| `comment_added` (edit)   | complaint_comments table | `log_comment_edit_trigger`         | 037 ✨    |
+| `comment_added` (delete) | complaint_comments table | `log_comment_deletion_trigger`     | 037 ✨    |
+| `reopened`               | API function             | `reopenComplaint()`                | N/A       |
+| `rated`                  | API function             | `submitRating()`                   | N/A       |
+| `tags_added`             | API function             | `bulkAddTags()`                    | N/A       |
+| `escalated`              | Future                   | Not yet implemented                | TBD       |
 
 ## Security Model
 
@@ -246,26 +246,31 @@ User sees complete audit trail ✅
 ## Benefits of This Architecture
 
 ### 1. Automatic Logging
+
 - ✅ No manual code needed for most actions
 - ✅ Cannot be bypassed
 - ✅ Consistent across all entry points
 
 ### 2. Immutability
+
 - ✅ History cannot be changed
 - ✅ Reliable audit trail
 - ✅ Meets compliance requirements
 
 ### 3. Transparency
+
 - ✅ Users see full complaint lifecycle
 - ✅ Clear accountability
 - ✅ Easy debugging
 
 ### 4. Performance
+
 - ✅ Indexed for fast queries
 - ✅ Efficient timeline display
 - ✅ Minimal overhead
 
 ### 5. Flexibility
+
 - ✅ Hybrid approach (triggers + API)
 - ✅ JSONB details for extensibility
 - ✅ Easy to add new action types

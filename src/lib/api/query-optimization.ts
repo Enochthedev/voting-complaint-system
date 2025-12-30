@@ -8,6 +8,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Batch fetch multiple complaints by IDs
@@ -16,20 +17,22 @@ import { supabase } from '@/lib/supabase';
 export async function batchFetchComplaintsByIds(ids: string[]) {
   if (ids.length === 0) return [];
 
-  // Using singleton supabase client
-  const { data, error } = await supabase
-    .from('complaints')
-    .select(
-      `
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
+    const { data, error } = await supabase
+      .from('complaints')
+      .select(
+        `
       *,
       student:users!complaints_student_id_fkey(id, full_name, email),
       assigned_user:users!complaints_assigned_to_fkey(id, full_name, email)
     `
-    )
-    .in('id', ids);
+      )
+      .in('id', ids);
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 /**
@@ -39,14 +42,16 @@ export async function batchFetchComplaintsByIds(ids: string[]) {
 export async function batchFetchUsersByIds(ids: string[]) {
   if (ids.length === 0) return [];
 
-  // Using singleton supabase client
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, full_name, email, role')
-    .in('id', ids);
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, full_name, email, role')
+      .in('id', ids);
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  });
 }
 
 /**
@@ -58,33 +63,35 @@ export async function getComplaintCountsByStatus(filters?: {
   assignedTo?: string;
   isDraft?: boolean;
 }) {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  let query = supabase.from('complaints').select('status');
+    let query = supabase.from('complaints').select('status');
 
-  if (filters?.studentId) {
-    query = query.eq('student_id', filters.studentId);
-  }
+    if (filters?.studentId) {
+      query = query.eq('student_id', filters.studentId);
+    }
 
-  if (filters?.assignedTo) {
-    query = query.eq('assigned_to', filters.assignedTo);
-  }
+    if (filters?.assignedTo) {
+      query = query.eq('assigned_to', filters.assignedTo);
+    }
 
-  if (filters?.isDraft !== undefined) {
-    query = query.eq('is_draft', filters.isDraft);
-  }
+    if (filters?.isDraft !== undefined) {
+      query = query.eq('is_draft', filters.isDraft);
+    }
 
-  const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) throw error;
+    if (error) throw error;
 
-  // Group by status on client side (more efficient than multiple DB queries)
-  const counts: Record<string, number> = {};
-  (data || []).forEach((complaint: any) => {
-    counts[complaint.status] = (counts[complaint.status] || 0) + 1;
+    // Group by status on client side (more efficient than multiple DB queries)
+    const counts: Record<string, number> = {};
+    (data || []).forEach((complaint: any) => {
+      counts[complaint.status] = (counts[complaint.status] || 0) + 1;
+    });
+
+    return counts;
   });
-
-  return counts;
 }
 
 /**
@@ -101,40 +108,42 @@ export async function prefetchComplaintRelatedData(complaintIds: string[]) {
     };
   }
 
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  // Fetch all related data in parallel
-  const [tagsResult, commentsResult, attachmentsResult, historyResult] = await Promise.all([
-    supabase.from('complaint_tags').select('*').in('complaint_id', complaintIds),
-    supabase
-      .from('complaint_comments')
-      .select(
-        `
+    // Fetch all related data in parallel
+    const [tagsResult, commentsResult, attachmentsResult, historyResult] = await Promise.all([
+      supabase.from('complaint_tags').select('*').in('complaint_id', complaintIds),
+      supabase
+        .from('complaint_comments')
+        .select(
+          `
         *,
         user:users(id, full_name, email, role)
       `
-      )
-      .in('complaint_id', complaintIds)
-      .order('created_at', { ascending: true }),
-    supabase.from('complaint_attachments').select('*').in('complaint_id', complaintIds),
-    supabase
-      .from('complaint_history')
-      .select(
-        `
+        )
+        .in('complaint_id', complaintIds)
+        .order('created_at', { ascending: true }),
+      supabase.from('complaint_attachments').select('*').in('complaint_id', complaintIds),
+      supabase
+        .from('complaint_history')
+        .select(
+          `
         *,
         performed_by_user:users!complaint_history_performed_by_fkey(id, full_name, email)
       `
-      )
-      .in('complaint_id', complaintIds)
-      .order('created_at', { ascending: false }),
-  ]);
+        )
+        .in('complaint_id', complaintIds)
+        .order('created_at', { ascending: false }),
+    ]);
 
-  return {
-    tags: tagsResult.data || [],
-    comments: commentsResult.data || [],
-    attachments: attachmentsResult.data || [],
-    history: historyResult.data || [],
-  };
+    return {
+      tags: tagsResult.data || [],
+      comments: commentsResult.data || [],
+      attachments: attachmentsResult.data || [],
+      history: historyResult.data || [],
+    };
+  });
 }
 
 /**
@@ -151,39 +160,41 @@ export async function paginatedQuery<T>(
     orderBy?: { column: string; ascending?: boolean };
   }
 ): Promise<{ data: T[]; total: number; hasMore: boolean }> {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  const from = page * pageSize;
-  const to = from + pageSize - 1;
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
 
-  let query = supabase.from(table).select(options?.select || '*', { count: 'exact' });
+    let query = supabase.from(table).select(options?.select || '*', { count: 'exact' });
 
-  // Apply filters
-  if (options?.filters) {
-    Object.entries(options.filters).forEach(([key, value]) => {
-      query = query.eq(key, value);
-    });
-  }
+    // Apply filters
+    if (options?.filters) {
+      Object.entries(options.filters).forEach(([key, value]) => {
+        query = query.eq(key, value);
+      });
+    }
 
-  // Apply ordering
-  if (options?.orderBy) {
-    query = query.order(options.orderBy.column, {
-      ascending: options.orderBy.ascending ?? false,
-    });
-  }
+    // Apply ordering
+    if (options?.orderBy) {
+      query = query.order(options.orderBy.column, {
+        ascending: options.orderBy.ascending ?? false,
+      });
+    }
 
-  // Apply range
-  query = query.range(from, to);
+    // Apply range
+    query = query.range(from, to);
 
-  const { data, error, count } = await query;
+    const { data, error, count } = await query;
 
-  if (error) throw error;
+    if (error) throw error;
 
-  return {
-    data: (data || []) as T[],
-    total: count || 0,
-    hasMore: count ? to < count - 1 : false,
-  };
+    return {
+      data: (data || []) as T[],
+      total: count || 0,
+      hasMore: count ? to < count - 1 : false,
+    };
+  });
 }
 
 /**
@@ -223,12 +234,13 @@ export async function searchComplaints(
     };
   }
 ) {
-  // Using singleton supabase client
+  return withTokenRefresh(async () => {
+    // Using singleton supabase client
 
-  let query = supabase
-    .from('complaints')
-    .select(
-      `
+    let query = supabase
+      .from('complaints')
+      .select(
+        `
       id,
       title,
       description,
@@ -239,39 +251,40 @@ export async function searchComplaints(
       student:users!complaints_student_id_fkey(id, full_name),
       assigned_user:users!complaints_assigned_to_fkey(id, full_name)
     `
-    )
-    .textSearch('search_vector', searchTerm, {
-      type: 'websearch',
-      config: 'english',
-    })
-    .eq('is_draft', false);
+      )
+      .textSearch('search_vector', searchTerm, {
+        type: 'websearch',
+        config: 'english',
+      })
+      .eq('is_draft', false);
 
-  // Apply filters
-  if (options?.filters?.status) {
-    query = query.eq('status', options.filters.status);
-  }
-  if (options?.filters?.category) {
-    query = query.eq('category', options.filters.category);
-  }
-  if (options?.filters?.priority) {
-    query = query.eq('priority', options.filters.priority);
-  }
-  if (options?.filters?.studentId) {
-    query = query.eq('student_id', options.filters.studentId);
-  }
-  if (options?.filters?.assignedTo) {
-    query = query.eq('assigned_to', options.filters.assignedTo);
-  }
+    // Apply filters
+    if (options?.filters?.status) {
+      query = query.eq('status', options.filters.status);
+    }
+    if (options?.filters?.category) {
+      query = query.eq('category', options.filters.category);
+    }
+    if (options?.filters?.priority) {
+      query = query.eq('priority', options.filters.priority);
+    }
+    if (options?.filters?.studentId) {
+      query = query.eq('student_id', options.filters.studentId);
+    }
+    if (options?.filters?.assignedTo) {
+      query = query.eq('assigned_to', options.filters.assignedTo);
+    }
 
-  // Apply limit
-  if (options?.limit) {
-    query = query.limit(options.limit);
-  }
+    // Apply limit
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
 
-  query = query.order('created_at', { ascending: false });
+    query = query.order('created_at', { ascending: false });
 
-  const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) throw error;
-  return data || [];
+    if (error) throw error;
+    return data || [];
+  });
 }

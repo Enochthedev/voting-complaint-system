@@ -32,10 +32,7 @@ The toast notification feature for real-time updates was already implemented as 
 
 ```typescript
 // Show toast notification for real-time update
-toast.info(
-  newNotification.message,
-  newNotification.title
-);
+toast.info(newNotification.message, newNotification.title);
 ```
 
 ### How It Works

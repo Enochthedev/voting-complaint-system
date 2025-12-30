@@ -9,6 +9,7 @@ The bulk export feature allows users to select multiple complaints and export th
 ### Components Created/Modified
 
 #### 1. **BulkActionBar Component** (New)
+
 - **Location**: `src/components/complaints/bulk-action-bar.tsx`
 - **Purpose**: Displays a sticky action bar at the bottom of the screen when complaints are selected
 - **Features**:
@@ -19,6 +20,7 @@ The bulk export feature allows users to select multiple complaints and export th
   - Sticky positioning for easy access while scrolling
 
 #### 2. **ComplaintList Component** (Modified)
+
 - **Location**: `src/components/complaints/complaint-list.tsx`
 - **Changes**:
   - Added `selectionMode`, `selectedIds`, and `onSelectionChange` props
@@ -27,12 +29,14 @@ The bulk export feature allows users to select multiple complaints and export th
   - Click behavior changes based on selection mode
 
 #### 3. **ComplaintsGrid Component** (Modified)
+
 - **Location**: `src/components/complaints/complaints-grid.tsx`
 - **Changes**:
   - Added selection-related props to pass through to ComplaintList
   - Acts as a bridge between the page and the list component
 
 #### 4. **ComplaintsHeader Component** (Modified)
+
 - **Location**: `src/components/complaints/complaints-header.tsx`
 - **Changes**:
   - Added "Select" button to toggle selection mode
@@ -41,6 +45,7 @@ The bulk export feature allows users to select multiple complaints and export th
   - Hides "Export CSV" button when in selection mode (bulk action bar handles export)
 
 #### 5. **Complaints Page** (Modified)
+
 - **Location**: `src/app/complaints/page.tsx`
 - **Changes**:
   - Added state management for selection mode and selected IDs
@@ -79,6 +84,7 @@ The bulk export feature allows users to select multiple complaints and export th
 ### Exiting Selection Mode
 
 Users can exit selection mode by:
+
 - Clicking the "Cancel" button in the header
 - Clicking the "Clear" button in the bulk action bar
 - Completing an export (automatically exits)
@@ -108,10 +114,10 @@ const handleBulkExport = () => {
   const selectedComplaints = filteredComplaints.filter((complaint) =>
     selectedIds.has(complaint.id)
   );
-  
+
   // Export using existing CSV export utility
   exportComplaintsToCSV(complaintsToExport, filename);
-  
+
   // Clean up
   setSelectedIds(new Set());
   setSelectionMode(false);

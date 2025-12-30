@@ -13,10 +13,8 @@ When a comment is added to a complaint, the system automatically:
 1. **Notifies the complaint owner** (if they didn't write the comment)
    - Only for non-anonymous complaints
    - Only for non-internal comments
-   
 2. **Notifies the assigned lecturer** (if they didn't write the comment)
    - Only for non-internal comments
-   
 3. **Logs the comment** in the complaint history
    - Both regular comments and internal notes are logged
    - Internal notes are marked as such in the history
@@ -24,6 +22,7 @@ When a comment is added to a complaint, the system automatically:
 ### Internal Notes
 
 Internal notes (lecturer-only comments) have special handling:
+
 - **Do NOT** trigger notifications
 - **Are** logged in complaint history
 - Only visible to lecturers and admins
@@ -35,6 +34,7 @@ Internal notes (lecturer-only comments) have special handling:
 Located in: `supabase/migrations/030_create_comment_notification_trigger.sql`
 
 **Logic:**
+
 ```sql
 1. Get complaint details (title, student_id, assigned_to)
 2. Get commenter information (name, id)
@@ -47,8 +47,9 @@ Located in: `supabase/migrations/030_create_comment_notification_trigger.sql`
 ```
 
 **Notification Details:**
+
 - **Type:** `comment_added`
-- **Title:** 
+- **Title:**
   - For students: "New Comment on Your Complaint"
   - For lecturers: "New Comment on Assigned Complaint"
 - **Message:** "[Commenter Name] commented on [complaint title]"
@@ -57,6 +58,7 @@ Located in: `supabase/migrations/030_create_comment_notification_trigger.sql`
 ### Trigger Function: `log_comment_addition()`
 
 **Logic:**
+
 ```sql
 1. Determine comment type (internal_note or comment)
 2. Insert record into complaint_history table
@@ -134,12 +136,14 @@ The `ComplaintDetailView` component displays comments and uses the `CommentInput
 ### Manual Testing
 
 1. **Test regular comments:**
+
    ```bash
    # As lecturer, comment on a student's complaint
    # Verify student receives notification
    ```
 
 2. **Test internal notes:**
+
    ```bash
    # As lecturer, add internal note
    # Verify NO notifications are created
@@ -154,12 +158,14 @@ The `ComplaintDetailView` component displays comments and uses the `CommentInput
 ### Automated Testing
 
 Run the test script:
+
 ```bash
 cd student-complaint-system
 node scripts/test-comment-notifications.js
 ```
 
 The test script verifies:
+
 - ✓ Notifications created for complaint owner
 - ✓ Notifications created for assigned lecturer
 - ✓ Users don't receive notifications for own comments
@@ -185,16 +191,16 @@ supabase db push
 
 ```sql
 -- Check if trigger exists
-SELECT 
-  trigger_name, 
-  event_manipulation, 
+SELECT
+  trigger_name,
+  event_manipulation,
   event_object_table
 FROM information_schema.triggers
 WHERE trigger_name = 'notify_on_comment_added_trigger';
 
 -- Check if function exists
-SELECT 
-  routine_name, 
+SELECT
+  routine_name,
   routine_type
 FROM information_schema.routines
 WHERE routine_name = 'notify_on_comment_added';
@@ -205,11 +211,13 @@ WHERE routine_name = 'notify_on_comment_added';
 This implementation satisfies:
 
 ### Acceptance Criteria
+
 - **AC15:** Follow-up and Discussion System
   - ✓ Comments trigger notifications for relevant parties
   - ✓ All participants receive notifications for new comments
 
 ### Design Properties
+
 - **P4:** Notification Delivery
   - ✓ Notifications created automatically via database trigger
   - ✓ Delivered in real-time via Supabase Realtime
@@ -233,6 +241,7 @@ Using database triggers provides several advantages:
 ### Real-time Updates
 
 Combined with Supabase Realtime:
+
 - Users receive notifications instantly
 - No polling required
 - Efficient WebSocket connections
@@ -243,32 +252,36 @@ Combined with Supabase Realtime:
 ### Notifications Not Created
 
 1. **Check trigger is installed:**
+
    ```sql
-   SELECT * FROM information_schema.triggers 
+   SELECT * FROM information_schema.triggers
    WHERE trigger_name = 'notify_on_comment_added_trigger';
    ```
 
 2. **Check function exists:**
+
    ```sql
-   SELECT * FROM information_schema.routines 
+   SELECT * FROM information_schema.routines
    WHERE routine_name = 'notify_on_comment_added';
    ```
 
 3. **Test trigger manually:**
+
    ```sql
    -- Insert test comment
    INSERT INTO complaint_comments (complaint_id, user_id, comment, is_internal)
    VALUES ('complaint-id', 'user-id', 'Test comment', false);
-   
+
    -- Check notifications
-   SELECT * FROM notifications 
-   WHERE related_id = 'complaint-id' 
+   SELECT * FROM notifications
+   WHERE related_id = 'complaint-id'
    ORDER BY created_at DESC;
    ```
 
 ### Internal Notes Creating Notifications
 
 If internal notes are creating notifications:
+
 1. Verify `is_internal` flag is set to `true`
 2. Check trigger logic in database
 3. Review application code setting `is_internal`
@@ -276,6 +289,7 @@ If internal notes are creating notifications:
 ### Missing History Logs
 
 If comments aren't logged in history:
+
 1. Check `log_comment_addition_trigger` is installed
 2. Verify `complaint_history` table exists
 3. Check RLS policies allow INSERT
@@ -314,6 +328,7 @@ Potential improvements for Phase 12:
 ## Support
 
 For issues or questions:
+
 1. Check the test script output
 2. Review database logs
 3. Verify trigger installation

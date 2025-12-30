@@ -7,16 +7,19 @@ The complaints list page (`src/app/complaints/page.tsx`) has been refactored to 
 ## Refactored Components
 
 ### 1. ComplaintsHeader
+
 **Location**: `src/components/complaints/complaints-header.tsx`
 
 **Purpose**: Displays the page header with title, description, and action buttons.
 
 **Features**:
+
 - Role-based title display ("My Complaints" for students, "All Complaints" for lecturers/admins)
 - Conditional "New Complaint" button (students only)
 - Responsive description text
 
 **Props**:
+
 ```typescript
 interface ComplaintsHeaderProps {
   userRole: 'student' | 'lecturer' | 'admin';
@@ -25,21 +28,21 @@ interface ComplaintsHeaderProps {
 ```
 
 **Usage**:
+
 ```tsx
-<ComplaintsHeader 
-  userRole={userRole}
-  onNewComplaint={handleNewComplaint}
-/>
+<ComplaintsHeader userRole={userRole} onNewComplaint={handleNewComplaint} />
 ```
 
 ---
 
 ### 2. ComplaintsSearchBar
+
 **Location**: `src/components/complaints/complaints-search-bar.tsx`
 
 **Purpose**: Provides search functionality with suggestions, error handling, and result display.
 
 **Features**:
+
 - Real-time search with suggestions
 - Error message display
 - Search results count and status
@@ -47,6 +50,7 @@ interface ComplaintsHeaderProps {
 - Loading state indicator
 
 **Props**:
+
 ```typescript
 interface ComplaintsSearchBarProps {
   searchQuery: string;
@@ -66,6 +70,7 @@ interface ComplaintsSearchBarProps {
 ```
 
 **Usage**:
+
 ```tsx
 <ComplaintsSearchBar
   searchQuery={searchQuery}
@@ -83,11 +88,13 @@ interface ComplaintsSearchBarProps {
 ---
 
 ### 3. ComplaintsFilters
+
 **Location**: `src/components/complaints/complaints-filters.tsx`
 
 **Purpose**: Consolidates all filtering capabilities including quick filters, advanced filters, and preset management.
 
 **Features**:
+
 - Quick filters for lecturers/admins:
   - "Assigned to Me"
   - "High Priority"
@@ -97,6 +104,7 @@ interface ComplaintsSearchBarProps {
 - Automatic page reset and search clearing when filters change
 
 **Props**:
+
 ```typescript
 interface ComplaintsFiltersProps {
   userRole: 'student' | 'lecturer' | 'admin';
@@ -115,6 +123,7 @@ interface ComplaintsFiltersProps {
 ```
 
 **Usage**:
+
 ```tsx
 <ComplaintsFilters
   userRole={userRole}
@@ -135,11 +144,13 @@ interface ComplaintsFiltersProps {
 ---
 
 ### 4. ComplaintsGrid
+
 **Location**: `src/components/complaints/complaints-grid.tsx`
 
 **Purpose**: Displays the main complaint list with intelligent empty states for different scenarios.
 
 **Features**:
+
 - Pagination support
 - Search result display mode
 - Role-based empty messages
@@ -147,6 +158,7 @@ interface ComplaintsFiltersProps {
 - Integration with ComplaintList component
 
 **Props**:
+
 ```typescript
 interface ComplaintsGridProps {
   userRole: 'student' | 'lecturer' | 'admin';
@@ -163,6 +175,7 @@ interface ComplaintsGridProps {
 ```
 
 **Usage**:
+
 ```tsx
 <ComplaintsGrid
   userRole={userRole}
@@ -183,21 +196,25 @@ interface ComplaintsGridProps {
 ## Benefits of Refactoring
 
 ### 1. **Improved Maintainability (NFR3)**
+
 - **Separation of Concerns**: Each component has a single, well-defined responsibility
 - **Easier Testing**: Smaller, focused components are easier to unit test
 - **Better Code Organization**: Related functionality is grouped logically
 
 ### 2. **Reduced Complexity**
+
 - **File Size Reduction**: From 707 lines to 585 lines (122 lines, ~17% reduction)
 - **Cognitive Load**: Each component can be understood independently
 - **Easier Debugging**: Issues can be isolated to specific components
 
 ### 3. **Reusability**
+
 - Components can potentially be reused in other pages
 - Props interface makes component contracts clear
 - Documented components are easier for other developers to use
 
 ### 4. **Type Safety**
+
 - All components have well-defined TypeScript interfaces
 - Props are explicitly typed and documented
 - Better IDE autocomplete and error detection
@@ -272,6 +289,7 @@ npm test -- --watch
 If you have code that directly interacts with the complaints page JSX, update it to use the new components:
 
 ### Before (Old Code)
+
 ```tsx
 // Direct JSX in page.tsx
 <div className="mb-8 flex items-center justify-between">
@@ -284,12 +302,10 @@ If you have code that directly interacts with the complaints page JSX, update it
 ```
 
 ### After (New Code)
+
 ```tsx
 // Using extracted component
-<ComplaintsHeader 
-  userRole={userRole}
-  onNewComplaint={handleNewComplaint}
-/>
+<ComplaintsHeader userRole={userRole} onNewComplaint={handleNewComplaint} />
 ```
 
 ---
@@ -297,6 +313,7 @@ If you have code that directly interacts with the complaints page JSX, update it
 ## Future Improvements
 
 ### Potential Enhancements
+
 1. **Further Extract Mock Data**: Move `MOCK_COMPLAINTS` and `MOCK_LECTURERS` to separate mock data files
 2. **Custom Hooks**: Extract complex filter logic into custom hooks
 3. **Memoization**: Add React.memo to prevent unnecessary re-renders
@@ -304,6 +321,7 @@ If you have code that directly interacts with the complaints page JSX, update it
 5. **Performance**: Implement virtual scrolling for large complaint lists
 
 ### Component Splitting Opportunities
+
 - **QuickFilters**: Extract from ComplaintsFilters into its own component
 - **EmptyState**: Create dedicated component for different empty states
 - **SearchResultsInfo**: Extract search results display logic
@@ -313,6 +331,7 @@ If you have code that directly interacts with the complaints page JSX, update it
 ## Files Changed
 
 ### Created Files
+
 1. `src/components/complaints/complaints-header.tsx` (new)
 2. `src/components/complaints/complaints-search-bar.tsx` (new)
 3. `src/components/complaints/complaints-filters.tsx` (new)
@@ -321,6 +340,7 @@ If you have code that directly interacts with the complaints page JSX, update it
 6. `src/components/complaints/__tests__/complaints-search-bar.test.tsx` (new)
 
 ### Modified Files
+
 1. `src/app/complaints/page.tsx` (refactored, reduced from 707 to 585 lines)
 2. `src/components/complaints/index.ts` (added new exports)
 
@@ -328,18 +348,19 @@ If you have code that directly interacts with the complaints page JSX, update it
 
 ## Performance Metrics
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| File Size (page.tsx) | 707 lines | 585 lines | -122 lines (-17%) |
-| Number of Components | 1 (page) | 5 (1 page + 4 components) | Better separation |
-| Average Component Size | 707 lines | ~120 lines | Smaller, focused units |
-| Test Coverage | Limited | Comprehensive | 2 new test files |
+| Metric                 | Before    | After                     | Improvement            |
+| ---------------------- | --------- | ------------------------- | ---------------------- |
+| File Size (page.tsx)   | 707 lines | 585 lines                 | -122 lines (-17%)      |
+| Number of Components   | 1 (page)  | 5 (1 page + 4 components) | Better separation      |
+| Average Component Size | 707 lines | ~120 lines                | Smaller, focused units |
+| Test Coverage          | Limited   | Comprehensive             | 2 new test files       |
 
 ---
 
 ## Conclusion
 
 This refactoring successfully achieves the goals outlined in **Task 5.6.1**:
+
 - ✅ Analyzed the 700-line complaints page
 - ✅ Extracted ComplaintsHeader component
 - ✅ Extracted ComplaintsSearchBar component
@@ -350,6 +371,7 @@ This refactoring successfully achieves the goals outlined in **Task 5.6.1**:
 - ✅ Created comprehensive tests
 
 **Acceptance Criteria NFR3 (Maintainability)**: ✅ **MET**
+
 - Code is more modular and easier to maintain
 - Components have clear, documented interfaces
 - Test coverage has improved

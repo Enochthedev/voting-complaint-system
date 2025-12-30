@@ -1,14 +1,17 @@
 # Task 3.1: "Save as Draft" Functionality - Completion Summary
 
 ## Overview
+
 Successfully implemented the "Save as Draft" functionality for the complaint submission form, allowing students to save incomplete complaints and continue working on them later.
 
 ## Implementation Details
 
 ### 1. Complaint Form Component (`complaint-form.tsx`)
+
 The form already had the core draft functionality implemented:
 
 #### Features Implemented:
+
 - ✅ **Separate "Save as Draft" button** - Distinct from the "Submit Complaint" button
 - ✅ **Draft-specific validation** - Less strict validation for drafts (only validates field lengths if content exists)
 - ✅ **Separate loading states** - `isSavingDraft` state separate from `isLoading` for better UX
@@ -17,6 +20,7 @@ The form already had the core draft functionality implemented:
 - ✅ **Auto-scroll to errors** - Scrolls to first validation error for better UX
 
 #### Validation Logic:
+
 ```typescript
 // For drafts: Only validate if fields have content
 if (!isDraft) {
@@ -29,6 +33,7 @@ if (!isDraft) {
 ### 2. Complaint Submission Page (`complaints/new/page.tsx`)
 
 #### Enhanced Features:
+
 - ✅ **Toast notifications** - Replaced `alert()` with proper toast notifications
 - ✅ **Success messages** - Different messages for draft save vs. full submission
 - ✅ **Error handling** - Comprehensive error handling with user-friendly messages
@@ -36,6 +41,7 @@ if (!isDraft) {
 - ✅ **Try-catch wrapper** - Proper error handling and re-throwing
 
 #### Toast Messages:
+
 - **Draft Saved**: "Your draft has been saved successfully!"
 - **Complaint Submitted**: "Your complaint has been submitted and will be reviewed by our team."
 - **Error**: Context-specific error messages for draft save vs. submission failures
@@ -43,6 +49,7 @@ if (!isDraft) {
 ### 3. Drafts List Page (`complaints/drafts/page.tsx`)
 
 #### New Page Created:
+
 - ✅ **Drafts listing** - Shows all saved draft complaints
 - ✅ **Mock data** - Uses mock data for UI development (Phase 3-11 approach)
 - ✅ **Draft metadata** - Displays title, category, priority, tags, and last edited time
@@ -53,6 +60,7 @@ if (!isDraft) {
 - ✅ **Time formatting** - Human-readable "X minutes/hours/days ago" format
 
 #### Features:
+
 ```typescript
 // Draft card shows:
 - Title (truncated if too long)
@@ -67,6 +75,7 @@ if (!isDraft) {
 ## User Flow
 
 ### Saving a Draft:
+
 1. User fills out complaint form (partially or fully)
 2. User clicks "Save as Draft" button
 3. Form validates only field lengths (if content exists)
@@ -75,12 +84,14 @@ if (!isDraft) {
 6. User is redirected to `/complaints/drafts`
 
 ### Continuing a Draft:
+
 1. User navigates to `/complaints/drafts`
 2. User sees list of saved drafts
 3. User clicks "Continue" on a draft
 4. User is redirected to `/complaints/new?draft={id}` (to be implemented in Task 3.5)
 
 ### Deleting a Draft:
+
 1. User clicks delete button (trash icon)
 2. Confirmation dialog appears
 3. If confirmed, draft is removed from list
@@ -89,12 +100,14 @@ if (!isDraft) {
 ## Acceptance Criteria Met
 
 ### AC10: Draft Complaints ✅
+
 - ✅ Students can save incomplete complaints as drafts
 - ✅ Drafts are stored (currently mock, will be database in Phase 12)
 - ✅ Students can view and manage their draft complaints
 - ✅ Drafts can be submitted or deleted
 
 ### AC2: Complaint Submission ✅
+
 - ✅ Form includes all required fields
 - ✅ Validation works correctly
 - ✅ Success confirmation provided
@@ -102,6 +115,7 @@ if (!isDraft) {
 ## Technical Implementation
 
 ### Form Validation Strategy:
+
 ```typescript
 // Draft validation is lenient
 const validateForm = (isDraft: boolean = false): boolean => {
@@ -117,16 +131,18 @@ const validateForm = (isDraft: boolean = false): boolean => {
     // - Description length check (if provided)
     // - No required field checks
   }
-}
+};
 ```
 
 ### State Management:
+
 ```typescript
-const [isLoading, setIsLoading] = useState(false);        // For full submission
+const [isLoading, setIsLoading] = useState(false); // For full submission
 const [isSavingDraft, setIsSavingDraft] = useState(false); // For draft save
 ```
 
 ### Button States:
+
 ```typescript
 // Save as Draft button
 <Button
@@ -150,6 +166,7 @@ const [isSavingDraft, setIsSavingDraft] = useState(false); // For draft save
 ## UI/UX Enhancements
 
 ### Visual Feedback:
+
 1. **Loading States**: Separate spinners for draft save vs. submission
 2. **Toast Notifications**: Non-intrusive success/error messages
 3. **Error Scrolling**: Auto-scroll to first validation error
@@ -157,6 +174,7 @@ const [isSavingDraft, setIsSavingDraft] = useState(false); // For draft save
 5. **Time Formatting**: Human-readable timestamps
 
 ### Responsive Design:
+
 - Mobile-friendly layout for drafts page
 - Flexible button arrangement (column on mobile, row on desktop)
 - Truncated text with proper overflow handling
@@ -185,6 +203,7 @@ const mockDrafts = [
 When connecting to Supabase in Phase 12:
 
 ### Database Operations Needed:
+
 1. **Save Draft**: Insert complaint with `is_draft: true`
 2. **Load Drafts**: Query complaints where `is_draft: true` and `student_id: userId`
 3. **Continue Draft**: Load draft data and populate form
@@ -192,14 +211,18 @@ When connecting to Supabase in Phase 12:
 5. **Submit Draft**: Update `is_draft: false` and set `status: 'new'`
 
 ### API Calls to Implement:
+
 ```typescript
 // Save draft
 await supabase.from('complaints').insert({
   student_id: isAnonymous ? null : userId,
   is_anonymous: isAnonymous,
   is_draft: true,
-  title, description, category, priority,
-  status: 'draft'
+  title,
+  description,
+  category,
+  priority,
+  status: 'draft',
 });
 
 // Load drafts
@@ -217,6 +240,7 @@ await supabase.from('complaints').delete().eq('id', draftId);
 ## Testing Considerations
 
 ### Manual Testing Checklist:
+
 - [ ] Save draft with minimal data (only title)
 - [ ] Save draft with all fields filled
 - [ ] Save draft with tags
@@ -230,6 +254,7 @@ await supabase.from('complaints').delete().eq('id', draftId);
 - [ ] Test with multiple drafts
 
 ### Edge Cases Handled:
+
 - ✅ Empty drafts list (shows friendly message)
 - ✅ Long titles (truncated with ellipsis)
 - ✅ Multiple tags (wrapped properly)
@@ -240,6 +265,7 @@ await supabase.from('complaints').delete().eq('id', draftId);
 ## Files Modified/Created
 
 ### Modified:
+
 1. `src/app/complaints/new/page.tsx`
    - Added toast notifications
    - Enhanced error handling
@@ -251,6 +277,7 @@ await supabase.from('complaints').delete().eq('id', draftId);
    - Improved validation feedback
 
 ### Created:
+
 1. `src/app/complaints/drafts/page.tsx`
    - New page for viewing saved drafts
    - Mock data for UI development
@@ -262,12 +289,14 @@ await supabase.from('complaints').delete().eq('id', draftId);
 ## Next Steps
 
 ### Immediate (Task 3.1 Complete):
+
 - ✅ Draft save functionality working
 - ✅ Drafts list page created
 - ✅ Toast notifications integrated
 - ✅ Error handling implemented
 
 ### Future Tasks:
+
 - **Task 3.5**: Implement draft editing (load draft data into form)
 - **Phase 12**: Connect to Supabase database for persistence
 - **Phase 12**: Implement real-time draft auto-save (optional enhancement)
@@ -275,6 +304,7 @@ await supabase.from('complaints').delete().eq('id', draftId);
 ## Conclusion
 
 The "Save as Draft" functionality is now fully implemented for the UI layer. Users can:
+
 - Save incomplete complaints as drafts
 - View their saved drafts
 - See draft metadata (category, priority, tags, last edited)

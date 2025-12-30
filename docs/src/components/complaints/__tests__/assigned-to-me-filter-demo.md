@@ -7,6 +7,7 @@ The "Assigned to Me" quick filter is a convenient button that allows lecturers a
 ## Location
 
 The quick filter buttons are displayed:
+
 - **Above the main content grid** on the complaints page
 - **Only visible to lecturers and admins** (not shown to students)
 - **Positioned between the search bar and the filter panel**
@@ -22,22 +23,26 @@ Three quick filter buttons are available:
 ## Visual States
 
 ### Default State (Not Active)
+
 ```
 ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
 │ Assigned to Me  │  │  High Priority  │  │   Unresolved    │
 └─────────────────┘  └─────────────────┘  └─────────────────┘
 ```
+
 - Outline style button
 - Gray border
 - White background
 
 ### Active State
+
 ```
 ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
 │ Assigned to Me  │  │  High Priority  │  │   Unresolved    │
 │     (ACTIVE)    │  └─────────────────┘  └─────────────────┘
 └─────────────────┘
 ```
+
 - Solid style button
 - Dark background
 - White text
@@ -48,6 +53,7 @@ Three quick filter buttons are available:
 ### Clicking "Assigned to Me"
 
 **When Not Active:**
+
 1. Sets the `assignedTo` filter to the current user's ID
 2. Button changes to active state (solid background)
 3. Complaint list updates to show only complaints assigned to the current user
@@ -55,6 +61,7 @@ Three quick filter buttons are available:
 5. If search is active, it clears the search
 
 **When Already Active:**
+
 1. Clears the `assignedTo` filter
 2. Button returns to default state (outline)
 3. Complaint list shows all complaints (or filtered by other active filters)
@@ -75,13 +82,16 @@ The quick filters work seamlessly with the filter panel:
 ### Scenario 1: Lecturer Checking Their Workload
 
 **Initial State:**
+
 - Lecturer logs in
 - Sees all complaints in the system (100+ complaints)
 
 **Action:**
+
 - Clicks "Assigned to Me" button
 
 **Result:**
+
 - List filters to show only 15 complaints assigned to them
 - Button shows active state
 - Can now focus on their assigned work
@@ -89,12 +99,15 @@ The quick filters work seamlessly with the filter panel:
 ### Scenario 2: Finding Urgent Assigned Complaints
 
 **Initial State:**
+
 - Lecturer has "Assigned to Me" filter active (15 complaints)
 
 **Action:**
+
 - Clicks "High Priority" button
 
 **Result:**
+
 - List filters to show only 3 high/critical priority complaints assigned to them
 - Both buttons show active state
 - Lecturer can prioritize urgent work
@@ -102,12 +115,15 @@ The quick filters work seamlessly with the filter panel:
 ### Scenario 3: Clearing Quick Filter
 
 **Initial State:**
+
 - "Assigned to Me" filter is active (15 complaints)
 
 **Action:**
+
 - Clicks "Assigned to Me" button again
 
 **Result:**
+
 - Filter is cleared
 - Button returns to default state
 - List shows all complaints again (100+ complaints)
@@ -157,6 +173,7 @@ if (filters.assignedTo === userId) {
 ## Mobile Responsiveness
 
 On mobile devices:
+
 - Buttons stack vertically or wrap to multiple rows
 - Touch-friendly size (minimum 44x44px touch target)
 - Maintains visual feedback on touch
@@ -164,6 +181,7 @@ On mobile devices:
 ## Testing
 
 The functionality is tested in:
+
 - `assigned-to-me-filter.test.tsx` - Unit tests for filter logic
 - Manual testing for UI interaction and visual states
 

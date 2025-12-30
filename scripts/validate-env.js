@@ -29,10 +29,10 @@ function log(message, color = 'reset') {
 // Load environment variables from .env.local or process.env (for Vercel)
 function loadEnvFile() {
   const envPath = path.join(process.cwd(), '.env.local');
-  
+
   // Check if running in CI/CD environment (like Vercel)
   const isCI = process.env.CI || process.env.VERCEL || process.env.NETLIFY;
-  
+
   if (isCI) {
     // In CI/CD, use process.env directly
     log('ℹ️  Running in CI/CD environment, using process.env', 'cyan');

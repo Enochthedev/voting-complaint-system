@@ -36,10 +36,7 @@ if (error) {
 ```typescript
 import { signIn } from '@/lib/auth';
 
-const { user, error } = await signIn(
-  'student@example.com',
-  'SecurePassword123'
-);
+const { user, error } = await signIn('student@example.com', 'SecurePassword123');
 
 if (error) {
   console.error('Sign in failed:', error.message);
@@ -153,7 +150,7 @@ import { requireAuthServer } from '@/lib/auth-server';
 export default async function ProtectedPage() {
   try {
     const user = await requireAuthServer();
-    
+
     return <div>Welcome, {user.email}</div>;
   } catch (error) {
     // Redirect to login or show error
@@ -170,7 +167,7 @@ import { requireRoleServer } from '@/lib/auth-server';
 export default async function LecturerOnlyPage() {
   try {
     const user = await requireRoleServer('lecturer');
-    
+
     return <div>Lecturer Dashboard</div>;
   } catch (error) {
     return <div>Access denied</div>;
@@ -342,10 +339,7 @@ export async function GET(request: NextRequest) {
   const user = await getCurrentUserServer();
 
   if (!user) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // Handle request

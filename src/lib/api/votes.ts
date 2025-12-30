@@ -2,6 +2,7 @@ import type { Vote, VoteResponse } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import { DatabaseError } from '@/lib/validation';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Vote API functions
@@ -15,16 +16,24 @@ import { DatabaseError } from '@/lib/validation';
  * @returns Created vote
  */
 async function createVoteImpl(voteData: Omit<Vote, 'id' | 'created_at'>): Promise<Vote> {
-  const { data, error } = await supabase.from('votes').insert(voteData).select().single();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase.from('votes').insert(voteData).select().single();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to create vote', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to create vote',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  // Note: Vote notifications are created automatically via database trigger
-  // See: supabase/migrations/*_create_vote_notification_trigger.sql
+    // Note: Vote notifications are created automatically via database trigger
+    // See: supabase/migrations/*_create_vote_notification_trigger.sql
 
-  return data;
+    return data;
+  });
 }
 
 export const createVote = withRateLimit(createVoteImpl, 'write');
@@ -35,23 +44,31 @@ export const createVote = withRateLimit(createVoteImpl, 'write');
  * @returns Array of votes
  */
 async function getVotesImpl(options?: { isActive?: boolean; createdBy?: string }): Promise<Vote[]> {
-  let query = supabase.from('votes').select('*');
+  return withTokenRefresh(async () => {
+    let query = supabase.from('votes').select('*');
 
-  if (options?.isActive !== undefined) {
-    query = query.eq('is_active', options.isActive);
-  }
+    if (options?.isActive !== undefined) {
+      query = query.eq('is_active', options.isActive);
+    }
 
-  if (options?.createdBy) {
-    query = query.eq('created_by', options.createdBy);
-  }
+    if (options?.createdBy) {
+      query = query.eq('created_by', options.createdBy);
+    }
 
-  const { data, error } = await query.order('created_at', { ascending: false });
+    const { data, error } = await query.order('created_at', { ascending: false });
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch votes', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch votes',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data || [];
+    return data || [];
+  });
 }
 
 export const getVotes = withRateLimit(getVotesImpl, 'read');
@@ -62,13 +79,21 @@ export const getVotes = withRateLimit(getVotesImpl, 'read');
  * @returns Vote or null if not found
  */
 async function getVoteByIdImpl(voteId: string): Promise<Vote | null> {
-  const { data, error } = await supabase.from('votes').select('*').eq('id', voteId).maybeSingle();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase.from('votes').select('*').eq('id', voteId).maybeSingle();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch vote', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch vote',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const getVoteById = withRateLimit(getVoteByIdImpl, 'read');
@@ -83,18 +108,26 @@ async function updateVoteImpl(
   voteId: string,
   updates: Partial<Omit<Vote, 'id' | 'created_at' | 'created_by'>>
 ): Promise<Vote> {
-  const { data, error } = await supabase
-    .from('votes')
-    .update(updates)
-    .eq('id', voteId)
-    .select()
-    .single();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('votes')
+      .update(updates)
+      .eq('id', voteId)
+      .select()
+      .single();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to update vote', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to update vote',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const updateVote = withRateLimit(updateVoteImpl, 'write');
@@ -104,13 +137,21 @@ export const updateVote = withRateLimit(updateVoteImpl, 'write');
  * @param voteId - Vote ID
  */
 async function deleteVoteImpl(voteId: string): Promise<void> {
-  const { error } = await supabase.from('votes').delete().eq('id', voteId);
+  return withTokenRefresh(async () => {
+    const { error } = await supabase.from('votes').delete().eq('id', voteId);
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to delete vote', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to delete vote',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  // Note: Associated vote_responses are automatically deleted via CASCADE foreign key
+    // Note: Associated vote_responses are automatically deleted via CASCADE foreign key
+  });
 }
 
 export const deleteVote = withRateLimit(deleteVoteImpl, 'write');
@@ -131,24 +172,41 @@ async function submitVoteResponseImpl(
   studentId: string,
   selectedOption: string
 ): Promise<VoteResponse> {
-  // The database has a UNIQUE constraint on (vote_id, student_id) which enforces
-  // one vote per student per poll. The constraint will automatically prevent duplicates.
+  return withTokenRefresh(async () => {
+    // The database has a UNIQUE constraint on (vote_id, student_id) which enforces
+    // one vote per student per poll. The constraint will automatically prevent duplicates.
 
-  const { data, error } = await supabase
-    .from('vote_responses')
-    .insert({ vote_id: voteId, student_id: studentId, selected_option: selectedOption })
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from('vote_responses')
+      .insert({ vote_id: voteId, student_id: studentId, selected_option: selectedOption })
+      .select()
+      .single();
 
-  if (error) {
-    // Check if error is due to unique constraint violation (duplicate vote)
-    if (error.code === '23505' && error.message.includes('vote_responses_vote_id_student_id_key')) {
-      throw new DatabaseError('You have already voted on this poll', error.code, 409, error.details, error.hint);
+    if (error) {
+      // Check if error is due to unique constraint violation (duplicate vote)
+      if (
+        error.code === '23505' &&
+        error.message.includes('vote_responses_vote_id_student_id_key')
+      ) {
+        throw new DatabaseError(
+          'You have already voted on this poll',
+          error.code,
+          409,
+          error.details,
+          error.hint
+        );
+      }
+      throw new DatabaseError(
+        error.message || 'Failed to submit vote',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
     }
-    throw new DatabaseError(error.message || 'Failed to submit vote', error.code, undefined, error.details, error.hint);
-  }
 
-  return data;
+    return data;
+  });
 }
 
 export const submitVoteResponse = withRateLimit(submitVoteResponseImpl, 'write');
@@ -159,13 +217,21 @@ export const submitVoteResponse = withRateLimit(submitVoteResponseImpl, 'write')
  * @returns Array of vote responses
  */
 async function getVoteResponsesImpl(voteId: string): Promise<VoteResponse[]> {
-  const { data, error } = await supabase.from('vote_responses').select('*').eq('vote_id', voteId);
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase.from('vote_responses').select('*').eq('vote_id', voteId);
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch vote responses', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch vote responses',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data || [];
+    return data || [];
+  });
 }
 
 export const getVoteResponses = withRateLimit(getVoteResponsesImpl, 'read');
@@ -177,19 +243,21 @@ export const getVoteResponses = withRateLimit(getVoteResponsesImpl, 'read');
  * @returns true if student has voted, false otherwise
  */
 async function hasStudentVotedImpl(voteId: string, studentId: string): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('vote_responses')
-    .select('id')
-    .eq('vote_id', voteId)
-    .eq('student_id', studentId)
-    .maybeSingle();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('vote_responses')
+      .select('id')
+      .eq('vote_id', voteId)
+      .eq('student_id', studentId)
+      .maybeSingle();
 
-  if (error) {
-    console.error('Error checking if student voted:', error);
-    return false;
-  }
+    if (error) {
+      console.error('Error checking if student voted:', error);
+      return false;
+    }
 
-  return !!data;
+    return !!data;
+  });
 }
 
 export const hasStudentVoted = withRateLimit(hasStudentVotedImpl, 'read');
@@ -200,21 +268,29 @@ export const hasStudentVoted = withRateLimit(hasStudentVotedImpl, 'read');
  * @returns Object with option counts
  */
 async function getVoteResultsImpl(voteId: string): Promise<Record<string, number>> {
-  const { data, error } = await supabase
-    .from('vote_responses')
-    .select('selected_option')
-    .eq('vote_id', voteId);
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('vote_responses')
+      .select('selected_option')
+      .eq('vote_id', voteId);
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch vote results', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch vote results',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  const results: Record<string, number> = {};
-  (data || []).forEach((response: any) => {
-    results[response.selected_option] = (results[response.selected_option] || 0) + 1;
+    const results: Record<string, number> = {};
+    (data || []).forEach((response: any) => {
+      results[response.selected_option] = (results[response.selected_option] || 0) + 1;
+    });
+
+    return results;
   });
-
-  return results;
 }
 
 export const getVoteResults = withRateLimit(getVoteResultsImpl, 'read');

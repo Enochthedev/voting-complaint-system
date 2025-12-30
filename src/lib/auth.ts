@@ -9,6 +9,7 @@
 import type { User, AuthError } from '@supabase/supabase-js';
 import type { UserRole } from './constants';
 import { supabase } from './supabase';
+import { withTokenRefresh } from './api-wrapper';
 
 /**
  * Authentication response type
@@ -191,14 +192,20 @@ export async function getUserRole(): Promise<UserRole | null> {
   }
 
   try {
-    const { data, error } = await supabase.from('users').select('role').eq('id', user.id).single();
+    return await withTokenRefresh(async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-    if (error) {
-      console.error('Error fetching user role:', error);
-      return null;
-    }
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return null;
+      }
 
-    return (data?.role as UserRole) || null;
+      return (data?.role as UserRole) || null;
+    });
   } catch (error) {
     console.error('Unexpected error fetching user role:', error);
     return null;
@@ -310,7 +317,9 @@ export async function updatePassword(newPassword: string): Promise<AuthError | n
  * @param metadata - Metadata to update
  * @returns Error if update fails, null otherwise
  */
-export async function updateUserMetadata(metadata: Record<string, unknown>): Promise<AuthError | null> {
+export async function updateUserMetadata(
+  metadata: Record<string, unknown>
+): Promise<AuthError | null> {
   try {
     const { error } = await supabase.auth.updateUser({
       data: metadata,

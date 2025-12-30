@@ -50,15 +50,15 @@ The `ComplaintList` component displays a paginated list of complaints with statu
 
 ```typescript
 interface ComplaintListProps {
-  complaints?: ComplaintWithTags[];      // Array of complaints to display
-  isLoading?: boolean;                   // Loading state
-  error?: string;                        // Error message
+  complaints?: ComplaintWithTags[]; // Array of complaints to display
+  isLoading?: boolean; // Loading state
+  error?: string; // Error message
   onComplaintClick?: (id: string) => void; // Click handler
-  currentPage?: number;                  // Current page number
-  totalPages?: number;                   // Total number of pages
+  currentPage?: number; // Current page number
+  totalPages?: number; // Total number of pages
   onPageChange?: (page: number) => void; // Page change handler
-  emptyMessage?: string;                 // Custom empty state message
-  showPagination?: boolean;              // Show/hide pagination
+  emptyMessage?: string; // Custom empty state message
+  showPagination?: boolean; // Show/hide pagination
 }
 ```
 
@@ -106,6 +106,7 @@ function MyComplaintsPage() {
 ## Mock Data
 
 The `/complaints` page includes comprehensive mock data for UI development:
+
 - 8 sample complaints with various statuses, priorities, and categories
 - Mix of anonymous and non-anonymous complaints
 - Different timestamps (from 30 minutes ago to 10 days ago)
@@ -138,6 +139,7 @@ When connecting to real APIs:
 ## Testing
 
 The component is ready for testing with:
+
 - Mock data provided in the demo page
 - All UI states (loading, error, empty, success)
 - Pagination functionality

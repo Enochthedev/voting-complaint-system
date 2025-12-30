@@ -3,7 +3,9 @@
 ## Task Status: ✅ COMPLETE (Manual Application Required)
 
 ## Overview
+
 Created RLS (Row Level Security) policies for the announcements table to control access based on user roles. The policies ensure that:
+
 - All authenticated users can view announcements
 - Only lecturers and admins can create announcements
 - Lecturers and admins can only update/delete their own announcements
@@ -11,30 +13,36 @@ Created RLS (Row Level Security) policies for the announcements table to control
 ## Files Created
 
 ### 1. Migration File
+
 **File:** `supabase/migrations/026_fix_announcements_rls.sql`
 
 This migration fixes the infinite recursion issue in the original announcements RLS policies by using JWT claims instead of querying the users table.
 
 **Key Changes:**
+
 - Uses `auth.jwt()->>'role'` instead of querying `public.users` table
 - Prevents circular dependency between announcements and users tables
 - Maintains all security requirements from the design document
 
 ### 2. Test Script
+
 **File:** `scripts/test-announcements-rls.js`
 
 Comprehensive test script that verifies all RLS policies:
+
 - ✅ SELECT: All users can view announcements
 - ✅ INSERT: Only lecturers/admins can create
 - ✅ UPDATE: Lecturers/admins can update own announcements
 - ✅ DELETE: Lecturers/admins can delete own announcements
 
 ### 3. Verification Script
+
 **File:** `scripts/verify-announcements-rls.js`
 
 Script to check if RLS policies are properly configured in the database.
 
 ### 4. Documentation
+
 **File:** `APPLY_ANNOUNCEMENTS_RLS_FIX.md`
 
 Detailed instructions for applying the RLS fix migration.
@@ -42,6 +50,7 @@ Detailed instructions for applying the RLS fix migration.
 ## RLS Policies Implemented
 
 ### Policy 1: All users view announcements (SELECT)
+
 ```sql
 CREATE POLICY "All users view announcements"
   ON public.announcements
@@ -49,10 +58,12 @@ CREATE POLICY "All users view announcements"
   TO authenticated
   USING (true);
 ```
+
 **Purpose:** Allows all authenticated users (students, lecturers, admins) to view announcements.
 **Validates:** Design Property P10, Requirement AC7
 
 ### Policy 2: Lecturers create announcements (INSERT)
+
 ```sql
 CREATE POLICY "Lecturers create announcements"
   ON public.announcements
@@ -62,10 +73,12 @@ CREATE POLICY "Lecturers create announcements"
     auth.jwt()->>'role' IN ('lecturer', 'admin')
   );
 ```
+
 **Purpose:** Only lecturers and admins can create new announcements.
 **Validates:** Design Property P10, Requirement AC7
 
 ### Policy 3: Lecturers update own announcements (UPDATE)
+
 ```sql
 CREATE POLICY "Lecturers update own announcements"
   ON public.announcements
@@ -80,10 +93,12 @@ CREATE POLICY "Lecturers update own announcements"
     auth.jwt()->>'role' IN ('lecturer', 'admin')
   );
 ```
+
 **Purpose:** Lecturers and admins can only update announcements they created.
 **Validates:** Design Property P7 (Role-Based Access), Requirement AC7
 
 ### Policy 4: Lecturers delete own announcements (DELETE)
+
 ```sql
 CREATE POLICY "Lecturers delete own announcements"
   ON public.announcements
@@ -94,6 +109,7 @@ CREATE POLICY "Lecturers delete own announcements"
     auth.jwt()->>'role' IN ('lecturer', 'admin')
   );
 ```
+
 **Purpose:** Lecturers and admins can only delete announcements they created.
 **Validates:** Design Property P7 (Role-Based Access), Requirement AC7
 
@@ -128,6 +144,7 @@ node scripts/test-announcements-rls.js
 ```
 
 **Expected Output:**
+
 ```
 ============================================================
 Testing Announcements Table RLS Policies
@@ -171,6 +188,7 @@ DELETE permissions: ✅ PASS
 ### Why JWT Claims Instead of Table Queries?
 
 **Problem:** The original policies queried the `users` table to check roles:
+
 ```sql
 EXISTS (
   SELECT 1 FROM public.users
@@ -180,17 +198,20 @@ EXISTS (
 ```
 
 This caused **infinite recursion** because:
+
 1. Announcements policy checks users table
 2. Users table has its own RLS policies
 3. Users RLS policies might reference other tables
 4. Creates circular dependency
 
 **Solution:** Use JWT claims which are already available in the session:
+
 ```sql
 auth.jwt()->>'role' IN ('lecturer', 'admin')
 ```
 
 This is:
+
 - ✅ Faster (no database query)
 - ✅ No recursion issues
 - ✅ Same security guarantees
@@ -203,15 +224,18 @@ The JWT claims are populated by migration `018_add_role_to_jwt_claims.sql`, whic
 ## Security Properties Validated
 
 ✅ **P7: Role-Based Access Control**
+
 - Students cannot create, update, or delete announcements
 - Lecturers and admins can create announcements
 - Lecturers and admins can only modify their own announcements
 
 ✅ **P10: Announcement Visibility**
+
 - All authenticated users can view all announcements
 - No private or hidden announcements
 
 ✅ **NFR2: Security**
+
 - All operations require authentication
 - Role-based permissions enforced at database level
 - Cannot bypass security through API manipulation
@@ -219,6 +243,7 @@ The JWT claims are populated by migration `018_add_role_to_jwt_claims.sql`, whic
 ## Requirements Validated
 
 ✅ **AC7: Announcements**
+
 - Lecturers/admins can create announcements ✓
 - Announcements are visible to all students ✓
 - Announcements include title, content, and timestamp ✓
@@ -227,10 +252,12 @@ The JWT claims are populated by migration `018_add_role_to_jwt_claims.sql`, whic
 ## Integration with Other Components
 
 ### Related Tables
+
 - **users**: Referenced by `created_by` foreign key
 - **notifications**: Announcements trigger notifications (future implementation)
 
 ### Related Migrations
+
 - `001_create_users_table_extension.sql`: Users table with roles
 - `014_create_announcements_table.sql`: Original table creation
 - `018_add_role_to_jwt_claims.sql`: JWT claims setup
@@ -239,11 +266,13 @@ The JWT claims are populated by migration `018_add_role_to_jwt_claims.sql`, whic
 ## Known Issues
 
 ### Issue: Original Policies Cause Infinite Recursion
+
 **Status:** ✅ FIXED in migration 026
 **Solution:** Use JWT claims instead of querying users table
 
 ### Issue: Cannot Execute SQL via Supabase Client
-**Status:** ⚠️  LIMITATION
+
+**Status:** ⚠️ LIMITATION
 **Workaround:** Apply migration manually via Supabase Dashboard
 **Reason:** Supabase REST API doesn't expose direct SQL execution endpoint
 
@@ -252,7 +281,7 @@ The JWT claims are populated by migration `018_add_role_to_jwt_claims.sql`, whic
 1. ✅ Apply the migration (see "How to Apply" section above)
 2. ✅ Run the test script to verify (see "Verification Steps" above)
 3. ✅ Update task status in tasks.md
-4. ➡️  Move to next task: Task 2.3 - Create Authentication Pages
+4. ➡️ Move to next task: Task 2.3 - Create Authentication Pages
 
 ## Files Modified/Created
 

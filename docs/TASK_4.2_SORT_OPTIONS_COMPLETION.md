@@ -3,11 +3,13 @@
 ## Status: ✅ COMPLETED
 
 ## Overview
+
 The sort options functionality for the complaint list has been fully implemented and is working as specified in the requirements.
 
 ## Implementation Details
 
 ### 1. Sort Options Available
+
 The following sort options are implemented in the FilterPanel component:
 
 - **Date Created** (`created_at`) - Sort by complaint submission date
@@ -17,31 +19,37 @@ The following sort options are implemented in the FilterPanel component:
 - **Title** (`title`) - Sort alphabetically by complaint title (bonus feature)
 
 ### 2. Sort Order
+
 Users can toggle between:
+
 - **Ascending** - Oldest to newest, lowest to highest priority, A-Z
 - **Descending** - Newest to oldest, highest to lowest priority, Z-A
 
 ### 3. UI Components
 
 #### FilterPanel Component (`src/components/complaints/filter-panel.tsx`)
+
 - Dropdown select for choosing sort field
 - Two buttons for toggling sort order (Ascending/Descending)
 - Visual indication of active sort order
 - Located in the "Sort By" section of the filter panel
 
 #### Complaints Page (`src/app/complaints/page.tsx`)
+
 - Sort logic implemented in `filteredComplaints` memo (lines 280-330)
 - Handles all sort options with proper type conversions
 - Priority ordering: `{ low: 1, medium: 2, high: 3, critical: 4 }`
 - Status ordering: `{ new: 1, opened: 2, in_progress: 3, resolved: 4, closed: 5, reopened: 6 }`
 
 ### 4. Default Behavior
+
 - Default sort: **Date Created** (created_at)
 - Default order: **Descending** (newest first)
 
 ## Requirements Validation
 
 ### AC13: Search and Advanced Filtering
+
 ✅ Sort by: date created, last updated, priority, status
 ✅ Sort results are applied to filtered complaints
 ✅ Sort works with pagination
@@ -50,6 +58,7 @@ Users can toggle between:
 ## Code Locations
 
 ### Filter Panel UI
+
 ```typescript
 // File: src/components/complaints/filter-panel.tsx
 // Lines: 60-67 (Sort options definition)
@@ -57,6 +66,7 @@ Users can toggle between:
 ```
 
 ### Sort Logic
+
 ```typescript
 // File: src/app/complaints/page.tsx
 // Lines: 280-330 (Sort implementation in filteredComplaints memo)
@@ -65,6 +75,7 @@ Users can toggle between:
 ## Testing
 
 ### Manual Testing Checklist
+
 - [x] Sort by date created (ascending/descending)
 - [x] Sort by last updated (ascending/descending)
 - [x] Sort by priority (low to critical / critical to low)
@@ -77,6 +88,7 @@ Users can toggle between:
 - [x] UI correctly shows active sort order
 
 ### Integration with Other Features
+
 - ✅ Works with status filters
 - ✅ Works with category filters
 - ✅ Works with priority filters
@@ -90,7 +102,9 @@ Users can toggle between:
 ## User Experience
 
 ### Student View
+
 Students can sort their own complaints by:
+
 - Most recent submissions (default)
 - Oldest submissions
 - Highest priority issues
@@ -98,7 +112,9 @@ Students can sort their own complaints by:
 - Alphabetically by title
 
 ### Lecturer View
+
 Lecturers can sort all complaints by:
+
 - Most recent submissions (default)
 - Last updated (to see recently modified)
 - Highest priority (to address critical issues first)
@@ -106,16 +122,19 @@ Lecturers can sort all complaints by:
 - Alphabetically for easier browsing
 
 ## Performance Considerations
+
 - Sort is performed in-memory on filtered results
 - Efficient comparison functions for each sort type
 - No additional API calls required
 - Works seamlessly with mock data (UI-first approach)
 
 ## Future Enhancements (Out of Scope)
+
 - Multi-column sorting (e.g., sort by priority, then by date)
 - Custom sort orders
 - Save sort preference per user
 - Sort by number of comments or attachments
 
 ## Conclusion
+
 The sort options feature is fully implemented and meets all requirements specified in AC13. The implementation provides a comprehensive sorting experience that works seamlessly with all other filtering and search features.

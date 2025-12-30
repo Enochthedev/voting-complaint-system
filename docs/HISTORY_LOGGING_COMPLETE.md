@@ -9,6 +9,7 @@ This document describes the comprehensive history logging system for the Student
 The system logs the following actions:
 
 ### 1. Complaint Creation ✅
+
 - **Action**: `created`
 - **Trigger**: `log_complaint_creation_trigger`
 - **When**: A new complaint is submitted (not draft)
@@ -16,6 +17,7 @@ The system logs the following actions:
 - **Migration**: `017_create_complaint_triggers.sql`
 
 ### 2. Status Changes ✅
+
 - **Action**: `status_changed`
 - **Trigger**: `complaint_status_change_trigger`
 - **When**: Complaint status is updated
@@ -23,6 +25,7 @@ The system logs the following actions:
 - **Migration**: `017_create_complaint_triggers.sql`
 
 ### 3. Assignment ✅
+
 - **Action**: `assigned` or `reassigned`
 - **Trigger**: `log_complaint_assignment_trigger`
 - **When**: Complaint is assigned or reassigned to a lecturer
@@ -30,6 +33,7 @@ The system logs the following actions:
 - **Migration**: `017_create_complaint_triggers.sql`
 
 ### 4. Feedback Addition ✅
+
 - **Action**: `feedback_added`
 - **Trigger**: `log_feedback_addition_trigger`
 - **When**: A lecturer adds feedback to a complaint
@@ -37,6 +41,7 @@ The system logs the following actions:
 - **Migration**: `037_add_missing_history_logging_triggers.sql`
 
 ### 5. Comment Addition ✅
+
 - **Action**: `comment_added`
 - **Trigger**: `log_comment_addition_trigger`
 - **When**: A user adds a comment to a complaint
@@ -44,6 +49,7 @@ The system logs the following actions:
 - **Migration**: `037_add_missing_history_logging_triggers.sql`
 
 ### 6. Comment Edit ✅
+
 - **Action**: `comment_added` (with action_type: 'edited')
 - **Trigger**: `log_comment_edit_trigger`
 - **When**: A user edits their comment
@@ -51,6 +57,7 @@ The system logs the following actions:
 - **Migration**: `037_add_missing_history_logging_triggers.sql`
 
 ### 7. Comment Deletion ✅
+
 - **Action**: `comment_added` (with action_type: 'deleted')
 - **Trigger**: `log_comment_deletion_trigger`
 - **When**: A user deletes their comment
@@ -58,6 +65,7 @@ The system logs the following actions:
 - **Migration**: `037_add_missing_history_logging_triggers.sql`
 
 ### 8. Complaint Reopening ✅
+
 - **Action**: `reopened`
 - **Logged by**: API function `reopenComplaint()`
 - **When**: A student reopens a resolved complaint
@@ -65,6 +73,7 @@ The system logs the following actions:
 - **Location**: `src/lib/api/complaints.ts`
 
 ### 9. Rating Submission ✅
+
 - **Action**: `rated`
 - **Logged by**: API function `submitRating()`
 - **When**: A student rates a resolved complaint
@@ -72,6 +81,7 @@ The system logs the following actions:
 - **Location**: `src/lib/api/complaints.ts`
 
 ### 10. Tag Addition ✅
+
 - **Action**: `tags_added`
 - **Logged by**: API function `bulkAddTags()`
 - **When**: Tags are added to a complaint
@@ -79,6 +89,7 @@ The system logs the following actions:
 - **Location**: `src/lib/api/complaints.ts`
 
 ### 11. Escalation (Future) ⏳
+
 - **Action**: `escalated`
 - **Status**: Not yet implemented
 - **When**: Auto-escalation rules trigger
@@ -141,6 +152,7 @@ Some actions are logged manually in API functions:
 3. **Tag addition** - Logged in `bulkAddTags()` function
 
 This hybrid approach ensures:
+
 - Automatic logging for most common actions
 - Flexibility for complex actions that need additional context
 - Consistency across all entry points
@@ -197,6 +209,7 @@ node scripts/verify-history-logging.js
 ```
 
 This script will:
+
 1. Create a test complaint
 2. Perform all possible actions
 3. Verify each action is logged correctly
@@ -204,6 +217,7 @@ This script will:
 5. Clean up test data
 
 Expected output:
+
 ```
 ✅ Passed: 9/9
 🎉 All tests passed! History logging is working correctly.
@@ -214,7 +228,7 @@ Expected output:
 ### Get all history for a complaint
 
 ```sql
-SELECT 
+SELECT
   h.*,
   u.full_name as performed_by_name,
   u.email as performed_by_email
@@ -237,7 +251,7 @@ ORDER BY created_at DESC;
 ### Get recent history across all complaints
 
 ```sql
-SELECT 
+SELECT
   h.*,
   c.title as complaint_title,
   u.full_name as performed_by_name
@@ -255,6 +269,7 @@ The history is displayed in the complaint detail view via the `TimelineSection` 
 **Location**: `src/components/complaints/complaint-detail/TimelineSection.tsx`
 
 The timeline shows:
+
 - Action type with appropriate icon
 - User who performed the action
 - Timestamp
@@ -281,6 +296,7 @@ The complaint_history table has RLS enabled with the following policies:
 ### Immutability
 
 The history table is designed to be immutable:
+
 - No UPDATE or DELETE policies
 - Provides a reliable audit trail
 - Cannot be tampered with after creation
@@ -297,22 +313,27 @@ The history table is designed to be immutable:
 ## Related Files
 
 ### Migrations
+
 - `supabase/migrations/005_create_complaint_history_table.sql`
 - `supabase/migrations/017_create_complaint_triggers.sql`
 - `supabase/migrations/036_add_tags_added_to_complaint_action.sql`
 - `supabase/migrations/037_add_missing_history_logging_triggers.sql` ✨ NEW
 
 ### Scripts
+
 - `scripts/apply-history-logging-triggers.js` ✨ NEW
 - `scripts/verify-history-logging.js` ✨ NEW
 
 ### API Functions
+
 - `src/lib/api/complaints.ts`
 
 ### UI Components
+
 - `src/components/complaints/complaint-detail/TimelineSection.tsx`
 
 ### Documentation
+
 - `docs/TASK_9.2_TIMELINE_COMPONENT_COMPLETION.md`
 - `docs/HISTORY_LOGGING_COMPLETE.md` ✨ NEW
 

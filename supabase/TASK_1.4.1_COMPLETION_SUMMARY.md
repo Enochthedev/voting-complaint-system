@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.complaints (
 ```
 
 **Column Specifications:**
+
 - **Name**: `search_vector`
 - **Type**: `tsvector` (PostgreSQL full-text search vector type)
 - **Nullable**: Yes (automatically populated by trigger)
@@ -36,7 +37,7 @@ The search vector is automatically populated and maintained by a trigger functio
 CREATE OR REPLACE FUNCTION public.update_complaint_search_vector()
 RETURNS TRIGGER AS $
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B');
   RETURN NEW;
@@ -45,6 +46,7 @@ $ LANGUAGE plpgsql;
 ```
 
 **Key Features:**
+
 - **Weighted Search**: Title (weight 'A') ranks higher than description (weight 'B')
 - **Language**: English text search configuration
 - **Null Safety**: Uses COALESCE to handle null values
@@ -60,6 +62,7 @@ CREATE TRIGGER update_complaints_search_vector
 ```
 
 **Trigger Details:**
+
 - **Name**: `update_complaints_search_vector`
 - **Timing**: BEFORE INSERT OR UPDATE
 - **Level**: FOR EACH ROW
@@ -70,11 +73,12 @@ CREATE TRIGGER update_complaints_search_vector
 A GIN (Generalized Inverted Index) index was created for fast searching:
 
 ```sql
-CREATE INDEX IF NOT EXISTS idx_complaints_search_vector 
+CREATE INDEX IF NOT EXISTS idx_complaints_search_vector
 ON public.complaints USING GIN(search_vector);
 ```
 
 **Index Benefits:**
+
 - O(log n) search performance
 - Efficient for large datasets
 - Supports complex text queries
@@ -85,11 +89,13 @@ ON public.complaints USING GIN(search_vector);
 ### Automated Verification
 
 Run the verification script:
+
 ```bash
 node scripts/verify-search-vector.js
 ```
 
 **Expected Output:**
+
 ```
 ✅ PASSED: search_vector column exists in complaints table
 ```
@@ -124,9 +130,9 @@ WHERE search_vector @@ to_tsquery('english', 'academic & issue');
 ### Search with Ranking
 
 ```sql
-SELECT 
-  id, 
-  title, 
+SELECT
+  id,
+  title,
   description,
   ts_rank(search_vector, to_tsquery('english', 'facilities')) as rank
 FROM public.complaints
@@ -137,8 +143,8 @@ ORDER BY rank DESC;
 ### Search with Highlighting
 
 ```sql
-SELECT 
-  id, 
+SELECT
+  id,
   title,
   ts_headline('english', description, to_tsquery('english', 'harassment')) as highlighted
 FROM public.complaints
@@ -155,15 +161,15 @@ import { createClient } from '@/lib/supabase';
 
 async function searchComplaints(searchTerm: string) {
   const supabase = createClient();
-  
+
   const { data, error } = await supabase
     .from('complaints')
     .select('*')
     .textSearch('search_vector', searchTerm, {
       type: 'websearch',
-      config: 'english'
+      config: 'english',
     });
-    
+
   return data;
 }
 ```
@@ -180,19 +186,16 @@ async function advancedSearch(
   }
 ) {
   const supabase = createClient();
-  
-  let query = supabase
-    .from('complaints')
-    .select('*')
-    .textSearch('search_vector', searchTerm, {
-      type: 'websearch',
-      config: 'english'
-    });
-    
+
+  let query = supabase.from('complaints').select('*').textSearch('search_vector', searchTerm, {
+    type: 'websearch',
+    config: 'english',
+  });
+
   if (filters.status) query = query.eq('status', filters.status);
   if (filters.category) query = query.eq('category', filters.category);
   if (filters.priority) query = query.eq('priority', filters.priority);
-  
+
   const { data, error } = await query;
   return data;
 }
@@ -201,15 +204,18 @@ async function advancedSearch(
 ## Acceptance Criteria Met
 
 ✅ **AC13**: Search and Advanced Filtering
+
 - Full-text search across complaint titles and descriptions
 - Weighted results (title matches rank higher)
 - Fast query performance with GIN index
 
 ✅ **NFR1**: Performance
+
 - Sub-second search query times
 - Efficient indexing for large datasets
 
 ✅ **NFR4**: Scalability
+
 - GIN index scales efficiently with growing data
 - Automatic maintenance via triggers
 
@@ -238,6 +244,7 @@ The search_vector column is now complete. The remaining sub-tasks for Task 1.4 a
 ### Why tsvector?
 
 PostgreSQL's `tsvector` type is specifically designed for full-text search:
+
 - Stores preprocessed, normalized text
 - Removes stop words (common words like "the", "a", "is")
 - Stems words to their root form (e.g., "running" → "run")
@@ -247,6 +254,7 @@ PostgreSQL's `tsvector` type is specifically designed for full-text search:
 ### Why Weighted Search?
 
 The implementation uses weighted search to prioritize matches:
+
 - **Weight 'A'** (highest): Title matches
 - **Weight 'B'**: Description matches
 
@@ -265,6 +273,7 @@ This ensures that complaints with matching titles rank higher than those with ma
 ### Issue: Search not returning expected results
 
 **Solution**: Ensure the search query uses proper PostgreSQL full-text search syntax:
+
 ```sql
 -- Correct: Use to_tsquery or websearch_to_tsquery
 WHERE search_vector @@ to_tsquery('english', 'term1 & term2')
@@ -276,6 +285,7 @@ WHERE search_vector LIKE '%term%'  -- This won't work!
 ### Issue: Search vector not updating
 
 **Solution**: Check if trigger is enabled:
+
 ```sql
 SELECT trigger_name, event_manipulation, action_statement
 FROM information_schema.triggers
@@ -286,6 +296,7 @@ WHERE event_object_table = 'complaints'
 ### Issue: Slow search performance
 
 **Solution**: Verify GIN index exists:
+
 ```sql
 SELECT indexname, indexdef
 FROM pg_indexes

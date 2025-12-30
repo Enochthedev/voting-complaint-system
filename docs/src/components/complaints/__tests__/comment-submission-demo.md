@@ -1,11 +1,13 @@
 # Comment Submission Implementation Demo
 
 ## Overview
+
 This document demonstrates the comment submission functionality implemented for Task 5.2.
 
 ## Implementation Summary
 
 ### 1. CommentInput Component
+
 The `CommentInput` component (`src/components/complaints/comment-input.tsx`) provides a reusable form for submitting comments with the following features:
 
 - **Form Validation**: Validates comment length (min 1, max 2000 characters by default)
@@ -13,22 +15,25 @@ The `CommentInput` component (`src/components/complaints/comment-input.tsx`) pro
 - **Internal Notes Toggle**: Lecturers can mark comments as internal (visible only to staff)
 - **Loading States**: Shows loading indicator during submission
 - **Error Handling**: Displays error messages if submission fails
-- **Keyboard Shortcuts**: 
+- **Keyboard Shortcuts**:
   - `Ctrl+Enter` or `Cmd+Enter` to submit
   - `Escape` to cancel (when in edit mode)
 - **Auto-resize Textarea**: Textarea grows with content
 - **Auto-focus Support**: Can automatically focus on mount
 
 ### 2. Comment Submission Logic
+
 The comment submission is implemented in the `CommentsSection` component within `complaint-detail-view.tsx`:
 
 #### Key Features:
+
 - **Optimistic UI Updates**: Comments appear immediately in the UI before API confirmation
 - **Mock Data for Development**: Uses mock data following the UI-first development approach
 - **State Management**: Maintains local state for comments with React hooks
 - **Error Recovery**: Properly handles and propagates errors
 
 #### Implementation Flow:
+
 1. User types comment in the `CommentInput` component
 2. Form validates the input (length, required fields)
 3. On submit, the `handleSubmit` function is called
@@ -45,12 +50,14 @@ The comment submission is implemented in the `CommentsSection` component within 
 ### 3. User Experience
 
 #### For Students:
+
 - Can add comments to their own complaints
 - See all non-internal comments
 - Comments appear immediately after submission
 - Clear visual feedback during submission
 
 #### For Lecturers/Admins:
+
 - Can add regular comments or internal notes
 - Internal notes are marked with a yellow badge
 - Can see all comments including internal ones
@@ -82,10 +89,10 @@ const handleSubmit = async (comment: string, isInternal: boolean) => {
       created_at: new Date().toISOString(),
       user: currentUser,
     };
-    
+
     // Add to local state
     setLocalComments((prev) => [...prev, newComment]);
-    
+
     // In Phase 12: Call Supabase API here
   } catch (error) {
     // Error handling
@@ -134,7 +141,7 @@ await supabase.from('complaint_history').insert({
   complaint_id: complaintId,
   action: 'comment_added',
   performed_by: currentUser.id,
-  details: { is_internal: isInternal }
+  details: { is_internal: isInternal },
 });
 
 // Note: Notifications are created automatically by database triggers
@@ -158,11 +165,13 @@ await supabase.from('complaint_history').insert({
 ## Acceptance Criteria Met
 
 ✅ **AC15**: Follow-up and Discussion System
+
 - Students can add follow-up comments to their complaints
 - Lecturers can reply to comments, creating a discussion thread
 - Comments are timestamped and attributed to users
 
 ✅ **P19**: Comment Thread Ordering
+
 - Comments are displayed in chronological order
 - New comments appear at the bottom of the list
 

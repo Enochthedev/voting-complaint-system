@@ -3,6 +3,7 @@
 ## 🔴 CRITICAL ISSUES (Fix Immediately)
 
 ### 1. **Stale Closure Bug in useAuth Hook**
+
 **File**: `src/hooks/useAuth.ts:41`
 
 **Issue**: The `user` variable in the TOKEN_REFRESHED event handler captures the value from the initial render, causing stale closures.
@@ -18,11 +19,13 @@
 ```
 
 **Impact**:
+
 - If user signs in, the `user` in the closure is still `null`
 - TOKEN_REFRESHED will always call loadUser() even when user is already loaded
 - Causes unnecessary database queries
 
 **Fix**: Use a ref or check session instead of user state
+
 ```typescript
 } else if (event === 'TOKEN_REFRESHED') {
   // Check if we need to reload based on session, not stale closure
@@ -36,6 +39,7 @@
 ---
 
 ### 2. **Missing Dependencies in useEffect**
+
 **File**: `src/hooks/useAuth.ts:61`
 
 **Issue**: useEffect dependency array is incomplete
@@ -46,11 +50,13 @@
 ```
 
 **Impact**:
+
 - React will use stale closures for queryClient and user
 - Potential memory leaks
 - Unpredictable behavior
 
 **Fix**: Add all dependencies or use refs
+
 ```typescript
 }, [router, queryClient]);
 // Note: 'user' should not be a dependency as it's set inside loadUser
@@ -60,22 +66,26 @@
 ---
 
 ### 3. **Race Condition in loadUser**
+
 **File**: `src/hooks/useAuth.ts:63`
 
 **Issue**: Multiple concurrent calls to `loadUser()` can race, causing the last one to complete to "win"
 
 **Scenario**:
+
 1. Component mounts → calls `loadUser()` (Request A)
 2. SIGNED_IN event fires → calls `loadUser()` (Request B)
 3. Request B completes first → sets user
 4. Request A completes second → overwrites with potentially stale data
 
 **Impact**:
+
 - User data may be incorrect
 - Loading states may be incorrect
 - Race conditions hard to debug
 
 **Fix**: Implement request cancellation or debouncing
+
 ```typescript
 const loadUserRef = useRef(0);
 
@@ -100,6 +110,7 @@ const loadUser = async () => {
 ---
 
 ### 4. **Hard Redirect Loses Application State**
+
 **File**: `src/lib/api-wrapper.ts:32, 61`
 
 **Issue**: Using `window.location.href` causes hard page reload, losing all React state
@@ -112,6 +123,7 @@ if (typeof window !== 'undefined') {
 ```
 
 **Impact**:
+
 - User loses form data
 - Navigation stack lost
 - Poor UX
@@ -119,9 +131,13 @@ if (typeof window !== 'undefined') {
 **Fix**: Import and use Next.js router (but this won't work in api-wrapper as it's not a React component)
 
 **Alternative Fix**: Throw a specific error that components can catch
+
 ```typescript
 export class SessionExpiredError extends Error {
-  constructor(message: string, public reason: string) {
+  constructor(
+    message: string,
+    public reason: string
+  ) {
     super(message);
     this.name = 'SessionExpiredError';
   }
@@ -143,17 +159,20 @@ try {
 ---
 
 ### 5. **Infinite Loop Risk in withTokenRefresh**
+
 **File**: `src/lib/api-wrapper.ts:70`
 
 **Issue**: If refresh succeeds but API call still fails with auth error, it could retry indefinitely
 
 **Current Flow**:
+
 1. API call fails with auth error
 2. Refresh token
 3. Retry API call
 4. If still auth error... infinite loop? (Actually no, but risk exists)
 
 **Fix**: Add retry counter
+
 ```typescript
 export async function withTokenRefresh<T>(
   apiCall: () => Promise<T>,
@@ -183,15 +202,18 @@ export async function withTokenRefresh<T>(
 ## 🟡 HIGH PRIORITY ISSUES (Fix Soon)
 
 ### 6. **No Request Deduplication**
+
 **Issue**: Multiple components can trigger the same API call simultaneously
 
 **Example**:
+
 - User navigates to /complaints
 - ComplaintsPage component mounts → calls `useAllComplaints()`
 - ComplaintsHeader component mounts → calls `useAllComplaints()`
 - Same API called twice simultaneously
 
 **Impact**:
+
 - Wasted bandwidth
 - Increased server load
 - Rate limit exhaustion
@@ -201,14 +223,17 @@ export async function withTokenRefresh<T>(
 ---
 
 ### 7. **Missing Error Boundaries for Async Operations**
+
 **Issue**: Errors in async operations (mutations) aren't caught by ErrorBoundary
 
 **Impact**:
+
 - Silent failures
 - User sees loading state forever
 - Data inconsistency
 
 **Fix**: Add error handling in mutation hooks
+
 ```typescript
 export function useCreateComplaint() {
   const queryClient = useQueryClient();
@@ -226,15 +251,18 @@ export function useCreateComplaint() {
 ---
 
 ### 8. **Role Cache Not Invalidated on User Deletion**
+
 **File**: `src/lib/role-cache.ts`
 
 **Issue**: If admin deletes a user, their role remains in cache for 5 minutes
 
 **Impact**:
+
 - Deleted users can still access system for up to 5 minutes
 - Security risk
 
 **Fix**: Add cache invalidation to user deletion function
+
 ```typescript
 export const deleteUser = async (userId: string) => {
   // ... delete user logic ...
@@ -250,15 +278,18 @@ export const deleteUser = async (userId: string) => {
 ---
 
 ### 9. **No Cleanup in Rate Limiter**
+
 **File**: `src/lib/rate-limiter.ts:72`
 
 **Issue**: Rate limiter creates an interval in constructor but only cleans up when explicitly destroyed
 
 **Impact**:
+
 - Memory leak in long-running servers
 - Interval continues running even if not needed
 
 **Fix**: Already has cleanup, but ensure it's called
+
 ```typescript
 // In Next.js middleware or app shutdown
 if (process.env.NODE_ENV === 'production') {
@@ -271,14 +302,17 @@ if (process.env.NODE_ENV === 'production') {
 ---
 
 ### 10. **Missing Input Validation**
+
 **Issue**: No validation layer before API calls
 
 **Impact**:
+
 - Invalid data sent to database
 - Potential SQL injection (mitigated by Supabase, but still risky)
 - Poor error messages
 
 **Fix**: Add Zod schemas for validation
+
 ```typescript
 import { z } from 'zod';
 
@@ -307,13 +341,16 @@ export const createComplaint = async (complaint: unknown) => {
 ## 🟢 MEDIUM PRIORITY ISSUES (Consider Fixing)
 
 ### 11. **No Optimistic Updates**
+
 **Issue**: All mutations wait for server response before updating UI
 
 **Impact**:
+
 - Slow perceived performance
 - User waits for network roundtrip
 
 **Fix**: Add optimistic updates to mutations
+
 ```typescript
 export function useUpdateComplaint() {
   const queryClient = useQueryClient();
@@ -346,13 +383,16 @@ export function useUpdateComplaint() {
 ---
 
 ### 12. **Large Bundle Size from Lazy Loading**
+
 **Issue**: Lazy loading individual components instead of route-level code splitting
 
 **Impact**:
+
 - Slower initial page load
 - Many small chunks instead of few large chunks
 
 **Fix**: Use route-level code splitting in Next.js
+
 ```typescript
 // app/complaints/page.tsx
 export default async function ComplaintsPage() {
@@ -366,13 +406,16 @@ const ComplaintForm = lazy(() => import('./ComplaintForm'));
 ---
 
 ### 13. **No Database Connection Pooling Monitoring**
+
 **Issue**: No visibility into Supabase connection pool usage
 
 **Impact**:
+
 - Can't detect connection pool exhaustion
 - Hard to debug performance issues
 
 **Fix**: Add monitoring
+
 ```typescript
 // Create a monitoring utility
 export async function checkDatabaseHealth() {
@@ -387,13 +430,16 @@ export async function checkDatabaseHealth() {
 ---
 
 ### 14. **Missing Indexes Documentation**
+
 **Issue**: No documentation of required database indexes
 
 **Impact**:
+
 - Slow queries
 - Hard to optimize performance
 
 **Fix**: Document indexes
+
 ```sql
 -- Add to documentation
 CREATE INDEX idx_complaints_student_id ON complaints(student_id);
@@ -405,13 +451,16 @@ CREATE INDEX idx_complaint_tags_complaint_id ON complaint_tags(complaint_id);
 ---
 
 ### 15. **No Request Timeout**
+
 **Issue**: API calls can hang indefinitely
 
 **Impact**:
+
 - User stuck on loading screen
 - Resource waste
 
 **Fix**: Add timeout to Supabase client or use AbortController
+
 ```typescript
 export async function createComplaintWithTimeout(complaint: unknown) {
   const controller = new AbortController();
@@ -439,9 +488,11 @@ export async function createComplaintWithTimeout(complaint: unknown) {
 ## 🔵 LOW PRIORITY ISSUES (Nice to Have)
 
 ### 16. **No Compression for API Responses**
+
 **Issue**: Large API responses not compressed
 
 **Fix**: Enable compression in Next.js config
+
 ```typescript
 // next.config.ts
 module.exports = {
@@ -452,6 +503,7 @@ module.exports = {
 ---
 
 ### 17. **No Service Worker for Offline Support**
+
 **Issue**: App doesn't work offline
 
 **Fix**: Add service worker for basic offline support
@@ -459,6 +511,7 @@ module.exports = {
 ---
 
 ### 18. **Missing Telemetry/Analytics**
+
 **Issue**: No visibility into user behavior or errors
 
 **Fix**: Add error tracking (Sentry) and analytics
@@ -466,6 +519,7 @@ module.exports = {
 ---
 
 ### 19. **No A/B Testing Framework**
+
 **Issue**: Can't test UI variations
 
 **Fix**: Add feature flags library
@@ -473,6 +527,7 @@ module.exports = {
 ---
 
 ### 20. **Missing Accessibility Audit**
+
 **Issue**: Unknown WCAG compliance level
 
 **Fix**: Run Lighthouse accessibility audit
@@ -481,18 +536,18 @@ module.exports = {
 
 ## Summary Table
 
-| Priority | Issue | Impact | Effort |
-|----------|-------|--------|--------|
-| 🔴 Critical | Stale Closure in useAuth | High | Low |
-| 🔴 Critical | Missing useEffect Dependencies | High | Low |
-| 🔴 Critical | Race Condition in loadUser | High | Medium |
-| 🔴 Critical | Hard Redirect Loses State | Medium | Low |
-| 🔴 Critical | Infinite Loop Risk | Medium | Low |
-| 🟡 High | No Request Deduplication | Medium | Low (already handled by React Query) |
-| 🟡 High | Missing Error Boundaries | Medium | Medium |
-| 🟡 High | Role Cache Not Invalidated | High | Low |
-| 🟡 High | No Cleanup in Rate Limiter | Low | Low |
-| 🟡 High | Missing Input Validation | Medium | High |
+| Priority    | Issue                          | Impact | Effort                               |
+| ----------- | ------------------------------ | ------ | ------------------------------------ |
+| 🔴 Critical | Stale Closure in useAuth       | High   | Low                                  |
+| 🔴 Critical | Missing useEffect Dependencies | High   | Low                                  |
+| 🔴 Critical | Race Condition in loadUser     | High   | Medium                               |
+| 🔴 Critical | Hard Redirect Loses State      | Medium | Low                                  |
+| 🔴 Critical | Infinite Loop Risk             | Medium | Low                                  |
+| 🟡 High     | No Request Deduplication       | Medium | Low (already handled by React Query) |
+| 🟡 High     | Missing Error Boundaries       | Medium | Medium                               |
+| 🟡 High     | Role Cache Not Invalidated     | High   | Low                                  |
+| 🟡 High     | No Cleanup in Rate Limiter     | Low    | Low                                  |
+| 🟡 High     | Missing Input Validation       | Medium | High                                 |
 
 ---
 

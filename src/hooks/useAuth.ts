@@ -132,7 +132,11 @@ export function useAuth() {
         // Only redirect if not already on login/register/reset-password pages
         if (typeof window !== 'undefined') {
           const pathname = window.location.pathname;
-          if (!pathname.startsWith('/login') && !pathname.startsWith('/register') && !pathname.startsWith('/reset-password')) {
+          if (
+            !pathname.startsWith('/login') &&
+            !pathname.startsWith('/register') &&
+            !pathname.startsWith('/reset-password')
+          ) {
             router.push('/login');
           }
         }

@@ -16,9 +16,11 @@ The feedback form allows lecturers to provide detailed feedback on student compl
 ## Components Created
 
 ### 1. FeedbackForm Component
+
 **Location**: `src/components/complaints/feedback-form.tsx`
 
 **Features**:
+
 - Rich text editor with formatting options
 - Minimum 10 characters, maximum 5000 characters
 - Real-time character count
@@ -29,17 +31,19 @@ The feedback form allows lecturers to provide detailed feedback on student compl
 - Cancel functionality
 
 **Props**:
+
 ```typescript
 interface FeedbackFormProps {
-  complaintId: string;           // ID of the complaint
-  onSubmit?: (content: string) => Promise<void>;  // Submit callback
-  onCancel?: () => void;         // Cancel callback
-  existingFeedback?: Feedback;   // For editing existing feedback
-  isEditing?: boolean;           // Edit mode flag
+  complaintId: string; // ID of the complaint
+  onSubmit?: (content: string) => Promise<void>; // Submit callback
+  onCancel?: () => void; // Cancel callback
+  existingFeedback?: Feedback; // For editing existing feedback
+  isEditing?: boolean; // Edit mode flag
 }
 ```
 
 **Usage Example**:
+
 ```tsx
 import { FeedbackForm } from '@/components/complaints';
 
@@ -67,9 +71,11 @@ import { FeedbackForm } from '@/components/complaints';
 ```
 
 ### 2. FeedbackDisplay Component
+
 **Location**: `src/components/complaints/feedback-display.tsx`
 
 **Features**:
+
 - Display all feedback in chronological order
 - Show lecturer information and avatar
 - Relative timestamps (e.g., "2 hours ago")
@@ -80,18 +86,20 @@ import { FeedbackForm } from '@/components/complaints';
 - Inline editing mode
 
 **Props**:
+
 ```typescript
 interface FeedbackDisplayProps {
-  complaintId: string;           // ID of the complaint
+  complaintId: string; // ID of the complaint
   feedback?: FeedbackWithUser[]; // Array of feedback entries
-  userRole?: 'student' | 'lecturer' | 'admin';  // Current user role
-  currentUserId?: string;        // Current user ID
-  onAddFeedback?: () => void;    // Add feedback callback
-  onEditFeedback?: (feedbackId: string) => void;  // Edit callback
+  userRole?: 'student' | 'lecturer' | 'admin'; // Current user role
+  currentUserId?: string; // Current user ID
+  onAddFeedback?: () => void; // Add feedback callback
+  onEditFeedback?: (feedbackId: string) => void; // Edit callback
 }
 ```
 
 **Usage Example**:
+
 ```tsx
 import { FeedbackDisplay } from '@/components/complaints';
 
@@ -102,17 +110,19 @@ import { FeedbackDisplay } from '@/components/complaints';
   currentUserId="lecturer-456"
   onAddFeedback={() => console.log('Adding feedback')}
   onEditFeedback={(id) => console.log('Editing feedback:', id)}
-/>
+/>;
 ```
 
 ## UI States
 
 ### 1. Empty State (No Feedback)
+
 - Shows empty state icon and message
 - "Add Feedback" button for lecturers
 - Clean, centered layout
 
 ### 2. Add Feedback Mode
+
 - Rich text editor with formatting toolbar
 - Character counter
 - Validation messages
@@ -120,6 +130,7 @@ import { FeedbackDisplay } from '@/components/complaints';
 - Info alert about notification
 
 ### 3. Display Feedback
+
 - Lecturer avatar and name
 - Timestamp with relative time
 - Formatted feedback content
@@ -127,22 +138,26 @@ import { FeedbackDisplay } from '@/components/complaints';
 - "Edited" indicator if modified
 
 ### 4. Edit Feedback Mode
+
 - Pre-filled with existing content
 - Same editor as add mode
 - Update and Cancel buttons
 - Time limit notice
 
 ### 5. Loading State
+
 - Disabled form during submission
 - Loading spinner on submit button
 - "Sending..." or "Updating..." text
 
 ### 6. Success State
+
 - Green success alert
 - Confirmation message
 - Auto-close after 2 seconds
 
 ### 7. Error State
+
 - Red error alert
 - Error message
 - Form remains open for retry
@@ -193,7 +208,7 @@ function ComplaintDetailPage({ complaintId }) {
   return (
     <div className="space-y-6">
       {/* Other complaint details */}
-      
+
       {/* Feedback Section */}
       <FeedbackDisplay
         complaintId={complaintId}
@@ -211,6 +226,7 @@ function ComplaintDetailPage({ complaintId }) {
 When implementing real API integration in Phase 12:
 
 1. **Submit Feedback**:
+
    ```typescript
    await supabase.from('feedback').insert({
      complaint_id: complaintId,
@@ -220,13 +236,16 @@ When implementing real API integration in Phase 12:
    ```
 
 2. **Update Feedback**:
+
    ```typescript
-   await supabase.from('feedback')
+   await supabase
+     .from('feedback')
      .update({ content, updated_at: new Date().toISOString() })
      .eq('id', feedbackId);
    ```
 
 3. **Create Notification**:
+
    ```typescript
    await supabase.from('notifications').insert({
      user_id: complaint.student_id,
@@ -238,6 +257,7 @@ When implementing real API integration in Phase 12:
    ```
 
 4. **Log History**:
+
    ```typescript
    await supabase.from('complaint_history').insert({
      complaint_id: complaintId,
@@ -290,6 +310,7 @@ When implementing real API integration in Phase 12:
 ## Related Requirements
 
 This implementation addresses:
+
 - **AC5**: Feedback System
   - Lecturers can write and send feedback on complaints
   - Students receive notifications when feedback is provided

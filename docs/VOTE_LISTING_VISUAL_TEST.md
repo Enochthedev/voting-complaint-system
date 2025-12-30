@@ -11,7 +11,9 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ## Test Scenarios
 
 ### Scenario 1: Empty State
+
 **Steps**:
+
 1. Navigate to `/admin/votes`
 2. If no votes exist, you should see:
    - Empty state card with vote icon
@@ -23,7 +25,9 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 2: Create New Vote
+
 **Steps**:
+
 1. Click "Create Vote" button
 2. Fill in the form:
    - Title: "Preferred Study Hours"
@@ -32,7 +36,8 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
    - Set closing date (optional)
 3. Click "Create Vote"
 
-**Expected Result**: 
+**Expected Result**:
+
 - Form validates inputs
 - Vote is created successfully
 - Redirected to vote list
@@ -41,11 +46,14 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 3: View Active Votes
+
 **Steps**:
+
 1. Navigate to `/admin/votes`
 2. Observe the active votes section
 
 **Expected Result**:
+
 - Each vote card shows:
   - Title and description
   - "Active" badge (green)
@@ -58,11 +66,14 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 4: Expand Vote Results
+
 **Steps**:
+
 1. Click "Show Details" button on any vote
 2. Observe the expanded results
 
 **Expected Result**:
+
 - Results expand to show:
   - Each option with vote count
   - Percentage for each option
@@ -73,12 +84,15 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 5: Edit Vote
+
 **Steps**:
+
 1. Click "Edit" button on any vote
 2. Modify the title or description
 3. Click "Update Vote"
 
 **Expected Result**:
+
 - Form opens with pre-filled data
 - Changes are saved
 - Redirected back to vote list
@@ -87,11 +101,14 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 6: Close Vote
+
 **Steps**:
+
 1. Click "Close Vote" button on an active vote
 2. Observe the changes
 
 **Expected Result**:
+
 - Vote moves from "Active Polls" to "Closed Polls" section
 - Badge changes from "Active" to "Closed"
 - Card becomes slightly transparent (opacity-75)
@@ -101,11 +118,14 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 7: Reopen Vote
+
 **Steps**:
+
 1. Click "Reopen Vote" button on a closed vote
 2. Observe the changes
 
 **Expected Result**:
+
 - Vote moves from "Closed Polls" back to "Active Polls"
 - Badge changes from "Closed" to "Active"
 - Card returns to full opacity
@@ -114,11 +134,14 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 8: Delete Vote
+
 **Steps**:
+
 1. Click "Delete" button on any vote
 2. Confirm deletion in the dialog
 
 **Expected Result**:
+
 - Confirmation dialog appears
 - After confirmation, vote is removed from list
 - If it was the last vote, empty state appears
@@ -126,22 +149,28 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ---
 
 ### Scenario 9: Loading State
+
 **Steps**:
+
 1. Refresh the page
 2. Observe the loading state (may be brief)
 
 **Expected Result**:
+
 - 3 skeleton cards with pulsing animation
 - Skeleton shows placeholder for title, description, and buttons
 
 ---
 
 ### Scenario 10: Error Handling
+
 **Steps**:
+
 1. Simulate an error (disconnect network, etc.)
 2. Try to perform an action
 
 **Expected Result**:
+
 - Red alert banner appears at top
 - Error message is displayed
 - Page remains functional
@@ -152,18 +181,21 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 ## Visual Checks
 
 ### Layout
+
 - [ ] Page is centered with max-width container
 - [ ] Proper spacing between elements
 - [ ] Responsive on mobile, tablet, and desktop
 - [ ] Cards have consistent padding and borders
 
 ### Typography
+
 - [ ] Page title is large and bold
 - [ ] Descriptions are readable
 - [ ] Vote titles stand out
 - [ ] Dates and counts are subtle but readable
 
 ### Colors
+
 - [ ] Active badge is green
 - [ ] Closed badge is gray/secondary
 - [ ] Progress bars use primary color
@@ -171,6 +203,7 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 - [ ] Error alerts are red
 
 ### Interactions
+
 - [ ] Buttons have hover states
 - [ ] Cards don't have hover effects (static)
 - [ ] Expand/collapse is smooth
@@ -178,6 +211,7 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 - [ ] Disabled states are visible
 
 ### Accessibility
+
 - [ ] All buttons have clear labels
 - [ ] Icons have proper sizing
 - [ ] Color contrast is sufficient
@@ -191,6 +225,7 @@ This page allows lecturers/admins to manage voting polls, view results, and cont
 The page uses mock data from `src/lib/api/votes.ts`:
 
 **Default Mock Votes**:
+
 1. "Preferred Study Hours" - Active, 4 options
 2. "Campus WiFi Improvement Priority" - Active, 5 options
 
@@ -201,6 +236,7 @@ The page uses mock data from `src/lib/api/votes.ts`:
 ## Integration Points
 
 ### Components Used:
+
 - `VoteForm` - For creating/editing votes
 - `Card` - For vote containers
 - `Button` - For all actions
@@ -208,6 +244,7 @@ The page uses mock data from `src/lib/api/votes.ts`:
 - `Alert` - For error messages
 
 ### API Functions Used:
+
 - `getVotes()` - Fetch votes by lecturer
 - `deleteVote()` - Remove a vote
 - `closeVote()` - Mark as inactive
@@ -219,6 +256,7 @@ The page uses mock data from `src/lib/api/votes.ts`:
 ## Phase 12 Notes
 
 When connecting to real APIs:
+
 - Replace `mockLecturerId` with actual auth user ID
 - Update API calls to use Supabase
 - Add real-time updates for vote counts
@@ -251,7 +289,7 @@ These will be addressed in Phase 12 during API integration.
 ✅ Error handling works  
 ✅ Responsive on all screen sizes  
 ✅ Follows design system tokens  
-✅ Accessible and keyboard-friendly  
+✅ Accessible and keyboard-friendly
 
 ---
 

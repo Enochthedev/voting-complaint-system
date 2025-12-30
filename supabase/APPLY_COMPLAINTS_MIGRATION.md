@@ -5,6 +5,7 @@
 ### Step 1: Ensure Prerequisites
 
 Before applying this migration, make sure:
+
 - ✅ You have applied `001_create_users_table_extension.sql`
 - ✅ Your Supabase project is set up
 - ✅ You have access to the Supabase Dashboard
@@ -125,27 +126,33 @@ DELETE FROM public.complaints WHERE title IN ('Test Complaint', 'Anonymous Test'
 ## What Was Created
 
 ### Tables
+
 - ✅ `public.complaints` - Main complaints table with 18 columns
 
 ### Enums
+
 - ✅ `complaint_category` - 6 values (academic, facilities, harassment, course_content, administrative, other)
 - ✅ `complaint_priority` - 4 values (low, medium, high, critical)
 - ✅ `complaint_status` - 7 values (draft, new, opened, in_progress, resolved, closed, reopened)
 
 ### Indexes
+
 - ✅ 8 single-column indexes
 - ✅ 3 composite indexes
 - ✅ 1 GIN index for full-text search
 
 ### Constraints
+
 - ✅ `anonymous_complaint_check` - Ensures anonymous complaints have no student_id
 - ✅ `draft_status_check` - Ensures drafts have 'draft' status
 
 ### Triggers
+
 - ✅ `update_complaints_search_vector` - Auto-updates search vector
 - ✅ `update_complaints_updated_at` - Auto-updates timestamp
 
 ### RLS Policies
+
 - ✅ "Students view own complaints" - SELECT policy
 - ✅ "Students insert complaints" - INSERT policy
 - ✅ "Students update own drafts" - UPDATE policy
@@ -176,7 +183,8 @@ DELETE FROM public.complaints WHERE title IN ('Test Complaint', 'Anonymous Test'
 
 **Cause**: Trying to insert invalid data
 
-**Solution**: 
+**Solution**:
+
 - For anonymous complaints: Set `student_id = NULL` and `is_anonymous = true`
 - For drafts: Set `is_draft = true` and `status = 'draft'`
 
@@ -197,6 +205,7 @@ After successfully applying this migration:
 ## Support
 
 If you encounter issues:
+
 1. Check the verification script output
 2. Review the troubleshooting section above
 3. Consult the full documentation

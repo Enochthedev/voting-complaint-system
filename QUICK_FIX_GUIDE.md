@@ -31,6 +31,7 @@ supabase db push
 ```
 
 **Alternative:** Apply migration manually via Supabase Dashboard:
+
 1. Go to: https://app.supabase.com/project/<your-project>/sql
 2. Paste contents of `supabase/migrations/035_final_secure_user_creation.sql`
 3. Click "Run"
@@ -47,25 +48,29 @@ npm run dev
 ## Step 4: Test the Fixes
 
 ### Test 1: Route Protection
+
 1. Open browser in incognito mode
 2. Navigate to: `http://localhost:3001/dashboard`
 3. ✅ Should redirect to `/login`
 
 ### Test 2: Authentication
+
 1. Login with valid credentials
 2. ✅ Should redirect to `/dashboard`
 3. Access should be granted
 
 ### Test 3: Role-Based Access
+
 1. Login as student
 2. Try to access: `http://localhost:3001/admin`
 3. ✅ Should redirect to `/dashboard?error=unauthorized`
 
 ### Test 4: Secure User Creation
+
 1. Create new user via `/register`
 2. Check database:
    ```sql
-   SELECT id, email, role FROM public.users 
+   SELECT id, email, role FROM public.users
    WHERE email = 'newuser@example.com';
    ```
 3. ✅ Role should be 'student'
@@ -75,13 +80,13 @@ npm run dev
 Run this SQL query to check for any suspicious user roles:
 
 ```sql
-SELECT 
-  id, 
-  email, 
-  role, 
+SELECT
+  id,
+  email,
+  role,
   created_at,
   updated_at
-FROM public.users 
+FROM public.users
 WHERE role IN ('admin', 'lecturer')
 ORDER BY created_at DESC;
 ```
@@ -91,12 +96,14 @@ Review the results and verify only legitimate users have elevated roles.
 ## What's Been Fixed?
 
 ### Before:
+
 ❌ No server-side route protection
 ❌ Users could escalate privileges via signup metadata
 ❌ Roles stored in untrusted user metadata
 ❌ Client-side only authentication checks
 
 ### After:
+
 ✅ Server-side middleware protects all routes
 ✅ All new users get 'student' role (cannot escalate)
 ✅ Roles stored in database (single source of truth)
@@ -126,7 +133,7 @@ To upgrade a user's role (admin only):
 ```sql
 -- Must be run by an admin or via admin panel
 SELECT update_user_role(
-  '<user_id>'::uuid, 
+  '<user_id>'::uuid,
   'lecturer'::user_role
 );
 ```

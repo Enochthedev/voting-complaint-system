@@ -3,11 +3,13 @@
 ## 🚀 Quick Reference
 
 ### Installation
+
 Already installed! React Query is configured and ready to use.
 
 ### Basic Usage
 
 #### 1. Fetching Data (Query)
+
 ```tsx
 import { useUserComplaints } from '@/hooks/use-complaints';
 
@@ -22,6 +24,7 @@ function MyComponent({ userId }: { userId: string }) {
 ```
 
 #### 2. Mutating Data (Create/Update/Delete)
+
 ```tsx
 import { useCreateComplaint } from '@/hooks/use-complaints';
 
@@ -39,10 +42,7 @@ function CreateForm() {
   };
 
   return (
-    <button 
-      onClick={handleSubmit}
-      disabled={createMutation.isPending}
-    >
+    <button onClick={handleSubmit} disabled={createMutation.isPending}>
       {createMutation.isPending ? 'Creating...' : 'Create'}
     </button>
   );
@@ -52,26 +52,28 @@ function CreateForm() {
 ## 📚 Available Hooks
 
 ### Complaints
+
 ```tsx
 // Queries
-useUserComplaints(userId)
-useUserDrafts(userId)
-useUserComplaintStats(userId)
-useComplaint(id)
-useAllComplaints()
+useUserComplaints(userId);
+useUserDrafts(userId);
+useUserComplaintStats(userId);
+useComplaint(id);
+useAllComplaints();
 
 // Mutations
-useCreateComplaint()
-useUpdateComplaint()
-useDeleteComplaint()
-useReopenComplaint()
-useSubmitRating()
-useBulkAssignComplaints()
-useBulkChangeStatus()
-useBulkAddTags()
+useCreateComplaint();
+useUpdateComplaint();
+useDeleteComplaint();
+useReopenComplaint();
+useSubmitRating();
+useBulkAssignComplaints();
+useBulkChangeStatus();
+useBulkAddTags();
 ```
 
 ### Notifications
+
 ```tsx
 // Queries
 useNotifications(limit?)
@@ -83,11 +85,13 @@ useMarkAllAsRead()
 ```
 
 ### Announcements
+
 ```tsx
-useRecentAnnouncements(limit)
+useRecentAnnouncements(limit);
 ```
 
 ### Votes
+
 ```tsx
 useVotes(filters?)
 useHasStudentVoted(voteId, studentId)
@@ -96,6 +100,7 @@ useHasStudentVoted(voteId, studentId)
 ## 🎯 Common Patterns
 
 ### Loading State
+
 ```tsx
 const { data, isLoading } = useUserComplaints(userId);
 
@@ -105,6 +110,7 @@ if (isLoading) {
 ```
 
 ### Error Handling
+
 ```tsx
 const { data, error } = useUserComplaints(userId);
 
@@ -114,6 +120,7 @@ if (error) {
 ```
 
 ### Conditional Fetching
+
 ```tsx
 // Only fetch if userId exists
 const { data } = useUserComplaints(userId, {
@@ -122,13 +129,15 @@ const { data } = useUserComplaints(userId, {
 ```
 
 ### Manual Refetch
+
 ```tsx
 const { data, refetch } = useUserComplaints(userId);
 
-<button onClick={() => refetch()}>Refresh</button>
+<button onClick={() => refetch()}>Refresh</button>;
 ```
 
 ### Mutation with Callbacks
+
 ```tsx
 const mutation = useCreateComplaint();
 
@@ -148,6 +157,7 @@ mutation.mutate(data, {
 ## 🔧 DevTools
 
 Press the floating React Query icon in development mode to:
+
 - View all active queries
 - Inspect cache contents
 - Manually trigger refetches

@@ -29,22 +29,23 @@ To visually verify that notification icons and colors are working correctly:
 
 #### Notification Types and Their Visual Appearance:
 
-| Type | Icon | Color | Example |
-|------|------|-------|---------|
-| New Complaint | 📄 FileText | Purple | "New Complaint Submitted" |
-| Complaint Assigned | 👤 UserPlus | Blue | "Complaint Assigned to You" |
-| Comment Added | 💬 MessageSquare | Green | "New Comment on Your Complaint" |
-| Feedback Received | 💬 MessageSquare | Green | "Feedback Received" |
-| Status Changed | ⚠️ AlertCircle | Orange | "Complaint Status Updated" |
-| Complaint Escalated | 📈 TrendingUp | Red | "Complaint Escalated" |
-| Complaint Opened | 📄 FileText | Purple | "Complaint Opened" |
-| Complaint Reopened | ⚠️ AlertCircle | Yellow | "Complaint Reopened" |
-| New Announcement | 🔔 Bell | Indigo | "New Announcement" |
-| New Vote | 📄 FileText | Cyan | "New Vote Available" |
+| Type                | Icon             | Color  | Example                         |
+| ------------------- | ---------------- | ------ | ------------------------------- |
+| New Complaint       | 📄 FileText      | Purple | "New Complaint Submitted"       |
+| Complaint Assigned  | 👤 UserPlus      | Blue   | "Complaint Assigned to You"     |
+| Comment Added       | 💬 MessageSquare | Green  | "New Comment on Your Complaint" |
+| Feedback Received   | 💬 MessageSquare | Green  | "Feedback Received"             |
+| Status Changed      | ⚠️ AlertCircle   | Orange | "Complaint Status Updated"      |
+| Complaint Escalated | 📈 TrendingUp    | Red    | "Complaint Escalated"           |
+| Complaint Opened    | 📄 FileText      | Purple | "Complaint Opened"              |
+| Complaint Reopened  | ⚠️ AlertCircle   | Yellow | "Complaint Reopened"            |
+| New Announcement    | 🔔 Bell          | Indigo | "New Announcement"              |
+| New Vote            | 📄 FileText      | Cyan   | "New Vote Available"            |
 
 ### 4. Mock Data Available
 
 The system includes 10 mock notifications covering all types:
+
 - 5 unread notifications (with blue dot indicator)
 - 5 read notifications
 - Various timestamps (5 minutes ago to 8 days ago)
@@ -61,10 +62,12 @@ The system includes 10 mock notifications covering all types:
 ### 6. Color Scheme Verification
 
 **Dropdown View:**
+
 - Icons use text color classes (e.g., `text-red-500`)
 - Clean, minimal appearance
 
 **Full Page View:**
+
 - Icons use text color + background color (e.g., `text-red-500 bg-red-500/10`)
 - Circular backgrounds with 10% opacity
 - More prominent visual distinction
@@ -79,11 +82,13 @@ The system includes 10 mock notifications covering all types:
 ## Troubleshooting
 
 If notifications don't appear:
+
 1. Check that `USE_MOCK_DATA = true` in `src/lib/api/notifications.ts`
 2. Verify you're logged in (mock auth should work)
 3. Check browser console for errors
 
 If colors don't appear:
+
 1. Verify Tailwind CSS is properly configured
 2. Check that color classes are not being purged
 3. Ensure dark mode toggle (if any) is working correctly
@@ -91,6 +96,7 @@ If colors don't appear:
 ## Next Steps
 
 After visual verification:
+
 - ✅ Task completed: Show notification icons and colors by type
 - ⏳ Next task: Implement real-time subscriptions (Task 6.3)
 - ⏳ Future: Connect to real Supabase API (Phase 12)

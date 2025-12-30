@@ -1,24 +1,29 @@
 # Assignment Dropdown - Visual Demo
 
 ## Overview
+
 The assignment dropdown has been successfully implemented in the complaint detail view. This feature allows lecturers and admins to assign or reassign complaints to specific lecturers or admins.
 
 ## Location
+
 - **Component**: `ComplaintDetailView` in `src/components/complaints/complaint-detail-view.tsx`
 - **Section**: Action Buttons (Lecturer/Admin view only)
 
 ## Features Implemented
 
 ### 1. Assignment Button
+
 - Located in the action buttons section for lecturers/admins
 - Opens a modal dialog when clicked
 - Shows "Assign" text with a User icon
 
 ### 2. Assignment Modal
+
 The modal includes:
+
 - **Title**: "Assign Complaint"
 - **Current Assignment Display**: Shows who the complaint is currently assigned to (if anyone)
-- **Lecturer/Admin Dropdown**: 
+- **Lecturer/Admin Dropdown**:
   - Lists all available lecturers and admins
   - Shows full name, role, and email for each option
   - Pre-selects current assignment if exists
@@ -26,7 +31,9 @@ The modal includes:
 - **Action Buttons**: Cancel and Assign/Reassign
 
 ### 3. Mock Data
+
 Following the UI-first development approach, the component uses mock lecturer data:
+
 - Dr. Sarah Smith (lecturer)
 - Prof. Michael Johnson (lecturer)
 - Dr. Emily Williams (lecturer)
@@ -34,12 +41,14 @@ Following the UI-first development approach, the component uses mock lecturer da
 - Dr. Jennifer Davis (lecturer)
 
 ### 4. State Management
+
 - Updates complaint state immediately for better UX
 - Adds assignment action to complaint history timeline
 - Updates the "Assigned to" field in the complaint header
 - Handles both initial assignment and reassignment
 
 ### 5. Visual Feedback
+
 - Loading state during assignment ("Assigning...")
 - Disabled state for buttons during operation
 - Color-coded info boxes:
@@ -50,6 +59,7 @@ Following the UI-first development approach, the component uses mock lecturer da
 ## User Flow
 
 ### For New Assignment:
+
 1. Lecturer clicks "Assign" button
 2. Modal opens with dropdown
 3. Lecturer selects a person from dropdown
@@ -60,6 +70,7 @@ Following the UI-first development approach, the component uses mock lecturer da
 8. Header shows assigned lecturer
 
 ### For Reassignment:
+
 1. Lecturer clicks "Assign" button
 2. Modal opens showing current assignment
 3. Dropdown is pre-selected with current assignee
@@ -73,7 +84,8 @@ Following the UI-first development approach, the component uses mock lecturer da
 ## UI States
 
 ### Assignment Modal States:
-1. **No Assignment**: 
+
+1. **No Assignment**:
    - Shows "Assign this complaint to a lecturer or admin"
    - Button text: "Assign"
 
@@ -101,11 +113,11 @@ The component includes commented code showing where real API calls will be integ
 
 ```typescript
 // In Phase 12, this will call the actual API:
-// await supabase.from('complaints').update({ 
+// await supabase.from('complaints').update({
 //   assigned_to: lecturerId,
 //   updated_at: new Date().toISOString()
 // }).eq('id', complaintId);
-// 
+//
 // // Log history
 // await supabase.from('complaint_history').insert({
 //   complaint_id: complaintId,
@@ -161,6 +173,7 @@ The next sub-task will implement the actual assignment functionality with real A
 ## Requirements Validated
 
 This implementation addresses:
+
 - **AC17**: Complaint Assignment - Lecturers/admins can assign complaints to specific lecturers or departments
 - **P15**: Assignment Validity - Complaints can only be assigned to users with lecturer or admin role
 

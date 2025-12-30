@@ -7,6 +7,7 @@ This document describes the implementation of the satisfaction rating prompt fea
 ## Requirements
 
 Based on AC16 (Satisfaction Rating):
+
 - After complaint is marked as resolved, student receives prompt to rate
 - Rating scale: 1-5 stars
 - Optional text feedback on resolution quality
@@ -22,6 +23,7 @@ Based on AC16 (Satisfaction Rating):
 A standalone component that displays the rating interface with the following features:
 
 **Features:**
+
 - **Star Rating System**: Interactive 1-5 star rating with hover effects
 - **Rating Labels**: Descriptive labels for each rating level (Very Dissatisfied to Very Satisfied)
 - **Optional Feedback**: Textarea for additional comments (500 character limit)
@@ -32,6 +34,7 @@ A standalone component that displays the rating interface with the following fea
 - **Error Handling**: Displays error messages if submission fails
 
 **Props:**
+
 ```typescript
 interface RatingPromptProps {
   complaintId: string;
@@ -42,6 +45,7 @@ interface RatingPromptProps {
 ```
 
 **Visual Design:**
+
 - Gradient background (primary color) to make it stand out
 - Large, interactive star icons with smooth animations
 - Clear typography and spacing
@@ -50,6 +54,7 @@ interface RatingPromptProps {
 #### 2. Textarea Component (`src/components/ui/textarea.tsx`)
 
 A reusable textarea component following the design system patterns:
+
 - Consistent styling with other form inputs
 - Focus states and accessibility
 - Disabled states
@@ -63,6 +68,7 @@ The rating prompt is integrated into the complaint detail view with the followin
 
 **Display Conditions:**
 The prompt appears when ALL of the following are true:
+
 1. User is a student (not lecturer/admin)
 2. Complaint status is 'resolved'
 3. User is the complaint owner (student_id matches current user)
@@ -70,6 +76,7 @@ The prompt appears when ALL of the following are true:
 5. Prompt hasn't been dismissed by the user
 
 **State Management:**
+
 ```typescript
 const [showRatingPrompt, setShowRatingPrompt] = useState(false);
 const [hasRated, setHasRated] = useState(false);
@@ -77,6 +84,7 @@ const [hasRated, setHasRated] = useState(false);
 
 **Dismissal Persistence:**
 When a user dismisses the prompt, the dismissal is stored in localStorage:
+
 ```typescript
 localStorage.setItem(`rating-dismissed-${complaintId}`, 'true');
 ```
@@ -84,18 +92,20 @@ localStorage.setItem(`rating-dismissed-${complaintId}`, 'true');
 This ensures the prompt doesn't reappear for that specific complaint.
 
 **Rating Submission:**
+
 ```typescript
 const handleRatingSubmit = async (rating: number, feedbackText: string) => {
   // 1. Submit to API (Phase 12)
   // 2. Update local state
   // 3. Add to complaint history
   // 4. Hide prompt
-}
+};
 ```
 
 ### Mock Data Updates
 
 Updated `getMockComplaintData` to support testing:
+
 - Added `isResolved` flag to easily toggle between resolved/in-progress states
 - Added resolved status to history when `isResolved` is true
 - Set `resolved_at` timestamp when resolved
@@ -118,6 +128,7 @@ complaint_ratings:
 ### History Tracking
 
 When a rating is submitted, a history entry is created:
+
 ```typescript
 {
   action: 'rated',
@@ -140,24 +151,29 @@ When a rating is submitted, a history entry is created:
 ## UI/UX Considerations
 
 ### Placement
+
 The rating prompt appears:
+
 - After the action buttons
 - Before the main content (description, attachments, etc.)
 - In a prominent position to catch the user's attention
 
 ### Visual Hierarchy
+
 - Gradient background makes it stand out from other content
 - Clear heading and instructions
 - Large, interactive star icons
 - Dismiss button in top-right corner
 
 ### Accessibility
+
 - Proper ARIA labels for star buttons
 - Keyboard navigation support
 - Screen reader friendly
 - Focus management
 
 ### Mobile Responsiveness
+
 - Touch-friendly star buttons
 - Responsive layout
 - Proper spacing on small screens
@@ -209,6 +225,7 @@ The rating prompt appears:
 In Phase 12, the following will be implemented:
 
 ### API Integration
+
 ```typescript
 // Replace mock submission with real API call
 await supabase.from('complaint_ratings').insert({
@@ -220,6 +237,7 @@ await supabase.from('complaint_ratings').insert({
 ```
 
 ### Check Existing Rating
+
 ```typescript
 // Check if complaint has been rated
 const { data: existingRating } = await supabase
@@ -232,6 +250,7 @@ setHasRated(!!existingRating);
 ```
 
 ### Real-time Updates
+
 - Consider adding real-time subscription to rating changes
 - Update analytics dashboard when new ratings are submitted
 
@@ -257,11 +276,13 @@ setHasRated(!!existingRating);
 ## Files Modified/Created
 
 ### Created:
+
 - `src/components/complaints/rating-prompt.tsx` - Main rating prompt component
 - `src/components/ui/textarea.tsx` - Reusable textarea component
 - `docs/RATING_PROMPT_IMPLEMENTATION.md` - This documentation
 
 ### Modified:
+
 - `src/components/complaints/complaint-detail/index.tsx` - Integrated rating prompt
 - `src/components/complaints/complaint-detail/types.ts` - Added complaint_rating field
 - `src/components/complaints/complaint-detail/mock-data.ts` - Added resolved state support
@@ -269,19 +290,24 @@ setHasRated(!!existingRating);
 ## Validation Against Requirements
 
 ✅ **AC16.1**: After complaint is marked as resolved, student receives prompt to rate
+
 - Prompt appears automatically when complaint status is 'resolved'
 
 ✅ **AC16.2**: Rating scale: 1-5 stars
+
 - Interactive 5-star rating system implemented
 
 ✅ **AC16.3**: Optional text feedback on resolution quality
+
 - Textarea with 500 character limit for additional feedback
 
 ✅ **AC16.4**: Ratings are anonymous to encourage honest feedback
+
 - Clear messaging that ratings are anonymous
 - No identifying information displayed with ratings
 
 ✅ **AC16.5**: Aggregate ratings visible in analytics dashboard
+
 - Database schema supports this (future task 8.1)
 
 ## Notes

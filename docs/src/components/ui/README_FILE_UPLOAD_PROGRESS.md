@@ -30,26 +30,26 @@ function MyComponent() {
       progress: 0,
       status: 'uploading'
     }));
-    
+
     setUploadProgress(initialProgress);
 
     // Simulate upload for each file
     for (let i = 0; i < newFiles.length; i++) {
       const file = newFiles[i];
-      
+
       try {
         // Simulate upload with progress updates
         await simulateUpload(file, (progress) => {
-          setUploadProgress(prev => 
-            prev.map((p, idx) => 
+          setUploadProgress(prev =>
+            prev.map((p, idx) =>
               idx === i ? { ...p, progress } : p
             )
           );
         });
 
         // Mark as completed
-        setUploadProgress(prev => 
-          prev.map((p, idx) => 
+        setUploadProgress(prev =>
+          prev.map((p, idx) =>
             idx === i ? { ...p, progress: 100, status: 'completed' } : p
           )
         );
@@ -62,12 +62,12 @@ function MyComponent() {
 
       } catch (error) {
         // Mark as error
-        setUploadProgress(prev => 
-          prev.map((p, idx) => 
-            idx === i ? { 
-              ...p, 
-              status: 'error', 
-              error: 'Upload failed. Please try again.' 
+        setUploadProgress(prev =>
+          prev.map((p, idx) =>
+            idx === i ? {
+              ...p,
+              status: 'error',
+              error: 'Upload failed. Please try again.'
             } : p
           )
         );
@@ -87,7 +87,7 @@ function MyComponent() {
 
 // Helper function to simulate upload with progress
 function simulateUpload(
-  file: File, 
+  file: File,
   onProgress: (progress: number) => void
 ): Promise<void> {
   return new Promise((resolve) => {
@@ -95,7 +95,7 @@ function simulateUpload(
     const interval = setInterval(() => {
       progress += 10;
       onProgress(progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
         resolve();
@@ -116,10 +116,10 @@ async function uploadFileWithProgress(
   onProgress: (progress: number) => void
 ): Promise<string> {
   const supabase = createClientComponentClient();
-  
+
   // Upload to Supabase Storage
   const filePath = `${complaintId}/${file.name}`;
-  
+
   const { data, error } = await supabase.storage
     .from('complaint-attachments')
     .upload(filePath, file, {
@@ -131,10 +131,10 @@ async function uploadFileWithProgress(
     });
 
   if (error) throw error;
-  
+
   // Simulate progress for now (in production, implement real progress tracking)
   onProgress(100);
-  
+
   return data.path;
 }
 ```
@@ -145,10 +145,10 @@ async function uploadFileWithProgress(
 
 ```typescript
 interface FileUploadProgress {
-  file: File;              // The file being uploaded
-  progress: number;        // Upload progress (0-100)
-  status: 'uploading' | 'completed' | 'error';  // Current status
-  error?: string;          // Error message if status is 'error'
+  file: File; // The file being uploaded
+  progress: number; // Upload progress (0-100)
+  status: 'uploading' | 'completed' | 'error'; // Current status
+  error?: string; // Error message if status is 'error'
 }
 ```
 
@@ -156,7 +156,7 @@ interface FileUploadProgress {
 
 ```typescript
 interface FileUploadProps {
-  files?: File[];                      // Completed/selected files
+  files?: File[]; // Completed/selected files
   uploadProgress?: FileUploadProgress[]; // Files currently uploading
   onFilesSelected?: (files: File[]) => void;
   onFileRemove?: (file: File) => void;
@@ -169,16 +169,19 @@ interface FileUploadProps {
 ## Visual States
 
 ### Uploading State
+
 - Shows animated spinner icon
 - Displays progress bar with percentage
 - Shows "Uploading..." text
 
 ### Completed State
+
 - Shows green checkmark icon
 - File moves to "Selected Files" section
 - Progress indicator removed
 
 ### Error State
+
 - Shows red alert icon
 - Displays error message below file info
 - File remains in upload progress section
@@ -196,21 +199,18 @@ interface FileUploadProps {
 For UI-first development without backend integration:
 
 ```typescript
-function mockUploadWithProgress(
-  file: File,
-  onProgress: (progress: number) => void
-): Promise<void> {
+function mockUploadWithProgress(file: File, onProgress: (progress: number) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     let progress = 0;
-    
+
     const interval = setInterval(() => {
       progress += Math.random() * 15; // Random progress increments
-      
+
       if (progress >= 100) {
         progress = 100;
         onProgress(progress);
         clearInterval(interval);
-        
+
         // Simulate occasional failures (10% chance)
         if (Math.random() < 0.1) {
           reject(new Error('Upload failed'));
@@ -228,6 +228,7 @@ function mockUploadWithProgress(
 ## Accessibility
 
 The progress bar includes proper ARIA attributes:
+
 - `role="progressbar"`
 - `aria-valuenow`: Current progress value
 - `aria-valuemin="0"`

@@ -35,12 +35,16 @@ When a new active vote is created, the trigger generates notifications with:
 ## Behavior
 
 ### Active Votes
+
 ✅ **Triggers notifications** when:
+
 - A new vote is inserted into the database
 - The vote's `is_active` field is `true`
 
 ### Inactive Votes
+
 ❌ **Does NOT trigger notifications** when:
+
 - A new vote is inserted with `is_active = false`
 - This allows lecturers to create draft votes without notifying students
 
@@ -168,6 +172,7 @@ Potential improvements:
 ### No Notifications Created
 
 **Check:**
+
 1. Is the vote's `is_active` field set to `true`?
 2. Are there students in the database?
 3. Is the trigger enabled?
@@ -183,6 +188,7 @@ SELECT * FROM pg_proc WHERE proname = 'notify_students_on_new_vote';
 ### Duplicate Notifications
 
 **Check:**
+
 1. Is the trigger firing multiple times?
 2. Are there multiple triggers on the votes table?
 
@@ -224,6 +230,6 @@ ALTER TABLE public.votes ENABLE TRIGGER notify_on_new_vote;
 ✅ **Implemented:** Database trigger for new vote notifications  
 ✅ **Tested:** All test cases passing  
 ✅ **Documented:** Complete documentation provided  
-✅ **Integrated:** Works with existing notification system  
+✅ **Integrated:** Works with existing notification system
 
 The new vote notification trigger is fully functional and ready for production use.

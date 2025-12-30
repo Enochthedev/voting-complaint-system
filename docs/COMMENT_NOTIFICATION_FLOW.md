@@ -310,6 +310,7 @@ Total Time: < 1 second (typically 100-500ms)
 ## Data Flow
 
 ### Input (Comment)
+
 ```json
 {
   "complaint_id": "uuid-123",
@@ -320,10 +321,11 @@ Total Time: < 1 second (typically 100-500ms)
 ```
 
 ### Processing (Trigger)
+
 ```sql
 -- Get complaint info
-SELECT title, student_id, assigned_to 
-FROM complaints 
+SELECT title, student_id, assigned_to
+FROM complaints
 WHERE id = 'uuid-123';
 
 -- Result:
@@ -343,6 +345,7 @@ WHERE id = 'uuid-123';
 ```
 
 ### Output (Notification)
+
 ```json
 {
   "user_id": "student-789",
@@ -356,6 +359,7 @@ WHERE id = 'uuid-123';
 ```
 
 ### Output (History)
+
 ```json
 {
   "complaint_id": "uuid-123",
@@ -374,14 +378,14 @@ WHERE id = 'uuid-123';
 
 ## Performance Characteristics
 
-| Metric | Value | Notes |
-|--------|-------|-------|
-| Trigger Execution Time | < 50ms | Database-level, very fast |
-| Notification Creation | < 100ms | Single or dual INSERT |
-| Real-time Broadcast | < 200ms | WebSocket delivery |
-| Total User-to-User Latency | < 500ms | End-to-end notification |
-| Database Load | Minimal | Efficient indexed queries |
-| Scalability | High | Handles 1000+ concurrent users |
+| Metric                     | Value   | Notes                          |
+| -------------------------- | ------- | ------------------------------ |
+| Trigger Execution Time     | < 50ms  | Database-level, very fast      |
+| Notification Creation      | < 100ms | Single or dual INSERT          |
+| Real-time Broadcast        | < 200ms | WebSocket delivery             |
+| Total User-to-User Latency | < 500ms | End-to-end notification        |
+| Database Load              | Minimal | Efficient indexed queries      |
+| Scalability                | High    | Handles 1000+ concurrent users |
 
 ## Error Handling
 

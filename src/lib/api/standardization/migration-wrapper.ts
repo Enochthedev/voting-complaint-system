@@ -5,7 +5,13 @@
  * to the new standardized API response format.
  */
 
-import { StandardApiResponse, PaginatedApiResponse, ErrorType, StandardApiError, ResponseMeta } from './types';
+import {
+  StandardApiResponse,
+  PaginatedApiResponse,
+  ErrorType,
+  StandardApiError,
+  ResponseMeta,
+} from './types';
 import { ApiResponseWrapper } from './response-wrapper';
 import { withMonitoring } from './monitoring-wrapper';
 import { StandardizedErrorHandler } from './error-handler';
@@ -52,7 +58,7 @@ export class MigrationWrapper {
    */
   private handleLegacyError(error: any): StandardApiResponse<null> {
     const standardError = StandardizedErrorHandler.processError(error, {
-      requestId: this.responseWrapper.getRequestId()
+      requestId: this.responseWrapper.getRequestId(),
     });
 
     return this.responseWrapper.createErrorResponse(
@@ -83,7 +89,7 @@ export class MigrationWrapper {
    */
   private handleSupabaseError(error: any): StandardApiResponse<null> {
     const standardError = StandardizedErrorHandler.processError(error, {
-      requestId: this.responseWrapper.getRequestId()
+      requestId: this.responseWrapper.getRequestId(),
     });
 
     return this.responseWrapper.createErrorResponse(

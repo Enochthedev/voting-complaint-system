@@ -18,6 +18,7 @@ Go to: `http://localhost:3000/complaints/new`
 ### 3. Test Autocomplete Functionality
 
 #### Basic Autocomplete
+
 1. Scroll down to the "Tags" field
 2. Start typing in the tag input field (e.g., "class")
 3. You should see a dropdown with suggestions like:
@@ -26,6 +27,7 @@ Go to: `http://localhost:3000/complaints/new`
 4. The suggestions update as you type
 
 #### Keyboard Navigation
+
 1. Type "e" in the tag input
 2. Use **Arrow Down** to navigate through suggestions:
    - equipment
@@ -35,24 +37,28 @@ Go to: `http://localhost:3000/complaints/new`
 5. Press **Escape** to close the dropdown
 
 #### Mouse Interaction
+
 1. Type "lib" in the tag input
 2. Hover over "library" in the dropdown
 3. Click on it to add the tag
 4. The tag should appear as a chip below the input
 
 #### Creating Custom Tags
+
 1. Type "my-custom-tag" in the input
 2. Notice the hint: "Press Enter or click Add to create new tag: 'my-custom-tag'"
 3. Press **Enter** or click the **Add** button
 4. The custom tag is added even though it wasn't in the suggestions
 
 #### Removing Tags
+
 1. Add several tags using the methods above
 2. Click the **×** button on any tag chip
 3. The tag should be removed
 4. That tag should now appear in suggestions again (if it was a popular tag)
 
 #### Duplicate Prevention
+
 1. Add a tag (e.g., "wifi-issues")
 2. Try to add the same tag again
 3. It should not be added (duplicates are prevented)
@@ -61,25 +67,30 @@ Go to: `http://localhost:3000/complaints/new`
 ### 4. Test Edge Cases
 
 #### Empty Input
+
 - Try clicking "Add" with an empty input
 - Nothing should happen (button is disabled)
 
 #### Whitespace
-- Type "  spaces  " with leading/trailing spaces
+
+- Type " spaces " with leading/trailing spaces
 - Add the tag
 - It should be trimmed to "spaces"
 
 #### Case Insensitivity
+
 - Type "WIFI" (uppercase)
 - You should see "wifi-issues" in suggestions
 - Add it and it becomes "wifi" (lowercase)
 
 #### Click Outside
+
 - Type something to show suggestions
 - Click anywhere outside the input/dropdown
 - The dropdown should close
 
 #### Form Submission
+
 - Add some tags
 - Fill out the rest of the form
 - Click "Submit Complaint"
@@ -88,12 +99,14 @@ Go to: `http://localhost:3000/complaints/new`
 ### 5. Test Accessibility
 
 #### Screen Reader
+
 - Use a screen reader to navigate the form
 - The tag input should announce its purpose
 - Suggestions should be announced as you navigate
 - Added tags should be announced
 
 #### Keyboard Only
+
 - Use only the keyboard (no mouse)
 - Tab to the tag input field
 - Type to filter suggestions
@@ -105,16 +118,19 @@ Go to: `http://localhost:3000/complaints/new`
 ### 6. Test Responsive Design
 
 #### Mobile View
+
 - Resize browser to mobile width (< 640px)
 - The tag input should be full width
 - Suggestions dropdown should fit the screen
 - Tag chips should wrap properly
 
 #### Tablet View
+
 - Resize to tablet width (640px - 1024px)
 - Everything should remain functional and readable
 
 #### Desktop View
+
 - Full desktop width (> 1024px)
 - Layout should be optimal
 
@@ -176,21 +192,25 @@ These will be implemented in Phase 12 when connecting to the real Supabase backe
 ## Troubleshooting
 
 ### Dropdown doesn't appear
+
 - Make sure you're typing at least one character
 - Check that there are matching suggestions
 - Verify the input field has focus
 
 ### Suggestions don't filter correctly
+
 - Check browser console for errors
 - Verify the popularTags array is loaded
 - Try refreshing the page
 
 ### Tags don't add
+
 - Check that the tag isn't already added
 - Verify the input isn't empty
 - Check browser console for errors
 
 ### Styling issues
+
 - Clear browser cache
 - Check that Tailwind CSS is loaded
 - Verify dark mode is working correctly
@@ -198,4 +218,5 @@ These will be implemented in Phase 12 when connecting to the real Supabase backe
 ## Next Steps
 
 After testing, you can proceed to the next sub-task:
+
 - Add rich text editor for description

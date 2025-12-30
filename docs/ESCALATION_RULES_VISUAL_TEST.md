@@ -1,9 +1,11 @@
 # Escalation Rules Page - Visual Test Guide
 
 ## Overview
+
 This document provides a visual testing guide for the Escalation Rules management page located at `/admin/escalation-rules`.
 
 ## Access
+
 - **URL**: `/admin/escalation-rules`
 - **Role Required**: Admin
 - **Navigation**: Sidebar → "Escalation Rules" (with ArrowUpCircle icon)
@@ -11,6 +13,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ## Page Layout
 
 ### Header Section
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Auto-Escalation Rules                                       │
@@ -20,6 +23,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ```
 
 ### Info Alert
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ ℹ️ Escalation rules automatically reassign complaints to    │
@@ -29,6 +33,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ```
 
 ### Search and Filters Panel
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Search Rules          Category         Priority    Status   │
@@ -39,6 +44,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ```
 
 ### Rules List (Example Card)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Harassment - [Critical]                          [Active]   │
@@ -55,16 +61,19 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ## Visual Elements
 
 ### 1. Status Badges
+
 - **Active**: Green badge with "Active" text
 - **Inactive**: Gray badge with "Inactive" text
 
 ### 2. Priority Badges
+
 - **Low**: Blue background, blue text
 - **Medium**: Yellow background, yellow text
 - **High**: Orange background, orange text
 - **Critical**: Red background, red text
 
 ### 3. Icons
+
 - **Clock** (🕐): Time threshold indicator
 - **ArrowUpCircle** (⬆️): Escalation target indicator
 - **Eye** (👁️): Activate rule button
@@ -75,6 +84,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 - **Search** (🔍): Search input icon
 
 ### 4. Color Scheme
+
 - **Background**: zinc-50 (light) / zinc-900 (dark)
 - **Cards**: white (light) / zinc-950 (dark)
 - **Borders**: zinc-200 (light) / zinc-800 (dark)
@@ -84,6 +94,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ## Test Scenarios
 
 ### Scenario 1: View All Rules
+
 1. Navigate to `/admin/escalation-rules`
 2. Verify page loads with header and info alert
 3. Verify all mock rules are displayed (5 rules)
@@ -98,6 +109,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: All 5 mock rules displayed correctly
 
 ### Scenario 2: Search Functionality
+
 1. Type "harassment" in search box
 2. Verify only harassment-related rules appear
 3. Clear search
@@ -107,6 +119,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Search filters rules in real-time
 
 ### Scenario 3: Category Filter
+
 1. Select "Facilities" from category dropdown
 2. Verify only facilities rules appear (1 rule)
 3. Select "Academic" from category dropdown
@@ -117,6 +130,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Category filter works correctly
 
 ### Scenario 4: Priority Filter
+
 1. Select "Critical" from priority dropdown
 2. Verify only critical priority rules appear (1 rule)
 3. Select "High" from priority dropdown
@@ -127,6 +141,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Priority filter works correctly
 
 ### Scenario 5: Status Filter
+
 1. Select "Active" from status dropdown
 2. Verify only active rules appear (4 rules)
 3. Select "Inactive" from status dropdown
@@ -137,6 +152,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Status filter works correctly
 
 ### Scenario 6: Toggle Active/Inactive
+
 1. Find an active rule
 2. Click the Eye icon button
 3. Verify success message appears
@@ -148,6 +164,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Toggle works and UI updates immediately
 
 ### Scenario 7: Delete Rule
+
 1. Click the Trash icon on any rule
 2. Verify delete confirmation modal appears
 3. Verify modal shows rule details
@@ -161,6 +178,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Delete confirmation works and rule is removed
 
 ### Scenario 8: Create New Rule (Placeholder)
+
 1. Click "Create New Rule" button
 2. Verify modal opens
 3. Verify placeholder message is shown
@@ -170,6 +188,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Modal opens and closes (form to be implemented)
 
 ### Scenario 9: Edit Rule (Placeholder)
+
 1. Click Edit icon on any rule
 2. Verify modal opens with placeholder
 3. Verify modal title says "Edit Escalation Rule"
@@ -179,6 +198,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Modal opens and closes (form to be implemented)
 
 ### Scenario 10: Empty State
+
 1. Apply filters that match no rules (e.g., "Other" category + "Critical" priority)
 2. Verify empty state message appears
 3. Verify message says "No escalation rules found matching your filters"
@@ -188,6 +208,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Empty state displays correctly
 
 ### Scenario 11: Combined Filters
+
 1. Select "Facilities" category
 2. Select "High" priority
 3. Select "Active" status
@@ -198,6 +219,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Multiple filters work together correctly
 
 ### Scenario 12: Dark Mode
+
 1. Toggle dark mode
 2. Verify all colors invert correctly
 3. Verify text remains readable
@@ -207,6 +229,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 **Expected Result**: Dark mode styling works correctly
 
 ### Scenario 13: Responsive Design
+
 1. Resize browser to mobile width
 2. Verify filters stack vertically
 3. Verify cards remain readable
@@ -219,6 +242,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 ## Mock Data Summary
 
 ### Rules
+
 1. **Harassment + Critical**: 2 hours → Dr. Sarah Johnson (Active)
 2. **Facilities + High**: 24 hours → Prof. Michael Chen (Active)
 3. **Academic + High**: 48 hours → Dr. Sarah Johnson (Active)
@@ -226,6 +250,7 @@ This document provides a visual testing guide for the Escalation Rules managemen
 5. **Administrative + Low**: 168 hours → Prof. Michael Chen (Active)
 
 ### Users
+
 1. Dr. Sarah Johnson (Admin)
 2. Prof. Michael Chen (Admin)
 3. Dr. Emily Rodriguez (Admin)

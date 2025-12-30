@@ -1,6 +1,7 @@
 # Task 2.2: Complaint History RLS Policies - Completion Summary
 
 ## Task Overview
+
 Create RLS (Row Level Security) policies for the `complaint_history` table to ensure proper access control and immutability.
 
 ## Implementation Details
@@ -30,6 +31,7 @@ Create RLS (Row Level Security) policies for the `complaint_history` table to en
 ## RLS Policies Implemented
 
 ### 1. SELECT Policy: "Users view history on accessible complaints"
+
 ```sql
 CREATE POLICY "Users view history on accessible complaints"
   ON public.complaint_history
@@ -53,6 +55,7 @@ CREATE POLICY "Users view history on accessible complaints"
 **Purpose**: Allows students to view history on their own complaints, and lecturers/admins to view all history.
 
 ### 2. INSERT Policy: "System inserts history records"
+
 ```sql
 CREATE POLICY "System inserts history records"
   ON public.complaint_history
@@ -64,6 +67,7 @@ CREATE POLICY "System inserts history records"
 **Purpose**: Allows authenticated users to insert history records for audit trail.
 
 ### 3. UPDATE Policy: "Deny history updates"
+
 ```sql
 CREATE POLICY "Deny history updates"
   ON public.complaint_history
@@ -75,6 +79,7 @@ CREATE POLICY "Deny history updates"
 **Purpose**: Explicitly denies UPDATE operations to enforce immutability (Property P13).
 
 ### 4. DELETE Policy: "Deny history deletes"
+
 ```sql
 CREATE POLICY "Deny history deletes"
   ON public.complaint_history
@@ -88,14 +93,16 @@ CREATE POLICY "Deny history deletes"
 ## Correctness Properties Validated
 
 ### Property P13: Status History Immutability (AC12)
+
 - **Property**: Once created, history records cannot be modified or deleted
 - **Verification**: RLS policies only allow INSERT and SELECT, explicitly deny UPDATE and DELETE
-- **Implementation**: 
+- **Implementation**:
   - INSERT-only RLS policy on complaint_history table
   - Explicit DENY policies for UPDATE and DELETE
   - Revoked UPDATE and DELETE permissions from authenticated role
 
 ### Property P7: Role-Based Access (AC3)
+
 - **Property**: Students can only view their own complaint history; lecturers can view all history
 - **Verification**: RLS policies check user role and complaint ownership using JWT claims
 - **Implementation**: SELECT policy uses `auth.jwt()->>'role'` to check user role
@@ -126,11 +133,13 @@ CREATE POLICY "Deny history deletes"
 ## Testing
 
 ### Manual Testing Steps
+
 1. Apply the migration: `npx supabase db push --linked`
 2. Run verification script: `psql -f supabase/verify-complaint-history-rls.sql`
 3. Run test script: `node scripts/test-complaint-history-rls.js`
 
 ### Expected Test Results
+
 - ✅ Students can view history on their own complaints
 - ✅ Lecturers can view history on all complaints
 - ✅ Authenticated users can insert history records
@@ -143,7 +152,8 @@ CREATE POLICY "Deny history deletes"
 
 **Migration File**: `021_fix_complaint_history_rls.sql`
 
-**To Apply**: 
+**To Apply**:
+
 ```bash
 cd student-complaint-system
 npx supabase db push --linked
@@ -164,4 +174,3 @@ npx supabase db push --linked
 - Test: `scripts/test-complaint-history-rls.js`
 - Design: `.kiro/specs/student-complaint-system/design.md` (Property P13)
 - Requirements: `.kiro/specs/student-complaint-system/requirements.md` (AC12)
-

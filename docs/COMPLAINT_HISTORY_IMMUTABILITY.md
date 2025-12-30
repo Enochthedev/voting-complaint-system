@@ -13,16 +13,19 @@ The `complaint_history` table provides an **immutable audit trail** of all actio
 Three BEFORE triggers enforce immutability at the database level:
 
 **prevent_history_update**
+
 - Fires: BEFORE UPDATE on each row
 - Action: Raises exception preventing any UPDATE operations
 - Error: `complaint_history records are immutable and cannot be updated`
 
 **prevent_history_delete**
+
 - Fires: BEFORE DELETE on each row
 - Action: Raises exception preventing any DELETE operations
 - Error: `complaint_history records are immutable and cannot be deleted`
 
 **prevent_history_truncate**
+
 - Fires: BEFORE TRUNCATE on statement level
 - Action: Raises exception preventing TRUNCATE operations
 - Error: `complaint_history table cannot be truncated - records are immutable`
@@ -32,19 +35,23 @@ Three BEFORE triggers enforce immutability at the database level:
 Four RLS policies control access to history records:
 
 **Users view history on accessible complaints** (SELECT)
+
 - Students: Can view history on their own complaints
 - Lecturers/Admins: Can view all history records
 - Uses JWT claims to determine role
 
 **System inserts history records** (INSERT)
+
 - All authenticated users can insert history records
 - Required for triggers and application code to log actions
 
 **Deny history updates** (UPDATE)
+
 - Explicitly denies all UPDATE operations
 - Returns false for all authenticated users
 
 **Deny history deletes** (DELETE)
+
 - Explicitly denies all DELETE operations
 - Returns false for all authenticated users
 
@@ -80,6 +87,7 @@ CREATE TABLE public.complaint_history (
 ```
 
 **Action Types** (complaint_action enum):
+
 - `created` - Complaint was created
 - `updated` - Complaint details were updated
 - `assigned` - Complaint was assigned to a lecturer
@@ -110,6 +118,7 @@ node scripts/verify-complaint-history-immutability.js
 ```
 
 The script tests:
+
 1. ✅ INSERT operations work correctly
 2. ✅ UPDATE operations are blocked
 3. ✅ Records remain unchanged after UPDATE attempts
@@ -157,21 +166,25 @@ The immutability implementation is spread across multiple migrations:
 ## Benefits
 
 ### 1. Audit Trail Integrity
+
 - Complete, tamper-proof record of all complaint actions
 - Supports compliance and accountability requirements
 - Enables investigation of issues or disputes
 
 ### 2. Data Forensics
+
 - Track who did what and when
 - Understand the complete lifecycle of each complaint
 - Identify patterns in complaint handling
 
 ### 3. Security
+
 - Prevents malicious or accidental modification of history
 - Protects against data tampering
 - Maintains trust in the system
 
 ### 4. Compliance
+
 - Meets audit requirements for educational institutions
 - Provides evidence for dispute resolution
 - Supports data retention policies
@@ -195,16 +208,14 @@ History records are typically created automatically by triggers, but can also be
 
 ```typescript
 // Manual history logging (if needed)
-const { error } = await supabase
-  .from('complaint_history')
-  .insert({
-    complaint_id: complaintId,
-    action: 'status_changed',
-    old_value: 'new',
-    new_value: 'in_progress',
-    performed_by: userId,
-    details: { reason: 'Assigned to lecturer' }
-  });
+const { error } = await supabase.from('complaint_history').insert({
+  complaint_id: complaintId,
+  action: 'status_changed',
+  old_value: 'new',
+  new_value: 'in_progress',
+  performed_by: userId,
+  details: { reason: 'Assigned to lecturer' },
+});
 ```
 
 ### Attempting Modifications (Will Fail)
@@ -227,8 +238,8 @@ const { error } = await supabase
 **Solution**: Check that triggers are enabled:
 
 ```sql
-SELECT tgname, tgenabled 
-FROM pg_trigger 
+SELECT tgname, tgenabled
+FROM pg_trigger
 WHERE tgrelid = 'public.complaint_history'::regclass;
 ```
 
@@ -238,9 +249,9 @@ WHERE tgrelid = 'public.complaint_history'::regclass;
 **Solution**: Verify permissions:
 
 ```sql
-SELECT privilege_type 
+SELECT privilege_type
 FROM information_schema.table_privileges
-WHERE table_name = 'complaint_history' 
+WHERE table_name = 'complaint_history'
   AND grantee = 'authenticated';
 ```
 
@@ -260,6 +271,7 @@ WHERE table_name = 'complaint_history'
 ✅ **Property P13: History records are immutable**
 
 The implementation ensures that:
+
 - History records can be created (INSERT)
 - History records can be read (SELECT with RLS)
 - History records CANNOT be modified (UPDATE blocked)
@@ -267,6 +279,7 @@ The implementation ensures that:
 - History table CANNOT be truncated (TRUNCATE blocked)
 
 This is enforced through:
+
 - Database triggers (work for all users including superusers)
 - RLS policies (work for authenticated users)
 - Permission restrictions (work at the role level)

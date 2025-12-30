@@ -7,6 +7,7 @@ The NotificationDropdown component provides a comprehensive notification center 
 ## Features
 
 ### Core Features
+
 - ✅ **Dropdown Interface**: Opens on bell icon click, closes on outside click
 - ✅ **Notification List**: Scrollable list of notifications (max height 400px)
 - ✅ **Unread Badge**: Shows count of unread notifications on bell icon
@@ -20,17 +21,17 @@ The NotificationDropdown component provides a comprehensive notification center 
 
 ### Notification Types & Icons
 
-| Type | Icon | Color | Description |
-|------|------|-------|-------------|
-| `complaint_opened` | FileText | Purple | Complaint has been opened by staff |
-| `comment_added` | MessageSquare | Green | New comment on complaint |
-| `feedback_received` | MessageSquare | Green | Feedback added to complaint |
-| `status_changed` | AlertCircle | Orange | Complaint status updated |
-| `complaint_assigned` | UserPlus | Blue | Complaint assigned to lecturer |
-| `complaint_escalated` | TrendingUp | Red | Complaint escalated |
-| `new_complaint` | FileText | Purple | New complaint submitted |
-| `new_announcement` | Bell | Gray | New announcement posted |
-| `new_vote` | Bell | Gray | New vote created |
+| Type                  | Icon          | Color  | Description                        |
+| --------------------- | ------------- | ------ | ---------------------------------- |
+| `complaint_opened`    | FileText      | Purple | Complaint has been opened by staff |
+| `comment_added`       | MessageSquare | Green  | New comment on complaint           |
+| `feedback_received`   | MessageSquare | Green  | Feedback added to complaint        |
+| `status_changed`      | AlertCircle   | Orange | Complaint status updated           |
+| `complaint_assigned`  | UserPlus      | Blue   | Complaint assigned to lecturer     |
+| `complaint_escalated` | TrendingUp    | Red    | Complaint escalated                |
+| `new_complaint`       | FileText      | Purple | New complaint submitted            |
+| `new_announcement`    | Bell          | Gray   | New announcement posted            |
+| `new_vote`            | Bell          | Gray   | New vote created                   |
 
 ## Usage
 
@@ -89,7 +90,7 @@ NotificationDropdown
 ### Click Behaviors
 
 1. **Bell Icon Click**: Opens/closes dropdown
-2. **Notification Click**: 
+2. **Notification Click**:
    - Marks notification as read (if unread)
    - Navigates to related content
    - Closes dropdown
@@ -109,6 +110,7 @@ The component automatically determines the navigation route based on notificatio
 ## States
 
 ### Loading State
+
 ```tsx
 // Shows loading indicator
 <div className="flex items-center justify-center py-8">
@@ -117,6 +119,7 @@ The component automatically determines the navigation route based on notificatio
 ```
 
 ### Empty State
+
 ```tsx
 // Shows when no notifications exist
 <div className="flex flex-col items-center justify-center py-8">
@@ -127,6 +130,7 @@ The component automatically determines the navigation route based on notificatio
 ```
 
 ### With Notifications
+
 ```tsx
 // Shows scrollable list of notifications
 <div className="py-2 px-2 space-y-1">
@@ -182,12 +186,12 @@ export function AppHeader() {
 The component uses the `useNotifications` hook for data management:
 
 ```tsx
-const { 
-  notifications,      // Array of notifications
-  unreadCount,        // Count of unread notifications
-  isLoading,          // Loading state
-  markAsRead,         // Mark single notification as read
-  markAllAsRead       // Mark all notifications as read
+const {
+  notifications, // Array of notifications
+  unreadCount, // Count of unread notifications
+  isLoading, // Loading state
+  markAsRead, // Mark single notification as read
+  markAllAsRead, // Mark all notifications as read
 } = useNotifications();
 ```
 
@@ -221,6 +225,7 @@ formatRelativeTime(dateString: string): string
 ```
 
 **Output Examples:**
+
 - Less than 1 minute: "Just now"
 - Less than 1 hour: "30m ago"
 - Less than 24 hours: "5h ago"
@@ -267,11 +272,13 @@ No changes needed to the NotificationDropdown component itself!
 ### Visual Testing
 
 1. Import the demo component:
+
    ```tsx
    import { NotificationDropdownDemo } from '@/components/notifications/__tests__/notification-dropdown.test';
    ```
 
 2. Render in a test page:
+
    ```tsx
    export default function TestPage() {
      return <NotificationDropdownDemo />;

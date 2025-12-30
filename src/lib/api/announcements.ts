@@ -2,6 +2,7 @@ import type { Announcement } from '@/types/database.types';
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import { DatabaseError } from '@/lib/validation';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Announcement API functions
@@ -17,20 +18,28 @@ import { DatabaseError } from '@/lib/validation';
 async function createAnnouncementImpl(
   announcementData: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Announcement> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .insert(announcementData)
-    .select()
-    .single();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('announcements')
+      .insert(announcementData)
+      .select()
+      .single();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to create announcement', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to create announcement',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  // Note: Announcement notifications are created automatically via database trigger
-  // See: supabase/migrations/*_create_announcement_notification_trigger.sql
+    // Note: Announcement notifications are created automatically via database trigger
+    // See: supabase/migrations/*_create_announcement_notification_trigger.sql
 
-  return data;
+    return data;
+  });
 }
 
 export const createAnnouncement = withRateLimit(createAnnouncementImpl, 'write');
@@ -44,23 +53,34 @@ async function getAnnouncementsImpl(options?: {
   limit?: number;
   createdBy?: string;
 }): Promise<Announcement[]> {
-  let query = supabase.from('announcements').select('*').order('created_at', { ascending: false });
+  return withTokenRefresh(async () => {
+    let query = supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (options?.limit) {
-    query = query.limit(options.limit);
-  }
+    if (options?.limit) {
+      query = query.limit(options.limit);
+    }
 
-  if (options?.createdBy) {
-    query = query.eq('created_by', options.createdBy);
-  }
+    if (options?.createdBy) {
+      query = query.eq('created_by', options.createdBy);
+    }
 
-  const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch announcements', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch announcements',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data || [];
+    return data || [];
+  });
 }
 
 export const getAnnouncements = withRateLimit(getAnnouncementsImpl, 'read');
@@ -71,17 +91,25 @@ export const getAnnouncements = withRateLimit(getAnnouncementsImpl, 'read');
  * @returns Announcement or null if not found
  */
 async function getAnnouncementByIdImpl(announcementId: string): Promise<Announcement | null> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
-    .eq('id', announcementId)
-    .maybeSingle();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('id', announcementId)
+      .maybeSingle();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to fetch announcement', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to fetch announcement',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const getAnnouncementById = withRateLimit(getAnnouncementByIdImpl, 'read');
@@ -96,21 +124,29 @@ async function updateAnnouncementImpl(
   announcementId: string,
   updates: Partial<Omit<Announcement, 'id' | 'created_at' | 'created_by'>>
 ): Promise<Announcement> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', announcementId)
-    .select()
-    .single();
+  return withTokenRefresh(async () => {
+    const { data, error } = await supabase
+      .from('announcements')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', announcementId)
+      .select()
+      .single();
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to update announcement', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to update announcement',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
 
-  return data;
+    return data;
+  });
 }
 
 export const updateAnnouncement = withRateLimit(updateAnnouncementImpl, 'write');
@@ -120,11 +156,19 @@ export const updateAnnouncement = withRateLimit(updateAnnouncementImpl, 'write')
  * @param announcementId - Announcement ID
  */
 async function deleteAnnouncementImpl(announcementId: string): Promise<void> {
-  const { error } = await supabase.from('announcements').delete().eq('id', announcementId);
+  return withTokenRefresh(async () => {
+    const { error } = await supabase.from('announcements').delete().eq('id', announcementId);
 
-  if (error) {
-    throw new DatabaseError(error.message || 'Failed to delete announcement', error.code, undefined, error.details, error.hint);
-  }
+    if (error) {
+      throw new DatabaseError(
+        error.message || 'Failed to delete announcement',
+        error.code,
+        undefined,
+        error.details,
+        error.hint
+      );
+    }
+  });
 }
 
 export const deleteAnnouncement = withRateLimit(deleteAnnouncementImpl, 'write');

@@ -29,6 +29,7 @@ INSERT INTO escalation_rules (
 ### 3. Set Up Cron Job
 
 **GitHub Actions** (`.github/workflows/auto-escalate.yml`):
+
 ```yaml
 name: Auto-Escalate
 on:
@@ -53,6 +54,7 @@ node scripts/test-auto-escalation.js
 ## 📊 Quick Monitoring
 
 ### Check Recent Escalations
+
 ```sql
 SELECT id, title, escalated_at, escalation_level
 FROM complaints
@@ -60,11 +62,13 @@ WHERE escalated_at > NOW() - INTERVAL '24 hours';
 ```
 
 ### View Function Logs
+
 ```bash
 supabase functions logs auto-escalate-complaints --follow
 ```
 
 ### Check Active Rules
+
 ```sql
 SELECT * FROM escalation_rules WHERE is_active = true;
 ```
@@ -72,22 +76,26 @@ SELECT * FROM escalation_rules WHERE is_active = true;
 ## 🔧 Common Commands
 
 ### Deploy
+
 ```bash
 supabase functions deploy auto-escalate-complaints
 ```
 
 ### Test Locally
+
 ```bash
 supabase functions serve auto-escalate-complaints
 curl -X POST http://localhost:54321/functions/v1/auto-escalate-complaints
 ```
 
 ### View Logs
+
 ```bash
 supabase functions logs auto-escalate-complaints
 ```
 
 ### Manual Invoke
+
 ```bash
 curl -X POST \
   -H "Authorization: Bearer YOUR_SERVICE_KEY" \
@@ -96,24 +104,26 @@ curl -X POST \
 
 ## 📝 Recommended Rules
 
-| Category | Priority | Threshold | Escalate To |
-|----------|----------|-----------|-------------|
-| Harassment | Critical | 2 hours | Admin |
-| Academic | Critical | 2 hours | Admin |
-| Harassment | High | 4 hours | Senior Lecturer |
-| Academic | High | 24 hours | Department Head |
-| Facilities | High | 48 hours | Facilities Manager |
+| Category   | Priority | Threshold | Escalate To        |
+| ---------- | -------- | --------- | ------------------ |
+| Harassment | Critical | 2 hours   | Admin              |
+| Academic   | Critical | 2 hours   | Admin              |
+| Harassment | High     | 4 hours   | Senior Lecturer    |
+| Academic   | High     | 24 hours  | Department Head    |
+| Facilities | High     | 48 hours  | Facilities Manager |
 
 ## 🐛 Troubleshooting
 
 ### No Escalations Happening?
 
 1. **Check active rules**:
+
    ```sql
    SELECT * FROM escalation_rules WHERE is_active = true;
    ```
 
 2. **Check eligible complaints**:
+
    ```sql
    SELECT * FROM complaints
    WHERE status IN ('new', 'opened')
@@ -159,7 +169,7 @@ Ensure your service role key is correct in the cron job configuration.
 
 ```bash
 # 1. Create test complaint (backdated)
-psql -c "INSERT INTO complaints (student_id, title, description, category, priority, status, created_at) 
+psql -c "INSERT INTO complaints (student_id, title, description, category, priority, status, created_at)
 VALUES ((SELECT id FROM users WHERE role='student' LIMIT 1), 'Test', 'Test', 'academic', 'high', 'new', NOW() - INTERVAL '25 hours');"
 
 # 2. Run function

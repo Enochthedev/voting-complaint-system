@@ -141,6 +141,7 @@ The implementation includes:
 The implementation correctly uses the following database schema:
 
 ### complaints table
+
 ```sql
 - escalated_at: timestamp        -- Set when escalated
 - escalation_level: integer      -- Incremented on each escalation
@@ -149,6 +150,7 @@ The implementation correctly uses the following database schema:
 ```
 
 ### escalation_rules table
+
 ```sql
 - category: enum                 -- Matched against complaints
 - priority: enum                 -- Matched against complaints
@@ -158,6 +160,7 @@ The implementation correctly uses the following database schema:
 ```
 
 ### notifications table
+
 ```sql
 - user_id: uuid                  -- Set to rule.escalate_to
 - type: enum                     -- Set to 'complaint_escalated'
@@ -168,6 +171,7 @@ The implementation correctly uses the following database schema:
 ```
 
 ### complaint_history table
+
 ```sql
 - complaint_id: uuid             -- Escalated complaint
 - action: enum                   -- Set to 'escalated'
@@ -189,12 +193,14 @@ node scripts/test-auto-escalation.js
 ### Manual Testing
 
 1. Create an escalation rule:
+
 ```sql
 INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
 VALUES ('academic', 'high', 2, 'admin-user-id', true);
 ```
 
 2. Create an old complaint:
+
 ```sql
 INSERT INTO complaints (student_id, title, description, category, priority, status, created_at)
 VALUES (
@@ -209,6 +215,7 @@ VALUES (
 ```
 
 3. Invoke the edge function:
+
 ```bash
 curl -X POST \
   -H "Authorization: Bearer SERVICE_KEY" \
@@ -216,6 +223,7 @@ curl -X POST \
 ```
 
 4. Verify escalation:
+
 ```sql
 SELECT * FROM complaints WHERE escalated_at IS NOT NULL;
 SELECT * FROM notifications WHERE type = 'complaint_escalated';
@@ -236,6 +244,7 @@ These tasks involve deployment and scheduling configuration, not code implementa
 When ready to deploy:
 
 1. Deploy the edge function:
+
    ```bash
    supabase functions deploy auto-escalate-complaints
    ```
@@ -245,9 +254,7 @@ When ready to deploy:
      ```bash
      supabase functions schedule auto-escalate-complaints --cron "0 * * * *"
      ```
-   
    - **Option B**: GitHub Actions (see README for workflow)
-   
    - **Option C**: External cron service (Vercel, AWS EventBridge, etc.)
 
 3. Create at least one active escalation rule in the database

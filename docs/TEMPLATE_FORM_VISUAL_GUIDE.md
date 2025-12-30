@@ -240,6 +240,7 @@ On mobile devices, the form adapts:
 ## Dark Mode
 
 The form fully supports dark mode with:
+
 - Dark background colors
 - Light text on dark backgrounds
 - Adjusted border colors
@@ -296,6 +297,7 @@ The form fully supports dark mode with:
 ## Example Templates
 
 ### Template 1: Broken Equipment
+
 ```
 Title: Broken Equipment in Lab
 Description: Template for reporting broken or malfunctioning equipment
@@ -318,6 +320,7 @@ Fields:
 ```
 
 ### Template 2: Assignment Grading Issue
+
 ```
 Title: Assignment Grading Issue
 Description: Template for students to report concerns about assignment grading
@@ -348,6 +351,7 @@ Fields:
 ```
 
 ### Template 3: Parking Permit Issue
+
 ```
 Title: Parking Permit Issue
 Description: Template for reporting problems with parking permits
@@ -384,15 +388,15 @@ Fields:
 
 ## Common Validation Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "Title is required" | Empty title field | Enter a title |
-| "Title must be at least 3 characters" | Title too short | Add more characters |
-| "Description is required" | Empty description | Enter a description |
-| "Field name is required" | Empty field name | Enter a field name |
-| "Field name must be lowercase..." | Invalid format | Use lowercase and underscores |
-| "Field name must be unique" | Duplicate name | Use a different name |
-| "Field label is required" | Empty label | Enter a label |
+| Error                                 | Cause             | Solution                      |
+| ------------------------------------- | ----------------- | ----------------------------- |
+| "Title is required"                   | Empty title field | Enter a title                 |
+| "Title must be at least 3 characters" | Title too short   | Add more characters           |
+| "Description is required"             | Empty description | Enter a description           |
+| "Field name is required"              | Empty field name  | Enter a field name            |
+| "Field name must be lowercase..."     | Invalid format    | Use lowercase and underscores |
+| "Field name must be unique"           | Duplicate name    | Use a different name          |
+| "Field label is required"             | Empty label       | Enter a label                 |
 
 ## Performance
 

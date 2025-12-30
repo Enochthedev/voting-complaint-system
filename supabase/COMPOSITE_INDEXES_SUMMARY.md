@@ -9,6 +9,7 @@ Composite indexes are database indexes that include multiple columns. They are p
 ## Composite Indexes by Table
 
 ### 1. complaints
+
 **Migration**: `002_create_complaints_table.sql`
 
 - **idx_complaints_status_created_at** `(status, created_at DESC)`
@@ -24,6 +25,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all complaints assigned to me that are 'in_progress'"
 
 ### 2. complaint_tags
+
 **Migration**: `003_create_complaint_tags_table.sql`
 
 - **idx_complaint_tags_tag_complaint** `(tag_name, complaint_id)`
@@ -31,6 +33,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all complaints tagged with 'urgent'"
 
 ### 3. complaint_attachments
+
 **Migrations**: `004_create_complaint_attachments_table.sql`, `015_add_additional_composite_indexes.sql`
 
 - **idx_complaint_attachments_complaint_created** `(complaint_id, created_at DESC)`
@@ -38,6 +41,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all files attached to this complaint, newest first"
 
 ### 4. complaint_history
+
 **Migration**: `005_create_complaint_history_table.sql`
 
 - **idx_complaint_history_complaint_created** `(complaint_id, created_at DESC)`
@@ -45,6 +49,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all actions performed on this complaint, chronologically"
 
 ### 5. complaint_comments
+
 **Migration**: `006_create_complaint_comments_table.sql`
 
 - **idx_complaint_comments_complaint_created** `(complaint_id, created_at ASC)`
@@ -52,6 +57,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all comments on this complaint, oldest first"
 
 ### 6. complaint_ratings
+
 **Migration**: `015_add_additional_composite_indexes.sql`
 
 - **idx_complaint_ratings_created_rating** `(created_at DESC, rating)`
@@ -63,6 +69,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all ratings submitted by this student"
 
 ### 7. complaint_templates
+
 **Migration**: `008_create_complaint_templates_table.sql`
 
 - **idx_complaint_templates_active_category** `(is_active, category)`
@@ -70,6 +77,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all active templates for 'academic' complaints"
 
 ### 8. escalation_rules
+
 **Migration**: `009_create_escalation_rules_table.sql`
 
 - **idx_escalation_rules_active_category_priority** `(is_active, category, priority)`
@@ -77,6 +85,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Get escalation rule for 'harassment' complaints with 'critical' priority"
 
 ### 9. feedback
+
 **Migration**: `010_create_feedback_table.sql`
 
 - **idx_feedback_complaint_created** `(complaint_id, created_at DESC)`
@@ -84,6 +93,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all feedback on this complaint, newest first"
 
 ### 10. notifications
+
 **Migration**: `011_create_notifications_table.sql`
 
 - **idx_notifications_user_unread** `(user_id, is_read, created_at DESC)`
@@ -95,6 +105,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all 'complaint_opened' notifications for this user"
 
 ### 11. votes
+
 **Migration**: `012_create_votes_table.sql`
 
 - **idx_votes_active_created** `(is_active, created_at DESC)`
@@ -102,6 +113,7 @@ Composite indexes are database indexes that include multiple columns. They are p
   - Common queries: "Show all active polls, newest first"
 
 ### 12. vote_responses
+
 **Migration**: `013_create_vote_responses_table.sql`
 
 - **idx_vote_responses_vote_option** `(vote_id, selected_option)`

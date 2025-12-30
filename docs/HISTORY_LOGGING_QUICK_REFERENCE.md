@@ -6,19 +6,19 @@ All complaint actions are now automatically logged in the `complaint_history` ta
 
 ## What's Logged
 
-| Action | How | Status |
-|--------|-----|--------|
-| Complaint creation | Database trigger | ✅ |
-| Status changes | Database trigger | ✅ |
-| Assignment/reassignment | Database trigger | ✅ |
-| Feedback addition | Database trigger | ✅ NEW |
-| Comment addition | Database trigger | ✅ NEW |
-| Comment edit | Database trigger | ✅ NEW |
-| Comment deletion | Database trigger | ✅ NEW |
-| Complaint reopening | API function | ✅ |
-| Rating submission | API function | ✅ |
-| Tag addition | API function | ✅ |
-| Escalation | Not yet implemented | ⏳ |
+| Action                  | How                 | Status |
+| ----------------------- | ------------------- | ------ |
+| Complaint creation      | Database trigger    | ✅     |
+| Status changes          | Database trigger    | ✅     |
+| Assignment/reassignment | Database trigger    | ✅     |
+| Feedback addition       | Database trigger    | ✅ NEW |
+| Comment addition        | Database trigger    | ✅ NEW |
+| Comment edit            | Database trigger    | ✅ NEW |
+| Comment deletion        | Database trigger    | ✅ NEW |
+| Complaint reopening     | API function        | ✅     |
+| Rating submission       | API function        | ✅     |
+| Tag addition            | API function        | ✅     |
+| Escalation              | Not yet implemented | ⏳     |
 
 ## Quick Setup
 
@@ -45,6 +45,7 @@ node scripts/verify-history-logging.js
 ```
 
 Expected output:
+
 ```
 ✅ Passed: 9/9
 🎉 All tests passed!
@@ -57,7 +58,8 @@ Expected output:
 ```typescript
 const { data: complaint } = await supabase
   .from('complaints')
-  .select(`
+  .select(
+    `
     *,
     history:complaint_history(
       id,
@@ -71,12 +73,13 @@ const { data: complaint } = await supabase
         email
       )
     )
-  `)
+  `
+  )
   .eq('id', complaintId)
   .single();
 
 // Display in timeline
-complaint.history.forEach(entry => {
+complaint.history.forEach((entry) => {
   console.log(`${entry.action} by ${entry.performed_by_user.full_name}`);
 });
 ```
@@ -147,18 +150,21 @@ const { data: comments } = await supabase
 ### History not appearing?
 
 1. Check if triggers are installed:
+
 ```sql
-SELECT tgname FROM pg_trigger 
+SELECT tgname FROM pg_trigger
 WHERE tgname LIKE 'log_%';
 ```
 
 2. Check RLS policies:
+
 ```sql
-SELECT * FROM complaint_history 
+SELECT * FROM complaint_history
 WHERE complaint_id = 'your-complaint-id';
 ```
 
 3. Run verification script:
+
 ```bash
 node scripts/verify-history-logging.js
 ```
@@ -166,7 +172,7 @@ node scripts/verify-history-logging.js
 ### Need to see all triggers?
 
 ```sql
-SELECT 
+SELECT
   t.tgname as trigger_name,
   c.relname as table_name,
   p.proname as function_name

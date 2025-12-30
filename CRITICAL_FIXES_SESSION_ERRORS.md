@@ -6,6 +6,7 @@
 ## Problem Summary
 
 User reported three critical issues:
+
 1. **400 errors from Supabase** - Failed to load resource errors
 2. **Draft saving failures** - "Failed to Save Draft" errors
 3. **Session corruption** - "if a request fails, the dashboard data fails to load and all sessions after that gets corrupted"
@@ -13,24 +14,29 @@ User reported three critical issues:
 ## Root Causes Identified
 
 ### 1. Validation Schema Too Strict
+
 **Problem:** The `CreateComplaintSchema` required non-empty category and priority, but the form sends empty strings (`''`) for draft complaints.
 
 **Impact:** Validation errors were thrown when saving drafts, causing 400 errors.
 
 ### 2. Error Objects Lost Properties
+
 **Problem:** When wrapping Supabase errors in `new Error()`, we lost the `code` and `status` properties needed for auth error detection in `api-wrapper.ts`.
 
 **Impact:**
+
 - Auth errors couldn't be properly detected
 - Non-auth errors might falsely trigger session refresh
 - Session corruption when normal errors were treated as auth errors
 
 ### 3. Error Messages Were Objects
+
 **Problem:** Supabase errors are objects, not Error instances. Console showed "Object" instead of helpful error messages.
 
 **Impact:** Debugging was impossible, users saw unhelpful error messages.
 
 ### 4. Over-Aggressive Auth Error Detection
+
 **Problem:** The auth error check in `api-wrapper.ts` used broad string matching like `error?.message?.includes('session')`.
 
 **Impact:** Non-auth errors that mentioned "session" in the message would falsely trigger session refresh and logout.
@@ -44,11 +50,13 @@ User reported three critical issues:
 **File:** `src/lib/validation.ts`
 
 **Changes:**
+
 - Made category and priority accept empty strings using `z.union([ComplaintCategorySchema, z.literal('')])`
 - Added `.refine()` validation that only enforces required fields for non-drafts
 - Drafts can now be saved with minimal data
 
 **Code:**
+
 ```typescript
 export const CreateComplaintSchema = z
   .object({
@@ -85,10 +93,12 @@ export const CreateComplaintSchema = z
 **File:** `src/lib/validation.ts`
 
 **Changes:**
+
 - Created new `DatabaseError` class that preserves Supabase error properties
 - Maintains `code`, `status`, `details`, and `hint` for proper error handling
 
 **Code:**
+
 ```typescript
 export class DatabaseError extends Error {
   constructor(
@@ -109,6 +119,7 @@ export class DatabaseError extends Error {
 **File:** `src/lib/api/complaints.ts`
 
 **Changes:**
+
 - Replaced all `throw error` and `throw new Error()` with `throw new DatabaseError()`
 - Preserved Supabase error code, details, and hint in all 8 error locations:
   - getUserComplaintsImpl
@@ -120,6 +131,7 @@ export class DatabaseError extends Error {
   - deleteComplaintImpl
 
 **Example:**
+
 ```typescript
 if (error) {
   throw new DatabaseError(
@@ -137,23 +149,26 @@ if (error) {
 **File:** `src/lib/api-wrapper.ts`
 
 **Changes:**
+
 - Made auth error detection more specific
 - Only treat 401 status or specific error codes as auth errors
 - Removed broad string matching that could cause false positives
 
 **Before:**
+
 ```typescript
 const isAuthError =
   error?.message?.includes('JWT') ||
   error?.message?.includes('token') ||
   error?.message?.includes('expired') ||
   error?.message?.includes('invalid') ||
-  error?.message?.includes('session') ||  // TOO BROAD!
+  error?.message?.includes('session') || // TOO BROAD!
   error?.code === 'PGRST301' ||
   error?.status === 401;
 ```
 
 **After:**
+
 ```typescript
 const isAuthError =
   error?.status === 401 ||
@@ -167,11 +182,13 @@ const isAuthError =
 **File:** `src/hooks/use-complaints.ts`
 
 **Changes:**
+
 - Added DatabaseError handling to all mutation error handlers
 - Show detailed error messages from `error.details` when available
 - Proper error type checking for ValidationError, TimeoutError, and DatabaseError
 
 **Code:**
+
 ```typescript
 if (err instanceof ValidationError) {
   errorMessage = err.getUserMessage();
@@ -191,9 +208,11 @@ toast.error(errorMessage, 'Error Creating Complaint');
 ## Files Modified
 
 ### Created Files (1)
+
 - `src/lib/validation.ts` - Added DatabaseError class
 
 ### Modified Files (3)
+
 1. **src/lib/validation.ts**
    - Updated CreateComplaintSchema to allow drafts
    - Created DatabaseError class
@@ -216,6 +235,7 @@ toast.error(errorMessage, 'Error Creating Complaint');
 ## Impact
 
 ### Before Fixes
+
 - ❌ Draft saving failed with validation errors
 - ❌ Error messages showed "Object" in console
 - ❌ Session got corrupted when non-auth errors occurred
@@ -223,6 +243,7 @@ toast.error(errorMessage, 'Error Creating Complaint');
 - ❌ Auth error detection had false positives
 
 ### After Fixes
+
 - ✅ Drafts save successfully with minimal data
 - ✅ Error messages are clear and helpful
 - ✅ Session remains stable even when queries fail

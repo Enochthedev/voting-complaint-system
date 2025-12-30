@@ -49,10 +49,7 @@ const CATEGORY_OPTIONS: Array<{ value: ComplaintCategory; label: string }> = [
 ];
 
 // Category filter handler
-const handleCategoryChange = (
-  category: ComplaintCategory,
-  checked: boolean
-) => {
+const handleCategoryChange = (category: ComplaintCategory, checked: boolean) => {
   const newCategory = checked
     ? [...filters.category, category]
     : filters.category.filter((c) => c !== category);
@@ -87,9 +84,7 @@ The category filter is integrated into the complaints page filtering logic:
 ```typescript
 // Apply category filter
 if (filters.category.length > 0) {
-  complaints = complaints.filter((complaint) =>
-    filters.category.includes(complaint.category)
-  );
+  complaints = complaints.filter((complaint) => filters.category.includes(complaint.category));
 }
 ```
 
@@ -190,6 +185,7 @@ A live demo of the category filter is available in the filter panel demo compone
 Location: `src/components/complaints/__tests__/filter-panel-demo.tsx`
 
 To view the demo:
+
 1. Navigate to the demo component
 2. Select different categories from the filter panel
 3. Observe the filter state updates in real-time

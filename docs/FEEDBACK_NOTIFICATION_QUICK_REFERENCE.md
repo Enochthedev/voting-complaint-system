@@ -15,6 +15,7 @@ Lecturer adds feedback → Database trigger → Notification created → Student
 ## What Gets Created
 
 ### 1. Notification
+
 - **Type**: `feedback_received`
 - **Title**: "New Feedback Received"
 - **Message**: "A lecturer has provided feedback on your complaint: [complaint title]"
@@ -22,6 +23,7 @@ Lecturer adds feedback → Database trigger → Notification created → Student
 - **Exception**: No notification for anonymous complaints
 
 ### 2. History Entry
+
 - **Action**: `feedback_added`
 - **Logged in**: `complaint_history` table
 - **Includes**: Feedback ID, lecturer ID, timestamp
@@ -29,17 +31,20 @@ Lecturer adds feedback → Database trigger → Notification created → Student
 ## Files
 
 ### Migration
+
 ```
 supabase/migrations/029_create_feedback_notification_trigger.sql
 ```
 
 ### Documentation
+
 ```
 docs/FEEDBACK_NOTIFICATION_IMPLEMENTATION.md
 docs/TASK_5.1_FEEDBACK_NOTIFICATION_COMPLETION.md
 ```
 
 ### Test Scripts
+
 ```
 scripts/test-feedback-notification.js
 scripts/verify-feedback-notification-trigger.js
@@ -68,12 +73,14 @@ node scripts/test-feedback-notification.js
 ## Database Triggers
 
 ### `notify_on_feedback_added`
+
 - **Table**: `feedback`
 - **Event**: AFTER INSERT
 - **Function**: `notify_student_on_feedback()`
 - **Purpose**: Create notification for student
 
 ### `log_feedback_addition_trigger`
+
 - **Table**: `feedback`
 - **Event**: AFTER INSERT
 - **Function**: `log_feedback_addition()`
@@ -101,13 +108,17 @@ When integrated with Supabase Realtime:
 ```javascript
 supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, handleNewNotification)
-  .subscribe()
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    handleNewNotification
+  )
+  .subscribe();
 ```
 
 ## Example Notification
@@ -148,11 +159,13 @@ supabase
 ### Notifications not being created?
 
 1. Check if migration is applied:
+
    ```bash
    node scripts/verify-feedback-notification-trigger.js
    ```
 
 2. Check if triggers are enabled:
+
    ```sql
    SELECT * FROM pg_trigger WHERE tgname LIKE '%feedback%';
    ```
@@ -165,6 +178,7 @@ supabase
 ### History entries not being created?
 
 1. Verify trigger exists:
+
    ```sql
    SELECT * FROM pg_trigger WHERE tgname = 'log_feedback_addition_trigger';
    ```

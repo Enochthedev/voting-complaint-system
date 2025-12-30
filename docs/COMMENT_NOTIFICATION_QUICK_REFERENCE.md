@@ -14,13 +14,13 @@ User adds comment → Database trigger fires → Notifications created automatic
 
 ## Notification Rules
 
-| Scenario | Student Notified? | Assigned Lecturer Notified? |
-|----------|-------------------|----------------------------|
-| Lecturer comments on student's complaint | ✅ Yes | ❌ No (own comment) |
-| Student replies to their complaint | ❌ No (own comment) | ✅ Yes |
-| Another lecturer comments | ✅ Yes (if not anonymous) | ✅ Yes (if assigned) |
-| Internal note added | ❌ No | ❌ No |
-| Comment on anonymous complaint | ❌ No (no student) | ✅ Yes (if assigned) |
+| Scenario                                 | Student Notified?         | Assigned Lecturer Notified? |
+| ---------------------------------------- | ------------------------- | --------------------------- |
+| Lecturer comments on student's complaint | ✅ Yes                    | ❌ No (own comment)         |
+| Student replies to their complaint       | ❌ No (own comment)       | ✅ Yes                      |
+| Another lecturer comments                | ✅ Yes (if not anonymous) | ✅ Yes (if assigned)        |
+| Internal note added                      | ❌ No                     | ❌ No                       |
+| Comment on anonymous complaint           | ❌ No (no student)        | ✅ Yes (if assigned)        |
 
 ## Code Example
 
@@ -28,14 +28,12 @@ User adds comment → Database trigger fires → Notifications created automatic
 
 ```typescript
 // Simple insert - notifications are automatic!
-const { data, error } = await supabase
-  .from('complaint_comments')
-  .insert({
-    complaint_id: complaintId,
-    user_id: currentUser.id,
-    comment: commentText,
-    is_internal: false, // Set to true for internal notes
-  });
+const { data, error } = await supabase.from('complaint_comments').insert({
+  complaint_id: complaintId,
+  user_id: currentUser.id,
+  comment: commentText,
+  is_internal: false, // Set to true for internal notes
+});
 
 // That's it! Notifications are created by database trigger
 ```
@@ -44,14 +42,12 @@ const { data, error } = await supabase
 
 ```typescript
 // Internal notes do NOT create notifications
-const { data, error } = await supabase
-  .from('complaint_comments')
-  .insert({
-    complaint_id: complaintId,
-    user_id: currentUser.id,
-    comment: internalNoteText,
-    is_internal: true, // This prevents notifications
-  });
+const { data, error } = await supabase.from('complaint_comments').insert({
+  complaint_id: complaintId,
+  user_id: currentUser.id,
+  comment: internalNoteText,
+  is_internal: true, // This prevents notifications
+});
 ```
 
 ## Database Triggers
@@ -59,27 +55,32 @@ const { data, error } = await supabase
 ### Trigger 1: `notify_on_comment_added_trigger`
 
 **What it does:**
+
 - Creates notifications for complaint owner (if not anonymous)
 - Creates notifications for assigned lecturer
 - Skips notifications for internal notes
 - Skips notifications for comment author
 
 **When it runs:**
+
 - After INSERT on `complaint_comments` table
 
 ### Trigger 2: `log_comment_addition_trigger`
 
 **What it does:**
+
 - Logs comment in `complaint_history` table
 - Marks internal notes as "internal_note" type
 - Includes comment metadata in details
 
 **When it runs:**
+
 - After INSERT on `complaint_comments` table
 
 ## Notification Details
 
 ### For Students
+
 ```json
 {
   "type": "comment_added",
@@ -90,6 +91,7 @@ const { data, error } = await supabase
 ```
 
 ### For Lecturers
+
 ```json
 {
   "type": "comment_added",
@@ -123,18 +125,21 @@ node scripts/test-comment-notifications.js
 ### No Notifications Created
 
 **Check 1:** Is the trigger installed?
+
 ```sql
-SELECT * FROM information_schema.triggers 
+SELECT * FROM information_schema.triggers
 WHERE trigger_name = 'notify_on_comment_added_trigger';
 ```
 
 **Check 2:** Is it an internal note?
+
 ```sql
 -- Internal notes don't create notifications
 SELECT is_internal FROM complaint_comments WHERE id = 'comment-id';
 ```
 
 **Check 3:** Did the author comment on their own complaint?
+
 ```sql
 -- Users don't get notified of their own comments
 SELECT user_id, complaint_id FROM complaint_comments WHERE id = 'comment-id';
@@ -145,27 +150,32 @@ SELECT user_id, complaint_id FROM complaint_comments WHERE id = 'comment-id';
 **Problem:** Internal notes are creating notifications
 
 **Solution:** Ensure `is_internal` is set to `true`:
+
 ```typescript
 // Correct
-is_internal: true  // No notifications
+is_internal: true; // No notifications
 
 // Incorrect
-is_internal: false // Creates notifications
+is_internal: false; // Creates notifications
 ```
 
 ## Files
 
 ### Database
+
 - `supabase/migrations/030_create_comment_notification_trigger.sql` - Trigger definition
 
 ### Scripts
+
 - `scripts/test-comment-notifications.js` - Automated tests
 
 ### Documentation
+
 - `docs/COMMENT_NOTIFICATION_IMPLEMENTATION.md` - Full implementation guide
 - `docs/COMMENT_NOTIFICATION_QUICK_REFERENCE.md` - This file
 
 ### Frontend
+
 - `src/components/complaints/comment-input.tsx` - Comment input component
 - `src/components/complaints/complaint-detail-view.tsx` - Uses comment input
 
@@ -187,6 +197,7 @@ is_internal: false // Creates notifications
 ## Next Steps
 
 After implementing comment notifications:
+
 1. ✅ Test with automated script
 2. ✅ Verify in Supabase Dashboard
 3. ⏭️ Implement notification UI (Phase 6)

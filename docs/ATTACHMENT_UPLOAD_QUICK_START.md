@@ -49,7 +49,7 @@ import { Button } from '@/components/ui/button';
 
 export function MyComplaintForm() {
   const [files, setFiles] = useState<File[]>([]);
-  
+
   const {
     uploadProgress,
     uploadedAttachments,
@@ -103,14 +103,9 @@ If you prefer not to use the hook:
 import { uploadAttachment } from '@/lib/attachment-upload';
 
 async function handleUpload(file: File) {
-  const result = await uploadAttachment(
-    file,
-    'complaint-id',
-    'user-id',
-    (progress) => {
-      console.log(`Upload: ${progress}%`);
-    }
-  );
+  const result = await uploadAttachment(file, 'complaint-id', 'user-id', (progress) => {
+    console.log(`Upload: ${progress}%`);
+  });
 
   if (result.success) {
     console.log('Uploaded:', result.attachment);
@@ -127,7 +122,7 @@ import { getComplaintAttachments, getAttachmentUrl } from '@/lib/attachment-uplo
 
 async function loadAttachments(complaintId: string) {
   const attachments = await getComplaintAttachments(complaintId);
-  
+
   if (attachments) {
     for (const attachment of attachments) {
       const url = await getAttachmentUrl(attachment.file_path);
@@ -144,7 +139,7 @@ import { deleteAttachment } from '@/lib/attachment-upload';
 
 async function handleDelete(attachmentId: string, filePath: string) {
   const result = await deleteAttachment(attachmentId, filePath);
-  
+
   if (result.success) {
     console.log('Deleted successfully');
   } else {
@@ -188,11 +183,11 @@ const handleSubmit = async (formData) => {
   if (files.length > 0) {
     await uploadFiles(files, complaintId, userId);
   }
-  
+
   // Then submit form
   await submitComplaint({
     ...formData,
-    attachmentIds: uploadedAttachments.map(a => a.id),
+    attachmentIds: uploadedAttachments.map((a) => a.id),
   });
 };
 ```
@@ -225,9 +220,9 @@ const handleFilesSelected = async (newFiles: File[]) => {
 const handleUpload = async (files: File[]) => {
   try {
     await uploadFiles(files, complaintId, userId);
-    
+
     // Check for any errors
-    const hasErrors = uploadProgress.some(p => p.status === 'error');
+    const hasErrors = uploadProgress.some((p) => p.status === 'error');
     if (hasErrors) {
       alert('Some files failed to upload');
     }
@@ -256,21 +251,25 @@ const handleUpload = async (files: File[]) => {
 ## Troubleshooting
 
 **Files not uploading?**
+
 - Check console for errors
 - Verify Supabase connection
 - Ensure storage bucket exists
 - Check RLS policies
 
 **Progress not updating?**
+
 - Ensure `onProgress` callback is provided
 - Check component re-renders
 
 **Database errors?**
+
 - Verify table schema matches types
 - Check RLS policies allow insert
 - Ensure user is authenticated
 
 **Storage errors?**
+
 - Check bucket configuration
 - Verify file size limits
 - Ensure storage policies allow upload

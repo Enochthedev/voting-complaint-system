@@ -9,11 +9,13 @@
 ### Scenario 1: First-Time Rating (Happy Path)
 
 **Setup**:
+
 1. Log in as a student
 2. Navigate to a resolved complaint that you submitted
 3. Complaint should not have been rated yet
 
 **Expected Behavior**:
+
 - ✅ Rating prompt card is displayed
 - ✅ Card shows: "Rate Your Experience"
 - ✅ Card shows complaint title
@@ -23,12 +25,14 @@
 - ✅ "Skip" button is available
 
 **Actions**:
+
 1. Hover over stars - they should highlight in yellow
 2. Click on 5 stars
 3. Type feedback: "Great resolution, thank you!"
 4. Click "Submit Rating"
 
 **Expected Result**:
+
 - ✅ Rating is submitted successfully
 - ✅ Rating prompt disappears
 - ✅ Success message or toast notification appears
@@ -40,24 +44,29 @@
 ### Scenario 2: Duplicate Rating Attempt (Error Handling)
 
 **Setup**:
+
 1. Use the same complaint from Scenario 1 (already rated)
 2. Refresh the page or navigate away and back
 
 **Expected Behavior**:
+
 - ✅ Rating prompt is NOT displayed
 - ✅ Complaint detail view shows normally
 - ✅ History timeline shows the previous rating
 - ✅ No way to submit another rating
 
 **Manual Test** (if you try to bypass UI):
+
 1. Open browser console
 2. Try to call the API directly:
+
 ```javascript
 // This should fail
 await submitRating('complaint-id', 'student-id', 4, 'Another rating');
 ```
 
 **Expected Result**:
+
 - ✅ API returns error: "You have already rated this complaint"
 - ✅ No new rating is created in database
 - ✅ Original rating remains unchanged
@@ -67,14 +76,17 @@ await submitRating('complaint-id', 'student-id', 4, 'Another rating');
 ### Scenario 3: Rating Prompt Dismissal
 
 **Setup**:
+
 1. Log in as a student
 2. Navigate to a resolved complaint (not yet rated)
 3. Rating prompt is displayed
 
 **Actions**:
+
 1. Click the "Skip" button or X icon
 
 **Expected Behavior**:
+
 - ✅ Rating prompt disappears
 - ✅ Dismissal is saved to localStorage
 - ✅ Refresh page - prompt does NOT reappear
@@ -85,21 +97,25 @@ await submitRating('complaint-id', 'student-id', 4, 'Another rating');
 ### Scenario 4: Non-Resolved Complaint
 
 **Setup**:
+
 1. Log in as a student
 2. Navigate to a complaint with status: "open", "in_progress", or "new"
 
 **Expected Behavior**:
+
 - ✅ Rating prompt is NOT displayed
 - ✅ No way to submit a rating
 - ✅ Complaint detail view shows normally
 
 **Manual Test** (if you try to bypass UI):
+
 ```javascript
 // This should fail
 await submitRating('open-complaint-id', 'student-id', 5);
 ```
 
 **Expected Result**:
+
 - ✅ API returns error: "Can only rate resolved complaints"
 
 ---
@@ -107,20 +123,24 @@ await submitRating('open-complaint-id', 'student-id', 5);
 ### Scenario 5: Non-Owner Attempt
 
 **Setup**:
+
 1. Log in as Student A
 2. Try to rate a complaint submitted by Student B (even if resolved)
 
 **Expected Behavior**:
+
 - ✅ Rating prompt is NOT displayed (UI prevents this)
 - ✅ No way to submit a rating
 
 **Manual Test** (if you try to bypass UI):
+
 ```javascript
 // This should fail
 await submitRating('other-student-complaint-id', 'your-student-id', 5);
 ```
 
 **Expected Result**:
+
 - ✅ API returns error: "Only the complaint owner can rate"
 
 ---
@@ -128,14 +148,16 @@ await submitRating('other-student-complaint-id', 'your-student-id', 5);
 ### Scenario 6: Invalid Rating Values
 
 **Manual Test** (API validation):
+
 ```javascript
 // These should all fail
-await submitRating('complaint-id', 'student-id', 0);  // Too low
-await submitRating('complaint-id', 'student-id', 6);  // Too high
+await submitRating('complaint-id', 'student-id', 0); // Too low
+await submitRating('complaint-id', 'student-id', 6); // Too high
 await submitRating('complaint-id', 'student-id', -1); // Negative
 ```
 
 **Expected Result**:
+
 - ✅ API returns error: "Rating must be between 1 and 5"
 - ✅ Database CHECK constraint also prevents invalid values
 
@@ -144,10 +166,12 @@ await submitRating('complaint-id', 'student-id', -1); // Negative
 ### Scenario 7: Lecturer/Admin View
 
 **Setup**:
+
 1. Log in as a lecturer or admin
 2. Navigate to any resolved complaint
 
 **Expected Behavior**:
+
 - ✅ Rating prompt is NOT displayed (lecturers don't rate)
 - ✅ If complaint has been rated, rating is visible in history
 - ✅ Lecturers can VIEW ratings but not submit them
@@ -157,10 +181,12 @@ await submitRating('complaint-id', 'student-id', -1); // Negative
 ### Scenario 8: Anonymous Complaint
 
 **Setup**:
+
 1. Log in as a student
 2. Navigate to a resolved complaint that was submitted anonymously by you
 
 **Expected Behavior**:
+
 - ✅ Rating prompt IS displayed (you can still rate your own anonymous complaint)
 - ✅ Rating submission works normally
 - ✅ Rating is recorded but maintains complaint anonymity
@@ -193,7 +219,7 @@ VALUES ('new-complaint-id', 'student-id', 6);
 
 ```sql
 -- Check if complaint has been rated
-SELECT * FROM complaint_ratings 
+SELECT * FROM complaint_ratings
 WHERE complaint_id = 'your-complaint-id';
 
 -- Should return 0 or 1 row (never more than 1)

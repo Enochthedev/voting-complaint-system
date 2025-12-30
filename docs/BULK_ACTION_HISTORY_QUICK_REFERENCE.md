@@ -1,62 +1,69 @@
 # Bulk Action History Logging - Quick Reference
 
 ## Overview
+
 All bulk actions in the complaint management system automatically log to the `complaint_history` table for audit and transparency.
 
 ## API Functions
 
 ### 1. Bulk Status Change
+
 ```typescript
 import { bulkChangeStatus } from '@/lib/api/complaints';
 
 const results = await bulkChangeStatus(
-  ['complaint-id-1', 'complaint-id-2'],  // Array of complaint IDs
-  'in_progress',                          // New status
-  'user-id'                               // User performing the action
+  ['complaint-id-1', 'complaint-id-2'], // Array of complaint IDs
+  'in_progress', // New status
+  'user-id' // User performing the action
 );
 
 // Returns: { success: number, failed: number, errors: string[] }
 ```
 
 **History Entry Created**:
+
 - Action: `status_changed`
 - Old Value: Previous status
 - New Value: New status
 - Details: `{ bulk_action: true }`
 
 ### 2. Bulk Assignment
+
 ```typescript
 import { bulkAssignComplaints } from '@/lib/api/complaints';
 
 const results = await bulkAssignComplaints(
-  ['complaint-id-1', 'complaint-id-2'],  // Array of complaint IDs
-  'lecturer-id',                          // Lecturer to assign to
-  'user-id'                               // User performing the action
+  ['complaint-id-1', 'complaint-id-2'], // Array of complaint IDs
+  'lecturer-id', // Lecturer to assign to
+  'user-id' // User performing the action
 );
 
 // Returns: { success: number, failed: number, errors: string[] }
 ```
 
 **History Entry Created**:
+
 - Action: `assigned`
 - Old Value: Previous assignment or "unassigned"
 - New Value: New lecturer ID
 - Details: `{ lecturer_name: string, bulk_action: true }`
 
 ### 3. Bulk Tag Addition
+
 ```typescript
 import { bulkAddTags } from '@/lib/api/complaints';
 
 const results = await bulkAddTags(
-  ['complaint-id-1', 'complaint-id-2'],  // Array of complaint IDs
-  ['urgent', 'facilities'],               // Tags to add
-  'user-id'                               // User performing the action
+  ['complaint-id-1', 'complaint-id-2'], // Array of complaint IDs
+  ['urgent', 'facilities'], // Tags to add
+  'user-id' // User performing the action
 );
 
 // Returns: { success: number, failed: number, errors: string[] }
 ```
 
 **History Entry Created**:
+
 - Action: `tags_added`
 - Old Value: Comma-separated list of existing tags
 - New Value: Comma-separated list of all tags after addition
@@ -65,6 +72,7 @@ const results = await bulkAddTags(
 ## Querying Bulk Action History
 
 ### Get All Bulk Actions
+
 ```typescript
 const { data, error } = await supabase
   .from('complaint_history')
@@ -74,6 +82,7 @@ const { data, error } = await supabase
 ```
 
 ### Get Bulk Actions for a Specific Complaint
+
 ```typescript
 const { data, error } = await supabase
   .from('complaint_history')
@@ -84,6 +93,7 @@ const { data, error } = await supabase
 ```
 
 ### Get Bulk Actions by Type
+
 ```typescript
 // Status changes
 const { data, error } = await supabase
@@ -108,6 +118,7 @@ const { data, error } = await supabase
 ```
 
 ### Get Bulk Actions by User
+
 ```typescript
 const { data, error } = await supabase
   .from('complaint_history')
@@ -140,6 +151,7 @@ interface ComplaintHistoryEntry {
 ## Error Handling
 
 All bulk action functions:
+
 - Process each complaint individually
 - Continue on errors (don't fail entire batch)
 - Return detailed results with success/failure counts
@@ -147,6 +159,7 @@ All bulk action functions:
 - Don't fail if history logging fails (non-blocking)
 
 Example error handling:
+
 ```typescript
 const results = await bulkChangeStatus(ids, status, userId);
 
@@ -156,13 +169,14 @@ if (results.success > 0) {
 
 if (results.failed > 0) {
   console.error(`❌ Failed to update ${results.failed} complaints`);
-  results.errors.forEach(error => console.error(error));
+  results.errors.forEach((error) => console.error(error));
 }
 ```
 
 ## Verification
 
 Run the verification script to check bulk action history:
+
 ```bash
 node scripts/verify-bulk-action-history.js
 ```
@@ -170,6 +184,7 @@ node scripts/verify-bulk-action-history.js
 ## Database Migration
 
 The `tags_added` action type was added via migration:
+
 ```sql
 -- Migration: 036_add_tags_added_to_complaint_action.sql
 ALTER TYPE complaint_action ADD VALUE IF NOT EXISTS 'tags_added';
@@ -188,23 +203,19 @@ ALTER TYPE complaint_action ADD VALUE IF NOT EXISTS 'tags_added';
 ```typescript
 const handleBulkStatusChange = async (status: ComplaintStatus) => {
   try {
-    const results = await bulkChangeStatus(
-      Array.from(selectedIds),
-      status,
-      currentUserId
-    );
-    
+    const results = await bulkChangeStatus(Array.from(selectedIds), status, currentUserId);
+
     if (results.success > 0) {
       showSuccessToast(`Updated ${results.success} complaints`);
     }
-    
+
     if (results.failed > 0) {
       showErrorToast(`Failed to update ${results.failed} complaints`);
     }
-    
+
     // Refresh complaint list
     await refreshComplaints();
-    
+
     // Clear selection
     setSelectedIds(new Set());
   } catch (error) {

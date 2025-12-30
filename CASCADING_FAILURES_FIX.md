@@ -14,6 +14,7 @@
 ### 1. React Fast Refresh / Hot Module Reload Issue
 
 The ReferenceError `"Cannot access 'ef' before initialization"` was caused by:
+
 - Hot module reloading creating stale module references
 - Minified variable names (`ef`) in development build
 - Circular module dependencies being resolved in wrong order
@@ -25,6 +26,7 @@ The ReferenceError `"Cannot access 'ef' before initialization"` was caused by:
 **Root Cause**: React Query was throwing errors to error boundaries, causing entire pages to crash when a single query failed.
 
 **Flow Before Fix**:
+
 ```
 1. Query A fails (e.g., user complaints)
    ↓
@@ -38,6 +40,7 @@ The ReferenceError `"Cannot access 'ef' before initialization"` was caused by:
 ```
 
 **Configuration Issue**:
+
 ```typescript
 // BEFORE (DEFAULT BEHAVIOR):
 queries: {
@@ -51,6 +54,7 @@ queries: {
 **Root Cause**: Cache invalidation was conditional - only invalidating drafts OR complaints, not both.
 
 **Code Before**:
+
 ```typescript
 onSuccess: (data, variables) => {
   queryClient.invalidateQueries({ queryKey: complaintKeys.all });
@@ -58,14 +62,14 @@ onSuccess: (data, variables) => {
   // Only invalidate one or the other ❌
   if (variables.is_draft) {
     queryClient.invalidateQueries({
-      queryKey: complaintKeys.userDrafts(variables.student_id)
+      queryKey: complaintKeys.userDrafts(variables.student_id),
     });
   } else {
     queryClient.invalidateQueries({
-      queryKey: complaintKeys.user(variables.student_id)
+      queryKey: complaintKeys.user(variables.student_id),
     });
   }
-}
+};
 ```
 
 **Problem**: If a draft is created, the user's complaints list wasn't invalidated, and vice versa.
@@ -79,12 +83,14 @@ onSuccess: (data, variables) => {
 **File:** `src/lib/react-query.tsx`
 
 **Changes:**
+
 1. Set `throwOnError: false` for both queries and mutations
 2. Added smart retry logic - don't retry 4xx errors
 3. Added exponential backoff for retries
 4. Disabled mutation retries (prevent duplicate side effects)
 
 **Code:**
+
 ```typescript
 function makeQueryClient() {
   return new QueryClient({
@@ -93,9 +99,9 @@ function makeQueryClient() {
         // Smart retry - don't retry client errors (4xx)
         retry: (failureCount, error: any) => {
           if (error?.status >= 400 && error?.status < 500) {
-            return false;  // Don't retry 4xx errors
+            return false; // Don't retry 4xx errors
           }
-          return failureCount < 2;  // Retry network errors up to 2 times
+          return failureCount < 2; // Retry network errors up to 2 times
         },
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 
@@ -115,6 +121,7 @@ function makeQueryClient() {
 ```
 
 **Impact**:
+
 - ✅ Failed queries no longer crash the page
 - ✅ Other queries continue to work independently
 - ✅ Smart retry prevents wasted requests on client errors
@@ -128,6 +135,7 @@ function makeQueryClient() {
 Always invalidate ALL user complaint-related queries, not just one.
 
 **Code:**
+
 ```typescript
 onSuccess: (data, variables: any) => {
   // Invalidate all complaint queries to ensure fresh data
@@ -147,6 +155,7 @@ onSuccess: (data, variables: any) => {
 ```
 
 **Why This Works**:
+
 - When a draft is saved, it invalidates the drafts list → user sees new draft
 - When a complaint is submitted, it invalidates both lists → UI updates everywhere
 - Stats are always fresh after any mutation
@@ -156,6 +165,7 @@ onSuccess: (data, variables: any) => {
 **Issue**: Hot module reloading can create stale references in development.
 
 **Solution**:
+
 ```bash
 # Kill the dev server (Ctrl+C)
 # Clear Next.js cache
@@ -170,6 +180,7 @@ npm run dev
 ## Error Handling Flow
 
 ### Before Fixes:
+
 ```
 Query fails
   ↓
@@ -181,6 +192,7 @@ All other queries unmounted ❌
 ```
 
 ### After Fixes:
+
 ```
 Query A fails
   ↓
@@ -198,21 +210,25 @@ Dashboard shows partial data with error state
 ## Benefits
 
 ### 1. Resilient Dashboard
+
 - One failed query doesn't break the entire page
 - Users can still see and interact with working components
 - Better user experience during network issues
 
 ### 2. Smart Retry Logic
+
 - Don't waste resources retrying 4xx errors (they'll keep failing)
 - Exponential backoff prevents server overload
 - Network errors get retried with increasing delays
 
 ### 3. Always Fresh Drafts
+
 - Creating a draft immediately shows it in the drafts list
 - Submitting a draft removes it from drafts and adds to complaints
 - No more stale data or missing drafts
 
 ### 4. No Mutation Retries
+
 - Mutations might have side effects (create, update, delete)
 - Retrying could create duplicates or inconsistent state
 - Errors are handled in onError callbacks with user feedback
@@ -280,6 +296,7 @@ Dashboard shows partial data with error state
 ### Test ReferenceError Fix:
 
 1. **Restart Dev Server:**
+
    ```bash
    # Stop server (Ctrl+C)
    rm -rf .next
@@ -318,6 +335,7 @@ Route (app)
 ## Related Fixes
 
 This fix builds on previous session management improvements:
+
 - Session corruption fixes (DatabaseError preservation)
 - Logout reliability fixes (optimistic logout)
 - Draft validation fixes (status enum sync)

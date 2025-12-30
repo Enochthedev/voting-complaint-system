@@ -7,6 +7,7 @@ This document describes the database trigger that automatically creates notifica
 ## Implementation
 
 ### Migration File
+
 - **File**: `supabase/migrations/030_create_feedback_notification_trigger.sql`
 - **Applied**: ✅ Successfully applied to database
 
@@ -35,12 +36,15 @@ This document describes the database trigger that automatically creates notifica
 ### Database Changes
 
 #### Enum Update
+
 Added 'feedback_received' to the `notification_type` enum:
+
 ```sql
 ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'feedback_received';
 ```
 
 #### Trigger Function
+
 ```sql
 CREATE OR REPLACE FUNCTION public.notify_student_on_feedback()
 RETURNS TRIGGER AS $$
@@ -53,7 +57,7 @@ BEGIN
   INTO v_complaint_title, v_student_id
   FROM public.complaints c
   WHERE c.id = NEW.complaint_id;
-  
+
   -- Only notify if the complaint has a student_id (not anonymous or has student)
   IF v_student_id IS NOT NULL THEN
     INSERT INTO public.notifications (
@@ -72,13 +76,14 @@ BEGIN
       false
     );
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 #### Trigger Creation
+
 ```sql
 CREATE TRIGGER notify_on_feedback_received
   AFTER INSERT ON public.feedback
@@ -89,12 +94,14 @@ CREATE TRIGGER notify_on_feedback_received
 ## Testing
 
 ### Test Script
+
 - **File**: `scripts/test-feedback-notification-trigger.js`
 - **Status**: ✅ All tests passing
 
 ### Test Results
 
 The test script verifies:
+
 1. ✅ Trigger creates notification when feedback is added
 2. ✅ Notification has correct type ('feedback_received')
 3. ✅ Notification has correct title
@@ -114,6 +121,7 @@ node scripts/test-feedback-notification-trigger.js
 ### For Students
 
 When a lecturer provides feedback on their complaint:
+
 1. A notification appears in their notification center
 2. The notification shows:
    - Title: "You received feedback on your complaint"
@@ -141,6 +149,7 @@ No notification is sent to lecturers when they add feedback (they are the ones p
 ## Acceptance Criteria
 
 This trigger satisfies the following acceptance criteria:
+
 - **AC5**: Lecturers can provide feedback on complaints
 - **P5**: Students receive notifications when feedback is added
 

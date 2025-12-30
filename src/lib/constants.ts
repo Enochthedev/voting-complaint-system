@@ -24,7 +24,7 @@ export type ComplaintPriority = (typeof COMPLAINT_PRIORITIES)[number];
 export const COMPLAINT_STATUSES = [
   'draft',
   'new',
-  'opened',  // Database has 'opened' not 'open'
+  'opened', // Database has 'opened' not 'open'
   'in_progress',
   'resolved',
   'closed',

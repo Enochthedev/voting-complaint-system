@@ -11,18 +11,20 @@ Search result highlighting visually emphasizes matching search terms in complain
 **Search Query:** `"lecture"`
 
 **Before Highlighting:**
+
 ```
 Title: Broken Air Conditioning in Lecture Hall A
 Description: The air conditioning system in Lecture Hall A has been malfunctioning...
 ```
 
 **After Highlighting:**
+
 ```
 Title: Broken Air Conditioning in [Lecture] Hall A
 Description: The air conditioning system in [Lecture] Hall A has been malfunctioning...
 ```
 
-*Note: [Lecture] represents highlighted text with yellow background*
+_Note: [Lecture] represents highlighted text with yellow background_
 
 ---
 
@@ -31,12 +33,14 @@ Description: The air conditioning system in [Lecture] Hall A has been malfunctio
 **Search Query:** `"broken hall"`
 
 **Before Highlighting:**
+
 ```
 Title: Broken Air Conditioning in Lecture Hall A
 Description: The air conditioning system in Lecture Hall A has been malfunctioning...
 ```
 
 **After Highlighting:**
+
 ```
 Title: [Broken] Air Conditioning in Lecture [Hall] A
 Description: The air conditioning system in Lecture [Hall] A has been malfunctioning...
@@ -49,12 +53,14 @@ Description: The air conditioning system in Lecture [Hall] A has been malfunctio
 **Search Query:** `"WIFI library"`
 
 **Before Highlighting:**
+
 ```
 Title: Library WiFi Connection Issues
 Description: The WiFi in the library keeps disconnecting every 10-15 minutes...
 ```
 
 **After Highlighting:**
+
 ```
 Title: [Library] [WiFi] Connection Issues
 Description: The [WiFi] in the [library] keeps disconnecting every 10-15 minutes...
@@ -99,12 +105,14 @@ Found 3 results for "lecture hall"
 ## Color Scheme
 
 ### Light Mode
+
 - **Highlight Background:** Yellow (#FEF08A - yellow-200)
 - **Highlight Text:** Dark Gray (#18181B - zinc-900)
 - **Border Radius:** 2px
 - **Padding:** 2px horizontal
 
 ### Dark Mode
+
 - **Highlight Background:** Dark Yellow (#854D0E - yellow-800)
 - **Highlight Text:** Light Gray (#FAFAFA - zinc-50)
 - **Border Radius:** 2px
@@ -125,6 +133,7 @@ Found 3 results for "lecture hall"
 ## User Experience Flow
 
 ### Step 1: User Enters Search Query
+
 ```
 ┌─────────────────────────────────────────┐
 │ Search: lecture hall          [Search] │
@@ -132,6 +141,7 @@ Found 3 results for "lecture hall"
 ```
 
 ### Step 2: Results Display with Highlighting
+
 ```
 Found 5 results for "lecture hall"
 
@@ -139,11 +149,13 @@ Found 5 results for "lecture hall"
 ```
 
 ### Step 3: User Scans Results
+
 - Yellow highlights draw attention to matching terms
 - Easy to verify relevance at a glance
 - Reduces cognitive load when scanning multiple results
 
 ### Step 4: User Clicks Relevant Result
+
 - Navigates to complaint detail page
 - Can see full context of the issue
 
@@ -152,6 +164,7 @@ Found 5 results for "lecture hall"
 ## Implementation Details
 
 ### Component Structure
+
 ```
 ComplaintsPage
   └── SearchBar (user input)
@@ -162,6 +175,7 @@ ComplaintsPage
 ```
 
 ### Highlighting Logic
+
 1. Split search query into individual terms
 2. Create regex pattern for each term
 3. Match terms case-insensitively
@@ -173,22 +187,27 @@ ComplaintsPage
 ## Edge Cases Handled
 
 ### Empty Query
+
 - No highlighting applied
 - Normal text display
 
 ### Whitespace-Only Query
+
 - Treated as empty query
 - No highlighting applied
 
 ### Special Characters
+
 - Regex special characters are escaped
 - Example: "$100" matches correctly
 
 ### HTML Content
+
 - HTML tags are stripped before highlighting
 - Prevents breaking markup structure
 
 ### Multiple Occurrences
+
 - All occurrences of search term are highlighted
 - Example: "test" appears 3 times → all 3 highlighted
 
@@ -231,11 +250,13 @@ ComplaintsPage
 ## Future Enhancements
 
 ### Phase 12 (API Integration)
+
 - Server-side search result ranking
 - Highlight relevance scoring
 - Context snippets with highlights
 
 ### Potential Features
+
 - Fuzzy matching support
 - Highlight animation on search
 - User-configurable highlight colors

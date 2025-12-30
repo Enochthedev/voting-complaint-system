@@ -200,7 +200,7 @@ Visual representation of lecturer dropdown:
   ┌─────────────────────────┐
   │ All Lecturers        ▼  │  ← Dropdown
   └─────────────────────────┘
-  
+
   When opened:
   ┌─────────────────────────┐
   │ All Lecturers           │
@@ -220,11 +220,11 @@ Visual representation of sort controls:
   ┌─────────────────────────┐
   │ Date Created         ▼  │  ← Sort field dropdown
   └─────────────────────────┘
-  
+
   ┌──────────────┬──────────────┐
   │ Ascending    │ Descending   │  ← Toggle buttons
   └──────────────┴──────────────┘
-  
+
   Sort options:
   - Date Created
   - Last Updated

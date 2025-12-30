@@ -1,6 +1,7 @@
 # Vote Results for Lecturers - Implementation Summary
 
 ## Overview
+
 Implemented the ability for lecturers and admins to view vote results in real-time, even before the vote closes.
 
 ## Changes Made
@@ -8,11 +9,13 @@ Implemented the ability for lecturers and admins to view vote results in real-ti
 ### 1. Updated Vote Detail Page (`src/app/votes/[id]/page.tsx`)
 
 #### Authentication Integration
+
 - **Added `useAuth` hook** to get the current user's role and ID
 - **Replaced mock user data** with actual authenticated user information
 - **Added auth loading state** to prevent premature data fetching
 
 #### Role-Based Results Display
+
 - **Lecturers and admins** can now see vote results immediately, even for active polls
 - **Students** can only see results after they have voted
 - **Live Results badge** displays for lecturers/admins viewing active polls
@@ -43,6 +46,7 @@ if (voted || isLecturerOrAdmin) {
 ## Features
 
 ### For Lecturers/Admins
+
 - ✅ View live vote results for active polls
 - ✅ See vote counts and percentages for each option
 - ✅ View total number of votes cast
@@ -50,6 +54,7 @@ if (voted || isLecturerOrAdmin) {
 - ✅ Can view results without voting themselves
 
 ### For Students
+
 - ✅ Can vote on active polls
 - ✅ See results after casting their vote
 - ✅ Cannot vote multiple times (enforced by database constraint)
@@ -58,6 +63,7 @@ if (voted || isLecturerOrAdmin) {
 ## Vote Results Display
 
 The results section shows:
+
 1. **Option name** with vote count and percentage
 2. **Visual progress bar** representing the percentage
 3. **Total votes** count at the bottom
@@ -73,12 +79,14 @@ The results section shows:
 ## Testing Notes
 
 ### To Test as Lecturer:
+
 1. Log in with a lecturer account
 2. Navigate to any active vote
 3. Results should be visible immediately without voting
 4. "Live Results" badge should appear
 
 ### To Test as Student:
+
 1. Log in with a student account
 2. Navigate to an active vote
 3. Results should NOT be visible until after voting
@@ -87,6 +95,7 @@ The results section shows:
 ## Future Enhancements (Phase 12)
 
 When connecting to real Supabase API:
+
 - Replace mock data with actual database queries
 - Implement real-time updates using Supabase Realtime
 - Add vote result caching for performance

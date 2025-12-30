@@ -11,6 +11,7 @@ Successfully set up a cron job to automatically run the `auto-escalate-complaint
 **File**: `supabase/migrations/20241126000000_setup_auto_escalation_cron.sql`
 
 Created a comprehensive migration that:
+
 - Enables the `pg_cron` extension for job scheduling
 - Stores project URL and anon key securely in Supabase Vault
 - Creates a cron job named `auto-escalate-complaints-hourly`
@@ -19,6 +20,7 @@ Created a comprehensive migration that:
 - Includes proper error handling and timeout configuration (5 minutes)
 
 **Key Features**:
+
 - ✅ Runs every hour automatically
 - ✅ Secure credential storage via Vault
 - ✅ Proper timeout handling (5 minutes)
@@ -30,6 +32,7 @@ Created a comprehensive migration that:
 **File**: `docs/AUTO_ESCALATION_CRON_SETUP.md`
 
 Created detailed documentation covering:
+
 - **Setup Instructions**: Step-by-step guide for local and production
 - **Secret Configuration**: How to set up Vault secrets properly
 - **Job Management**: Commands to pause, resume, modify, and delete the job
@@ -43,6 +46,7 @@ Created detailed documentation covering:
 **File**: `scripts/verify-auto-escalation-cron.js`
 
 Created a Node.js script that automatically checks:
+
 - ✅ Required extensions (pg_cron, pg_net) are enabled
 - ✅ Vault secrets are configured
 - ✅ Cron job exists and is active
@@ -97,6 +101,7 @@ The script provides a comprehensive health check of the entire auto-escalation s
 **Current Schedule**: `0 * * * *` (every hour at minute 0)
 
 This means the job runs:
+
 - 00:00, 01:00, 02:00, ..., 23:00 (every hour on the hour)
 
 ### Alternative Schedules
@@ -128,11 +133,13 @@ select cron.alter_job(
 ### Local Development
 
 1. **Start Supabase**:
+
    ```bash
    supabase start
    ```
 
 2. **Apply Migration**:
+
    ```bash
    supabase db reset
    ```
@@ -143,17 +150,20 @@ select cron.alter_job(
    ```
 
 The migration automatically uses local development defaults:
+
 - Project URL: `http://host.docker.internal:54321`
 - Anon Key: Default Supabase local key
 
 ### Production Deployment
 
 1. **Apply Migration**:
+
    ```bash
    supabase db push
    ```
 
 2. **Update Vault Secrets** (via SQL Editor):
+
    ```sql
    -- Update project URL
    select vault.update_secret(
@@ -186,7 +196,7 @@ where jobname = 'auto-escalate-complaints-hourly';
 ### View Recent Runs
 
 ```sql
-select 
+select
   runid,
   status,
   return_message,
@@ -194,8 +204,8 @@ select
   end_time
 from cron.job_run_details
 where jobid = (
-  select jobid 
-  from cron.job 
+  select jobid
+  from cron.job
   where jobname = 'auto-escalate-complaints-hourly'
 )
 order by start_time desc
@@ -205,7 +215,7 @@ limit 10;
 ### Check HTTP Responses
 
 ```sql
-select 
+select
   id,
   status_code,
   content,
@@ -219,7 +229,7 @@ limit 10;
 ### View Escalation History
 
 ```sql
-select 
+select
   ch.complaint_id,
   c.title,
   ch.action,
@@ -294,6 +304,7 @@ insert into complaints (
 ### Job Not Running
 
 1. Check if job is active:
+
    ```sql
    select active from cron.job where jobname = 'auto-escalate-complaints-hourly';
    ```
@@ -310,6 +321,7 @@ insert into complaints (
 ### Edge Function Not Being Called
 
 1. Verify Vault secrets:
+
    ```sql
    select name from vault.secrets where name in ('project_url', 'anon_key');
    ```
@@ -322,13 +334,14 @@ insert into complaints (
 ### No Complaints Being Escalated
 
 1. Check active rules:
+
    ```sql
    select * from escalation_rules where is_active = true;
    ```
 
 2. Check eligible complaints:
    ```sql
-   select 
+   select
      id,
      title,
      category,
@@ -383,6 +396,7 @@ node scripts/verify-auto-escalation-cron.js
 ```
 
 Expected output:
+
 ```
 ✅ Auto-escalation cron job is properly configured!
    The job will run every hour at minute 0.

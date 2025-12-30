@@ -52,15 +52,16 @@ Choose one method:
   - Check all tests show "✓ PASS"
 
 - [ ] Manual verification:
+
   ```sql
   -- Check table exists
   SELECT * FROM public.users LIMIT 1;
-  
+
   -- Check enum
   SELECT enum_range(NULL::user_role);
-  
+
   -- Check triggers
-  SELECT trigger_name FROM information_schema.triggers 
+  SELECT trigger_name FROM information_schema.triggers
   WHERE event_object_table = 'users';
   ```
 
@@ -80,8 +81,9 @@ Choose one method:
   - Click **Create user**
 
 - [ ] Verify profile was auto-created:
+
   ```sql
-  SELECT * FROM public.users 
+  SELECT * FROM public.users
   WHERE email = 'your-test-email@example.com';
   ```
 
@@ -111,13 +113,15 @@ Choose one method:
 ### Issue: "type user_role already exists"
 
 **Solution**: The migration was already applied. You can either:
+
 - Skip this migration
 - Drop the type first: `DROP TYPE IF EXISTS user_role CASCADE;`
 - Then re-run the migration
 
 ### Issue: "permission denied"
 
-**Solution**: 
+**Solution**:
+
 - Ensure you're using the SQL Editor in Supabase Dashboard
 - Check you have proper permissions on the project
 - Try using service_role key if available
@@ -125,6 +129,7 @@ Choose one method:
 ### Issue: Profile not created on signup
 
 **Solution**:
+
 - Check trigger exists: `SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';`
 - Check function exists: `SELECT * FROM pg_proc WHERE proname = 'handle_new_user';`
 - Re-run the migration if needed
@@ -133,6 +138,7 @@ Choose one method:
 ### Issue: RLS blocking access
 
 **Solution**:
+
 - Verify user is authenticated
 - Check JWT token contains correct claims
 - Review RLS policies: `SELECT * FROM pg_policies WHERE tablename = 'users';`
@@ -167,11 +173,12 @@ Resolution time: _______________
 
 ---
 
-**Status**: 
+**Status**:
+
 - [ ] Not started
 - [ ] In progress
 - [ ] Completed
 - [ ] Verified
 - [ ] Tested
 
-**Completion Date**: _______________
+**Completion Date**: **\*\***\_\_\_**\*\***

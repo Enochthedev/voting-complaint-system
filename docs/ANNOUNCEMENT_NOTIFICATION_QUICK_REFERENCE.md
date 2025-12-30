@@ -6,11 +6,11 @@ Automatic notifications for all students when a new announcement is created.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
+| File                                                                   | Purpose                    |
+| ---------------------------------------------------------------------- | -------------------------- |
 | `supabase/migrations/034_create_announcement_notification_trigger.sql` | Database trigger migration |
-| `scripts/test-announcement-notification-trigger.js` | Test script |
-| `docs/ANNOUNCEMENT_NOTIFICATION_IMPLEMENTATION.md` | Full documentation |
+| `scripts/test-announcement-notification-trigger.js`                    | Test script                |
+| `docs/ANNOUNCEMENT_NOTIFICATION_IMPLEMENTATION.md`                     | Full documentation         |
 
 ## How It Works
 
@@ -48,7 +48,7 @@ node scripts/test-announcement-notification-trigger.js
 ### Check Trigger Exists
 
 ```sql
-SELECT * FROM pg_trigger 
+SELECT * FROM pg_trigger
 WHERE tgname = 'notify_on_new_announcement';
 ```
 
@@ -66,7 +66,7 @@ LIMIT 10;
 ### Count Notifications per Announcement
 
 ```sql
-SELECT 
+SELECT
   a.title,
   COUNT(n.id) as notification_count
 FROM announcements a
@@ -87,11 +87,11 @@ No additional frontend changes needed!
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| No notifications created | Check trigger exists and is enabled |
-| Students not receiving | Verify student role in users table |
-| Real-time not working | Check Realtime subscription in frontend |
+| Issue                    | Solution                                                 |
+| ------------------------ | -------------------------------------------------------- |
+| No notifications created | Check trigger exists and is enabled                      |
+| Students not receiving   | Verify student role in users table                       |
+| Real-time not working    | Check Realtime subscription in frontend                  |
 | Wrong notification count | Verify RLS policies allow students to read notifications |
 
 ## Related Triggers

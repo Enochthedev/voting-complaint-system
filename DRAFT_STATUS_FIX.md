@@ -12,23 +12,40 @@ User reported: **"Failed to Save Draft - invalid input value for enum complaint_
 There were **THREE different definitions** of `ComplaintStatus` that were out of sync:
 
 1. **Database Types** (`src/types/database.types.ts`):
+
    ```typescript
-   type ComplaintStatus = 'draft' | 'new' | 'opened' | 'in_progress' | 'resolved' | 'closed' | 'reopened'
+   type ComplaintStatus =
+     | 'draft'
+     | 'new'
+     | 'opened'
+     | 'in_progress'
+     | 'resolved'
+     | 'closed'
+     | 'reopened';
    ```
 
 2. **Constants** (`src/lib/constants.ts`):
+
    ```typescript
    // BEFORE (WRONG):
-   const COMPLAINT_STATUSES = ['new', 'open', 'in_progress', 'resolved', 'closed', 'escalated']
+   const COMPLAINT_STATUSES = ['new', 'open', 'in_progress', 'resolved', 'closed', 'escalated'];
    ```
 
 3. **Validation Schema** (`src/lib/validation.ts`):
    ```typescript
    // BEFORE (WRONG):
-   ComplaintStatusSchema = z.enum(['new', 'open', 'in_progress', 'resolved', 'closed', 'escalated'])
+   ComplaintStatusSchema = z.enum([
+     'new',
+     'open',
+     'in_progress',
+     'resolved',
+     'closed',
+     'escalated',
+   ]);
    ```
 
 ### Issues Found:
+
 - ❌ Constants had `'open'` instead of `'opened'`
 - ❌ Constants had `'escalated'` instead of `'reopened'`
 - ❌ Constants was **missing** `'draft'`
@@ -45,15 +62,16 @@ This caused TypeScript compilation errors and potentially database enum errors.
 **File:** `src/lib/constants.ts`
 
 **Changed:**
+
 ```typescript
 export const COMPLAINT_STATUSES = [
-  'draft',      // ✅ Added
+  'draft', // ✅ Added
   'new',
-  'opened',     // ✅ Fixed (was 'open')
+  'opened', // ✅ Fixed (was 'open')
   'in_progress',
   'resolved',
   'closed',
-  'reopened',   // ✅ Fixed (was 'escalated')
+  'reopened', // ✅ Fixed (was 'escalated')
 ] as const;
 ```
 
@@ -62,15 +80,16 @@ export const COMPLAINT_STATUSES = [
 **File:** `src/lib/validation.ts`
 
 **Changed:**
+
 ```typescript
 export const ComplaintStatusSchema = z.enum([
-  'draft',      // ✅ Added
+  'draft', // ✅ Added
   'new',
-  'opened',     // ✅ Fixed (was 'open')
+  'opened', // ✅ Fixed (was 'open')
   'in_progress',
   'resolved',
   'closed',
-  'reopened',   // ✅ Fixed (was 'escalated')
+  'reopened', // ✅ Fixed (was 'escalated')
 ]);
 ```
 
@@ -79,6 +98,7 @@ export const ComplaintStatusSchema = z.enum([
 **File:** `src/lib/constants.ts`
 
 **Already Correct:**
+
 ```typescript
 export const STATUS_LABELS: Record<ComplaintStatus, string> = {
   draft: 'Draft',
@@ -152,6 +172,7 @@ Route (app)
 ## Testing
 
 1. **Restart Dev Server:**
+
    ```bash
    # Stop current dev server (Ctrl+C)
    npm run dev

@@ -6,12 +6,12 @@ The system enforces one vote per student per poll through a database UNIQUE cons
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `supabase/migrations/013_create_vote_responses_table.sql` | Database constraint definition |
-| `src/lib/api/votes.ts` | API validation and error handling |
-| `src/app/votes/[id]/page.tsx` | UI prevention and user experience |
-| `docs/VOTE_ONE_PER_STUDENT_ENFORCEMENT.md` | Detailed documentation |
+| File                                                      | Purpose                           |
+| --------------------------------------------------------- | --------------------------------- |
+| `supabase/migrations/013_create_vote_responses_table.sql` | Database constraint definition    |
+| `src/lib/api/votes.ts`                                    | API validation and error handling |
+| `src/app/votes/[id]/page.tsx`                             | UI prevention and user experience |
+| `docs/VOTE_ONE_PER_STUDENT_ENFORCEMENT.md`                | Detailed documentation            |
 
 ## Database Constraint
 
@@ -24,6 +24,7 @@ CONSTRAINT unique_vote_per_student UNIQUE (vote_id, student_id)
 ## How It Works
 
 ### 1. Student Votes (First Time)
+
 ```
 Student → UI → API → Database
                       ↓
@@ -33,6 +34,7 @@ Student → UI → API → Database
 ```
 
 ### 2. Student Tries to Vote Again
+
 ```
 Student → UI (shows results, no form)
    OR
@@ -46,15 +48,12 @@ Student → API → Database
 ## API Usage
 
 ### Submit Vote
+
 ```typescript
 import { submitVoteResponse } from '@/lib/api/votes';
 
 try {
-  const response = await submitVoteResponse(
-    voteId,
-    studentId,
-    selectedOption
-  );
+  const response = await submitVoteResponse(voteId, studentId, selectedOption);
   // Success: Vote recorded
 } catch (error) {
   // Error: "You have already voted on this poll"
@@ -62,6 +61,7 @@ try {
 ```
 
 ### Check if Voted
+
 ```typescript
 import { hasStudentVoted } from '@/lib/api/votes';
 
@@ -77,14 +77,15 @@ if (hasVoted) {
 
 ### Database Test Results ✅
 
-| Test | Result |
-|------|--------|
-| Student A votes once | ✅ SUCCESS |
-| Student A votes twice | ❌ CONSTRAINT VIOLATION (expected) |
-| Student B votes on same poll | ✅ SUCCESS |
-| Vote counts accurate | ✅ VERIFIED |
+| Test                         | Result                             |
+| ---------------------------- | ---------------------------------- |
+| Student A votes once         | ✅ SUCCESS                         |
+| Student A votes twice        | ❌ CONSTRAINT VIOLATION (expected) |
+| Student B votes on same poll | ✅ SUCCESS                         |
+| Vote counts accurate         | ✅ VERIFIED                        |
 
 ### SQL Verification
+
 ```sql
 -- Check constraint exists
 SELECT conname, pg_get_constraintdef(oid)
@@ -103,14 +104,15 @@ HAVING COUNT(*) > 1;
 ## Error Handling
 
 ### Database Error Code
+
 - **Code**: `23505`
 - **Message**: Contains `vote_responses_vote_id_student_id_key`
 - **Meaning**: Duplicate vote attempt
 
 ### User-Friendly Message
+
 ```typescript
-if (error.code === '23505' && 
-    error.message.includes('vote_responses_vote_id_student_id_key')) {
+if (error.code === '23505' && error.message.includes('vote_responses_vote_id_student_id_key')) {
   throw new Error('You have already voted on this poll');
 }
 ```
@@ -118,17 +120,20 @@ if (error.code === '23505' &&
 ## UI Behavior
 
 ### Before Voting
+
 - ✅ Voting form visible
 - ✅ Radio buttons for options
 - ✅ "Submit Vote" button enabled
 
 ### After Voting
+
 - ✅ "Voted" badge displayed
 - ✅ Voting form hidden
 - ✅ Results visualization shown
 - ✅ Success message displayed
 
 ### Attempting to Vote Again
+
 - ✅ UI prevents access to voting form
 - ✅ Only results are visible
 - ✅ Cannot submit duplicate vote
@@ -136,9 +141,11 @@ if (error.code === '23505' &&
 ## Requirements Satisfied
 
 ### AC6: Voting System
+
 > Students can only vote once per poll ✅
 
 ### P6: Vote Uniqueness
+
 > A student can vote only once per poll ✅
 > Verification: UNIQUE constraint on (vote_id, student_id) ✅
 

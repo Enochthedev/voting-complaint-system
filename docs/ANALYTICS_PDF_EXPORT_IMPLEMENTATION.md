@@ -7,22 +7,26 @@ This document describes the implementation of the analytics report PDF export fu
 ## Implementation Details
 
 ### Location
+
 - **File**: `src/lib/utils/export-analytics.ts`
 - **Function**: `exportAnalyticsAsPDF(data: AnalyticsData)`
 
 ### Technology Stack
+
 - **jsPDF**: Core PDF generation library
 - **jspdf-autotable**: Plugin for creating formatted tables in PDFs
 
 ### Features Implemented
 
 #### 1. Professional Document Layout
+
 - **Header Section**
   - Large title: "Analytics Report"
   - Blue horizontal line separator
   - Report metadata (period and generation date)
 
 #### 2. Key Metrics Section
+
 - Displays all key performance indicators in a formatted table:
   - Total Complaints
   - Average Response Time
@@ -32,21 +36,25 @@ This document describes the implementation of the analytics report PDF export fu
 - Each metric includes the current value and change from previous period
 
 #### 3. Status Distribution
+
 - Table showing complaints breakdown by status
 - Columns: Status, Count, Percentage
 - Striped table design for readability
 
 #### 4. Category Analysis
+
 - Table showing complaints distribution across categories
 - Columns: Category, Count, Percentage
 - Helps identify which areas receive the most complaints
 
 #### 5. Priority Breakdown
+
 - Table showing complaints by priority level
 - Columns: Priority, Count, Percentage
 - Critical for understanding urgency distribution
 
 #### 6. Complaints Over Time Visualization
+
 - Simple bar chart showing daily complaint trends
 - Visual representation of complaint volume over the selected period
 - Includes summary statistics:
@@ -54,6 +62,7 @@ This document describes the implementation of the analytics report PDF export fu
   - Peak Day
 
 #### 7. Lecturer Performance Table
+
 - Comprehensive performance metrics for each lecturer:
   - Name
   - Complaints Handled
@@ -63,11 +72,13 @@ This document describes the implementation of the analytics report PDF export fu
 - Helps identify top performers and areas for improvement
 
 #### 8. Top Complaint Types
+
 - Ranked list of the most common complaint types
 - Columns: Rank, Type, Count
 - Useful for identifying recurring issues
 
 #### 9. Professional Footer
+
 - Page numbers (e.g., "Page 1 of 3")
 - System name: "Student Complaint Resolution System"
 - Generation date
@@ -79,15 +90,15 @@ This document describes the implementation of the analytics report PDF export fu
 export function exportAnalyticsAsPDF(data: AnalyticsData): void {
   // 1. Initialize PDF document
   const doc = new jsPDF();
-  
+
   // 2. Set up page dimensions and margins
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
-  
+
   // 3. Helper function for page breaks
   const checkPageBreak = (requiredSpace: number) => { ... };
-  
+
   // 4. Add header and metadata
   // 5. Add key metrics table
   // 6. Add status distribution table
@@ -104,28 +115,33 @@ export function exportAnalyticsAsPDF(data: AnalyticsData): void {
 ### Key Design Decisions
 
 #### 1. Automatic Page Breaks
+
 - The `checkPageBreak()` helper function ensures content doesn't overflow pages
 - Automatically adds new pages when needed
 - Maintains consistent margins across all pages
 
 #### 2. Color Scheme
+
 - Primary blue (#3B82F6) for headers and accents
 - Gray tones for metadata and secondary text
 - Consistent with the application's design system
 
 #### 3. Table Formatting
+
 - Uses `autoTable` plugin for professional table layouts
 - Striped rows for better readability
 - Centered numeric values
 - Bold headers with blue background
 
 #### 4. Chart Visualization
+
 - Simple bar chart for complaints over time
 - Uses canvas-like drawing with rectangles
 - Includes axis labels and summary statistics
 - Lightweight approach without external charting libraries
 
 #### 5. File Naming Convention
+
 - Format: `analytics-report-YYYY-MM-DD.pdf`
 - Uses ISO date format for consistency
 - Easy to sort and identify by date
@@ -172,7 +188,12 @@ interface AnalyticsData {
   };
   complaintsByStatus: Array<{ status: string; count: number; percentage: number; color: string }>;
   complaintsByCategory: Array<{ category: string; count: number; percentage: number }>;
-  complaintsByPriority: Array<{ priority: string; count: number; percentage: number; color: string }>;
+  complaintsByPriority: Array<{
+    priority: string;
+    count: number;
+    percentage: number;
+    color: string;
+  }>;
   complaintsOverTime: Array<{ date: string; count: number; label: string }>;
   lecturerPerformance: Array<{
     id: string;
@@ -232,6 +253,7 @@ interface AnalyticsData {
 ## Requirements Validation
 
 This implementation validates:
+
 - **AC20**: Export Functionality - Users can export analytics reports as PDF
 - **P20**: Export Data Integrity - All data is accurately represented in the export
 

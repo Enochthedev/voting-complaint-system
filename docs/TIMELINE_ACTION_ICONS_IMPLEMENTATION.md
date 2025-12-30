@@ -1,6 +1,7 @@
 # Timeline Action Icons Implementation
 
 ## Overview
+
 This document describes the implementation of icons for different action types in the complaint history timeline.
 
 ## Implementation Details
@@ -9,19 +10,19 @@ This document describes the implementation of icons for different action types i
 
 The following action types are now supported with distinct icons:
 
-| Action Type | Icon | Description |
-|------------|------|-------------|
-| `created` | FileText | Complaint was created |
-| `status_changed` | Clock | Status was changed |
-| `assigned` | UserPlus | Complaint was assigned to a lecturer |
-| `reassigned` | User | Complaint was reassigned to a different lecturer |
-| `comment_added` | MessageSquare | A comment was added |
-| `feedback_added` | MessageSquare | Feedback was provided |
-| `reopened` | AlertCircle | Complaint was reopened |
-| `escalated` | TrendingUp | Complaint was escalated |
-| `rated` | Star | Complaint was rated by student |
-| `tags_added` | Tag | Tags were added to the complaint |
-| `default` | History | Fallback for unknown action types |
+| Action Type      | Icon          | Description                                      |
+| ---------------- | ------------- | ------------------------------------------------ |
+| `created`        | FileText      | Complaint was created                            |
+| `status_changed` | Clock         | Status was changed                               |
+| `assigned`       | UserPlus      | Complaint was assigned to a lecturer             |
+| `reassigned`     | User          | Complaint was reassigned to a different lecturer |
+| `comment_added`  | MessageSquare | A comment was added                              |
+| `feedback_added` | MessageSquare | Feedback was provided                            |
+| `reopened`       | AlertCircle   | Complaint was reopened                           |
+| `escalated`      | TrendingUp    | Complaint was escalated                          |
+| `rated`          | Star          | Complaint was rated by student                   |
+| `tags_added`     | Tag           | Tags were added to the complaint                 |
+| `default`        | History       | Fallback for unknown action types                |
 
 ### Files Modified
 
@@ -52,6 +53,7 @@ The following action types are now supported with distinct icons:
 ### Visual Consistency
 
 All icons:
+
 - Use the same size class: `h-4 w-4`
 - Are displayed in a circular badge with muted background
 - Maintain consistent spacing in the timeline
@@ -63,7 +65,7 @@ All icons:
 import { TimelineSection } from '@/components/complaints/complaint-detail/TimelineSection';
 
 // In your component
-<TimelineSection history={complaintHistory} />
+<TimelineSection history={complaintHistory} />;
 ```
 
 The timeline will automatically display the appropriate icon for each action type.
@@ -80,6 +82,7 @@ To verify the implementation:
 ### Future Enhancements
 
 Potential improvements:
+
 - Add color coding for different action types
 - Implement icon animations for recent actions
 - Add tooltips explaining each action type

@@ -13,6 +13,7 @@
  */
 
 import { supabase } from './supabase';
+import { withTokenRefresh } from './api-wrapper';
 import type { Complaint, ComplaintTag } from '@/types/database.types';
 
 export interface SearchFilters {
@@ -55,103 +56,107 @@ export async function searchComplaints(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResult> {
-  const {
-    filters = {},
-    sortBy = 'created_at',
-    sortOrder = 'desc',
-    page = 1,
-    pageSize = 20,
-  } = options;
+  return withTokenRefresh(async () => {
+    const {
+      filters = {},
+      sortBy = 'created_at',
+      sortOrder = 'desc',
+      page = 1,
+      pageSize = 20,
+    } = options;
 
-  // Build the base query
-  let queryBuilder = supabase.from('complaints').select('*, complaint_tags(*)', { count: 'exact' });
+    // Build the base query
+    let queryBuilder = supabase
+      .from('complaints')
+      .select('*, complaint_tags(*)', { count: 'exact' });
 
-  // Apply full-text search if query is provided
-  if (query && query.trim()) {
-    // Use textSearch for full-text search on the search_vector column
-    // The search_vector column is automatically maintained by a database trigger
-    queryBuilder = queryBuilder.textSearch('search_vector', query.trim(), {
-      type: 'websearch',
-      config: 'english',
-    });
-  }
-
-  // Apply filters
-  if (filters.status && filters.status.length > 0) {
-    queryBuilder = queryBuilder.in('status', filters.status);
-  }
-
-  if (filters.category && filters.category.length > 0) {
-    queryBuilder = queryBuilder.in('category', filters.category);
-  }
-
-  if (filters.priority && filters.priority.length > 0) {
-    queryBuilder = queryBuilder.in('priority', filters.priority);
-  }
-
-  if (filters.dateFrom) {
-    queryBuilder = queryBuilder.gte('created_at', filters.dateFrom);
-  }
-
-  if (filters.dateTo) {
-    queryBuilder = queryBuilder.lte('created_at', filters.dateTo);
-  }
-
-  if (filters.assignedTo) {
-    queryBuilder = queryBuilder.eq('assigned_to', filters.assignedTo);
-  }
-
-  // Apply tag filter if specified
-  // Note: This requires a join or subquery, handled differently
-  if (filters.tags && filters.tags.length > 0) {
-    // For tag filtering, we need to check if the complaint has any of the specified tags
-    // This is done by checking if the complaint_id exists in complaint_tags with matching tag_name
-    const { data: taggedComplaintIds } = await supabase
-      .from('complaint_tags')
-      .select('complaint_id')
-      .in('tag_name', filters.tags);
-
-    if (taggedComplaintIds && taggedComplaintIds.length > 0) {
-      const complaintIds = taggedComplaintIds.map((t: any) => t.complaint_id);
-      queryBuilder = queryBuilder.in('id', complaintIds);
-    } else {
-      // No complaints match the tag filter, return empty result
-      return {
-        complaints: [],
-        total: 0,
-        page,
-        pageSize,
-        totalPages: 0,
-      };
+    // Apply full-text search if query is provided
+    if (query && query.trim()) {
+      // Use textSearch for full-text search on the search_vector column
+      // The search_vector column is automatically maintained by a database trigger
+      queryBuilder = queryBuilder.textSearch('search_vector', query.trim(), {
+        type: 'websearch',
+        config: 'english',
+      });
     }
-  }
 
-  // Apply sorting
-  queryBuilder = queryBuilder.order(sortBy, { ascending: sortOrder === 'asc' });
+    // Apply filters
+    if (filters.status && filters.status.length > 0) {
+      queryBuilder = queryBuilder.in('status', filters.status);
+    }
 
-  // Apply pagination
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize - 1;
-  queryBuilder = queryBuilder.range(start, end);
+    if (filters.category && filters.category.length > 0) {
+      queryBuilder = queryBuilder.in('category', filters.category);
+    }
 
-  // Execute query
-  const { data, error, count } = await queryBuilder;
+    if (filters.priority && filters.priority.length > 0) {
+      queryBuilder = queryBuilder.in('priority', filters.priority);
+    }
 
-  if (error) {
-    console.error('Search error:', error);
-    throw new Error(`Failed to search complaints: ${error.message}`);
-  }
+    if (filters.dateFrom) {
+      queryBuilder = queryBuilder.gte('created_at', filters.dateFrom);
+    }
 
-  const total = count || 0;
-  const totalPages = Math.ceil(total / pageSize);
+    if (filters.dateTo) {
+      queryBuilder = queryBuilder.lte('created_at', filters.dateTo);
+    }
 
-  return {
-    complaints: data || [],
-    total,
-    page,
-    pageSize,
-    totalPages,
-  };
+    if (filters.assignedTo) {
+      queryBuilder = queryBuilder.eq('assigned_to', filters.assignedTo);
+    }
+
+    // Apply tag filter if specified
+    // Note: This requires a join or subquery, handled differently
+    if (filters.tags && filters.tags.length > 0) {
+      // For tag filtering, we need to check if the complaint has any of the specified tags
+      // This is done by checking if the complaint_id exists in complaint_tags with matching tag_name
+      const { data: taggedComplaintIds } = await supabase
+        .from('complaint_tags')
+        .select('complaint_id')
+        .in('tag_name', filters.tags);
+
+      if (taggedComplaintIds && taggedComplaintIds.length > 0) {
+        const complaintIds = taggedComplaintIds.map((t: any) => t.complaint_id);
+        queryBuilder = queryBuilder.in('id', complaintIds);
+      } else {
+        // No complaints match the tag filter, return empty result
+        return {
+          complaints: [],
+          total: 0,
+          page,
+          pageSize,
+          totalPages: 0,
+        };
+      }
+    }
+
+    // Apply sorting
+    queryBuilder = queryBuilder.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Apply pagination
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+    queryBuilder = queryBuilder.range(start, end);
+
+    // Execute query
+    const { data, error, count } = await queryBuilder;
+
+    if (error) {
+      console.error('Search error:', error);
+      throw new Error(`Failed to search complaints: ${error.message}`);
+    }
+
+    const total = count || 0;
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+      complaints: data || [],
+      total,
+      page,
+      pageSize,
+      totalPages,
+    };
+  });
 }
 
 /**
@@ -188,21 +193,23 @@ export async function getSearchSuggestions(
     return [];
   }
 
-  // Search for complaints with titles that start with or contain the query
-  const { data, error } = await supabase
-    .from('complaints')
-    .select('title')
-    .ilike('title', `%${partialQuery.trim()}%`)
-    .limit(limit);
+  return withTokenRefresh(async () => {
+    // Search for complaints with titles that start with or contain the query
+    const { data, error } = await supabase
+      .from('complaints')
+      .select('title')
+      .ilike('title', `%${partialQuery.trim()}%`)
+      .limit(limit);
 
-  if (error) {
-    console.error('Suggestion error:', error);
-    return [];
-  }
+    if (error) {
+      console.error('Suggestion error:', error);
+      return [];
+    }
 
-  // Extract unique titles
-  const suggestions: string[] = data?.map((c: any) => c.title as string) || [];
-  return [...new Set(suggestions)];
+    // Extract unique titles
+    const suggestions: string[] = data?.map((c: any) => c.title as string) || [];
+    return [...new Set(suggestions)];
+  });
 }
 
 /**

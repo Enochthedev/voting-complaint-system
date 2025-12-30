@@ -87,7 +87,9 @@ export function useUpdateAnnouncement() {
     }) => updateAnnouncement(announcementId, updates),
     onSuccess: (_, variables) => {
       // Invalidate specific announcement
-      queryClient.invalidateQueries({ queryKey: announcementKeys.detail(variables.announcementId) });
+      queryClient.invalidateQueries({
+        queryKey: announcementKeys.detail(variables.announcementId),
+      });
       // Invalidate all announcement lists
       queryClient.invalidateQueries({ queryKey: announcementKeys.lists() });
     },

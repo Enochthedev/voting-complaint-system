@@ -3,14 +3,17 @@
 ## Status: ✅ COMPLETE
 
 ## Overview
+
 The notification system for complaint assignment is **already fully implemented** in the database layer through triggers.
 
 ## Implementation Details
 
 ### Database Trigger
+
 The assignment notification functionality is implemented in migration `017_create_complaint_triggers.sql` within the `notify_student_on_status_change()` function.
 
 ### Trigger Logic
+
 ```sql
 -- Notify assigned lecturer when complaint is assigned
 IF NEW.assigned_to IS NOT NULL AND (OLD.assigned_to IS DISTINCT FROM NEW.assigned_to) THEN
@@ -33,12 +36,16 @@ END IF;
 ```
 
 ### Functionality
+
 The trigger automatically creates a notification when:
+
 1. **Initial Assignment**: A complaint is assigned to a lecturer (assigned_to changes from NULL to a user ID)
 2. **Reassignment**: A complaint is reassigned to a different lecturer (assigned_to changes from one user ID to another)
 
 ### Notification Details
+
 When a complaint is assigned, the system creates a notification with:
+
 - **Recipient**: The assigned lecturer (user_id = assigned_to)
 - **Type**: `complaint_assigned`
 - **Title**: "A complaint has been assigned to you"
@@ -49,7 +56,9 @@ When a complaint is assigned, the system creates a notification with:
 ### Related Components
 
 #### 1. Notification Type Enum
+
 The `complaint_assigned` notification type is defined in the notifications table:
+
 ```sql
 CREATE TYPE notification_type AS ENUM (
   'complaint_opened',
@@ -66,7 +75,9 @@ CREATE TYPE notification_type AS ENUM (
 ```
 
 #### 2. History Logging
+
 Assignment changes are also logged in the complaint_history table via the `log_complaint_assignment()` trigger function:
+
 ```sql
 CREATE OR REPLACE FUNCTION public.log_complaint_assignment()
 RETURNS TRIGGER AS $
@@ -81,7 +92,7 @@ BEGIN
       details
     ) VALUES (
       NEW.id,
-      CASE 
+      CASE
         WHEN OLD.assigned_to IS NULL THEN 'assigned'
         ELSE 'reassigned'
       END,
@@ -101,17 +112,17 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 ### Testing
+
 A test script exists at `scripts/test-complaint-triggers.js` that verifies:
+
 - Assignment history logging (Step 12)
 - Assignment notification creation (Step 13)
 
 The test performs the following checks:
+
 ```javascript
 // Step 11: Assign complaint to lecturer
-await supabase
-  .from('complaints')
-  .update({ assigned_to: lecturerId })
-  .eq('id', complaint.id);
+await supabase.from('complaints').update({ assigned_to: lecturerId }).eq('id', complaint.id);
 
 // Step 12: Verify assignment logged in history
 const { data: assignHistory } = await supabase
@@ -132,6 +143,7 @@ const { data: assignNotifs } = await supabase
 ## How It Works
 
 ### Workflow
+
 1. **Lecturer assigns complaint**: A lecturer updates the `assigned_to` field on a complaint
 2. **Trigger fires**: The `notify_on_complaint_status_change` trigger detects the change
 3. **Notification created**: A new notification record is inserted into the notifications table
@@ -141,6 +153,7 @@ const { data: assignNotifs } = await supabase
 ### Example Usage
 
 #### Frontend Code (Assignment Action)
+
 ```typescript
 // Assign complaint to a lecturer
 const { error } = await supabase
@@ -154,31 +167,38 @@ const { error } = await supabase
 ```
 
 #### Frontend Code (Receiving Notification)
+
 ```typescript
 // Subscribe to notifications (already implemented in UI)
 supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, (payload) => {
-    if (payload.new.type === 'complaint_assigned') {
-      // Show notification to user
-      showToast({
-        title: payload.new.title,
-        message: payload.new.message
-      });
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    (payload) => {
+      if (payload.new.type === 'complaint_assigned') {
+        // Show notification to user
+        showToast({
+          title: payload.new.title,
+          message: payload.new.message,
+        });
+      }
     }
-  })
+  )
   .subscribe();
 ```
 
 ## Verification
 
 ### Database Level
+
 The notification system is fully functional at the database level:
+
 - ✅ Trigger function created: `notify_student_on_status_change()`
 - ✅ Trigger attached: `notify_on_complaint_status_change`
 - ✅ Notification type defined: `complaint_assigned`
@@ -186,20 +206,25 @@ The notification system is fully functional at the database level:
 - ✅ RLS policies configured for notifications table
 
 ### Application Level
+
 The UI components for displaying and managing notifications are already implemented:
+
 - ✅ Notification bell icon with count badge
 - ✅ Notification dropdown/center
 - ✅ Real-time subscription to notifications
 - ✅ Mark as read functionality
 
 ## Related Files
+
 - **Migration**: `supabase/migrations/017_create_complaint_triggers.sql`
 - **Notifications Table**: `supabase/migrations/011_create_notifications_table.sql`
 - **Test Script**: `scripts/test-complaint-triggers.js`
 - **Design Document**: `.kiro/specs/student-complaint-system/design.md` (Property P4)
 
 ## Acceptance Criteria
+
 ✅ **AC17**: Complaint Assignment
+
 - Lecturers/admins can assign complaints to specific lecturers or departments
 - **Assigned lecturer receives notification** ← This task
 - Assignment history tracked in complaint timeline
@@ -207,7 +232,9 @@ The UI components for displaying and managing notifications are already implemen
 - Filter complaints by assigned lecturer
 
 ## Next Steps
+
 This task is complete. The notification system for complaint assignment is fully functional and integrated with:
+
 1. The complaint assignment UI (already implemented in Task 4.4.1)
 2. The notification system UI (to be implemented in Phase 6)
 3. The complaint history timeline (already implemented)

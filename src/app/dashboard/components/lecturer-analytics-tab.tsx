@@ -514,9 +514,7 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
                     />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Based on available feedback
-                </p>
+                <p className="text-sm text-muted-foreground">Based on available feedback</p>
               </div>
               <div className="text-right">
                 <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-sm font-medium">
@@ -531,7 +529,9 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
             <div className="space-y-3">
               <h4 className="text-sm font-semibold">Rating Distribution</h4>
               <div className="text-center py-4 text-muted-foreground text-sm">
-                <p>Detailed rating distribution will be available once student feedback is collected.</p>
+                <p>
+                  Detailed rating distribution will be available once student feedback is collected.
+                </p>
               </div>
             </div>
           </div>
@@ -624,10 +624,8 @@ export function LecturerAnalyticsTab({ analyticsData }: LecturerAnalyticsTabProp
               </div>
               <div>
                 <div className="text-2xl font-bold">
-                  {
-                    complaintsByStatus.find((s) => s.status.toLowerCase() === 'reopened')?.count ||
-                    0
-                  }
+                  {complaintsByStatus.find((s) => s.status.toLowerCase() === 'reopened')?.count ||
+                    0}
                 </div>
                 <p className="text-xs text-muted-foreground">Reopened cases</p>
               </div>

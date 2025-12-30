@@ -9,13 +9,13 @@ import { useAuth } from '@/hooks/useAuth';
 
 export function MyComponent() {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) return <div>Loading...</div>;
   if (!user) return <div>Not authenticated</div>;
-  
+
   // Access user role
   const role = user.role; // 'student' | 'lecturer' | 'admin'
-  
+
   return (
     <div>
       <p>Email: {user.email}</p>
@@ -33,14 +33,14 @@ export function MyComponent() {
 ```typescript
 export function ComplaintActions() {
   const { user } = useAuth();
-  
+
   return (
     <div>
       {/* Students can only view */}
       {user?.role === 'student' && (
         <Button>View Details</Button>
       )}
-      
+
       {/* Lecturers can assign and comment */}
       {user?.role === 'lecturer' && (
         <>
@@ -48,7 +48,7 @@ export function ComplaintActions() {
           <Button>Add Comment</Button>
         </>
       )}
-      
+
       {/* Admins can do everything */}
       {user?.role === 'admin' && (
         <>
@@ -81,13 +81,13 @@ export function ComplaintActions() {
 ```typescript
 export function Sidebar() {
   const { user } = useAuth();
-  
+
   const getNavItems = () => {
     const baseItems = [
       { label: 'Dashboard', href: '/dashboard' },
       { label: 'My Complaints', href: '/complaints' },
     ];
-    
+
     if (user?.role === 'lecturer') {
       return [
         ...baseItems,
@@ -95,7 +95,7 @@ export function Sidebar() {
         { label: 'All Complaints', href: '/complaints/all' },
       ];
     }
-    
+
     if (user?.role === 'admin') {
       return [
         ...baseItems,
@@ -104,10 +104,10 @@ export function Sidebar() {
         { label: 'Admin Panel', href: '/admin' },
       ];
     }
-    
+
     return baseItems; // Student
   };
-  
+
   return (
     <nav>
       {getNavItems().map(item => (
@@ -127,16 +127,16 @@ export function Sidebar() {
 export default function AdminPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  
+
   useEffect(() => {
     if (!isLoading && user?.role !== 'admin') {
       router.push('/dashboard');
     }
   }, [user, isLoading, router]);
-  
+
   if (isLoading) return <div>Loading...</div>;
   if (user?.role !== 'admin') return null;
-  
+
   return <div>Admin Content</div>;
 }
 ```
@@ -150,8 +150,9 @@ export default function AdminPage() {
 ## Test Users
 
 From the database:
+
 - `student@test.com` - Role: student
-- `lecturer@test.com` - Role: lecturer  
+- `lecturer@test.com` - Role: lecturer
 - `admin@test.com` - Role: admin
 
 All passwords: `password123`

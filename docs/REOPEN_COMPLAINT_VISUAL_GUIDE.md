@@ -1,11 +1,13 @@
 # Reopen Complaint - Visual Guide
 
 ## Overview
+
 This guide demonstrates the complaint reopening functionality that allows students to reopen resolved complaints with a justification.
 
 ## User Flow
 
 ### Step 1: View Resolved Complaint
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Complaint Detail View                                       │
@@ -27,9 +29,11 @@ This guide demonstrates the complaint reopening functionality that allows studen
 ```
 
 ### Step 2: Click "Reopen Complaint" Button
+
 When a student clicks the "Reopen Complaint" button, a modal appears.
 
 ### Step 3: Reopen Modal
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Reopen Complaint                         │
@@ -60,10 +64,12 @@ When a student clicks the "Reopen Complaint" button, a modal appears.
 ```
 
 ### Step 4: Validation
+
 - If justification is empty, an alert appears: "Please provide a justification for reopening this complaint"
 - Whitespace-only justification is also rejected
 
 ### Step 5: Submission
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Reopen Complaint                         │
@@ -75,6 +81,7 @@ When a student clicks the "Reopen Complaint" button, a modal appears.
 ```
 
 ### Step 6: Success
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ ✓ Success                                                   │
@@ -88,6 +95,7 @@ When a student clicks the "Reopen Complaint" button, a modal appears.
 ```
 
 ### Step 7: Updated Complaint View
+
 After reopening, the page reloads and shows:
 
 ```
@@ -126,16 +134,18 @@ After reopening, the page reloads and shows:
 When a complaint is reopened, the following happens automatically:
 
 ### 1. Database Update
+
 ```sql
 -- Update complaint status
-UPDATE complaints 
-SET status = 'reopened', 
+UPDATE complaints
+SET status = 'reopened',
     updated_at = NOW()
-WHERE id = 'complaint-123' 
+WHERE id = 'complaint-123'
   AND status = 'resolved';
 ```
 
 ### 2. History Logging
+
 ```sql
 -- Log the reopen action
 INSERT INTO complaint_history (
@@ -156,6 +166,7 @@ INSERT INTO complaint_history (
 ```
 
 ### 3. Notification Creation
+
 ```sql
 -- Create notification for assigned lecturer
 INSERT INTO notifications (
@@ -193,6 +204,7 @@ When a lecturer receives the notification:
 ```
 
 Clicking the notification takes them to the complaint detail view where they can see:
+
 - Updated status: "Reopened"
 - Timeline entry with justification
 - Student's reason for reopening
@@ -234,24 +246,28 @@ Clicking the notification takes them to the complaint detail view where they can
 ## Key Features
 
 ### 1. Validation
+
 - ✅ Justification is required
 - ✅ Whitespace-only text is rejected
 - ✅ Only resolved complaints can be reopened
 - ✅ Only complaint owner can reopen (enforced by RLS)
 
 ### 2. Audit Trail
+
 - ✅ All reopen actions are logged
 - ✅ Justification is stored in history details
 - ✅ Timestamp and user are recorded
 - ✅ History is immutable (insert-only)
 
 ### 3. Notifications
+
 - ✅ Assigned lecturer is notified
 - ✅ Notification includes complaint title
 - ✅ Real-time notification delivery
 - ✅ Notification links to complaint
 
 ### 4. User Experience
+
 - ✅ Clear warning message
 - ✅ Character counter for justification
 - ✅ Loading state during submission
@@ -261,24 +277,28 @@ Clicking the notification takes them to the complaint detail view where they can
 ## Error Handling
 
 ### Case 1: Not Authenticated
+
 ```
 Error: User not authenticated
 Action: Redirect to login page
 ```
 
 ### Case 2: Complaint Not Resolved
+
 ```
 Error: Only resolved complaints can be reopened
 Action: Show error alert, close modal
 ```
 
 ### Case 3: Database Error
+
 ```
 Error: Failed to reopen complaint: [error message]
 Action: Show error alert, keep modal open
 ```
 
 ### Case 4: Network Error
+
 ```
 Error: Failed to reopen complaint: Network error
 Action: Show error alert, allow retry
@@ -287,16 +307,19 @@ Action: Show error alert, allow retry
 ## Security
 
 ### Row Level Security (RLS)
+
 - Students can only reopen their own complaints
 - Anonymous complaints cannot be reopened (no student_id)
 - Lecturers cannot reopen complaints (student action only)
 
 ### Input Validation
+
 - Client-side: Required field validation
 - Server-side: Status validation (must be "resolved")
 - Database: Foreign key constraints
 
 ### Audit Trail
+
 - All actions are logged with user ID
 - Justification is stored for accountability
 - History records are immutable
@@ -316,6 +339,7 @@ Action: Show error alert, allow retry
 - [ ] Error handling works for various failure cases
 
 ## Related Documentation
+
 - [Task 5.3 Completion Summary](./TASK_5.3_REOPEN_COMPLAINT_COMPLETION.md)
 - [Complaint Detail View Refactoring](./COMPLAINT_DETAIL_VIEW_REFACTORING_COMPLETE.md)
 - [Notification System Quick Reference](./NOTIFICATION_SYSTEM_QUICK_REFERENCE.md)

@@ -7,13 +7,7 @@
 ```tsx
 import { Progress } from '@/components/ui/progress';
 
-<Progress
-  value={75}
-  label="Processing..."
-  showValue
-  size="default"
-  variant="default"
-/>
+<Progress value={75} label="Processing..." showValue size="default" variant="default" />;
 ```
 
 ### Using Export Progress Dialog
@@ -34,40 +28,40 @@ const [status, setStatus] = useState<'idle' | 'exporting' | 'success' | 'error'>
   status={status}
   title="Exporting Data"
   onClose={() => setShowDialog(false)}
-/>
+/>;
 ```
 
 ## Component Props
 
 ### Progress
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `number` | `0` | Progress value (0-100) |
-| `label` | `string` | - | Optional label text |
-| `showValue` | `boolean` | `false` | Show percentage |
-| `size` | `'sm' \| 'default' \| 'lg'` | `'default'` | Size variant |
-| `variant` | `'default' \| 'success' \| 'warning' \| 'error'` | `'default'` | Color variant |
+| Prop        | Type                                             | Default     | Description            |
+| ----------- | ------------------------------------------------ | ----------- | ---------------------- |
+| `value`     | `number`                                         | `0`         | Progress value (0-100) |
+| `label`     | `string`                                         | -           | Optional label text    |
+| `showValue` | `boolean`                                        | `false`     | Show percentage        |
+| `size`      | `'sm' \| 'default' \| 'lg'`                      | `'default'` | Size variant           |
+| `variant`   | `'default' \| 'success' \| 'warning' \| 'error'` | `'default'` | Color variant          |
 
 ### ExportProgressDialog
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `open` | `boolean` | ✅ | Dialog open state |
-| `onOpenChange` | `(open: boolean) => void` | - | Open state callback |
-| `progress` | `number` | ✅ | Progress (0-100) |
-| `message` | `string` | ✅ | Status message |
-| `status` | `'idle' \| 'exporting' \| 'success' \| 'error'` | ✅ | Export status |
-| `error` | `string` | - | Error message |
-| `title` | `string` | - | Dialog title |
-| `onClose` | `() => void` | - | Close callback |
+| Prop           | Type                                            | Required | Description         |
+| -------------- | ----------------------------------------------- | -------- | ------------------- |
+| `open`         | `boolean`                                       | ✅       | Dialog open state   |
+| `onOpenChange` | `(open: boolean) => void`                       | -        | Open state callback |
+| `progress`     | `number`                                        | ✅       | Progress (0-100)    |
+| `message`      | `string`                                        | ✅       | Status message      |
+| `status`       | `'idle' \| 'exporting' \| 'success' \| 'error'` | ✅       | Export status       |
+| `error`        | `string`                                        | -        | Error message       |
+| `title`        | `string`                                        | -        | Dialog title        |
+| `onClose`      | `() => void`                                    | -        | Close callback      |
 
 ### BulkActionBar (Updated)
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop             | Type     | Description            |
+| ---------------- | -------- | ---------------------- |
 | `exportProgress` | `number` | Progress value (0-100) |
-| `exportMessage` | `string` | Status message |
+| `exportMessage`  | `string` | Status message         |
 
 ## Common Patterns
 
@@ -87,22 +81,22 @@ const handleExport = async () => {
     setShowDialog(true);
     setProgress(0);
     setMessage('Starting export...');
-    
+
     // Stage 1
     setProgress(30);
     setMessage('Processing data...');
     await processData();
-    
+
     // Stage 2
     setProgress(70);
     setMessage('Generating file...');
     await generateFile();
-    
+
     // Complete
     setProgress(100);
     setMessage('Export complete!');
     setStatus('success');
-    
+
     // Auto-close
     setTimeout(() => {
       setShowDialog(false);
@@ -125,16 +119,13 @@ const handleExport = async () => {
     setIsExporting(true);
     setStatus('exporting');
     setShowDialog(true);
-    
-    await exportWithProgress(
-      data,
-      (current, total) => {
-        const percent = Math.round((current / total) * 100);
-        setProgress(percent);
-        setMessage(`Processing ${current}/${total} items...`);
-      }
-    );
-    
+
+    await exportWithProgress(data, (current, total) => {
+      const percent = Math.round((current / total) * 100);
+      setProgress(percent);
+      setMessage(`Processing ${current}/${total} items...`);
+    });
+
     setProgress(100);
     setMessage('Success!');
     setStatus('success');
@@ -211,16 +202,19 @@ const handleExport = async () => {
 ## Troubleshooting
 
 ### Progress not updating
+
 - Ensure state updates are called
 - Check for async/await issues
 - Verify progress value is 0-100
 
 ### Dialog not closing
+
 - Check `onOpenChange` callback
 - Verify status is not 'exporting'
 - Check auto-close timeout
 
 ### Progress bar not visible
+
 - Verify `value` prop is set
 - Check parent container width
 - Ensure component is rendered

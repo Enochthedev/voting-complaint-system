@@ -19,6 +19,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Simple textarea with placeholder
 - Character counter showing 0/2000
 - Submit button disabled when empty
@@ -39,6 +40,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Textarea with placeholder
 - Checkbox for "Internal note" below textarea
 - When checked, info alert appears explaining internal notes
@@ -62,6 +64,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Textarea pre-filled with existing comment
 - Label shows "Edit Comment"
 - Cancel button appears
@@ -82,6 +85,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Character counter shows 0/500
 - Warning when under 10 characters
 - Error when over 500 characters
@@ -101,6 +105,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Textarea is automatically focused on mount
 - Cursor is in the textarea
 - User can start typing immediately
@@ -111,7 +116,7 @@ This document demonstrates the `CommentInput` component in various states and co
 <CommentInput
   onSubmit={async (comment, isInternal) => {
     // Simulate slow API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log('Comment submitted:', comment);
   }}
   placeholder="Add your comment..."
@@ -119,6 +124,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - After clicking submit:
   - Textarea becomes disabled
   - Submit button shows spinner and "Posting..."
@@ -141,6 +147,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - After clicking submit:
   - Loading state appears
   - Error occurs
@@ -151,6 +158,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ### 8. Validation Errors
 
 #### Empty Comment
+
 ```tsx
 <CommentInput
   onSubmit={async (comment, isInternal) => {
@@ -161,11 +169,13 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Submit button is disabled when textarea is empty
 - Clicking submit does nothing
 - No error message (button is just disabled)
 
 #### Under Minimum Length
+
 ```tsx
 <CommentInput
   onSubmit={async (comment, isInternal) => {
@@ -177,12 +187,14 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Type "Hello" (5 characters)
 - Character counter shows orange: 5/2000
 - Error message: "Comment must be at least 20 characters"
 - Submit button is disabled
 
 #### Over Maximum Length
+
 ```tsx
 <CommentInput
   onSubmit={async (comment, isInternal) => {
@@ -194,6 +206,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Type more than 50 characters
 - Character counter shows red: 55/50
 - Error message: "Comment must be 50 characters or less"
@@ -213,6 +226,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Type a comment
 - Press Ctrl+Enter (or Cmd+Enter on Mac)
 - Comment is submitted without clicking button
@@ -234,6 +248,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Modify the text
 - Press Escape key
 - Cancel callback is triggered
@@ -251,6 +266,7 @@ This document demonstrates the `CommentInput` component in various states and co
 ```
 
 **Expected Behavior:**
+
 - Start with 3 rows
 - As you type and add line breaks, textarea grows
 - Height adjusts automatically to fit content
@@ -269,8 +285,8 @@ function CommentSection({ complaintId, userRole }) {
     setIsLoading(true);
     try {
       // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const newComment = {
         id: Date.now().toString(),
         complaint_id: complaintId,
@@ -283,7 +299,7 @@ function CommentSection({ complaintId, userRole }) {
           role: userRole,
         },
       };
-      
+
       setComments([...comments, newComment]);
       alert('Comment added successfully!');
     } catch (error) {
@@ -297,17 +313,13 @@ function CommentSection({ complaintId, userRole }) {
     <div className="space-y-6">
       {/* Existing Comments */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">
-          Comments ({comments.length})
-        </h3>
-        {comments.map(comment => (
+        <h3 className="text-lg font-semibold">Comments ({comments.length})</h3>
+        {comments.map((comment) => (
           <div key={comment.id} className="rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">{comment.user.full_name}</span>
               {comment.is_internal && (
-                <span className="text-xs bg-yellow-100 px-2 py-1 rounded">
-                  Internal
-                </span>
+                <span className="text-xs bg-yellow-100 px-2 py-1 rounded">Internal</span>
               )}
             </div>
             <p className="text-sm">{comment.comment}</p>
@@ -333,6 +345,7 @@ function CommentSection({ complaintId, userRole }) {
 ## Visual States
 
 ### Normal State
+
 ```
 ┌─────────────────────────────────────────────┐
 │ Write your comment here...                  │
@@ -344,6 +357,7 @@ Minimum 1 characters • Press Ctrl+Enter    0/2000
 ```
 
 ### With Text
+
 ```
 ┌─────────────────────────────────────────────┐
 │ This is a sample comment that I'm typing    │
@@ -355,8 +369,9 @@ Minimum 1 characters • Press Ctrl+Enter   67/2000
 ```
 
 ### With Internal Toggle (Checked)
+
 ```
-ℹ️ This internal note will only be visible to 
+ℹ️ This internal note will only be visible to
    lecturers and admins.
 
 ┌─────────────────────────────────────────────┐
@@ -372,6 +387,7 @@ Minimum 1 characters • Press Ctrl+Enter   42/2000
 ```
 
 ### Loading State
+
 ```
 ┌─────────────────────────────────────────────┐
 │ This comment is being submitted...          │ [disabled]
@@ -384,6 +400,7 @@ Minimum 1 characters • Press Ctrl+Enter   42/2000
 ```
 
 ### Error State
+
 ```
 ❌ Failed to submit comment. Please try again.
 
@@ -398,6 +415,7 @@ Comment must be at least 10 characters     8/2000
 ```
 
 ### Edit Mode
+
 ```
 Edit Comment
 
@@ -436,6 +454,7 @@ Minimum 1 characters • Press Ctrl+Enter   67/2000
 ## Browser Compatibility
 
 Tested and working in:
+
 - ✅ Chrome/Edge (latest)
 - ✅ Firefox (latest)
 - ✅ Safari (latest)

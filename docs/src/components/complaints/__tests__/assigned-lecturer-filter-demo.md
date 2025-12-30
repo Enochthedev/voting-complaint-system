@@ -1,37 +1,46 @@
 # Assigned Lecturer Filter - Visual Demo
 
 ## Overview
+
 The assigned lecturer filter allows lecturers and admins to filter complaints based on who they are assigned to. This is useful for viewing complaints assigned to specific team members or finding unassigned complaints.
 
 ## Filter Location
+
 The assigned lecturer filter is located in the Filter Panel sidebar, under the "Assigned To" section.
 
 ## Features
 
 ### 1. Dropdown Selection
+
 - **Component**: Select dropdown
-- **Options**: 
+- **Options**:
   - "All Lecturers" (default - shows all complaints)
   - Individual lecturer names (e.g., "Dr. Smith", "Prof. Johnson")
   - Admin names (e.g., "Admin Davis", "Admin Wilson")
 - **Behavior**: Single selection only
 
 ### 2. Filter Behavior
+
 - When "All Lecturers" is selected: Shows all complaints regardless of assignment
 - When a specific lecturer is selected: Shows only complaints assigned to that lecturer
 - Unassigned complaints (assigned_to = null) are excluded when filtering by a specific lecturer
 
 ### 3. Active Filter Display
+
 When a lecturer is selected, an active filter chip appears showing:
+
 ```
 Assigned: [Lecturer Name]
 ```
+
 Example: `Assigned: Dr. Smith`
 
 The chip can be removed by clicking the X icon, which resets the filter to "All Lecturers".
 
 ### 4. Integration with Other Filters
+
 The assigned lecturer filter works in combination with other filters:
+
 - Status filters
 - Category filters
 - Priority filters
@@ -44,8 +53,10 @@ All filters are applied together using AND logic.
 ## Use Cases
 
 ### Use Case 1: View My Assigned Complaints
+
 **Scenario**: A lecturer wants to see only complaints assigned to them
 **Steps**:
+
 1. Open the Filter Panel
 2. Expand the "Assigned To" section
 3. Select their name from the dropdown
@@ -54,8 +65,10 @@ All filters are applied together using AND logic.
 **Expected Result**: Only complaints assigned to that lecturer are displayed
 
 ### Use Case 2: Check Another Lecturer's Workload
+
 **Scenario**: An admin wants to see how many complaints are assigned to a specific lecturer
 **Steps**:
+
 1. Open the Filter Panel
 2. Select the lecturer's name from the "Assigned To" dropdown
 3. View the filtered complaint count
@@ -63,8 +76,10 @@ All filters are applied together using AND logic.
 **Expected Result**: All complaints assigned to that lecturer are shown
 
 ### Use Case 3: Find Unassigned Complaints
+
 **Scenario**: An admin wants to find complaints that haven't been assigned yet
 **Steps**:
+
 1. Use the "All Lecturers" option
 2. Apply a status filter for "new" or "opened"
 3. Manually review for complaints without assignment
@@ -72,8 +87,10 @@ All filters are applied together using AND logic.
 **Note**: A dedicated "Unassigned" option could be added in future iterations
 
 ### Use Case 4: Combine with Priority Filter
+
 **Scenario**: A lecturer wants to see high-priority complaints assigned to them
 **Steps**:
+
 1. Select their name in "Assigned To" dropdown
 2. Check "High" and "Critical" in the Priority filter
 3. View filtered results
@@ -83,6 +100,7 @@ All filters are applied together using AND logic.
 ## Visual States
 
 ### Default State
+
 ```
 ┌─────────────────────────────┐
 │ Assigned To                 │
@@ -93,6 +111,7 @@ All filters are applied together using AND logic.
 ```
 
 ### Lecturer Selected
+
 ```
 ┌─────────────────────────────┐
 │ Assigned To                 │
@@ -108,6 +127,7 @@ Active Filters:
 ```
 
 ### Dropdown Expanded
+
 ```
 ┌─────────────────────────────┐
 │ Assigned To                 │
@@ -126,6 +146,7 @@ Active Filters:
 ## Implementation Details
 
 ### Data Structure
+
 ```typescript
 interface FilterState {
   // ... other filters
@@ -133,27 +154,27 @@ interface FilterState {
 }
 
 interface Lecturer {
-  id: string;      // User ID
-  name: string;    // Display name
+  id: string; // User ID
+  name: string; // Display name
 }
 ```
 
 ### Filter Logic
+
 ```typescript
 // Apply assigned lecturer filter
 if (filters.assignedTo) {
-  complaints = complaints.filter(
-    (complaint) => complaint.assigned_to === filters.assignedTo
-  );
+  complaints = complaints.filter((complaint) => complaint.assigned_to === filters.assignedTo);
 }
 ```
 
 ### Active Filter Chip
+
 ```typescript
 {filters.assignedTo && (
   <FilterChip
     label={`Assigned: ${
-      availableLecturers.find((l) => l.id === filters.assignedTo)?.name || 
+      availableLecturers.find((l) => l.id === filters.assignedTo)?.name ||
       filters.assignedTo
     }`}
     onRemove={() => onFiltersChange({ ...filters, assignedTo: '' })}
@@ -170,22 +191,26 @@ if (filters.assignedTo) {
 ## Testing Scenarios
 
 ### Test 1: Filter by Single Lecturer
+
 - Select "Dr. Smith" from dropdown
 - Verify only complaints with `assigned_to: 'lecturer-1'` are shown
 - Verify active filter chip displays "Assigned: Dr. Smith"
 
 ### Test 2: Clear Filter
+
 - Select a lecturer
 - Click X on the active filter chip
 - Verify dropdown resets to "All Lecturers"
 - Verify all complaints are shown again
 
 ### Test 3: Combine with Status Filter
+
 - Select "Dr. Smith" from assigned to dropdown
 - Select "In Progress" status
 - Verify only in-progress complaints assigned to Dr. Smith are shown
 
 ### Test 4: No Results
+
 - Select a lecturer with no assigned complaints
 - Verify empty state is displayed
 - Verify appropriate message is shown
@@ -200,12 +225,14 @@ if (filters.assignedTo) {
 6. **Search in Dropdown**: Add search functionality for large lecturer lists
 
 ## Related Components
+
 - `FilterPanel` - Main filter component
 - `FilterChip` - Active filter display
 - `ComplaintList` - Displays filtered results
 - `FilterState` - Type definition for filter state
 
 ## Related Requirements
+
 - **AC13**: Search and Advanced Filtering
 - **AC17**: Complaint Assignment
 - **Task 4.2**: Build Advanced Filter System

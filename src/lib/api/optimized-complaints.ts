@@ -8,7 +8,7 @@
 import { supabase } from '@/lib/supabase';
 import { withRateLimit } from '@/lib/rate-limiter';
 import { withTokenRefresh } from '@/lib/api-wrapper';
-import { withMonitoring } from '@/lib/api/standardization/monitoring-wrapper';
+
 import {
   optimizeComplaintApiCall,
   optimizeComplaintOperations,
@@ -100,66 +100,68 @@ async function getUserComplaintStatsOptimizedImpl(userId: string) {
   return optimizeComplaintApiCall(
     `getUserComplaintStats-${userId}`,
     async () => {
-      // Use parallel execution for all count queries
-      const operations = {
-        total: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false),
-        new: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false)
-            .eq('status', 'new'),
-        opened: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false)
-            .eq('status', 'opened'),
-        inProgress: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false)
-            .eq('status', 'in_progress'),
-        resolved: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false)
-            .eq('status', 'resolved'),
-        closed: async () =>
-          await supabase
-            .from('complaints')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .eq('is_draft', false)
-            .eq('status', 'closed'),
-      };
+      return withTokenRefresh(async () => {
+        // Use parallel execution for all count queries
+        const operations = {
+          total: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false),
+          new: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false)
+              .eq('status', 'new'),
+          opened: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false)
+              .eq('status', 'opened'),
+          inProgress: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false)
+              .eq('status', 'in_progress'),
+          resolved: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false)
+              .eq('status', 'resolved'),
+          closed: async () =>
+            await supabase
+              .from('complaints')
+              .select('*', { count: 'exact', head: true })
+              .eq('student_id', userId)
+              .eq('is_draft', false)
+              .eq('status', 'closed'),
+        };
 
-      const results = (await optimizeComplaintOperations(operations)) as any;
+        const results = (await optimizeComplaintOperations(operations)) as any;
 
-      // Check for errors
-      Object.values(results).forEach((result: any) => {
-        if (result.error) throw result.error;
+        // Check for errors
+        Object.values(results).forEach((result: any) => {
+          if (result.error) throw result.error;
+        });
+
+        return {
+          total: results.total.count || 0,
+          new: results.new.count || 0,
+          opened: results.opened.count || 0,
+          in_progress: results.inProgress.count || 0,
+          resolved: results.resolved.count || 0,
+          closed: results.closed.count || 0,
+        };
       });
-
-      return {
-        total: results.total.count || 0,
-        new: results.new.count || 0,
-        opened: results.opened.count || 0,
-        in_progress: results.inProgress.count || 0,
-        resolved: results.resolved.count || 0,
-        closed: results.closed.count || 0,
-      };
     },
     {
       priority: 2,
@@ -180,40 +182,42 @@ async function getComplaintByIdOptimizedImpl(id: string) {
   return optimizeComplaintApiCall(
     `getComplaintById-${id}`,
     async () => {
-      // Fetch main complaint data and related data in parallel
-      const operations = {
-        complaint: async () =>
-          await supabase
-            .from('complaints')
-            .select(
-              `
+      return withTokenRefresh(async () => {
+        // Fetch main complaint data and related data in parallel
+        const operations = {
+          complaint: async () =>
+            await supabase
+              .from('complaints')
+              .select(
+                `
             *,
             student:users!complaints_student_id_fkey(id, full_name, email),
             assigned_user:users!complaints_assigned_to_fkey(id, full_name, email)
           `
-            )
-            .eq('id', id)
-            .single(),
-        tags: async () => await supabase.from('complaint_tags').select('tag_name').eq('complaint_id', id),
-        comments: async () =>
-          await supabase
-            .from('complaint_comments')
-            .select(
-              `
+              )
+              .eq('id', id)
+              .single(),
+          tags: async () =>
+            await supabase.from('complaint_tags').select('tag_name').eq('complaint_id', id),
+          comments: async () =>
+            await supabase
+              .from('complaint_comments')
+              .select(
+                `
             id,
             comment,
             is_internal,
             created_at,
             user:users(id, full_name, email, role)
           `
-            )
-            .eq('complaint_id', id)
-            .order('created_at', { ascending: true }),
-        attachments: async () =>
-          await supabase
-            .from('complaint_attachments')
-            .select(
-              `
+              )
+              .eq('complaint_id', id)
+              .order('created_at', { ascending: true }),
+          attachments: async () =>
+            await supabase
+              .from('complaint_attachments')
+              .select(
+                `
             id,
             file_name,
             file_path,
@@ -221,13 +225,13 @@ async function getComplaintByIdOptimizedImpl(id: string) {
             file_type,
             created_at
           `
-            )
-            .eq('complaint_id', id),
-        history: async () =>
-          await supabase
-            .from('complaint_history')
-            .select(
-              `
+              )
+              .eq('complaint_id', id),
+          history: async () =>
+            await supabase
+              .from('complaint_history')
+              .select(
+                `
             id,
             action,
             old_value,
@@ -235,32 +239,33 @@ async function getComplaintByIdOptimizedImpl(id: string) {
             created_at,
             performed_by_user:users!complaint_history_performed_by_fkey(id, full_name, email)
           `
-            )
-            .eq('complaint_id', id)
-            .order('created_at', { ascending: false }),
-      };
+              )
+              .eq('complaint_id', id)
+              .order('created_at', { ascending: false }),
+        };
 
-      const results = (await optimizeComplaintOperations(operations)) as any;
+        const results = (await optimizeComplaintOperations(operations)) as any;
 
-      // Check for errors
-      if (results.complaint.error) {
-        throw new DatabaseError(
-          results.complaint.error.message || 'Failed to fetch complaint',
-          results.complaint.error.code,
-          undefined,
-          results.complaint.error.details,
-          results.complaint.error.hint
-        );
-      }
+        // Check for errors
+        if (results.complaint.error) {
+          throw new DatabaseError(
+            results.complaint.error.message || 'Failed to fetch complaint',
+            results.complaint.error.code,
+            undefined,
+            results.complaint.error.details,
+            results.complaint.error.hint
+          );
+        }
 
-      // Combine all data
-      const complaint = results.complaint.data;
-      complaint.tags = results.tags.data || [];
-      complaint.comments = results.comments.data || [];
-      complaint.attachments = results.attachments.data || [];
-      complaint.history = results.history.data || [];
+        // Combine all data
+        const complaint = results.complaint.data;
+        complaint.tags = results.tags.data || [];
+        complaint.comments = results.comments.data || [];
+        complaint.attachments = results.attachments.data || [];
+        complaint.history = results.history.data || [];
 
-      return complaint;
+        return complaint;
+      });
     },
     {
       priority: 3,
@@ -425,7 +430,11 @@ async function bulkAssignComplaintsOptimizedImpl(
         // Fetch lecturer and complaints data in parallel
         const operations = {
           lecturer: async () =>
-            await supabase.from('users').select('id, full_name, email').eq('id', lecturerId).single(),
+            await supabase
+              .from('users')
+              .select('id, full_name, email')
+              .eq('id', lecturerId)
+              .single(),
           complaints: async () =>
             await supabase
               .from('complaints')
@@ -487,7 +496,8 @@ async function bulkAssignComplaintsOptimizedImpl(
         // Execute history and notifications in parallel
         const batchOperations = {
           history: async () => await supabase.from('complaint_history').insert(historyInserts),
-          notifications: async () => await supabase.from('notifications').insert(notificationInserts),
+          notifications: async () =>
+            await supabase.from('notifications').insert(notificationInserts),
         };
 
         await optimizeComplaintOperations(batchOperations);

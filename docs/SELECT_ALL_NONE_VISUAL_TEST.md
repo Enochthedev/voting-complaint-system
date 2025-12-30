@@ -9,6 +9,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
 ### 1. Updated BulkActionBar Component (`src/components/complaints/bulk-action-bar.tsx`)
 
 **Key Changes:**
+
 - Added "Select none" link next to "Select all" link
 - Both links are now displayed inline with a bullet separator
 - "Select all" link only shows when not all items are selected
@@ -17,6 +18,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
 - The existing "Clear" button remains for additional UX flexibility
 
 **UI Layout:**
+
 ```
 [X complaints selected] [Select all Y • Select none] | [Export CSV] [Clear]
 ```
@@ -24,6 +26,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
 ## Visual Test Steps
 
 ### Test 1: Initial Selection State
+
 1. Navigate to `/complaints`
 2. Click "Select" button in the header to enable selection mode
 3. Click checkboxes to select 2-3 complaints
@@ -34,6 +37,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - Export and Clear buttons
 
 ### Test 2: Select All Functionality
+
 1. With some complaints selected, click "Select all Y" link
 2. **Expected:**
    - All complaints on all pages are selected
@@ -43,6 +47,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - All checkboxes show as checked
 
 ### Test 3: Select None Functionality
+
 1. With all complaints selected, click "Select none" link
 2. **Expected:**
    - All selections are cleared
@@ -51,6 +56,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - Selection mode remains active
 
 ### Test 4: Select None from Partial Selection
+
 1. Select 2-3 complaints
 2. Click "Select none" link
 3. **Expected:**
@@ -59,6 +65,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - Selection mode remains active
 
 ### Test 5: Interaction with Clear Button
+
 1. Select some complaints
 2. Click the "Clear" button (with X icon)
 3. **Expected:**
@@ -67,6 +74,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - Selection mode is exited
 
 ### Test 6: Disabled State During Export
+
 1. Select some complaints
 2. Click "Export CSV" button
 3. **Expected:**
@@ -75,6 +83,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
    - Cannot click them during export
 
 ### Test 7: Responsive Behavior
+
 1. Test on mobile viewport (< 640px)
 2. Select complaints
 3. **Expected:**
@@ -85,11 +94,13 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
 ## UI/UX Improvements
 
 ### Before:
+
 - Only "Select all" link available (conditionally)
 - Had to use "Clear" button to deselect all
 - Less intuitive for users
 
 ### After:
+
 - Both "Select all" and "Select none" links available
 - Clear visual hierarchy with bullet separator
 - Consistent link styling
@@ -107,6 +118,7 @@ The "Select All" / "Select None" functionality has been implemented in the BulkA
 ## Integration Points
 
 The functionality integrates with:
+
 1. **Complaints Page** (`src/app/complaints/page.tsx`)
    - `handleSelectAll()` - Selects all filtered complaints
    - `handleClearSelection()` - Clears selection and exits selection mode

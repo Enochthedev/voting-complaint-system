@@ -11,16 +11,19 @@ Successfully implemented comprehensive immutability protections for the `complai
 Created three BEFORE triggers that prevent any modifications:
 
 **prevent_history_update**
+
 - Blocks all UPDATE operations at the row level
 - Raises exception: "complaint_history records are immutable and cannot be updated"
 - Works even for superusers
 
 **prevent_history_delete**
+
 - Blocks all DELETE operations at the row level
 - Raises exception: "complaint_history records are immutable and cannot be deleted"
 - Works even for superusers
 
 **prevent_history_truncate**
+
 - Blocks TRUNCATE operations at the statement level
 - Raises exception: "complaint_history table cannot be truncated - records are immutable"
 - Works even for superusers
@@ -61,6 +64,7 @@ Only SELECT and INSERT permissions remain.
 ### Automated Testing
 
 Created comprehensive verification script:
+
 - **Location**: `scripts/verify-complaint-history-immutability.js`
 - **Tests**: INSERT works, UPDATE blocked, DELETE blocked, TRUNCATE blocked
 - **Status**: ✅ All tests passing
@@ -84,6 +88,7 @@ Summary:
 ## Documentation
 
 Created comprehensive documentation:
+
 - **Location**: `docs/COMPLAINT_HISTORY_IMMUTABILITY.md`
 - **Contents**:
   - Implementation details
@@ -96,17 +101,20 @@ Created comprehensive documentation:
 ## How It Works
 
 ### Layer 1: Database Triggers (Strongest Protection)
+
 - Fires BEFORE any modification attempt
 - Raises exception and aborts transaction
 - Works for ALL users including superusers
 - Cannot be bypassed without dropping triggers
 
 ### Layer 2: RLS Policies
+
 - Enforces access control for authenticated users
 - Prevents UPDATE/DELETE through policy evaluation
 - Works in conjunction with triggers
 
 ### Layer 3: Permission Restrictions
+
 - Removes UPDATE/DELETE/TRUNCATE grants
 - Prevents accidental modifications
 - Works at the role level
@@ -114,16 +122,19 @@ Created comprehensive documentation:
 ## Benefits
 
 ### 1. Audit Trail Integrity
+
 - Complete, tamper-proof record of all actions
 - Supports compliance requirements
 - Enables investigation and dispute resolution
 
 ### 2. Security
+
 - Prevents malicious data tampering
 - Protects against accidental modifications
 - Maintains system trust
 
 ### 3. Compliance
+
 - Meets audit requirements
 - Provides evidence for disputes
 - Supports data retention policies
@@ -143,15 +154,13 @@ const { data: history } = await supabase
 ### ✅ Allowed: Creating History
 
 ```typescript
-const { error } = await supabase
-  .from('complaint_history')
-  .insert({
-    complaint_id: complaintId,
-    action: 'status_changed',
-    old_value: 'new',
-    new_value: 'in_progress',
-    performed_by: userId
-  });
+const { error } = await supabase.from('complaint_history').insert({
+  complaint_id: complaintId,
+  action: 'status_changed',
+  old_value: 'new',
+  new_value: 'in_progress',
+  performed_by: userId,
+});
 ```
 
 ### ❌ Blocked: Updating History
@@ -170,10 +179,7 @@ const { error } = await supabase
 
 ```typescript
 // This will fail with error
-const { error } = await supabase
-  .from('complaint_history')
-  .delete()
-  .eq('id', historyId);
+const { error } = await supabase.from('complaint_history').delete().eq('id', historyId);
 
 // Error: "complaint_history records are immutable and cannot be deleted"
 ```
@@ -222,6 +228,7 @@ TRUNCATE TABLE complaint_history;
 ✅ **Status**: Fully Implemented and Verified
 
 The implementation ensures:
+
 - ✅ History records can be created (INSERT allowed)
 - ✅ History records can be read (SELECT with RLS)
 - ✅ History records CANNOT be modified (UPDATE blocked by trigger)
@@ -229,6 +236,7 @@ The implementation ensures:
 - ✅ History table CANNOT be truncated (TRUNCATE blocked by trigger)
 
 Enforcement mechanisms:
+
 - ✅ Database triggers (strongest - works for all users)
 - ✅ RLS policies (works for authenticated users)
 - ✅ Permission restrictions (works at role level)
@@ -236,13 +244,16 @@ Enforcement mechanisms:
 ## Files Modified/Created
 
 ### Migrations
+
 - `supabase/migrations/038_enforce_complaint_history_immutability.sql`
 - `supabase/migrations/039_prevent_complaint_history_truncate_v2.sql`
 
 ### Scripts
+
 - `scripts/verify-complaint-history-immutability.js`
 
 ### Documentation
+
 - `docs/COMPLAINT_HISTORY_IMMUTABILITY.md`
 - `docs/TASK_9.2_HISTORY_IMMUTABILITY_COMPLETE.md`
 

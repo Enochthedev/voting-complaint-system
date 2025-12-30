@@ -55,6 +55,7 @@ node scripts/setup-storage-bucket.js
 ```
 
 The script will:
+
 - ✅ Verify environment variables
 - ✅ Test Supabase connection
 - ✅ Check for existing buckets
@@ -98,6 +99,7 @@ After creating the bucket, apply the Row Level Security policies:
 6. Click **Run** to execute
 
 The policies will:
+
 - ✅ Allow students to upload files to their own complaints
 - ✅ Allow lecturers/admins to upload files to any complaint
 - ✅ Allow students to view attachments on their own complaints
@@ -111,7 +113,7 @@ Run the verification queries at the end of `storage-rls-policies.sql` to confirm
 ```sql
 -- List all storage policies
 SELECT policyname, cmd FROM pg_policies
-WHERE tablename = 'objects' 
+WHERE tablename = 'objects'
   AND schemaname = 'storage'
   AND policyname LIKE '%attachments%';
 
@@ -122,15 +124,15 @@ WHERE name = 'complaint-attachments';
 
 **Expected Results:**
 
-| policyname | cmd |
-|------------|-----|
+| policyname                  | cmd    |
+| --------------------------- | ------ |
 | Students upload attachments | INSERT |
-| View attachments | SELECT |
-| Delete own attachments | DELETE |
+| View attachments            | SELECT |
+| Delete own attachments      | DELETE |
 
-| name | public | file_size_limit |
-|------|--------|-----------------|
-| complaint-attachments | false | 10485760 |
+| name                  | public | file_size_limit |
+| --------------------- | ------ | --------------- |
+| complaint-attachments | false  | 10485760        |
 
 ## Testing Storage
 
@@ -168,14 +170,16 @@ Find this key in: Supabase Dashboard → Project Settings → API → service_ro
 
 ### Error: "Failed to create bucket: permission denied"
 
-**Solution**: 
+**Solution**:
+
 1. Verify you're using the service role key (not anon key)
 2. Check that your Supabase project is active
 3. Ensure you have admin access to the project
 
 ### Error: "Row Level Security policy check violation"
 
-**Solution**: 
+**Solution**:
+
 1. Verify RLS policies are applied (Step 2)
 2. Check that the user is authenticated
 3. Verify the user's role is set correctly in JWT claims
@@ -184,6 +188,7 @@ Find this key in: Supabase Dashboard → Project Settings → API → service_ro
 ### Files not uploading
 
 **Checklist**:
+
 - ✅ Bucket created successfully
 - ✅ RLS policies applied
 - ✅ User is authenticated
@@ -208,8 +213,8 @@ Find this key in: Supabase Dashboard → Project Settings → API → service_ro
   'image/gif',
   'application/pdf',
   'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-]
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
 ```
 
 ## Security Considerations
@@ -217,6 +222,7 @@ Find this key in: Supabase Dashboard → Project Settings → API → service_ro
 ### Private Bucket
 
 The bucket is **private** by default, meaning:
+
 - Files are NOT publicly accessible via direct URL
 - All access requires authentication
 - RLS policies enforce access control
@@ -230,6 +236,7 @@ The bucket is **private** by default, meaning:
 ### File Validation
 
 Always validate files on both client and server:
+
 - ✅ Check file size before upload
 - ✅ Verify file type/MIME type
 - ✅ Scan for malware (recommended for production)
@@ -259,9 +266,7 @@ async function uploadAttachment(complaintId: string, file: File) {
 
 ```typescript
 async function downloadAttachment(filePath: string) {
-  const { data, error } = await supabase.storage
-    .from('complaint-attachments')
-    .download(filePath);
+  const { data, error } = await supabase.storage.from('complaint-attachments').download(filePath);
 
   if (error) throw error;
   return data;
@@ -285,9 +290,7 @@ async function getSignedUrl(filePath: string) {
 
 ```typescript
 async function deleteAttachment(filePath: string) {
-  const { error } = await supabase.storage
-    .from('complaint-attachments')
-    .remove([filePath]);
+  const { error } = await supabase.storage.from('complaint-attachments').remove([filePath]);
 
   if (error) throw error;
 }

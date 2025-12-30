@@ -95,7 +95,8 @@ The Complaint List component displays complaints in a clean, organized card-base
 │ ████████  ████████████  ████████                     │
 └──────────────────────────────────────────────────────┘
 ```
-*Skeleton loading placeholders with pulse animation*
+
+_Skeleton loading placeholders with pulse animation_
 
 ### 2. Empty State
 
@@ -158,21 +159,25 @@ The Complaint List component displays complaints in a clean, organized card-base
 │ [tag1] [tag2] [tag3]                                │
 └──────────────────────────────────────────────────────┘
 ```
-*Cursor changes to pointer, card elevates with shadow*
+
+_Cursor changes to pointer, card elevates with shadow_
 
 ## Responsive Behavior
 
 ### Desktop (> 1024px)
+
 - Full card layout
 - All metadata visible
 - Desktop pagination with page numbers
 
 ### Tablet (640px - 1024px)
+
 - Slightly condensed cards
 - All features visible
 - Adaptive pagination
 
 ### Mobile (< 640px)
+
 - Stacked layout
 - Simplified pagination
 - Tags may wrap to multiple lines
@@ -181,12 +186,14 @@ The Complaint List component displays complaints in a clean, organized card-base
 ## Color Scheme
 
 ### Light Mode
+
 - Background: White cards on light gray background
 - Text: Dark gray on white
 - Borders: Light gray
 - Hover: Darker borders, subtle shadow
 
 ### Dark Mode
+
 - Background: Dark cards on darker background
 - Text: Light gray on dark
 - Borders: Dark gray
@@ -226,28 +233,19 @@ The Complaint List component displays complaints in a clean, organized card-base
 ### With Loading State
 
 ```tsx
-<ComplaintList
-  complaints={[]}
-  isLoading={true}
-/>
+<ComplaintList complaints={[]} isLoading={true} />
 ```
 
 ### With Error State
 
 ```tsx
-<ComplaintList
-  complaints={[]}
-  error="Failed to load complaints"
-/>
+<ComplaintList complaints={[]} error="Failed to load complaints" />
 ```
 
 ### With Custom Empty Message
 
 ```tsx
-<ComplaintList
-  complaints={[]}
-  emptyMessage="You haven't submitted any complaints yet."
-/>
+<ComplaintList complaints={[]} emptyMessage="You haven't submitted any complaints yet." />
 ```
 
 ## Performance Optimizations

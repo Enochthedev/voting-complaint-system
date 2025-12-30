@@ -1,6 +1,7 @@
 # Notification System - Quick Reference
 
 ## Overview
+
 The Student Complaint System has an automated notification system that triggers on various events. This guide provides a quick reference for developers.
 
 ## Notification Types
@@ -25,30 +26,31 @@ CREATE TYPE notification_type AS ENUM (
 ## Automatic Notifications
 
 ### 1. Complaint Assignment ✅ IMPLEMENTED
+
 **Trigger**: When `complaints.assigned_to` is updated
 **Recipient**: The assigned lecturer
 **Implementation**: `notify_student_on_status_change()` function
 
 ```typescript
 // Frontend code - notification is automatic
-await supabase
-  .from('complaints')
-  .update({ assigned_to: lecturerId })
-  .eq('id', complaintId);
+await supabase.from('complaints').update({ assigned_to: lecturerId }).eq('id', complaintId);
 // Notification created automatically by trigger!
 ```
 
 ### 2. Complaint Opened
+
 **Trigger**: When complaint status changes from 'new' to 'opened'
 **Recipient**: The student who submitted the complaint
 **Implementation**: `notify_student_on_status_change()` function
 
 ### 3. New Complaint Submitted
+
 **Trigger**: When a new complaint is created (not draft)
 **Recipient**: All lecturers and admins
 **Implementation**: `notify_lecturers_on_new_complaint()` function
 
 ### 4. Status Changes
+
 **Trigger**: When complaint status changes to 'in_progress' or 'resolved'
 **Recipient**: The student who submitted the complaint
 **Implementation**: `notify_student_on_status_change()` function
@@ -56,6 +58,7 @@ await supabase
 ## Database Structure
 
 ### Notifications Table
+
 ```sql
 CREATE TABLE notifications (
   id UUID PRIMARY KEY,
@@ -70,6 +73,7 @@ CREATE TABLE notifications (
 ```
 
 ### Key Indexes
+
 - `idx_notifications_user_id` - Fast lookup by user
 - `idx_notifications_user_unread` - Unread notifications per user
 - `idx_notifications_user_type` - Notifications by type per user
@@ -77,6 +81,7 @@ CREATE TABLE notifications (
 ## Frontend Integration
 
 ### Subscribe to Notifications
+
 ```typescript
 import { createClient } from '@supabase/supabase-js';
 
@@ -85,25 +90,29 @@ const supabase = createClient(url, key);
 // Subscribe to real-time notifications
 const channel = supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, (payload) => {
-    const notification = payload.new;
-    
-    // Show toast notification
-    showToast({
-      title: notification.title,
-      message: notification.message,
-      type: notification.type,
-      link: getNotificationLink(notification)
-    });
-    
-    // Update notification count
-    updateNotificationCount();
-  })
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    (payload) => {
+      const notification = payload.new;
+
+      // Show toast notification
+      showToast({
+        title: notification.title,
+        message: notification.message,
+        type: notification.type,
+        link: getNotificationLink(notification),
+      });
+
+      // Update notification count
+      updateNotificationCount();
+    }
+  )
   .subscribe();
 
 // Cleanup on unmount
@@ -113,6 +122,7 @@ return () => {
 ```
 
 ### Get Notification Link
+
 ```typescript
 function getNotificationLink(notification: Notification): string {
   switch (notification.type) {
@@ -121,16 +131,16 @@ function getNotificationLink(notification: Notification): string {
     case 'complaint_reopened':
     case 'status_changed':
       return `/complaints/${notification.related_id}`;
-    
+
     case 'new_complaint':
       return `/complaints/${notification.related_id}`;
-    
+
     case 'new_announcement':
       return `/announcements`;
-    
+
     case 'new_vote':
       return `/votes/${notification.related_id}`;
-    
+
     default:
       return '/notifications';
   }
@@ -138,6 +148,7 @@ function getNotificationLink(notification: Notification): string {
 ```
 
 ### Fetch Notifications
+
 ```typescript
 // Get unread notifications
 const { data: unreadNotifs } = await supabase
@@ -157,12 +168,10 @@ const { data: allNotifs } = await supabase
 ```
 
 ### Mark as Read
+
 ```typescript
 // Mark single notification as read
-await supabase
-  .from('notifications')
-  .update({ is_read: true })
-  .eq('id', notificationId);
+await supabase.from('notifications').update({ is_read: true }).eq('id', notificationId);
 
 // Mark all as read
 await supabase
@@ -173,6 +182,7 @@ await supabase
 ```
 
 ### Get Unread Count
+
 ```typescript
 const { count } = await supabase
   .from('notifications')
@@ -190,21 +200,20 @@ For custom notifications not covered by triggers:
 
 ```typescript
 // Create a custom notification
-await supabase
-  .from('notifications')
-  .insert({
-    user_id: recipientId,
-    type: 'comment_added', // or other type
-    title: 'New comment on your complaint',
-    message: `${userName} commented: "${commentText}"`,
-    related_id: complaintId,
-    is_read: false
-  });
+await supabase.from('notifications').insert({
+  user_id: recipientId,
+  type: 'comment_added', // or other type
+  title: 'New comment on your complaint',
+  message: `${userName} commented: "${commentText}"`,
+  related_id: complaintId,
+  is_read: false,
+});
 ```
 
 ## Notification Styling
 
 ### Notification Icons
+
 ```typescript
 const notificationIcons = {
   complaint_assigned: '📋',
@@ -216,11 +225,12 @@ const notificationIcons = {
   complaint_reopened: '🔓',
   new_announcement: '📢',
   new_vote: '🗳️',
-  comment_added: '💭'
+  comment_added: '💭',
 };
 ```
 
 ### Notification Colors
+
 ```typescript
 const notificationColors = {
   complaint_assigned: 'blue',
@@ -232,19 +242,21 @@ const notificationColors = {
   complaint_reopened: 'orange',
   new_announcement: 'indigo',
   new_vote: 'pink',
-  comment_added: 'gray'
+  comment_added: 'gray',
 };
 ```
 
 ## Testing
 
 ### Verify Assignment Notification
+
 ```bash
 cd student-complaint-system
 node scripts/verify-assignment-notification.js
 ```
 
 ### Test All Triggers
+
 ```bash
 cd student-complaint-system
 node scripts/test-complaint-triggers.js
@@ -253,17 +265,20 @@ node scripts/test-complaint-triggers.js
 ## Troubleshooting
 
 ### Notifications Not Appearing
+
 1. Check if trigger is enabled:
+
    ```sql
-   SELECT * FROM pg_trigger 
+   SELECT * FROM pg_trigger
    WHERE tgname = 'notify_on_complaint_status_change';
    ```
 
 2. Check if notification was created:
+
    ```sql
-   SELECT * FROM notifications 
-   WHERE user_id = 'user-id' 
-   ORDER BY created_at DESC 
+   SELECT * FROM notifications
+   WHERE user_id = 'user-id'
+   ORDER BY created_at DESC
    LIMIT 10;
    ```
 
@@ -273,6 +288,7 @@ node scripts/test-complaint-triggers.js
    - Check browser console for errors
 
 ### Notifications Not Real-time
+
 1. Verify Supabase Realtime is enabled for the notifications table
 2. Check if the subscription filter is correct
 3. Ensure the user has SELECT permission on notifications table
@@ -325,6 +341,7 @@ CREATE POLICY "System insert notifications"
 ## Summary
 
 The notification system is fully automated at the database level. When implementing UI components:
+
 1. Subscribe to real-time notifications
 2. Display notifications with appropriate styling
 3. Provide mark-as-read functionality

@@ -12,6 +12,7 @@ This document describes the implementation of visual progress indicators for exp
 ## Objective
 
 Implement visual progress indicators that show users the status and progress of export operations, including:
+
 - PDF exports
 - CSV exports
 - Attachment exports
@@ -24,6 +25,7 @@ Implement visual progress indicators that show users the status and progress of 
 A reusable progress bar component that displays task completion visually.
 
 **Features**:
+
 - Configurable progress value (0-100)
 - Optional label text
 - Optional percentage display
@@ -32,14 +34,9 @@ A reusable progress bar component that displays task completion visually.
 - Smooth animations
 
 **Usage**:
+
 ```tsx
-<Progress
-  value={75}
-  label="Downloading files..."
-  showValue
-  size="default"
-  variant="default"
-/>
+<Progress value={75} label="Downloading files..." showValue size="default" variant="default" />
 ```
 
 ### 2. Dialog Component (`src/components/ui/dialog.tsx`)
@@ -47,6 +44,7 @@ A reusable progress bar component that displays task completion visually.
 A modal dialog component built with Radix UI for displaying content in an overlay.
 
 **Features**:
+
 - Accessible modal dialog
 - Backdrop overlay
 - Close button
@@ -55,6 +53,7 @@ A modal dialog component built with Radix UI for displaying content in an overla
 - Customizable content
 
 **Usage**:
+
 ```tsx
 <Dialog open={isOpen} onOpenChange={setIsOpen}>
   <DialogContent>
@@ -72,6 +71,7 @@ A modal dialog component built with Radix UI for displaying content in an overla
 A specialized dialog component for showing export progress with status indicators.
 
 **Features**:
+
 - Progress bar with percentage
 - Status messages
 - Success/error states with icons
@@ -80,6 +80,7 @@ A specialized dialog component for showing export progress with status indicator
 - Error handling
 
 **Props**:
+
 - `open`: Whether dialog is open
 - `onOpenChange`: Callback when dialog should close
 - `progress`: Current progress (0-100)
@@ -90,6 +91,7 @@ A specialized dialog component for showing export progress with status indicator
 - `onClose`: Close callback
 
 **Usage**:
+
 ```tsx
 <ExportProgressDialog
   open={showDialog}
@@ -108,6 +110,7 @@ A specialized dialog component for showing export progress with status indicator
 ### 1. ExportComplaintButton (`src/components/complaints/export-complaint-button.tsx`)
 
 **Changes**:
+
 - Added `ExportProgressDialog` integration
 - Added progress tracking state (`exportProgress`, `exportMessage`, `exportStatus`)
 - Updated export handlers to track progress
@@ -115,6 +118,7 @@ A specialized dialog component for showing export progress with status indicator
 - Auto-closes dialog on success after 2 seconds
 
 **Progress Tracking**:
+
 - PDF Export: Shows preparation and generation stages
 - Attachments Export: Shows download progress per file
 - Complete Package: Shows detailed progress through all stages
@@ -122,6 +126,7 @@ A specialized dialog component for showing export progress with status indicator
 ### 2. BulkActionBar (`src/components/complaints/bulk-action-bar.tsx`)
 
 **Changes**:
+
 - Added inline progress bar display
 - Added `exportProgress` and `exportMessage` props
 - Shows progress bar below action buttons during export
@@ -129,18 +134,21 @@ A specialized dialog component for showing export progress with status indicator
 - Expands to show progress information
 
 **New Props**:
+
 - `exportProgress?: number` - Progress value (0-100)
 - `exportMessage?: string` - Status message
 
 ### 3. Complaints Page (`src/app/complaints/page.tsx`)
 
 **Changes**:
+
 - Added progress state management
 - Updated `handleBulkExport` to track progress
 - Passes progress props to `BulkActionBar`
 - Simulates progress stages for better UX
 
 **Progress Stages**:
+
 1. Preparing export (0-20%)
 2. Processing complaints (20-60%)
 3. Generating CSV (60-100%)
@@ -158,18 +166,18 @@ const handleExportPDF = async () => {
     setShowProgressDialog(true);
     setExportProgress(0);
     setExportMessage('Preparing PDF export...');
-    
+
     // Stage 1: Preparation
     setExportProgress(30);
     setExportMessage('Generating PDF document...');
-    
+
     await exportComplaintToPDF(complaint);
-    
+
     // Stage 2: Complete
     setExportProgress(100);
     setExportMessage('PDF exported successfully!');
     setExportStatus('success');
-    
+
     // Auto-close after 2 seconds
     setTimeout(() => {
       setShowProgressDialog(false);
@@ -193,17 +201,13 @@ const handleExportAttachments = async () => {
     setExportStatus('exporting');
     setShowProgressDialog(true);
     setExportProgress(0);
-    
-    await exportComplaintAttachments(
-      complaint.id,
-      complaint.attachments,
-      (current, total) => {
-        const progress = Math.round((current / total) * 100);
-        setExportProgress(progress);
-        setExportMessage(`Downloading ${current}/${total} attachments...`);
-      }
-    );
-    
+
+    await exportComplaintAttachments(complaint.id, complaint.attachments, (current, total) => {
+      const progress = Math.round((current / total) * 100);
+      setExportProgress(progress);
+      setExportMessage(`Downloading ${current}/${total} attachments...`);
+    });
+
     setExportProgress(100);
     setExportMessage('Attachments exported successfully!');
     setExportStatus('success');
@@ -225,9 +229,7 @@ const handleBulkExport = async () => {
   setExportMessage('Preparing export...');
 
   try {
-    const selectedComplaints = filteredComplaints.filter(c => 
-      selectedIds.has(c.id)
-    );
+    const selectedComplaints = filteredComplaints.filter((c) => selectedIds.has(c.id));
 
     setExportProgress(20);
     setExportMessage(`Preparing ${selectedComplaints.length} complaints...`);
@@ -239,7 +241,7 @@ const handleBulkExport = async () => {
     setExportMessage('Generating CSV file...');
 
     // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     exportComplaintsToCSV(complaintsToExport, filename);
 
@@ -247,7 +249,7 @@ const handleBulkExport = async () => {
     setExportMessage('Export complete!');
 
     // Wait before clearing
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Clear selection
     setSelectedIds(new Set());
@@ -295,7 +297,7 @@ const handleBulkExport = async () => {
 
 ### Progress Bar Styles
 
-- **Height**: 
+- **Height**:
   - Small: 4px
   - Default: 8px
   - Large: 12px
@@ -326,17 +328,20 @@ const handleBulkExport = async () => {
 ## Accessibility
 
 ### Progress Component
+
 - Semantic HTML structure
 - Clear visual indicators
 - Percentage display option for screen readers
 
 ### Dialog Component
+
 - ARIA labels and roles
 - Keyboard navigation (ESC to close)
 - Focus management
 - Screen reader announcements
 
 ### Export Progress Dialog
+
 - Prevents closing during export (good UX)
 - Clear status messages
 - Visual and text indicators
@@ -345,6 +350,7 @@ const handleBulkExport = async () => {
 ## Browser Compatibility
 
 Tested and working in:
+
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
@@ -359,9 +365,11 @@ Tested and working in:
 ## Dependencies
 
 ### New Dependencies
+
 - `@radix-ui/react-dialog` - Accessible dialog primitives
 
 ### Existing Dependencies
+
 - React
 - Lucide React (icons)
 - Tailwind CSS (styling)
@@ -388,6 +396,7 @@ src/
 ## Testing Checklist
 
 ### Functional Testing
+
 - ✅ Progress bar displays correctly
 - ✅ Progress updates smoothly
 - ✅ Dialog opens/closes properly
@@ -398,6 +407,7 @@ src/
 - ✅ Bulk export progress displays
 
 ### Visual Testing
+
 - ✅ Progress bar styling correct
 - ✅ Dialog positioning correct
 - ✅ Icons display properly
@@ -406,6 +416,7 @@ src/
 - ✅ Responsive on mobile
 
 ### Accessibility Testing
+
 - ✅ Keyboard navigation works
 - ✅ Screen reader compatible
 - ✅ Focus management correct
@@ -428,7 +439,8 @@ src/
 
 ## Validation
 
-**Validates**: 
+**Validates**:
+
 - Requirements AC20 (Export Functionality)
 - Task 8.3 (Show export progress indicator)
 

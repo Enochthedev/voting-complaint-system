@@ -1,6 +1,6 @@
 /**
  * Request deduplication system for API optimization
- * 
+ *
  * Prevents duplicate requests from being sent within configurable time windows.
  * Provides statistics and monitoring for request deduplication effectiveness.
  */
@@ -84,11 +84,11 @@ export class RequestDeduplicator {
   ): string {
     const normalizedMethod = method.toUpperCase();
     const normalizedUrl = url.toLowerCase();
-    
+
     // Create a stable string representation of parameters and body
     const paramsStr = params ? JSON.stringify(this.sortObject(params)) : '';
     const bodyStr = body ? JSON.stringify(this.sortObject(body)) : '';
-    
+
     return `${normalizedMethod}:${normalizedUrl}:${paramsStr}:${bodyStr}`;
   }
 
@@ -110,7 +110,7 @@ export class RequestDeduplicator {
 
     // Check if there's already a pending request with the same key
     const existingRequest = this.pendingRequests.get(requestKey);
-    
+
     if (existingRequest) {
       // Check if the existing request is still within the time window
       const now = Date.now();
@@ -119,7 +119,7 @@ export class RequestDeduplicator {
         this.stats.deduplicatedRequests++;
         existingRequest.duplicateCount++;
         this.updateDeduplicationRate();
-        
+
         // Return the existing promise
         return existingRequest.promise;
       } else {
@@ -223,7 +223,7 @@ export class RequestDeduplicator {
    */
   private updateDeduplicationRate(): void {
     if (this.stats.totalRequests > 0) {
-      this.stats.deduplicationRate = 
+      this.stats.deduplicationRate =
         (this.stats.deduplicatedRequests / this.stats.totalRequests) * 100;
     }
   }
@@ -237,12 +237,12 @@ export class RequestDeduplicator {
     }
 
     if (Array.isArray(obj)) {
-      return obj.map(item => this.sortObject(item));
+      return obj.map((item) => this.sortObject(item));
     }
 
     const sorted: any = {};
     const keys = Object.keys(obj).sort();
-    
+
     for (const key of keys) {
       sorted[key] = this.sortObject(obj[key]);
     }

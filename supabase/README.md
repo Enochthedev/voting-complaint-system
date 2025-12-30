@@ -73,9 +73,9 @@ After applying migrations, verify they were successful:
 
 ```sql
 -- List all tables
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 ORDER BY table_name;
 ```
 
@@ -143,6 +143,7 @@ After applying migrations, test the schema:
 ### Error: "relation already exists"
 
 The table already exists. Either:
+
 - Skip this migration
 - Drop the table first (be careful in production!)
 - Use `CREATE TABLE IF NOT EXISTS`
@@ -154,6 +155,7 @@ Ensure you're connected with sufficient privileges (postgres role or service_rol
 ### Error: "type already exists"
 
 The enum type already exists. Either:
+
 - Skip the enum creation
 - Drop and recreate: `DROP TYPE IF EXISTS user_role CASCADE;`
 

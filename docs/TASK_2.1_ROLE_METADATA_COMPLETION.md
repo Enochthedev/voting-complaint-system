@@ -1,6 +1,7 @@
 # Task 2.1: Add Role Field to User Metadata - Completion Summary
 
 ## Task Overview
+
 Configure the system to properly store and access user roles in metadata and JWT claims for role-based access control.
 
 ## Implementation Summary
@@ -18,7 +19,7 @@ const { data, error } = await supabase.auth.signUp({
   options: {
     data: {
       full_name: fullName,
-      role: role,  // ← Role stored in user_metadata
+      role: role, // ← Role stored in user_metadata
     },
   },
 });
@@ -63,12 +64,14 @@ $$;
 ### 4. Helper Functions ✅
 
 **Client-side** (`src/lib/auth.ts`):
+
 - `getUserRole()` - Get current user's role
 - `hasRole(role)` - Check if user has specific role
 - `isStudent()`, `isLecturer()`, `isAdmin()` - Role-specific checks
 - `isLecturerOrAdmin()` - Combined check
 
 **Server-side** (`src/lib/auth-server.ts`):
+
 - `getUserRoleServer()` - Get role in server components
 - `hasRoleServer(role)` - Server-side role check
 - `requireRoleServer(role)` - Enforce role requirement
@@ -85,12 +88,14 @@ $$;
 ## Files Created/Modified
 
 ### Created Files:
+
 1. `supabase/migrations/018_add_role_to_jwt_claims.sql` - JWT claims hook
 2. `docs/JWT_ROLE_CONFIGURATION.md` - Configuration guide
 3. `scripts/verify-role-setup.js` - Verification script
 4. `scripts/configure-jwt-claims.js` - Configuration helper
 
 ### Modified Files:
+
 1. `supabase/migrations/001_fix_users_table_trigger.sql` - Fixed syntax
 
 ## Configuration Required
@@ -116,6 +121,7 @@ node scripts/verify-role-setup.js
 ```
 
 Expected output:
+
 - ✅ Users table exists with role column
 - ✅ User metadata configured in auth.ts signUp function
 - Instructions for JWT hook configuration
@@ -127,12 +133,7 @@ Expected output:
 ```typescript
 import { signUp } from '@/lib/auth';
 
-const result = await signUp(
-  'test@example.com',
-  'SecurePass123',
-  'Test User',
-  'student'
-);
+const result = await signUp('test@example.com', 'SecurePass123', 'Test User', 'student');
 
 // Check user metadata
 console.log(result.user?.user_metadata.role); // Should be 'student'
@@ -153,7 +154,9 @@ console.log(isStudentUser); // true or false
 ### 3. Test JWT Claims (After Hook Configuration)
 
 ```javascript
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 // Decode JWT at https://jwt.io
 // Should see: "role": "student" in claims
 ```
@@ -167,7 +170,7 @@ CREATE POLICY "Students view own complaints"
 ON complaints FOR SELECT
 TO authenticated
 USING (
-  student_id = auth.uid() OR 
+  student_id = auth.uid() OR
   auth.jwt()->>'role' IN ('lecturer', 'admin')
 );
 ```
@@ -175,6 +178,7 @@ USING (
 ## Documentation
 
 Comprehensive documentation available in:
+
 - `docs/JWT_ROLE_CONFIGURATION.md` - Full configuration guide
 - `docs/AUTH_QUICK_START.md` - Authentication quick start
 - `src/lib/README_AUTH.md` - Auth library documentation
@@ -182,6 +186,7 @@ Comprehensive documentation available in:
 ## Next Steps
 
 1. **Apply Migrations** (if not done):
+
    ```bash
    npx supabase db push --include-all
    ```

@@ -7,11 +7,13 @@ A comprehensive refactoring plan has been created for `complaint-detail-view.tsx
 ## Quick Reference
 
 ### Current State
+
 - **File**: `src/components/complaints/complaint-detail-view.tsx`
 - **Size**: 1,998 lines
 - **Status**: ❌ Too large, mixed concerns
 
 ### Target State
+
 - **Directory**: `src/components/complaints/complaint-detail/`
 - **Files**: 11 focused files
 - **Largest File**: ~450 lines (ActionButtons.tsx)
@@ -37,21 +39,25 @@ complaint-detail/
 ## Key Benefits
 
 ### 🎯 Maintainability
+
 - Single responsibility per file
 - Easy to locate and fix bugs
 - Reduced cognitive load
 
 ### 🧪 Testability
+
 - Smaller, focused components
 - Easier to test in isolation
 - Better test coverage
 
 ### ♻️ Reusability
+
 - Components can be used elsewhere
 - Shared utilities and constants
 - Better code organization
 
 ### 👥 Collaboration
+
 - Multiple developers can work simultaneously
 - Smaller diffs in version control
 - Fewer merge conflicts
@@ -59,47 +65,55 @@ complaint-detail/
 ## Component Responsibilities
 
 ### 1. index.tsx (Main Component)
+
 - Orchestrates all sub-components
 - Manages top-level state
 - Handles data loading
 - Provides layout structure
 
 ### 2. ComplaintHeader.tsx
+
 - Displays title and status
 - Shows metadata (priority, category, dates)
 - Renders tags
 - Anonymous indicator
 
 ### 3. ComplaintDescription.tsx
+
 - Renders rich text description
 - Applies prose styling
 - Safe HTML rendering
 
 ### 4. AttachmentsSection.tsx
+
 - Lists file attachments
 - Download functionality
 - Preview for images
 - File metadata display
 
 ### 5. TimelineSection.tsx
+
 - Chronological history
 - Action icons and labels
 - User attribution
 - Timeline visualization
 
 ### 6. CommentsSection.tsx
+
 - Discussion thread
 - Comment CRUD operations
 - Internal notes (role-based)
 - Edit/delete functionality
 
 ### 7. ActionButtons.tsx
+
 - Role-based actions
 - Status change modal
 - Assignment modal
 - Confirmation flows
 
 ### 8. Supporting Files
+
 - **types.ts**: Shared TypeScript interfaces
 - **constants.ts**: Status/Priority/Category configs
 - **utils.ts**: Formatting and helper functions
@@ -108,36 +122,43 @@ complaint-detail/
 ## Implementation Approach
 
 ### Phase 1: Setup (30 min)
+
 - Create directory structure
 - Set up basic file templates
 
 ### Phase 2: Extract Utilities (1 hour)
+
 - Move utility functions
 - Move constants
 - Move types
 - Move mock data
 
 ### Phase 3: Extract Simple Components (2 hours)
+
 - ComplaintDescription
 - ComplaintHeader
 - TimelineSection
 
 ### Phase 4: Extract Complex Components (3 hours)
+
 - AttachmentsSection
 - CommentsSection
 - ActionButtons
 
 ### Phase 5: Refactor Main (1 hour)
+
 - Update index.tsx
 - Compose all components
 - Remove old code
 
 ### Phase 6: Testing (2 hours)
+
 - Unit tests
 - Integration tests
 - Visual verification
 
 ### Phase 7: Cleanup (30 min)
+
 - Delete old file
 - Update imports
 - Documentation

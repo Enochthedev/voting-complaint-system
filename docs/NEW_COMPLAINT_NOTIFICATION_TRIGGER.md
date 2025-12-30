@@ -49,7 +49,7 @@ BEGIN
       related_id,
       is_read
     )
-    SELECT 
+    SELECT
       u.id,
       'new_complaint',
       'New complaint submitted',
@@ -59,7 +59,7 @@ BEGIN
     FROM public.users u
     WHERE u.role IN ('lecturer', 'admin');
   END IF;
-  
+
   RETURN NEW;
 END;
 $ LANGUAGE plpgsql SECURITY DEFINER;
@@ -139,15 +139,17 @@ This trigger satisfies the following acceptance criteria:
 If notifications are not being created:
 
 1. Check that the trigger exists and is enabled:
+
    ```sql
-   SELECT tgname, tgenabled 
-   FROM pg_trigger 
+   SELECT tgname, tgenabled
+   FROM pg_trigger
    WHERE tgname = 'notify_on_new_complaint';
    ```
 
 2. Verify the notification type enum includes 'new_complaint':
+
    ```sql
-   SELECT enumlabel 
+   SELECT enumlabel
    FROM pg_enum e
    JOIN pg_type t ON e.enumtypid = t.oid
    WHERE t.typname = 'notification_type';
@@ -155,8 +157,8 @@ If notifications are not being created:
 
 3. Check that lecturers/admins exist in the users table:
    ```sql
-   SELECT COUNT(*) 
-   FROM users 
+   SELECT COUNT(*)
+   FROM users
    WHERE role IN ('lecturer', 'admin');
    ```
 
@@ -165,8 +167,8 @@ If notifications are not being created:
 If duplicate notifications are created, check that the trigger is not defined multiple times:
 
 ```sql
-SELECT COUNT(*) 
-FROM pg_trigger 
+SELECT COUNT(*)
+FROM pg_trigger
 WHERE tgname = 'notify_on_new_complaint';
 ```
 

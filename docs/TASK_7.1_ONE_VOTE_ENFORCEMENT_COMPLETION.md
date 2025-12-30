@@ -13,6 +13,7 @@
 **Location**: `supabase/migrations/013_create_vote_responses_table.sql`
 
 Verified that the UNIQUE constraint exists and is working:
+
 ```sql
 CONSTRAINT unique_vote_per_student UNIQUE (vote_id, student_id)
 ```
@@ -23,12 +24,12 @@ CONSTRAINT unique_vote_per_student UNIQUE (vote_id, student_id)
 
 Performed comprehensive database testing to verify the constraint:
 
-| Test Case | Expected Result | Actual Result |
-|-----------|----------------|---------------|
-| Student A votes once | SUCCESS | ✅ Vote recorded |
-| Student A votes twice | FAILURE | ✅ Constraint violation (23505) |
-| Student B votes on same poll | SUCCESS | ✅ Vote recorded |
-| Vote results accuracy | Correct counts | ✅ Option A: 1, Option B: 1 |
+| Test Case                    | Expected Result | Actual Result                   |
+| ---------------------------- | --------------- | ------------------------------- |
+| Student A votes once         | SUCCESS         | ✅ Vote recorded                |
+| Student A votes twice        | FAILURE         | ✅ Constraint violation (23505) |
+| Student B votes on same poll | SUCCESS         | ✅ Vote recorded                |
+| Vote results accuracy        | Correct counts  | ✅ Option A: 1, Option B: 1     |
 
 **Test Vote ID**: `4d31c208-3d21-47e8-815f-f3166ac2a2bf` (cleaned up after testing)
 
@@ -37,6 +38,7 @@ Performed comprehensive database testing to verify the constraint:
 **Location**: `src/lib/api/votes.ts`
 
 Enhanced the `submitVoteResponse()` function with:
+
 - Detailed comments explaining the constraint enforcement
 - Proper error handling for Phase 12 Supabase integration
 - Error code 23505 detection for duplicate votes
@@ -44,8 +46,7 @@ Enhanced the `submitVoteResponse()` function with:
 
 ```typescript
 // Check if error is due to unique constraint violation (duplicate vote)
-if (error.code === '23505' && 
-    error.message.includes('vote_responses_vote_id_student_id_key')) {
+if (error.code === '23505' && error.message.includes('vote_responses_vote_id_student_id_key')) {
   throw new Error('You have already voted on this poll');
 }
 ```
@@ -55,6 +56,7 @@ if (error.code === '23505' &&
 **Location**: `src/app/votes/[id]/page.tsx`
 
 Verified existing UI implementation:
+
 - ✅ Pre-checks if student has voted before rendering
 - ✅ Conditionally shows voting form or results
 - ✅ Displays "Voted" badge after voting
@@ -92,6 +94,7 @@ Created comprehensive documentation:
 **Location**: `src/lib/api/__tests__/votes-one-vote-enforcement.test.ts`
 
 Created comprehensive test suite covering:
+
 - ✅ Student can vote once
 - ✅ Student cannot vote twice
 - ✅ Different students can vote on same poll
@@ -105,22 +108,26 @@ Created comprehensive test suite covering:
 ## Enforcement Layers
 
 ### Layer 1: Database (Primary) ✅
+
 - UNIQUE constraint on `(vote_id, student_id)`
 - Cannot be bypassed
 - Error code: 23505
 
 ### Layer 2: API (Secondary) ✅
+
 - Validates before insert
 - Catches constraint violations
 - Returns user-friendly errors
 
 ### Layer 3: UI (User Experience) ✅
+
 - Checks if voted before rendering
 - Hides voting form after voting
 - Shows results instead
 - Displays "Voted" badge
 
 ### Layer 4: Security (RLS) ✅
+
 - Students can only vote as themselves
 - Only students can cast votes
 - Lecturers can view all responses
@@ -128,13 +135,17 @@ Created comprehensive test suite covering:
 ## Requirements Satisfied
 
 ### Acceptance Criteria AC6 ✅
+
 > **AC6: Voting System**
+>
 > - Students can cast votes on active polls ✅
 > - **Students can only vote once per poll** ✅ **VERIFIED**
 > - Lecturers can view voting results and statistics ✅
 
 ### Design Property P6 ✅
+
 > **P6: Vote Uniqueness (AC6)**
+>
 > - **Property**: A student can vote only once per poll ✅
 > - **Verification**: UNIQUE constraint on (vote_id, student_id) in vote_responses ✅
 > - **Implementation**: Database UNIQUE constraint prevents duplicate votes ✅
@@ -171,10 +182,12 @@ GROUP BY selected_option;
 ## Files Modified/Created
 
 ### Modified Files
+
 1. `src/lib/api/votes.ts` - Enhanced comments and error handling
 2. `supabase/migrations/013_create_vote_responses_table.sql` - Added detailed comments
 
 ### Created Files
+
 1. `docs/VOTE_ONE_PER_STUDENT_ENFORCEMENT.md` - Full documentation
 2. `docs/VOTE_ONE_PER_STUDENT_QUICK_REFERENCE.md` - Quick reference guide
 3. `src/lib/api/__tests__/votes-one-vote-enforcement.test.ts` - Test suite
@@ -196,6 +209,7 @@ When connecting to real Supabase in Phase 12:
 ## Verification Commands
 
 ### Check Constraint Exists
+
 ```sql
 SELECT conname, pg_get_constraintdef(oid)
 FROM pg_constraint
@@ -204,6 +218,7 @@ WHERE conrelid = 'public.vote_responses'::regclass
 ```
 
 ### Verify No Duplicates
+
 ```sql
 SELECT vote_id, student_id, COUNT(*)
 FROM vote_responses
@@ -213,8 +228,9 @@ HAVING COUNT(*) > 1;
 ```
 
 ### Check Vote Integrity
+
 ```sql
-SELECT 
+SELECT
   v.title,
   COUNT(DISTINCT vr.student_id) as unique_voters,
   COUNT(vr.id) as total_votes

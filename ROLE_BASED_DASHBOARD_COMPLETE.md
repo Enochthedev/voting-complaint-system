@@ -92,6 +92,7 @@ src/app/dashboard/
 ## How It Works
 
 ### 1. Role Detection
+
 ```typescript
 // In src/app/dashboard/page.tsx
 const renderDashboard = () => {
@@ -108,11 +109,13 @@ const renderDashboard = () => {
 ```
 
 ### 2. Navigation
+
 - All roles access `/dashboard`
 - Sidebar already shows role-specific menu items
 - Middleware protects admin routes (`/admin/*`)
 
 ### 3. Data Loading
+
 - Student dashboard: Loads user-specific data
 - Lecturer dashboard: Uses mock data (will connect in Phase 12)
 - Admin dashboard: Uses mock data (will connect in Phase 12)

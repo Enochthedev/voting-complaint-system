@@ -11,6 +11,7 @@ The feedback form system allows lecturers to provide detailed feedback on studen
 A form component for lecturers to write and submit feedback on complaints.
 
 **Key Features:**
+
 - Rich text editor with formatting capabilities
 - Character count validation (10-5000 characters)
 - Real-time validation with error messages
@@ -21,17 +22,19 @@ A form component for lecturers to write and submit feedback on complaints.
 - Cancel functionality
 
 **Props:**
+
 ```typescript
 interface FeedbackFormProps {
-  complaintId: string;           // Required: ID of the complaint
-  onSubmit?: (content: string) => Promise<void>;  // Optional: Submit callback
-  onCancel?: () => void;         // Optional: Cancel callback
-  existingFeedback?: Feedback;   // Optional: For editing existing feedback
-  isEditing?: boolean;           // Optional: Edit mode flag
+  complaintId: string; // Required: ID of the complaint
+  onSubmit?: (content: string) => Promise<void>; // Optional: Submit callback
+  onCancel?: () => void; // Optional: Cancel callback
+  existingFeedback?: Feedback; // Optional: For editing existing feedback
+  isEditing?: boolean; // Optional: Edit mode flag
 }
 ```
 
 **Usage:**
+
 ```tsx
 // Add new feedback
 <FeedbackForm
@@ -59,6 +62,7 @@ interface FeedbackFormProps {
 A component to display all feedback entries for a complaint with add/edit capabilities.
 
 **Key Features:**
+
 - Display feedback in chronological order
 - Show lecturer information with avatars
 - Relative timestamps (e.g., "2 hours ago")
@@ -70,18 +74,20 @@ A component to display all feedback entries for a complaint with add/edit capabi
 - Role-based access control
 
 **Props:**
+
 ```typescript
 interface FeedbackDisplayProps {
-  complaintId: string;           // Required: ID of the complaint
+  complaintId: string; // Required: ID of the complaint
   feedback?: FeedbackWithUser[]; // Optional: Array of feedback entries
-  userRole?: 'student' | 'lecturer' | 'admin';  // Optional: Current user role
-  currentUserId?: string;        // Optional: Current user ID
-  onAddFeedback?: () => void;    // Optional: Add feedback callback
-  onEditFeedback?: (feedbackId: string) => void;  // Optional: Edit callback
+  userRole?: 'student' | 'lecturer' | 'admin'; // Optional: Current user role
+  currentUserId?: string; // Optional: Current user ID
+  onAddFeedback?: () => void; // Optional: Add feedback callback
+  onEditFeedback?: (feedbackId: string) => void; // Optional: Edit callback
 }
 ```
 
 **Usage:**
+
 ```tsx
 <FeedbackDisplay
   complaintId="complaint-123"
@@ -103,12 +109,14 @@ interface FeedbackDisplayProps {
 ## UI States
 
 ### Empty State
+
 - Displayed when no feedback exists
 - Shows empty state icon and message
 - "Add Feedback" button for lecturers
 - Clean, centered layout
 
 ### Add Feedback Mode
+
 - Rich text editor with formatting toolbar
 - Character counter with color coding:
   - Orange: Below minimum (< 10 chars)
@@ -119,6 +127,7 @@ interface FeedbackDisplayProps {
 - Form validation on submit
 
 ### Display Feedback
+
 - Lecturer avatar (first letter of name)
 - Lecturer full name
 - Relative timestamp (e.g., "2 hours ago")
@@ -128,6 +137,7 @@ interface FeedbackDisplayProps {
 - Time remaining for edit window
 
 ### Edit Feedback Mode
+
 - Pre-filled with existing content
 - Same editor as add mode
 - "Update Feedback" button
@@ -135,18 +145,21 @@ interface FeedbackDisplayProps {
 - Yellow notice about 24-hour edit limit
 
 ### Loading State
+
 - Disabled form during submission
 - Loading spinner on submit button
 - "Sending..." or "Updating..." text
 - Disabled cancel button
 
 ### Success State
+
 - Green success alert with checkmark
 - Confirmation message
 - Auto-close after 2 seconds
 - Form resets
 
 ### Error State
+
 - Red error alert with warning icon
 - Error message
 - Form remains open for retry
@@ -163,14 +176,14 @@ function ComplaintDetailPage({ complaintId }) {
   // Get from auth context
   const userRole = useAuth().user?.role;
   const currentUserId = useAuth().user?.id;
-  
+
   // Fetch feedback (Phase 12)
   const [feedback, setFeedback] = useState([]);
 
   return (
     <div className="space-y-6">
       {/* Complaint header, description, attachments, etc. */}
-      
+
       {/* Feedback Section */}
       <FeedbackDisplay
         complaintId={complaintId}
@@ -178,7 +191,7 @@ function ComplaintDetailPage({ complaintId }) {
         userRole={userRole}
         currentUserId={currentUserId}
       />
-      
+
       {/* Comments, timeline, etc. */}
     </div>
   );
@@ -239,7 +252,7 @@ const handleUpdateFeedback = async (feedbackId: string, content: string) => {
     .eq('id', feedbackId)
     .single();
 
-  const hoursSinceCreation = 
+  const hoursSinceCreation =
     (Date.now() - new Date(existing.created_at).getTime()) / (1000 * 60 * 60);
 
   if (hoursSinceCreation > 24) {
@@ -273,10 +286,12 @@ const handleUpdateFeedback = async (feedbackId: string, content: string) => {
 const fetchFeedback = async (complaintId: string) => {
   const { data, error } = await supabase
     .from('feedback')
-    .select(`
+    .select(
+      `
       *,
       lecturer:users!lecturer_id(*)
-    `)
+    `
+    )
     .eq('complaint_id', complaintId)
     .order('created_at', { ascending: true });
 
@@ -307,9 +322,7 @@ useEffect(() => {
           setFeedback((prev) => [...prev, payload.new]);
         } else if (payload.eventType === 'UPDATE') {
           // Update existing feedback
-          setFeedback((prev) =>
-            prev.map((f) => (f.id === payload.new.id ? payload.new : f))
-          );
+          setFeedback((prev) => prev.map((f) => (f.id === payload.new.id ? payload.new : f)));
         }
       }
     )

@@ -55,11 +55,13 @@ This migration fixes the infinite recursion issue in RLS policies by:
 ### Issue: Tests still failing after migration
 
 **Possible causes**:
+
 1. Users haven't signed out and back in (JWT claims not updated)
 2. JWT hook not configured (migration 018 not applied)
 3. Migration not applied correctly
 
 **Solutions**:
+
 1. Have all test users sign out and sign back in
 2. Verify migration 018 is applied: `018_add_role_to_jwt_claims.sql`
 3. Re-run the migration SQL
@@ -68,7 +70,8 @@ This migration fixes the infinite recursion issue in RLS policies by:
 
 **Cause**: The JWT custom claims hook is not configured.
 
-**Solution**: 
+**Solution**:
+
 1. Apply migration 018: `018_add_role_to_jwt_claims.sql`
 2. Configure the hook in Supabase Dashboard:
    - Go to Authentication > Hooks
@@ -92,5 +95,6 @@ This migration fixes the infinite recursion issue in RLS policies by:
 ## Support
 
 For detailed documentation, see:
+
 - `docs/TASK_2.2_COMPLAINT_ATTACHMENTS_RLS_COMPLETION.md`
 - Design document: `.kiro/specs/student-complaint-system/design.md`

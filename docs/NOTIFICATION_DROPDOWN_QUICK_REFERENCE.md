@@ -14,34 +14,34 @@ import { NotificationDropdown } from '@/components/notifications';
 
 ## Features at a Glance
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Bell Icon | ✅ | Shows notification bell with badge |
-| Unread Count | ✅ | Displays count of unread notifications |
-| Dropdown List | ✅ | Scrollable list of notifications |
-| Type Icons | ✅ | Different icons per notification type |
-| Color Coding | ✅ | Visual distinction by type |
-| Timestamps | ✅ | Relative time (e.g., "30m ago") |
-| Mark as Read | ✅ | Individual and bulk actions |
-| Navigation | ✅ | Click to go to related content |
-| Empty State | ✅ | Friendly message when no notifications |
-| Loading State | ✅ | Shows while fetching data |
-| Responsive | ✅ | Works on all screen sizes |
-| Accessible | ✅ | Keyboard and screen reader support |
+| Feature       | Status | Description                            |
+| ------------- | ------ | -------------------------------------- |
+| Bell Icon     | ✅     | Shows notification bell with badge     |
+| Unread Count  | ✅     | Displays count of unread notifications |
+| Dropdown List | ✅     | Scrollable list of notifications       |
+| Type Icons    | ✅     | Different icons per notification type  |
+| Color Coding  | ✅     | Visual distinction by type             |
+| Timestamps    | ✅     | Relative time (e.g., "30m ago")        |
+| Mark as Read  | ✅     | Individual and bulk actions            |
+| Navigation    | ✅     | Click to go to related content         |
+| Empty State   | ✅     | Friendly message when no notifications |
+| Loading State | ✅     | Shows while fetching data              |
+| Responsive    | ✅     | Works on all screen sizes              |
+| Accessible    | ✅     | Keyboard and screen reader support     |
 
 ## Notification Types
 
 ```typescript
 type NotificationType =
-  | 'complaint_opened'      // 📄 Purple
-  | 'comment_added'         // 💬 Green
-  | 'feedback_received'     // 💬 Green
-  | 'status_changed'        // ⚠️  Orange
-  | 'complaint_assigned'    // 👤 Blue
-  | 'complaint_escalated'   // 📈 Red
-  | 'new_complaint'         // 📄 Purple
-  | 'new_announcement'      // 🔔 Gray
-  | 'new_vote';             // 🔔 Gray
+  | 'complaint_opened' // 📄 Purple
+  | 'comment_added' // 💬 Green
+  | 'feedback_received' // 💬 Green
+  | 'status_changed' // ⚠️  Orange
+  | 'complaint_assigned' // 👤 Blue
+  | 'complaint_escalated' // 📈 Red
+  | 'new_complaint' // 📄 Purple
+  | 'new_announcement' // 🔔 Gray
+  | 'new_vote'; // 🔔 Gray
 ```
 
 ## User Interactions
@@ -68,7 +68,7 @@ type NotificationType =
 
 ```typescript
 interface NotificationDropdownProps {
-  className?: string;  // Optional styling
+  className?: string; // Optional styling
 }
 ```
 
@@ -76,17 +76,18 @@ interface NotificationDropdownProps {
 
 ```typescript
 const {
-  notifications,      // Notification[]
-  unreadCount,        // number
-  isLoading,          // boolean
-  markAsRead,         // (id: string) => Promise<void>
-  markAllAsRead,      // () => Promise<void>
+  notifications, // Notification[]
+  unreadCount, // number
+  isLoading, // boolean
+  markAsRead, // (id: string) => Promise<void>
+  markAllAsRead, // () => Promise<void>
 } = useNotifications();
 ```
 
 ## Styling
 
 Uses design tokens (CSS variables):
+
 - `--background`
 - `--foreground`
 - `--muted-foreground`
@@ -154,16 +155,16 @@ const mockNotifications: Notification[] = [
 
 ```tsx
 // Import demo component
-import { NotificationDropdownDemo } from 
-  '@/components/notifications/__tests__/notification-dropdown.test';
+import { NotificationDropdownDemo } from '@/components/notifications/__tests__/notification-dropdown.test';
 
 // Render in test page
-<NotificationDropdownDemo />
+<NotificationDropdownDemo />;
 ```
 
 ## Common Tasks
 
 ### Add to Header
+
 ```tsx
 import { NotificationDropdown } from '@/components/notifications';
 
@@ -177,23 +178,27 @@ export function MyHeader() {
 ```
 
 ### Custom Styling
+
 ```tsx
 <NotificationDropdown className="hover:bg-accent" />
 ```
 
 ### Check Unread Count
+
 ```tsx
 const { unreadCount } = useNotifications();
 console.log(`${unreadCount} unread notifications`);
 ```
 
 ### Mark Notification as Read
+
 ```tsx
 const { markAsRead } = useNotifications();
 await markAsRead('notification-id');
 ```
 
 ### Mark All as Read
+
 ```tsx
 const { markAllAsRead } = useNotifications();
 await markAllAsRead();
@@ -256,6 +261,7 @@ const { data, error } = await supabase
 ---
 
 **Quick Links:**
+
 - Component: `src/components/notifications/notification-dropdown.tsx`
 - Hook: `src/hooks/use-notifications.ts`
 - Types: `src/types/database.types.ts`

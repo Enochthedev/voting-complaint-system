@@ -7,6 +7,7 @@ The status filter has been successfully implemented in the FilterPanel component
 ## Implementation Details
 
 ### Location
+
 - **Component**: `src/components/complaints/filter-panel.tsx`
 - **Integration**: `src/app/complaints/page.tsx`
 - **Tests**: `src/components/complaints/__tests__/status-filter.test.tsx`
@@ -67,9 +68,11 @@ Same functionality as students, but with access to all complaints in the system.
 ### Example 1: Filter by "New" Status
 
 **Before Filtering:**
+
 - Complaint List shows all complaints (8 total)
 
 **After Selecting "New" Status:**
+
 - Filter Panel: ☑ New
 - Active Filters: [Status: New] ×
 - Complaint List: Shows only complaints with status "new" (3 complaints)
@@ -77,6 +80,7 @@ Same functionality as students, but with access to all complaints in the system.
 ### Example 2: Filter by Multiple Statuses
 
 **Selecting "New" and "Opened":**
+
 - Filter Panel: ☑ New, ☑ Opened
 - Active Filters: [Status: New] × [Status: Opened] ×
 - Complaint List: Shows complaints with status "new" OR "opened" (5 complaints)
@@ -84,6 +88,7 @@ Same functionality as students, but with access to all complaints in the system.
 ### Example 3: Filter by "Resolved" Status
 
 **Selecting "Resolved":**
+
 - Filter Panel: ☑ Resolved
 - Active Filters: [Status: Resolved] ×
 - Complaint List: Shows only resolved complaints (1 complaint)
@@ -91,6 +96,7 @@ Same functionality as students, but with access to all complaints in the system.
 ### Example 4: Clear All Filters
 
 **After Clicking "Clear All":**
+
 - Filter Panel: All checkboxes unchecked
 - Active Filters: (empty)
 - Complaint List: Shows all complaints (8 total)
@@ -106,12 +112,14 @@ The status filter works seamlessly with other filters:
 - **Assigned Lecturer**: Combine status + assignment (e.g., "Opened" + "Dr. Smith")
 
 All filters work together using AND logic:
+
 - Status: New AND Category: Facilities = Only new facilities complaints
 - Status: Opened OR In Progress AND Priority: High = Only high priority complaints that are opened or in progress
 
 ## Responsive Design
 
 The filter panel is responsive:
+
 - **Desktop (lg+)**: Shows as a sidebar on the left (1/4 width)
 - **Mobile/Tablet**: Shows as a full-width panel above the complaint list
 - **Collapsible**: Can be collapsed to save space (especially useful on mobile)
@@ -119,6 +127,7 @@ The filter panel is responsive:
 ## Testing
 
 The status filter has been tested with:
+
 - ✅ Single status selection
 - ✅ Multiple status selection
 - ✅ No status selection (show all)
@@ -134,9 +143,7 @@ The status filter has been tested with:
 ```typescript
 // Apply status filter
 if (filters.status.length > 0) {
-  complaints = complaints.filter((complaint) =>
-    filters.status.includes(complaint.status)
-  );
+  complaints = complaints.filter((complaint) => filters.status.includes(complaint.status));
 }
 ```
 
@@ -186,6 +193,7 @@ const [filters, setFilters] = useState<FilterState>({
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 - Save filter presets (already supported in FilterPanel component)
 - URL query parameters for shareable filtered views
 - Filter history/recent filters

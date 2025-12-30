@@ -11,12 +11,14 @@ The Filter Preset feature allows users to save their frequently used filter comb
 Users can save their current filter configuration with a custom name.
 
 **Steps:**
+
 1. Configure filters (status, category, priority, date range, tags, etc.)
 2. Click "Save Filter Preset" button at the bottom of the filter panel
 3. Enter a name for the preset
 4. Click "Save" or press Enter
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────┐
 │ Filters                        [6]  │
@@ -44,6 +46,7 @@ After clicking "Save Filter Preset":
 Saved presets appear in a separate panel below the filter panel.
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────┐
 │ 🔖 Saved Presets                    │
@@ -61,6 +64,7 @@ Saved presets appear in a separate panel below the filter panel.
 Click on any preset name to load its filter configuration.
 
 **Behavior:**
+
 - All filters are replaced with the preset's saved configuration
 - The active preset is highlighted with a checkmark
 - The complaint list updates to show filtered results
@@ -68,6 +72,7 @@ Click on any preset name to load its filter configuration.
 - Page resets to page 1
 
 **Visual (Active Preset):**
+
 ```
 ┌─────────────────────────────────────┐
 │ 🔖 Saved Presets                    │
@@ -83,6 +88,7 @@ Click on any preset name to load its filter configuration.
 Click the trash icon next to any preset to delete it.
 
 **Behavior:**
+
 - Preset is immediately removed from the list
 - If the deleted preset was active, the active state is cleared
 - Current filters remain unchanged
@@ -91,25 +97,31 @@ Click the trash icon next to any preset to delete it.
 ## Use Cases
 
 ### Use Case 1: Lecturer - Daily Review
+
 **Scenario:** A lecturer wants to quickly view new high-priority complaints each morning.
 
 **Steps:**
+
 1. Set filters: Status = "New", Priority = "High"
 2. Save as "Daily Review"
 3. Each morning, click "Daily Review" preset
 
 ### Use Case 2: Admin - Facilities Issues
+
 **Scenario:** An admin regularly checks facilities-related complaints.
 
 **Steps:**
+
 1. Set filters: Category = "Facilities", Status = "New" or "Opened"
 2. Save as "Facilities Issues"
 3. Quick access whenever needed
 
 ### Use Case 3: Student - My Urgent Complaints
+
 **Scenario:** A student wants to track their urgent complaints.
 
 **Steps:**
+
 1. Set filters: Priority = "High" or "Critical"
 2. Save as "My Urgent Issues"
 3. Quick check on status updates
@@ -117,6 +129,7 @@ Click the trash icon next to any preset to delete it.
 ## Technical Details
 
 ### Storage
+
 - Presets are stored in browser's localStorage
 - Storage key: `complaint-filter-presets`
 - Data persists across browser sessions
@@ -127,17 +140,20 @@ Click the trash icon next to any preset to delete it.
   - Creation timestamp
 
 ### Data Structure
+
 ```typescript
 interface FilterPreset {
-  id: string;              // "preset-1732123456789"
-  name: string;            // "High Priority Academic"
-  filters: FilterState;    // Complete filter configuration
-  createdAt: string;       // ISO date string
+  id: string; // "preset-1732123456789"
+  name: string; // "High Priority Academic"
+  filters: FilterState; // Complete filter configuration
+  createdAt: string; // ISO date string
 }
 ```
 
 ### Filter State Saved
+
 All filter settings are preserved:
+
 - Status selections (array)
 - Category selections (array)
 - Priority selections (array)
@@ -149,15 +165,20 @@ All filter settings are preserved:
 ## User Experience
 
 ### Disabled State
+
 The "Save Filter Preset" button is disabled when:
+
 - No filters are active (all filters are in default state)
 
 ### Empty State
+
 When no presets are saved:
+
 - The preset manager panel is hidden
 - Only the filter panel is visible
 
 ### Feedback
+
 - Preset name input supports Enter key to save
 - Escape key cancels preset creation
 - Active preset is visually highlighted
@@ -186,6 +207,7 @@ When no presets are saved:
 ## Future Enhancements
 
 Potential improvements:
+
 1. Preset sharing via URL
 2. Export/import presets
 3. Preset categories/folders
@@ -196,6 +218,7 @@ Potential improvements:
 ## Testing
 
 The feature includes comprehensive tests covering:
+
 - Save functionality
 - Load functionality
 - Delete functionality
@@ -205,6 +228,7 @@ The feature includes comprehensive tests covering:
 - Ordering preservation
 
 Run tests:
+
 ```bash
 npm test filter-preset.test.tsx
 ```
@@ -212,10 +236,10 @@ npm test filter-preset.test.tsx
 ## Example Usage in Code
 
 ```typescript
-import { 
-  FilterPresetManager, 
-  saveFilterPreset, 
-  loadFilterPresets 
+import {
+  FilterPresetManager,
+  saveFilterPreset,
+  loadFilterPresets
 } from '@/components/complaints/filter-preset-manager';
 
 // In your component
@@ -244,19 +268,23 @@ const handleLoadPreset = (preset: FilterPreset) => {
 ## Screenshots
 
 ### Before Saving
+
 - Filter panel with active filters
 - "Save Filter Preset" button enabled
 
 ### Saving Process
+
 - Input field for preset name
 - Save/Cancel buttons
 
 ### After Saving
+
 - Preset appears in preset manager
 - Can be clicked to load
 - Can be deleted
 
 ### Loading Preset
+
 - Preset is highlighted
 - Filters update immediately
 - Complaint list refreshes

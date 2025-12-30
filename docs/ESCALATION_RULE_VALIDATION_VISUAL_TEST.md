@@ -1,12 +1,15 @@
 # Escalation Rule Validation - Visual Test Guide
 
 ## Overview
+
 This guide demonstrates how to test the escalation rule validation functionality in the UI.
 
 ## Test Scenarios
 
 ### 1. Create Valid Rule
+
 **Steps:**
+
 1. Navigate to `/admin/escalation-rules`
 2. Click "Create New Rule"
 3. Fill in the form:
@@ -25,13 +28,16 @@ This guide demonstrates how to test the escalation rule validation functionality
 ---
 
 ### 2. Test Required Field Validation
+
 **Steps:**
+
 1. Click "Create New Rule"
 2. Leave all fields empty
 3. Click "Create Rule"
 
 **Expected Result:**
 ❌ Error messages appear for:
+
 - "Category is required"
 - "Priority is required"
 - "Time threshold is required"
@@ -42,7 +48,9 @@ This guide demonstrates how to test the escalation rule validation functionality
 ### 3. Test Hours Threshold Validation
 
 #### 3a. Zero Hours
+
 **Steps:**
+
 1. Create new rule
 2. Set hours threshold to `0`
 3. Try to submit
@@ -51,7 +59,9 @@ This guide demonstrates how to test the escalation rule validation functionality
 ❌ Error: "Time threshold must be greater than 0"
 
 #### 3b. Negative Hours
+
 **Steps:**
+
 1. Set hours threshold to `-5`
 2. Try to submit
 
@@ -59,7 +69,9 @@ This guide demonstrates how to test the escalation rule validation functionality
 ❌ Error: "Time threshold must be greater than 0"
 
 #### 3c. Exceeds Maximum
+
 **Steps:**
+
 1. Set hours threshold to `10000`
 2. Try to submit
 
@@ -71,7 +83,9 @@ This guide demonstrates how to test the escalation rule validation functionality
 ### 4. Test Priority-Based Warnings
 
 #### 4a. Critical Priority with Long Threshold
+
 **Steps:**
+
 1. Create new rule
 2. Set Priority: Critical
 3. Set Hours Threshold: 48
@@ -82,7 +96,9 @@ This guide demonstrates how to test the escalation rule validation functionality
 ✅ Can still submit (warning, not error)
 
 #### 4b. High Priority with Long Threshold
+
 **Steps:**
+
 1. Set Priority: High
 2. Set Hours Threshold: 100
 
@@ -95,6 +111,7 @@ This guide demonstrates how to test the escalation rule validation functionality
 
 **Setup:**
 First, create an active rule:
+
 - Category: Academic
 - Priority: High
 - Hours: 24
@@ -102,6 +119,7 @@ First, create an active rule:
 - Active: Yes
 
 **Steps:**
+
 1. Click "Create New Rule"
 2. Try to create another rule with:
    - Category: Academic
@@ -115,6 +133,7 @@ First, create an active rule:
 ❌ Error: "An active escalation rule already exists for this category and priority combination. Please deactivate the existing rule first or choose a different category/priority combination."
 
 ⚠️ Warning alert shows:
+
 - Existing rule details
 - Who it escalates to
 - Current threshold
@@ -124,6 +143,7 @@ First, create an active rule:
 ### 6. Test Editing Existing Rule
 
 **Steps:**
+
 1. Click edit on an existing rule
 2. Change the hours threshold
 3. Keep same category and priority
@@ -138,7 +158,9 @@ First, create an active rule:
 ### 7. Test Escalation Target Validation
 
 #### 7a. No User Selected
+
 **Steps:**
+
 1. Create new rule
 2. Leave "Escalate To" as "Select a user..."
 3. Try to submit
@@ -147,6 +169,7 @@ First, create an active rule:
 ❌ Error: "Please select a user to escalate to"
 
 #### 7b. Invalid User Role (if student in list)
+
 **Note:** The form filters to only show lecturers and admins, so this shouldn't be possible in the UI. But the validation would catch it if it happened.
 
 ---
@@ -154,6 +177,7 @@ First, create an active rule:
 ### 8. Test Real-time Validation
 
 **Steps:**
+
 1. Click "Create New Rule"
 2. Start typing in Hours Threshold field
 3. Enter `0`
@@ -163,9 +187,7 @@ First, create an active rule:
 ❌ Error appears immediately (before submitting)
 ❌ Error: "Time threshold must be greater than 0"
 
-**Steps:**
-5. Change to `48`
-6. Select Priority: Critical
+**Steps:** 5. Change to `48` 6. Select Priority: Critical
 
 **Expected Result:**
 ⚠️ Warning appears immediately
@@ -176,6 +198,7 @@ First, create an active rule:
 ### 9. Test Inactive Rule Warning
 
 **Steps:**
+
 1. Create new rule
 2. Fill all required fields correctly
 3. Uncheck "Rule is active"
@@ -190,6 +213,7 @@ First, create an active rule:
 ### 10. Test Quick Presets
 
 **Steps:**
+
 1. Create new rule
 2. Click on preset buttons:
    - "2 hours"
@@ -199,7 +223,8 @@ First, create an active rule:
 **Expected Result:**
 ✅ Hours threshold field updates to preset value
 ✅ Human-readable format shown below field
-   - Example: "Complaints will escalate after: 1 day"
+
+- Example: "Complaints will escalate after: 1 day"
 
 ---
 
@@ -207,12 +232,14 @@ First, create an active rule:
 
 **Setup:**
 Create an active rule:
+
 - Category: Facilities
 - Priority: High
 - Hours: 24
 - Escalate To: Dr. Sarah Johnson
 
 **Steps:**
+
 1. Click "Create New Rule"
 2. Select Category: Facilities
 3. Select Priority: High
@@ -227,6 +254,7 @@ Create an active rule:
 ### 12. Test Form Reset on Cancel
 
 **Steps:**
+
 1. Click "Create New Rule"
 2. Fill in some fields
 3. Click "Cancel"
@@ -242,16 +270,19 @@ Create an active rule:
 ## Visual Indicators
 
 ### Error States
+
 - 🔴 Red text
 - ❌ AlertCircle icon
 - Red border on input (if implemented)
 
 ### Warning States
+
 - 🟡 Yellow text
 - ⚠️ AlertTriangle icon
 - Yellow background alert box
 
 ### Success States
+
 - 🟢 Green text
 - ✅ CheckCircle icon
 - Green background alert box
@@ -261,6 +292,7 @@ Create an active rule:
 ## Browser Testing
 
 Test in multiple browsers:
+
 - ✅ Chrome
 - ✅ Firefox
 - ✅ Safari
@@ -290,20 +322,24 @@ Test in multiple browsers:
 ## Edge Cases
 
 ### 1. Very Short Threshold
+
 - Hours: 1
 - Expected: ⚠️ Warning about premature escalations
 
 ### 2. Very Long Threshold
+
 - Hours: 8000
 - Priority: High
 - Expected: ⚠️ Warning about ineffective escalation
 
 ### 3. Boundary Values
+
 - Hours: 1 (minimum) - ✅ Valid
 - Hours: 8760 (maximum) - ✅ Valid
 - Hours: 8761 - ❌ Error
 
 ### 4. Decimal Hours
+
 - Hours: 24.5
 - Expected: ❌ Error: "Time threshold must be a whole number"
 
@@ -326,6 +362,7 @@ Test in multiple browsers:
 ## Integration Testing
 
 ### With Database
+
 1. Create rule in UI
 2. Verify in database:
    ```sql
@@ -334,6 +371,7 @@ Test in multiple browsers:
 3. Check all fields match
 
 ### With RLS Policies
+
 1. Test as admin user - ✅ Can create/edit
 2. Test as lecturer user - ❌ Cannot create (if policy restricts)
 3. Test as student user - ❌ Cannot access page
@@ -357,6 +395,7 @@ After any changes to validation logic:
 ## Success Criteria
 
 All tests should pass with:
+
 - ✅ Appropriate error messages
 - ✅ Clear visual feedback
 - ✅ No false positives

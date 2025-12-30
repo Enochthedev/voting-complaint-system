@@ -178,9 +178,9 @@ export class CompatibilityManager {
     toVersion: ApiVersion,
     context: Partial<TransformationContext> = {}
   ): StandardApiResponse<T> {
-    const transformedData = (response.data
-      ? this.transformData(response.data, fromVersion, toVersion, context)
-      : null) as T | null;
+    const transformedData = (
+      response.data ? this.transformData(response.data, fromVersion, toVersion, context) : null
+    ) as T | null;
 
     return {
       ...response,
@@ -201,9 +201,11 @@ export class CompatibilityManager {
     toVersion: ApiVersion,
     context: Partial<TransformationContext> = {}
   ): PaginatedApiResponse<T> {
-    const transformedData = (response.data
-      ? response.data.map((item) => this.transformData(item, fromVersion, toVersion, context))
-      : []) as T[];
+    const transformedData = (
+      response.data
+        ? response.data.map((item) => this.transformData(item, fromVersion, toVersion, context))
+        : []
+    ) as T[];
 
     return {
       ...response,

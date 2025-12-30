@@ -12,7 +12,9 @@ import { exportComplaintsToCSV } from '@/lib/export';
 
 ```typescript
 // Export complaints with default fields
-const complaints = [/* array of complaints */];
+const complaints = [
+  /* array of complaints */
+];
 exportComplaintsToCSV(complaints);
 ```
 
@@ -124,7 +126,8 @@ The CSV file downloads to your browser's default download folder.
 
 **Problem**: CSV opens with garbled text
 
-**Solution**: 
+**Solution**:
+
 - Open in text editor
 - Save with UTF-8 encoding
 - Re-open in spreadsheet app
@@ -134,6 +137,7 @@ The CSV file downloads to your browser's default download folder.
 **Problem**: Data not separated into columns
 
 **Solution**:
+
 - Use Import function in spreadsheet app
 - Set delimiter to "comma"
 - Ensure proper import settings
@@ -143,6 +147,7 @@ The CSV file downloads to your browser's default download folder.
 **Problem**: Quotes or commas display incorrectly
 
 **Solution**:
+
 - This is normal CSV escaping
 - Spreadsheet app should handle automatically
 - Check import settings if issues persist
@@ -164,6 +169,7 @@ The CSV file downloads to your browser's default download folder.
 ## Support
 
 For issues or questions:
+
 1. Check the visual test guide
 2. Review implementation documentation
 3. Contact development team
@@ -171,6 +177,7 @@ For issues or questions:
 ---
 
 **Quick Links:**
+
 - [Implementation Details](./CSV_EXPORT_IMPLEMENTATION.md)
 - [Visual Test Guide](./CSV_EXPORT_VISUAL_TEST.md)
 - [Completion Summary](./TASK_8.3_CSV_EXPORT_COMPLETION.md)

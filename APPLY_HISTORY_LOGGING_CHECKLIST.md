@@ -7,6 +7,7 @@ Follow these steps to apply the complete history logging implementation:
 ### ☐ Step 1: Review the Changes
 
 Read the documentation to understand what's being added:
+
 - [ ] Read `HISTORY_LOGGING_IMPLEMENTATION_SUMMARY.md`
 - [ ] Review `docs/HISTORY_LOGGING_QUICK_REFERENCE.md`
 - [ ] Optional: Review `docs/HISTORY_LOGGING_COMPLETE.md` for full details
@@ -61,6 +62,7 @@ node scripts/verify-history-logging.js
 ```
 
 Expected output:
+
 ```
 ✅ Passed: 9/9
 🎉 All tests passed! History logging is working correctly.
@@ -87,28 +89,34 @@ Expected output:
 Test each action type to ensure logging works:
 
 #### Feedback Addition
+
 - [ ] Log in as a lecturer
 - [ ] Open a complaint
 - [ ] Add feedback
 - [ ] Verify "feedback_added" appears in timeline
 
 #### Comment Addition
+
 - [ ] Add a comment to a complaint
 - [ ] Verify "comment_added" appears in timeline
 
 #### Comment Edit
+
 - [ ] Edit an existing comment
 - [ ] Verify the edit is logged in timeline
 
 #### Comment Deletion
+
 - [ ] Delete a comment
 - [ ] Verify the deletion is logged in timeline
 
 #### Status Change
+
 - [ ] Change complaint status
 - [ ] Verify "status_changed" appears in timeline
 
 #### Assignment
+
 - [ ] Assign complaint to a lecturer
 - [ ] Verify "assigned" appears in timeline
 
@@ -117,7 +125,7 @@ Test each action type to ensure logging works:
 Verify triggers are installed:
 
 ```sql
-SELECT 
+SELECT
   t.tgname as trigger_name,
   c.relname as table_name,
   p.proname as function_name
@@ -129,6 +137,7 @@ ORDER BY c.relname, t.tgname;
 ```
 
 Expected triggers:
+
 - [ ] `log_comment_addition_trigger` on `complaint_comments`
 - [ ] `log_comment_deletion_trigger` on `complaint_comments`
 - [ ] `log_comment_edit_trigger` on `complaint_comments`
@@ -176,6 +185,7 @@ If history doesn't show in the timeline:
 ### Need Help?
 
 Refer to these documents:
+
 - `docs/HISTORY_LOGGING_QUICK_REFERENCE.md` - Quick troubleshooting
 - `docs/HISTORY_LOGGING_COMPLETE.md` - Complete documentation
 - `docs/HISTORY_LOGGING_ARCHITECTURE.md` - Architecture details
@@ -183,12 +193,14 @@ Refer to these documents:
 ## Summary of What's Being Added
 
 ### New Database Triggers (4)
+
 1. ✨ `log_feedback_addition_trigger` - Logs feedback additions
 2. ✨ `log_comment_addition_trigger` - Logs comment additions
 3. ✨ `log_comment_edit_trigger` - Logs comment edits
 4. ✨ `log_comment_deletion_trigger` - Logs comment deletions
 
 ### New Files (6)
+
 1. ✨ `supabase/migrations/037_add_missing_history_logging_triggers.sql`
 2. ✨ `scripts/apply-history-logging-triggers.js`
 3. ✨ `scripts/verify-history-logging.js`
@@ -197,6 +209,7 @@ Refer to these documents:
 6. ✨ `docs/HISTORY_LOGGING_ARCHITECTURE.md`
 
 ### What's Now Logged (10 actions)
+
 1. ✅ Complaint creation
 2. ✅ Status changes
 3. ✅ Assignment/reassignment

@@ -3,6 +3,7 @@
 ## Quick Test Commands
 
 ### Run Comprehensive Test Suite
+
 ```bash
 node scripts/test-escalation-scenarios.js
 ```
@@ -10,6 +11,7 @@ node scripts/test-escalation-scenarios.js
 Tests all 7 escalation scenarios in one run.
 
 ### Run Debug Test
+
 ```bash
 node scripts/test-escalation-debug.js
 ```
@@ -17,6 +19,7 @@ node scripts/test-escalation-debug.js
 Quick single-scenario test for debugging.
 
 ### Run Manual Simulation
+
 ```bash
 node scripts/test-escalation-manual.js
 ```
@@ -24,6 +27,7 @@ node scripts/test-escalation-manual.js
 Step-by-step simulation of edge function logic.
 
 ### Run Original Test
+
 ```bash
 node scripts/test-auto-escalation.js
 ```
@@ -32,19 +36,20 @@ Original basic escalation test.
 
 ## Test Scenarios Covered
 
-| # | Scenario | What It Tests |
-|---|----------|---------------|
-| 1 | Basic Escalation | Single complaint with matching rule |
-| 2 | Multiple Rules | Different rules working independently |
-| 3 | Batch Escalation | Multiple complaints at once |
-| 4 | Exclusion Cases | Complaints that should NOT escalate |
-| 5 | No Active Rules | Graceful handling of no rules |
-| 6 | Re-escalation | Multiple escalation levels |
-| 7 | Status Filtering | Only 'new' and 'open' statuses |
+| #   | Scenario         | What It Tests                         |
+| --- | ---------------- | ------------------------------------- |
+| 1   | Basic Escalation | Single complaint with matching rule   |
+| 2   | Multiple Rules   | Different rules working independently |
+| 3   | Batch Escalation | Multiple complaints at once           |
+| 4   | Exclusion Cases  | Complaints that should NOT escalate   |
+| 5   | No Active Rules  | Graceful handling of no rules         |
+| 6   | Re-escalation    | Multiple escalation levels            |
+| 7   | Status Filtering | Only 'new' and 'open' statuses        |
 
 ## Expected Output
 
 ### Success
+
 ```
 📊 Test Summary
 ==================================================
@@ -57,6 +62,7 @@ Success Rate: 100.0%
 ```
 
 ### Failure
+
 ```
 📊 Test Summary
 ==================================================
@@ -86,15 +92,20 @@ Success Rate: 85.7%
 ## Troubleshooting
 
 ### Test Fails: "Missing required test users"
+
 **Solution**: Create test users with admin, lecturer, and student roles.
 
 ### Test Fails: "Edge function call failed"
-**Solution**: 
+
+**Solution**:
+
 1. Check edge function is deployed: `npx supabase functions deploy auto-escalate-complaints`
 2. Verify environment variables are set
 
 ### Test Fails: "Invalid enum value"
+
 **Solution**: Check database enum values match the code:
+
 ```sql
 -- Check priority enum
 SELECT enumlabel FROM pg_enum WHERE enumtypid = 'complaint_priority'::regtype;
@@ -104,7 +115,9 @@ SELECT enumlabel FROM pg_enum WHERE enumtypid = 'complaint_status'::regtype;
 ```
 
 ### Tests Pass But Complaints Not Escalating in Production
+
 **Solution**:
+
 1. Check escalation rules are active: `SELECT * FROM escalation_rules WHERE is_active = true;`
 2. Verify cron job is configured and running
 3. Check edge function logs: `npx supabase functions logs auto-escalate-complaints`
@@ -112,6 +125,7 @@ SELECT enumlabel FROM pg_enum WHERE enumtypid = 'complaint_status'::regtype;
 ## Manual Testing
 
 ### Create Test Data
+
 ```sql
 -- Create escalation rule
 INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
@@ -131,6 +145,7 @@ VALUES (
 ```
 
 ### Invoke Edge Function
+
 ```bash
 curl -X POST "${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/auto-escalate-complaints" \
   -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
@@ -138,9 +153,10 @@ curl -X POST "${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/auto-escalate-complaints"
 ```
 
 ### Verify Escalation
+
 ```sql
 -- Check if complaint was escalated
-SELECT 
+SELECT
   id,
   title,
   escalated_at,

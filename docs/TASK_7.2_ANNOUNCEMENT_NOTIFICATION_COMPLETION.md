@@ -27,6 +27,7 @@ Create notifications for new announcements so that all students are automaticall
 ### Technical Details
 
 **Trigger Function**: `notify_students_on_new_announcement()`
+
 - Fires on INSERT to `announcements` table
 - Creates one notification per student
 - Notification type: `new_announcement`
@@ -34,6 +35,7 @@ Create notifications for new announcements so that all students are automaticall
 - Links to announcement via `related_id`
 
 **Performance**: O(n) where n = number of students
+
 - Single INSERT with SELECT statement
 - Efficient for typical educational institution sizes (hundreds to thousands of students)
 
@@ -45,6 +47,7 @@ The announcement notification trigger is working correctly!
 ```
 
 **Test Coverage**:
+
 - ✅ All students receive notification
 - ✅ Correct notification type
 - ✅ Message includes announcement title
@@ -53,14 +56,14 @@ The announcement notification trigger is working correctly!
 
 ### Files Created/Modified
 
-| File | Type | Description |
-|------|------|-------------|
-| `supabase/migrations/034_create_announcement_notification_trigger.sql` | Migration | Database trigger implementation |
-| `scripts/test-announcement-notification-trigger.js` | Test | Automated test script |
-| `docs/ANNOUNCEMENT_NOTIFICATION_IMPLEMENTATION.md` | Documentation | Full implementation guide |
-| `docs/ANNOUNCEMENT_NOTIFICATION_QUICK_REFERENCE.md` | Documentation | Quick reference |
-| `docs/TASK_7.2_ANNOUNCEMENT_NOTIFICATION_COMPLETION.md` | Documentation | This summary |
-| `.kiro/specs/tasks.md` | Update | Marked task as complete |
+| File                                                                   | Type          | Description                     |
+| ---------------------------------------------------------------------- | ------------- | ------------------------------- |
+| `supabase/migrations/034_create_announcement_notification_trigger.sql` | Migration     | Database trigger implementation |
+| `scripts/test-announcement-notification-trigger.js`                    | Test          | Automated test script           |
+| `docs/ANNOUNCEMENT_NOTIFICATION_IMPLEMENTATION.md`                     | Documentation | Full implementation guide       |
+| `docs/ANNOUNCEMENT_NOTIFICATION_QUICK_REFERENCE.md`                    | Documentation | Quick reference                 |
+| `docs/TASK_7.2_ANNOUNCEMENT_NOTIFICATION_COMPLETION.md`                | Documentation | This summary                    |
+| `.kiro/specs/tasks.md`                                                 | Update        | Marked task as complete         |
 
 ### Integration with Existing System
 
@@ -84,11 +87,13 @@ The notification trigger integrates seamlessly with the existing notification sy
 ### User Experience
 
 **For Lecturers/Admins**:
+
 1. Create announcement with title and content
 2. Click "Create Announcement"
 3. System automatically notifies all students (no additional action)
 
 **For Students**:
+
 1. Notification bell badge updates in real-time
 2. New notification appears in dropdown
 3. Click notification to view announcement
@@ -110,11 +115,13 @@ The notification trigger integrates seamlessly with the existing notification sy
 To verify the implementation:
 
 1. **Check Trigger Exists**:
+
    ```sql
    SELECT * FROM pg_trigger WHERE tgname = 'notify_on_new_announcement';
    ```
 
 2. **Run Test Script**:
+
    ```bash
    node scripts/test-announcement-notification-trigger.js
    ```
@@ -146,6 +153,7 @@ Potential improvements (not in current scope):
 ### Related Features
 
 This notification trigger complements:
+
 - Feedback notifications (`030_create_feedback_notification_trigger.sql`)
 - Comment notifications (`031_create_comment_notification_trigger.sql`)
 - Vote notifications (`033_create_new_vote_notification_trigger.sql`)
@@ -155,12 +163,12 @@ This notification trigger complements:
 
 Common issues and solutions:
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| No notifications | Trigger not applied | Run migration |
-| Wrong count | RLS policy issue | Check user role |
-| Not real-time | Subscription issue | Check frontend subscription |
-| Duplicate notifications | Multiple triggers | Check pg_trigger table |
+| Issue                   | Cause               | Solution                    |
+| ----------------------- | ------------------- | --------------------------- |
+| No notifications        | Trigger not applied | Run migration               |
+| Wrong count             | RLS policy issue    | Check user role             |
+| Not real-time           | Subscription issue  | Check frontend subscription |
+| Duplicate notifications | Multiple triggers   | Check pg_trigger table      |
 
 ### Conclusion
 

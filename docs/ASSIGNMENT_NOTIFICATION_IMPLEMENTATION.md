@@ -3,6 +3,7 @@
 ## Status: ✅ COMPLETE
 
 ## Overview
+
 This document describes the implementation of the assignment notification feature for the Student Complaint Resolution System. When a complaint is assigned or reassigned to a lecturer, the system automatically creates a notification for the assigned lecturer and logs the assignment in the complaint history.
 
 ## Implementation Details
@@ -39,7 +40,7 @@ BEGIN
       false
     );
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -51,6 +52,7 @@ CREATE TRIGGER notify_on_complaint_status_change
 ```
 
 **Trigger Logic**:
+
 - Fires AFTER UPDATE on the `complaints` table
 - Checks if `assigned_to` field has changed (either from NULL to a value, or from one value to another)
 - Creates a notification record with type 'assignment'
@@ -89,7 +91,7 @@ BEGIN
       )
     );
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -102,6 +104,7 @@ CREATE TRIGGER log_complaint_assignment_trigger
 ```
 
 **Trigger Logic**:
+
 - Fires AFTER UPDATE on the `complaints` table when `assigned_to` changes
 - Logs the assignment action in the `complaint_history` table
 - Records both old and new assignee IDs
@@ -112,29 +115,29 @@ CREATE TRIGGER log_complaint_assignment_trigger
 
 Each assignment notification includes:
 
-| Field | Value | Description |
-|-------|-------|-------------|
-| `user_id` | UUID | The ID of the assigned lecturer |
-| `type` | 'assignment' | Notification type from the enum |
-| `title` | String | "A complaint has been assigned to you" |
-| `message` | String | "You have been assigned complaint: [complaint title]" |
-| `related_id` | UUID | The complaint ID |
-| `is_read` | Boolean | false (unread by default) |
-| `created_at` | Timestamp | Auto-generated |
+| Field        | Value        | Description                                           |
+| ------------ | ------------ | ----------------------------------------------------- |
+| `user_id`    | UUID         | The ID of the assigned lecturer                       |
+| `type`       | 'assignment' | Notification type from the enum                       |
+| `title`      | String       | "A complaint has been assigned to you"                |
+| `message`    | String       | "You have been assigned complaint: [complaint title]" |
+| `related_id` | UUID         | The complaint ID                                      |
+| `is_read`    | Boolean      | false (unread by default)                             |
+| `created_at` | Timestamp    | Auto-generated                                        |
 
 ### History Log Structure
 
 Each assignment history entry includes:
 
-| Field | Value | Description |
-|-------|-------|-------------|
-| `complaint_id` | UUID | The complaint ID |
-| `action` | 'assigned' | Action type from the enum |
-| `old_value` | UUID (text) | Previous assignee ID (NULL for first assignment) |
-| `new_value` | UUID (text) | New assignee ID |
-| `performed_by` | UUID | User who made the assignment |
-| `details` | JSONB | Additional context including is_reassignment flag |
-| `created_at` | Timestamp | Auto-generated |
+| Field          | Value       | Description                                       |
+| -------------- | ----------- | ------------------------------------------------- |
+| `complaint_id` | UUID        | The complaint ID                                  |
+| `action`       | 'assigned'  | Action type from the enum                         |
+| `old_value`    | UUID (text) | Previous assignee ID (NULL for first assignment)  |
+| `new_value`    | UUID (text) | New assignee ID                                   |
+| `performed_by` | UUID        | User who made the assignment                      |
+| `details`      | JSONB       | Additional context including is_reassignment flag |
+| `created_at`   | Timestamp   | Auto-generated                                    |
 
 ## Verification
 
@@ -145,6 +148,7 @@ A comprehensive verification script has been created to test the assignment noti
 **Location**: `scripts/verify-assignment-notification.js`
 
 **What it tests**:
+
 1. Notifications table accessibility
 2. Notification type enum includes 'assignment'
 3. Notification creation on initial assignment
@@ -154,11 +158,13 @@ A comprehensive verification script has been created to test the assignment noti
 7. Notification content accuracy
 
 **How to run**:
+
 ```bash
 node scripts/verify-assignment-notification.js
 ```
 
 **Expected output**:
+
 ```
 ✅ Assignment notification verification PASSED
 
@@ -174,6 +180,7 @@ The assignment notification feature is working correctly:
 To manually test the assignment notification:
 
 1. Create a test complaint:
+
 ```javascript
 const { data: complaint } = await supabase
   .from('complaints')
@@ -185,21 +192,20 @@ const { data: complaint } = await supabase
     priority: 'medium',
     status: 'new',
     is_anonymous: false,
-    is_draft: false
+    is_draft: false,
   })
   .select()
   .single();
 ```
 
 2. Assign the complaint to a lecturer:
+
 ```javascript
-await supabase
-  .from('complaints')
-  .update({ assigned_to: lecturerId })
-  .eq('id', complaint.id);
+await supabase.from('complaints').update({ assigned_to: lecturerId }).eq('id', complaint.id);
 ```
 
 3. Verify notification was created:
+
 ```javascript
 const { data: notifications } = await supabase
   .from('notifications')
@@ -210,6 +216,7 @@ const { data: notifications } = await supabase
 ```
 
 4. Verify history was logged:
+
 ```javascript
 const { data: history } = await supabase
   .from('complaint_history')
@@ -223,6 +230,7 @@ const { data: history } = await supabase
 ### From Requirements Document (AC17)
 
 ✅ **Complaint Assignment**
+
 - Lecturers/admins can assign complaints to specific lecturers or departments
 - **Assigned lecturer receives notification** ← This task
 - Assignment history tracked in complaint timeline
@@ -232,11 +240,13 @@ const { data: history } = await supabase
 ### From Design Document
 
 ✅ **Property P4: Notification Delivery**
+
 > When a lecturer opens a complaint, the student receives a notification within 1 second
 
 This property also covers assignment notifications through the same trigger mechanism.
 
 ✅ **Property P15: Assignment Validity**
+
 > Complaints can only be assigned to users with lecturer or admin role
 
 The trigger creates notifications for any valid assignment.
@@ -252,20 +262,25 @@ The notification will be displayed to users through:
 3. **Real-time Updates**: Supabase Realtime subscription for instant delivery
 
 Example frontend subscription:
+
 ```javascript
 supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, (payload) => {
-    // Handle new notification
-    if (payload.new.type === 'assignment') {
-      showToast('New complaint assigned to you');
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    (payload) => {
+      // Handle new notification
+      if (payload.new.type === 'assignment') {
+        showToast('New complaint assigned to you');
+      }
     }
-  })
+  )
   .subscribe();
 ```
 
@@ -282,6 +297,7 @@ The component includes an assignment dropdown that updates the `assigned_to` fie
 ### Notification Type Enum
 
 The `notification_type` enum includes:
+
 - `complaint_update`
 - `assignment` ← Used for assignment notifications
 - `resolution`
@@ -292,6 +308,7 @@ The `notification_type` enum includes:
 ### Complaint Action Enum
 
 The `complaint_action` enum includes:
+
 - `created`
 - `updated`
 - `assigned` ← Used for assignment history
@@ -305,11 +322,13 @@ The `complaint_action` enum includes:
 ## Files Created/Modified
 
 ### New Files
+
 1. `scripts/verify-assignment-notification.js` - Verification script
 2. `supabase/migrations/029_fix_assignment_notification_type.sql` - Migration file
 3. `docs/ASSIGNMENT_NOTIFICATION_IMPLEMENTATION.md` - This documentation
 
 ### Modified Files
+
 None - All functionality is implemented via database triggers
 
 ## Testing Results

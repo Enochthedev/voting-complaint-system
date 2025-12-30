@@ -15,6 +15,7 @@ NEXT_PUBLIC_MAX_FILE_SIZE=10485760
 ```
 
 **Why it's safe:**
+
 - The `NEXT_PUBLIC_` prefix means Next.js will bundle these into the client-side JavaScript
 - The Supabase anon key is designed to be public - it's protected by Row Level Security (RLS) policies
 - These values are visible in the browser's network tab and source code
@@ -29,6 +30,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Why it's dangerous:**
+
 - The service role key **bypasses all RLS policies**
 - Anyone with this key has full admin access to your database
 - It can read, modify, or delete any data regardless of security rules
@@ -36,6 +38,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### Current Application Architecture
 
 This application is **frontend-only** and uses:
+
 - ✅ Client-side Supabase client with anon key
 - ✅ Row Level Security (RLS) policies for data protection
 - ✅ JWT-based authentication
@@ -63,6 +66,7 @@ You would only need the service role key if you add:
 ## Best Practices
 
 ### ✅ DO:
+
 - Use the anon key for all client-side operations
 - Rely on RLS policies for data security
 - Keep service role key in server-side code only
@@ -71,6 +75,7 @@ You would only need the service role key if you add:
 - Use different Supabase projects for dev/staging/production
 
 ### ❌ DON'T:
+
 - Never commit `.env.local` to Git
 - Never expose service role key to the client
 - Never use service role key in client-side code
@@ -83,6 +88,7 @@ You would only need the service role key if you add:
 When deploying to Vercel:
 
 1. **Only add these to Vercel environment variables:**
+
    ```
    NEXT_PUBLIC_SUPABASE_URL
    NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -90,6 +96,7 @@ When deploying to Vercel:
    ```
 
 2. **Do NOT add:**
+
    ```
    SUPABASE_SERVICE_ROLE_KEY  ❌
    ```
@@ -103,6 +110,7 @@ When deploying to Vercel:
 The application's security relies on RLS policies:
 
 ### Students Can:
+
 - ✅ Read their own complaints
 - ✅ Create new complaints
 - ✅ Update their own draft complaints
@@ -110,12 +118,14 @@ The application's security relies on RLS policies:
 - ✅ Read their own notifications
 
 ### Students Cannot:
+
 - ❌ Read other students' complaints (unless public)
 - ❌ Modify other students' data
 - ❌ Access admin functions
 - ❌ Bypass security policies
 
 ### Lecturers Can:
+
 - ✅ Read all complaints
 - ✅ Update complaint status
 - ✅ Add comments and feedback
@@ -123,6 +133,7 @@ The application's security relies on RLS policies:
 - ✅ View analytics
 
 ### Admins Can:
+
 - ✅ All lecturer permissions
 - ✅ Manage users
 - ✅ Configure escalation rules
@@ -161,6 +172,7 @@ If a key is exposed:
 ## Questions?
 
 If you're unsure about security:
+
 1. Check this document
 2. Review Supabase RLS policies
 3. Test with different user roles

@@ -3,18 +3,21 @@
 ## Pre-Deployment
 
 ### 1. Prerequisites
+
 - [ ] Supabase CLI installed (`npm install -g supabase`)
 - [ ] Supabase project linked (`supabase link --project-ref YOUR_REF`)
 - [ ] Service role key available
 - [ ] Project URL known
 
 ### 2. Environment Setup
+
 - [ ] `.env.local` file configured with:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
 
 ### 3. Database Ready
+
 - [ ] All required tables exist:
   - `complaints`
   - `escalation_rules`
@@ -40,6 +43,7 @@ supabase functions list
 ```
 
 Expected output:
+
 ```
 ┌──────────────────────────┬─────────┬────────────────────┐
 │ NAME                     │ VERSION │ CREATED AT         │
@@ -59,6 +63,7 @@ curl -X POST \
 ```
 
 Expected response:
+
 ```json
 {
   "success": true,
@@ -82,7 +87,7 @@ name: Auto-Escalate Complaints
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Every hour
+    - cron: '0 * * * *' # Every hour
   workflow_dispatch:
 
 jobs:
@@ -114,12 +119,14 @@ supabase functions schedule auto-escalate-complaints --cron "0 * * * *"
 #### Option C: External Cron Service
 
 Use services like:
+
 - Vercel Cron Jobs
 - AWS EventBridge
 - Google Cloud Scheduler
 - Cron-job.org
 
 Configure to call:
+
 ```
 POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/auto-escalate-complaints
 Authorization: Bearer YOUR_SERVICE_ROLE_KEY
@@ -150,6 +157,7 @@ node scripts/test-auto-escalation.js
 ```
 
 Expected output:
+
 ```
 🧪 Testing Auto-Escalation Edge Function
 
@@ -199,8 +207,9 @@ supabase functions logs auto-escalate-complaints --follow
 Save these queries for regular monitoring:
 
 **Check Recent Escalations:**
+
 ```sql
-SELECT 
+SELECT
   c.id,
   c.title,
   c.escalated_at,
@@ -213,8 +222,9 @@ ORDER BY c.escalated_at DESC;
 ```
 
 **Check Active Rules:**
+
 ```sql
-SELECT 
+SELECT
   er.*,
   u.full_name as escalate_to_name
 FROM escalation_rules er
@@ -223,8 +233,9 @@ WHERE er.is_active = true;
 ```
 
 **Check Eligible Complaints:**
+
 ```sql
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -244,6 +255,7 @@ ORDER BY c.created_at;
 **Issue**: `curl` returns 404
 
 **Solution**:
+
 1. Verify deployment: `supabase functions list`
 2. Check project URL is correct
 3. Redeploy: `supabase functions deploy auto-escalate-complaints`
@@ -253,6 +265,7 @@ ORDER BY c.created_at;
 **Issue**: Function returns 403 or permission errors
 
 **Solution**:
+
 1. Verify service role key is correct
 2. Check RLS policies on tables
 3. Ensure service role key has admin access
@@ -262,6 +275,7 @@ ORDER BY c.created_at;
 **Issue**: Function runs but doesn't escalate anything
 
 **Solution**:
+
 1. Check active rules exist:
    ```sql
    SELECT * FROM escalation_rules WHERE is_active = true;
@@ -280,6 +294,7 @@ ORDER BY c.created_at;
 **Issue**: Function doesn't run automatically
 
 **Solution**:
+
 1. Verify cron configuration
 2. Check GitHub Actions workflow status
 3. Review external cron service logs
@@ -290,6 +305,7 @@ ORDER BY c.created_at;
 If you need to rollback:
 
 1. **Disable all escalation rules**:
+
    ```sql
    UPDATE escalation_rules SET is_active = false;
    ```
@@ -319,17 +335,20 @@ If you need to rollback:
 ## Maintenance
 
 ### Weekly Tasks
+
 - [ ] Review escalation logs
 - [ ] Check for failed escalations
 - [ ] Verify cron job is running
 
 ### Monthly Tasks
+
 - [ ] Review escalation rules effectiveness
 - [ ] Adjust thresholds based on metrics
 - [ ] Check function performance
 - [ ] Review and archive old logs
 
 ### Quarterly Tasks
+
 - [ ] Analyze escalation patterns
 - [ ] Update documentation
 - [ ] Review security settings
@@ -338,6 +357,7 @@ If you need to rollback:
 ## Support
 
 For issues or questions:
+
 1. Check function logs: `supabase functions logs auto-escalate-complaints`
 2. Review documentation: `docs/AUTO_ESCALATION_SYSTEM.md`
 3. Run test script: `node scripts/test-auto-escalation.js`

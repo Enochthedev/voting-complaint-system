@@ -1,11 +1,13 @@
 # Comment Edit and Delete - Visual Demo
 
 ## Overview
+
 This document demonstrates the comment editing and deletion functionality implemented in the complaint detail view.
 
 ## Features Implemented
 
 ### 1. Comment Editing
+
 - ✅ Edit button appears only for user's own comments
 - ✅ Click Edit to enter edit mode
 - ✅ CommentInput component is reused for editing
@@ -18,6 +20,7 @@ This document demonstrates the comment editing and deletion functionality implem
 - ✅ Keyboard shortcuts (Ctrl+Enter to save, Esc to cancel)
 
 ### 2. Comment Deletion
+
 - ✅ Delete button appears only for user's own comments
 - ✅ Confirmation modal before deletion
 - ✅ Warning message about permanent deletion
@@ -27,12 +30,14 @@ This document demonstrates the comment editing and deletion functionality implem
 - ✅ Comment count updated
 
 ### 3. Permission Control
+
 - ✅ Users can only edit/delete their own comments
 - ✅ Ownership check: `comment.user_id === currentUserId`
 - ✅ Edit/Delete buttons hidden for other users' comments
 - ✅ Works for all roles (student, lecturer, admin)
 
 ### 4. Internal Notes Support
+
 - ✅ Internal notes can be edited by their authors
 - ✅ Internal notes can be deleted by their authors
 - ✅ Internal flag preserved during edit
@@ -41,6 +46,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ## UI Flow
 
 ### Edit Flow
+
 ```
 1. User views their own comment
    └─> Edit button visible
@@ -67,6 +73,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ```
 
 ### Delete Flow
+
 ```
 1. User views their own comment
    └─> Delete button visible
@@ -91,6 +98,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ## Visual Examples
 
 ### Comment in View Mode (Own Comment)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ [Avatar] Dr. Sarah Smith                    [Edit] [Delete] │
@@ -102,6 +110,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ```
 
 ### Comment in Edit Mode
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ [Avatar] Dr. Sarah Smith                                  │
@@ -122,6 +131,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ```
 
 ### Comment from Another User (No Edit/Delete)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ [Avatar] John Doe                                         │
@@ -133,6 +143,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ```
 
 ### Delete Confirmation Modal
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                                                            │
@@ -146,6 +157,7 @@ This document demonstrates the comment editing and deletion functionality implem
 ```
 
 ### Internal Note with Edit/Delete
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ [Avatar] Dr. Sarah Smith        [Internal] [Edit] [Delete]│
@@ -159,11 +171,13 @@ This document demonstrates the comment editing and deletion functionality implem
 ## Code Location
 
 ### Main Implementation
+
 - **File**: `src/components/complaints/complaint-detail-view.tsx`
 - **Component**: `CommentsSection`
 - **Lines**: ~920-1220
 
 ### Key Functions
+
 1. `handleEditComment(commentId, newText, isInternal)` - Handles comment editing
 2. `handleDeleteComment(commentId)` - Shows delete confirmation modal
 3. `confirmDeleteComment()` - Executes the deletion
@@ -171,6 +185,7 @@ This document demonstrates the comment editing and deletion functionality implem
 5. `canModifyComment(comment)` - Checks if user can edit/delete
 
 ### State Management
+
 ```typescript
 const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
@@ -182,12 +197,14 @@ const [localComments, setLocalComments] = useState(comments);
 ## Validation Rules
 
 ### Edit Validation
+
 - ✅ Comment cannot be empty
 - ✅ Minimum length: 1 character
 - ✅ Maximum length: 2000 characters
 - ✅ Whitespace-only comments rejected
 
 ### Permission Validation
+
 - ✅ User ID must match comment author
 - ✅ Applies to all roles equally
 - ✅ No special privileges for admins/lecturers
@@ -195,6 +212,7 @@ const [localComments, setLocalComments] = useState(comments);
 ## Integration Points
 
 ### With CommentInput Component
+
 - Reuses existing CommentInput for editing
 - Props passed:
   - `initialValue`: Current comment text
@@ -205,11 +223,13 @@ const [localComments, setLocalComments] = useState(comments);
   - `autoFocus`: true
 
 ### With Complaint History (Phase 12)
+
 - Edit action logged as 'comment_edited'
 - Delete action logged as 'comment_deleted'
 - Includes comment ID in details
 
 ### With Notifications (Phase 12)
+
 - No new notifications for edits
 - No new notifications for deletes
 - Original comment notifications remain
@@ -217,6 +237,7 @@ const [localComments, setLocalComments] = useState(comments);
 ## Accessibility
 
 ### Keyboard Support
+
 - ✅ Tab navigation through buttons
 - ✅ Enter to activate buttons
 - ✅ Ctrl+Enter to submit edit
@@ -224,12 +245,14 @@ const [localComments, setLocalComments] = useState(comments);
 - ✅ Focus management in edit mode
 
 ### Screen Reader Support
+
 - ✅ Button labels: "Edit comment", "Delete comment"
 - ✅ Modal title: "Delete Comment"
 - ✅ Warning message in modal
 - ✅ Loading states announced
 
 ### Visual Indicators
+
 - ✅ "(edited)" text for edited comments
 - ✅ Loading states during operations
 - ✅ Disabled states for buttons
@@ -238,6 +261,7 @@ const [localComments, setLocalComments] = useState(comments);
 ## Testing Checklist
 
 ### Manual Testing
+
 - [ ] Edit own comment as student
 - [ ] Edit own comment as lecturer
 - [ ] Edit own comment as admin
@@ -257,6 +281,7 @@ const [localComments, setLocalComments] = useState(comments);
 - [ ] Verify comment count updates after delete
 
 ### Edge Cases
+
 - [ ] Edit comment with special characters
 - [ ] Edit comment with very long text
 - [ ] Edit comment with emojis
@@ -270,6 +295,7 @@ const [localComments, setLocalComments] = useState(comments);
 ## Phase 12 Implementation Notes
 
 ### Database Operations
+
 When implementing real API calls in Phase 12:
 
 ```typescript
@@ -284,21 +310,19 @@ const { error } = await supabase
   .eq('id', commentId);
 
 // Delete Comment
-const { error } = await supabase
-  .from('complaint_comments')
-  .delete()
-  .eq('id', commentId);
+const { error } = await supabase.from('complaint_comments').delete().eq('id', commentId);
 
 // Log History
 await supabase.from('complaint_history').insert({
   complaint_id: complaintId,
   action: 'comment_edited', // or 'comment_deleted'
   performed_by: currentUser.id,
-  details: { comment_id: commentId }
+  details: { comment_id: commentId },
 });
 ```
 
 ### Security Considerations
+
 - ✅ RLS policies enforce ownership
 - ✅ Backend validates user permissions
 - ✅ Frontend checks are for UX only
@@ -307,6 +331,7 @@ await supabase.from('complaint_history').insert({
 ## Requirements Validation
 
 ### Acceptance Criteria AC15
+
 ✅ Students can add follow-up comments to their complaints
 ✅ Lecturers can reply to comments, creating a discussion thread
 ✅ All participants receive notifications for new comments
@@ -315,16 +340,19 @@ await supabase.from('complaint_history').insert({
 ✅ **NEW**: Users can delete their own comments
 
 ### Design Property P19
+
 ✅ Comments are always displayed in chronological order
 ✅ Editing doesn't change comment position
 ✅ Deletion maintains order of remaining comments
 
 ### Non-Functional Requirements
+
 ✅ NFR2: Security - Ownership-based access control
 ✅ NFR3: Usability - Clear UI for edit/delete actions
 ✅ NFR3: Usability - Confirmation before destructive actions
 
 ## Status
+
 ✅ **COMPLETE** - Comment editing and deletion fully implemented
 ✅ **COMPLETE** - Comment author and timestamp display
 ✅ Following UI-first development approach

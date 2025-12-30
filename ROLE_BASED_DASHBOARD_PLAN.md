@@ -1,6 +1,7 @@
 # Role-Based Dashboard Implementation Plan
 
 ## Current Situation
+
 - ✅ Sidebar navigation is role-aware
 - ✅ Middleware protects routes by role
 - ✅ Auth session now works correctly with cookies
@@ -9,15 +10,19 @@
 ## What Each Role Should See
 
 ### Student Dashboard
+
 **Focus**: Personal complaint management
+
 - Stats: My complaints (total, pending, resolved)
 - Recent complaints (my submissions)
 - Draft complaints
 - Announcements
 - Quick actions: Submit complaint, use template, view drafts
 
-### Lecturer Dashboard  
+### Lecturer Dashboard
+
 **Focus**: Complaint management and oversight
+
 - Stats: All complaints, assigned to me, pending review, resolved today
 - Assigned complaints (priority view)
 - Recent complaints (all)
@@ -26,7 +31,9 @@
 - Announcements management
 
 ### Admin Dashboard
+
 **Focus**: System overview and management
+
 - Stats: Total users, total complaints, system health, active lecturers
 - Recent activity (all complaints)
 - User management preview
@@ -37,33 +44,37 @@
 ## Implementation Approach
 
 ### Option 1: Conditional Rendering (Recommended)
+
 ```typescript
 // src/app/dashboard/page.tsx
 export default function DashboardPage() {
   const { user } = useAuth();
-  
+
   if (user.role === 'admin') {
     return <AdminDashboard user={user} />;
   }
-  
+
   if (user.role === 'lecturer') {
     return <LecturerDashboard user={user} />;
   }
-  
+
   return <StudentDashboard user={user} />;
 }
 ```
 
 **Pros:**
+
 - Single route `/dashboard`
 - Easy to maintain
 - Consistent URL structure
 - Sidebar already points to `/dashboard`
 
 **Cons:**
+
 - Larger bundle size (loads all dashboard variants)
 
 ### Option 2: Separate Routes
+
 ```
 /dashboard/student
 /dashboard/lecturer
@@ -71,10 +82,12 @@ export default function DashboardPage() {
 ```
 
 **Pros:**
+
 - Code splitting (smaller bundles)
 - Clear separation
 
 **Cons:**
+
 - Need to update sidebar links
 - Need to update middleware
 - More complex routing logic
@@ -82,6 +95,7 @@ export default function DashboardPage() {
 ## Recommended: Option 1 with Component Extraction
 
 ### File Structure
+
 ```
 src/app/dashboard/
 ├── page.tsx                    # Main router
@@ -104,6 +118,7 @@ src/app/dashboard/
    - Quick links
 
 ## What Students Can't See
+
 - User management
 - System analytics (only their own stats)
 - All complaints (only their own)
@@ -111,6 +126,7 @@ src/app/dashboard/
 - Assignment features
 
 ## What Lecturers Can See (Extra)
+
 - All complaints
 - Assignment features
 - Analytics for all complaints
@@ -118,6 +134,7 @@ src/app/dashboard/
 - Announcement creation
 
 ## What Admins Can See (Extra)
+
 - Everything lecturers see, plus:
 - User management
 - System-wide analytics
@@ -125,6 +142,7 @@ src/app/dashboard/
 - Escalation rules management
 
 ## Next Steps
+
 1. Create three dashboard components
 2. Update main dashboard page with conditional rendering
 3. Create role-specific API endpoints for stats

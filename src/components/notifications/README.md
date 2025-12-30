@@ -65,10 +65,10 @@ export function MyHeader() {
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `className` | `string` | `undefined` | Optional CSS classes for styling |
-| `onClick` | `() => void` | `undefined` | Optional click handler (overrides default navigation) |
+| Prop        | Type         | Default     | Description                                           |
+| ----------- | ------------ | ----------- | ----------------------------------------------------- |
+| `className` | `string`     | `undefined` | Optional CSS classes for styling                      |
+| `onClick`   | `() => void` | `undefined` | Optional click handler (overrides default navigation) |
 
 ## Integration
 
@@ -97,13 +97,13 @@ The component uses the `useNotifications` hook to fetch and manage notification 
 import { useNotifications } from '@/hooks/use-notifications';
 
 const {
-  notifications,      // Array of notification objects
-  unreadCount,        // Number of unread notifications
-  isLoading,          // Loading state
-  error,              // Error state
-  markAsRead,         // Function to mark a notification as read
-  markAllAsRead,      // Function to mark all as read
-  refreshNotifications // Function to refresh notifications
+  notifications, // Array of notification objects
+  unreadCount, // Number of unread notifications
+  isLoading, // Loading state
+  error, // Error state
+  markAsRead, // Function to mark a notification as read
+  markAllAsRead, // Function to mark all as read
+  refreshNotifications, // Function to refresh notifications
 } = useNotifications();
 ```
 
@@ -154,21 +154,25 @@ The component follows accessibility best practices:
 ## Visual States
 
 ### No Unread Notifications
+
 ```
 🔔 (Bell icon only, no badge)
 ```
 
 ### With Unread Notifications (1-9)
+
 ```
 🔔 (3) (Bell icon with red badge showing count)
 ```
 
 ### With Many Unread Notifications (10+)
+
 ```
 🔔 (9+) (Bell icon with red badge showing "9+")
 ```
 
 ### Loading State
+
 ```
 🔔 (Disabled, grayed out)
 ```
@@ -178,6 +182,7 @@ The component follows accessibility best practices:
 To test the notification bell component:
 
 1. **Visual Test**: Import and render the demo component
+
    ```tsx
    import { NotificationBellDemo } from '@/components/notifications/__tests__/notification-bell.test';
    ```

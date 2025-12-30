@@ -30,6 +30,7 @@ Created a comprehensive escalation rules management page at `/admin/escalation-r
 ### Features Implemented
 
 #### 1. Rules List View
+
 - Display all escalation rules in card format
 - Show rule details:
   - Category and priority combination
@@ -41,6 +42,7 @@ Created a comprehensive escalation rules management page at `/admin/escalation-r
 - Empty state when no rules exist
 
 #### 2. Search and Filtering
+
 - **Search**: Search by category name or assigned user name
 - **Category Filter**: Filter by complaint category (Academic, Facilities, Harassment, etc.)
 - **Priority Filter**: Filter by priority level (Low, Medium, High, Critical)
@@ -48,12 +50,14 @@ Created a comprehensive escalation rules management page at `/admin/escalation-r
 - Real-time filtering with useMemo optimization
 
 #### 3. Rule Actions
+
 - **Toggle Active/Inactive**: Enable or disable rules with one click
 - **Edit Rule**: Opens modal to edit rule configuration (placeholder for now)
 - **Delete Rule**: Confirmation modal before deletion
 - Success/error messages with auto-dismiss
 
 #### 4. UI Components
+
 - Responsive design with Tailwind CSS
 - Dark mode support
 - Consistent with existing admin pages (templates, announcements)
@@ -61,7 +65,9 @@ Created a comprehensive escalation rules management page at `/admin/escalation-r
 - Icon usage: Clock, ArrowUpCircle, Eye, EyeOff, Edit2, Trash2
 
 #### 5. Mock Data
+
 Following the UI-first development approach:
+
 - Mock escalation rules with various configurations
 - Mock users (admins and lecturers) for assignment
 - Realistic data for testing UI interactions
@@ -140,6 +146,7 @@ When connecting to the real API, the following will need to be implemented:
 ### Design Consistency
 
 The page follows the same patterns as other admin pages:
+
 - Similar layout to `/admin/templates`
 - Consistent card design
 - Same filter panel structure

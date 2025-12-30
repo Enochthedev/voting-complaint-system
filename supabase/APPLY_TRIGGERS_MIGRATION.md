@@ -78,6 +78,7 @@ node scripts/test-complaint-triggers.js
 ```
 
 This will:
+
 - Create test users (student and lecturer)
 - Create a test complaint
 - Update the complaint status
@@ -111,6 +112,7 @@ ORDER BY tgname;
 ```
 
 You should see:
+
 - 5 trigger functions
 - 7 triggers on the complaints table (including the existing search vector and updated_at triggers)
 
@@ -133,6 +135,7 @@ After successful migration, the `complaints` table should have these triggers:
 If you see this error, the migration may have been partially applied. You can:
 
 1. Drop the existing functions:
+
 ```sql
 DROP FUNCTION IF EXISTS public.log_complaint_status_change() CASCADE;
 DROP FUNCTION IF EXISTS public.notify_student_on_status_change() CASCADE;
@@ -197,6 +200,7 @@ After successfully applying this migration:
 ## Support
 
 If you encounter issues:
+
 - Check Supabase logs in the dashboard
 - Review the migration file for syntax errors
 - Consult Supabase documentation: https://supabase.com/docs

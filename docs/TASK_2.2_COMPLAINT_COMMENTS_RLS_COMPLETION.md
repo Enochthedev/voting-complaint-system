@@ -11,6 +11,7 @@ This document summarizes the implementation of Row Level Security (RLS) policies
 The following RLS policies were created for the `complaint_comments` table:
 
 #### Policy 1: View comments on accessible complaints
+
 - **Purpose**: Controls who can view comments
 - **Rules**:
   - Lecturers and admins can view ALL comments (including internal notes)
@@ -19,6 +20,7 @@ The following RLS policies were created for the `complaint_comments` table:
 - **Implementation**: Uses JWT claims to avoid infinite recursion
 
 #### Policy 2: Add comments to accessible complaints
+
 - **Purpose**: Controls who can add comments
 - **Rules**:
   - Students can add comments to their own complaints
@@ -27,18 +29,21 @@ The following RLS policies were created for the `complaint_comments` table:
 - **Implementation**: Uses JWT claims for role checking
 
 #### Policy 3: Users update own comments
+
 - **Purpose**: Allows users to edit their own comments
 - **Rules**:
   - Users can only update comments they authored
 - **Implementation**: Simple ownership check
 
 #### Policy 4: Users delete own comments
+
 - **Purpose**: Allows users to delete their own comments
 - **Rules**:
   - Users can only delete comments they authored
 - **Implementation**: Simple ownership check
 
 #### Policy 5: Lecturers delete any comment
+
 - **Purpose**: Allows lecturers/admins to moderate comments
 - **Rules**:
   - Lecturers and admins can delete any comment
@@ -47,6 +52,7 @@ The following RLS policies were created for the `complaint_comments` table:
 ## Technical Details
 
 ### Migration File
+
 - **File**: `supabase/migrations/022_fix_complaint_comments_rls.sql`
 - **Purpose**: Fixes infinite recursion issue by using JWT claims instead of querying users table
 
@@ -69,12 +75,14 @@ The following RLS policies were created for the `complaint_comments` table:
 ## Files Created/Modified
 
 ### New Files
+
 1. `supabase/migrations/022_fix_complaint_comments_rls.sql` - Migration to fix RLS policies
 2. `scripts/apply-complaint-comments-rls-fix.js` - Helper script to display migration instructions
 3. `scripts/test-complaint-comments-rls.js` - Comprehensive test script for RLS policies
 4. `docs/TASK_2.2_COMPLAINT_COMMENTS_RLS_COMPLETION.md` - This documentation
 
 ### Modified Files
+
 - None (this is a new migration that updates existing policies)
 
 ## How to Apply
@@ -82,6 +90,7 @@ The following RLS policies were created for the `complaint_comments` table:
 ### Step 1: Apply the Migration
 
 1. Open your Supabase Dashboard:
+
    ```
    https://supabase.com/dashboard/project/tnenutksxxdhamlyogto/editor
    ```
@@ -101,11 +110,13 @@ The following RLS policies were created for the `complaint_comments` table:
 ### Step 2: Verify the Migration
 
 Run the test script:
+
 ```bash
 node scripts/test-complaint-comments-rls.js
 ```
 
 Expected output:
+
 ```
 ✅ complaint_comments table exists
 ✅ Student can add comment to their own complaint
@@ -119,6 +130,7 @@ Expected output:
 ### Alternative: Use Helper Script
 
 Run the helper script to display instructions:
+
 ```bash
 node scripts/apply-complaint-comments-rls-fix.js
 ```
@@ -140,6 +152,7 @@ The test script (`test-complaint-comments-rls.js`) verifies:
 ### Test Data
 
 The test script:
+
 - Creates temporary test users (student and lecturer)
 - Creates a test complaint
 - Adds various types of comments
@@ -151,14 +164,17 @@ The test script:
 This implementation satisfies the following requirements:
 
 ### From Requirements Document (AC15)
+
 - ✅ Students can add follow-up comments to their complaints
 - ✅ Lecturers can reply to comments, creating a discussion thread
 - ✅ Comments are timestamped and attributed to users
 
 ### From Design Document (P19)
+
 - ✅ Comments are always displayed in chronological order (enforced by query ORDER BY)
 
 ### From Design Document (P7)
+
 - ✅ Role-based access control enforced via RLS policies
 - ✅ Students can only view their own complaint comments
 - ✅ Lecturers can view all comments
@@ -166,16 +182,19 @@ This implementation satisfies the following requirements:
 ## Security Considerations
 
 ### Privacy
+
 - Anonymous complaints: Comments on anonymous complaints don't expose student identity
 - Internal notes: Hidden from students, visible only to lecturers/admins
 - Ownership: Users can only modify/delete their own comments
 
 ### Performance
+
 - JWT claims are cached and don't require database queries
 - Policies use efficient subqueries with proper indexes
 - Foreign key indexes on `complaint_id` and `user_id` optimize lookups
 
 ### Audit Trail
+
 - All comments are immutable once created (except by author)
 - Deletion is allowed but logged via database triggers
 - Comment history preserved in `complaint_history` table

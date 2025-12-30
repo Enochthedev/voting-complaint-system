@@ -1,6 +1,7 @@
 # Checkbox Selection - Quick Reference Guide
 
 ## 🎯 Overview
+
 Quick reference for implementing and using checkbox selection in the complaint list.
 
 ---
@@ -8,41 +9,47 @@ Quick reference for implementing and using checkbox selection in the complaint l
 ## 📦 Components Involved
 
 ### 1. ComplaintList
+
 **File:** `src/components/complaints/complaint-list.tsx`
 
 **Props:**
+
 ```typescript
 interface ComplaintListProps {
-  selectionMode?: boolean;           // Enable/disable selection mode
-  selectedIds?: Set<string>;         // Set of selected IDs
+  selectionMode?: boolean; // Enable/disable selection mode
+  selectedIds?: Set<string>; // Set of selected IDs
   onSelectionChange?: (ids: Set<string>) => void; // Selection callback
   // ... other props
 }
 ```
 
 ### 2. ComplaintsHeader
+
 **File:** `src/components/complaints/complaints-header.tsx`
 
 **Props:**
+
 ```typescript
 interface ComplaintsHeaderProps {
-  selectionMode?: boolean;           // Current selection mode state
+  selectionMode?: boolean; // Current selection mode state
   onToggleSelectionMode?: () => void; // Toggle callback
   // ... other props
 }
 ```
 
 ### 3. BulkActionBar
+
 **File:** `src/components/complaints/bulk-action-bar.tsx`
 
 **Props:**
+
 ```typescript
 interface BulkActionBarProps {
-  selectedCount: number;             // Number of selected items
-  totalCount: number;                // Total available items
-  onExport: () => void;              // Export callback
-  onSelectAll: () => void;           // Select all callback
-  onClearSelection: () => void;      // Clear callback
+  selectedCount: number; // Number of selected items
+  totalCount: number; // Total available items
+  onExport: () => void; // Export callback
+  onSelectAll: () => void; // Select all callback
+  onClearSelection: () => void; // Clear callback
   // ... other props
 }
 ```
@@ -68,7 +75,7 @@ const handleToggleSelectionMode = () => {
 
 // 3. Select all
 const handleSelectAll = () => {
-  const allIds = new Set(complaints.map(c => c.id));
+  const allIds = new Set(complaints.map((c) => c.id));
   setSelectedIds(allIds);
 };
 
@@ -80,7 +87,7 @@ const handleClearSelection = () => {
 
 // 5. Bulk action (e.g., export)
 const handleBulkExport = async () => {
-  const selected = complaints.filter(c => selectedIds.has(c.id));
+  const selected = complaints.filter((c) => selectedIds.has(c.id));
   await exportToCSV(selected);
   setSelectedIds(new Set());
   setSelectionMode(false);
@@ -116,6 +123,7 @@ const handleBulkExport = async () => {
 ## 🎨 Styling
 
 ### Selected Item Styles
+
 ```typescript
 className={cn(
   'rounded-lg border bg-card p-4',
@@ -124,6 +132,7 @@ className={cn(
 ```
 
 ### Checkbox Styles
+
 ```typescript
 <input
   type="checkbox"
@@ -136,6 +145,7 @@ className={cn(
 ## 📋 Common Patterns
 
 ### Pattern 1: Toggle Individual Selection
+
 ```typescript
 const toggleSelection = (id: string) => {
   const newSelection = new Set(selectedIds);
@@ -149,23 +159,24 @@ const toggleSelection = (id: string) => {
 ```
 
 ### Pattern 2: Check if All Selected
+
 ```typescript
 const allSelected = selectedIds.size === complaints.length;
 ```
 
 ### Pattern 3: Get Selected Items
+
 ```typescript
-const selectedComplaints = complaints.filter(c => 
-  selectedIds.has(c.id)
-);
+const selectedComplaints = complaints.filter((c) => selectedIds.has(c.id));
 ```
 
 ### Pattern 4: Clear After Action
+
 ```typescript
 const performAction = async () => {
   // Do something with selected items
   await doSomething(selectedIds);
-  
+
   // Clear and exit
   setSelectedIds(new Set());
   setSelectionMode(false);
@@ -177,6 +188,7 @@ const performAction = async () => {
 ## 🚀 Usage Examples
 
 ### Example 1: Basic Selection
+
 ```typescript
 function ComplaintsPage() {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -187,7 +199,7 @@ function ComplaintsPage() {
       <button onClick={() => setSelectionMode(!selectionMode)}>
         {selectionMode ? 'Cancel' : 'Select'}
       </button>
-      
+
       <ComplaintList
         complaints={complaints}
         selectionMode={selectionMode}
@@ -200,6 +212,7 @@ function ComplaintsPage() {
 ```
 
 ### Example 2: With Bulk Export
+
 ```typescript
 function ComplaintsPage() {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -219,7 +232,7 @@ function ComplaintsPage() {
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
       />
-      
+
       {selectedIds.size > 0 && (
         <BulkActionBar
           selectedCount={selectedIds.size}
@@ -236,6 +249,7 @@ function ComplaintsPage() {
 ```
 
 ### Example 3: With Progress Tracking
+
 ```typescript
 function ComplaintsPage() {
   const [selectionMode, setSelectionMode] = useState(false);
@@ -249,15 +263,15 @@ function ComplaintsPage() {
 
     try {
       const selected = complaints.filter(c => selectedIds.has(c.id));
-      
+
       setProgress(20);
       await prepareExport(selected);
-      
+
       setProgress(60);
       await generateCSV(selected);
-      
+
       setProgress(100);
-      
+
       // Cleanup
       setSelectedIds(new Set());
       setSelectionMode(false);
@@ -274,7 +288,7 @@ function ComplaintsPage() {
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
       />
-      
+
       <BulkActionBar
         selectedCount={selectedIds.size}
         isExporting={isExporting}
@@ -291,24 +305,28 @@ function ComplaintsPage() {
 ## ⚠️ Important Notes
 
 ### State Management
+
 - ✅ Use `Set<string>` for efficient lookups
 - ✅ Create new Set for immutable updates
 - ✅ Clear selection when exiting mode
 - ❌ Don't mutate Set directly
 
 ### Event Handling
+
 - ✅ Stop propagation on checkbox clicks
 - ✅ Handle both click and change events
 - ✅ Respect selection mode in click handlers
 - ❌ Don't navigate when in selection mode
 
 ### Performance
+
 - ✅ Use Set for O(1) lookups
 - ✅ Memoize filtered lists
 - ✅ Avoid unnecessary re-renders
 - ❌ Don't iterate over all items repeatedly
 
 ### User Experience
+
 - ✅ Clear visual feedback for selection
 - ✅ Show selection count
 - ✅ Provide "Select all" option
@@ -320,6 +338,7 @@ function ComplaintsPage() {
 ## 🐛 Troubleshooting
 
 ### Checkboxes Not Showing
+
 ```typescript
 // Check: selectionMode is true
 console.log('Selection mode:', selectionMode);
@@ -329,6 +348,7 @@ console.log('Selection mode:', selectionMode);
 ```
 
 ### Selection Not Working
+
 ```typescript
 // Check: callback is provided
 <ComplaintList onSelectionChange={setSelectedIds} />
@@ -339,6 +359,7 @@ selectedIds.add(id); // ❌ Bad (mutates)
 ```
 
 ### Visual Feedback Missing
+
 ```typescript
 // Check: isSelected is calculated correctly
 const isSelected = selectedIds.has(complaint.id);

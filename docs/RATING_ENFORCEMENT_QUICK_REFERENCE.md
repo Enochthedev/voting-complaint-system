@@ -10,6 +10,7 @@ The system enforces that each complaint can only be rated once by the student wh
 ## Key Components
 
 ### 1. Database Constraint
+
 ```sql
 -- In: supabase/migrations/007_create_complaint_ratings_table.sql
 CONSTRAINT unique_complaint_rating UNIQUE(complaint_id)
@@ -18,12 +19,14 @@ CONSTRAINT unique_complaint_rating UNIQUE(complaint_id)
 ### 2. API Functions
 
 **Submit Rating** (`src/lib/api/complaints.ts`):
+
 ```typescript
 await submitRating(complaintId, studentId, rating, feedbackText);
 // Throws: "You have already rated this complaint" if duplicate
 ```
 
 **Check Rating Status** (`src/lib/api/complaints.ts`):
+
 ```typescript
 const hasRated = await hasRatedComplaint(complaintId, studentId);
 // Returns: true if rated, false if not
@@ -32,34 +35,35 @@ const hasRated = await hasRatedComplaint(complaintId, studentId);
 ### 3. UI Integration
 
 **Complaint Detail View** (`src/components/complaints/complaint-detail/index.tsx`):
+
 - Checks if complaint has been rated on load
 - Only shows rating prompt if not rated
 - Handles duplicate rating errors gracefully
 
 ## Validation Rules
 
-| Rule | Enforcement |
-|------|-------------|
-| One rating per complaint | Database UNIQUE constraint + API check |
-| Rating range (1-5) | Database CHECK constraint + API validation |
-| Only resolved complaints | API validation |
-| Only complaint owner | API validation + RLS policy |
-| Only students can rate | RLS policy + UI logic |
+| Rule                     | Enforcement                                |
+| ------------------------ | ------------------------------------------ |
+| One rating per complaint | Database UNIQUE constraint + API check     |
+| Rating range (1-5)       | Database CHECK constraint + API validation |
+| Only resolved complaints | API validation                             |
+| Only complaint owner     | API validation + RLS policy                |
+| Only students can rate   | RLS policy + UI logic                      |
 
 ## Error Messages
 
 ```typescript
 // Rating already exists
-"You have already rated this complaint"
+'You have already rated this complaint';
 
 // Invalid rating value
-"Rating must be between 1 and 5"
+'Rating must be between 1 and 5';
 
 // Complaint not resolved
-"Can only rate resolved complaints"
+'Can only rate resolved complaints';
 
 // Not complaint owner
-"Only the complaint owner can rate"
+'Only the complaint owner can rate';
 ```
 
 ## Usage Example
@@ -71,7 +75,7 @@ const hasRated = await hasRatedComplaint(complaintId, userId);
 if (!hasRated) {
   // Show rating form
   try {
-    await submitRating(complaintId, userId, 5, "Great service!");
+    await submitRating(complaintId, userId, 5, 'Great service!');
     // Success - rating saved
   } catch (error) {
     if (error.message.includes('already rated')) {
@@ -84,11 +88,13 @@ if (!hasRated) {
 ## Testing
 
 Run tests with:
+
 ```bash
 npm test -- src/lib/api/__tests__/complaints-rating.test.ts --run
 ```
 
 Test coverage:
+
 - ✅ First-time rating submission
 - ✅ Duplicate rating prevention
 - ✅ Invalid rating values

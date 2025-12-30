@@ -29,18 +29,21 @@ The trigger automatically notifies relevant users when a comment is added to a c
 ## Notification Details
 
 ### For Students
+
 - **Type**: `comment_added`
 - **Title**: "New comment on your complaint"
 - **Message**: "[Commenter Name] commented on your complaint: [Complaint Title]"
 - **Related ID**: The complaint ID
 
 ### For Assigned Lecturers
+
 - **Type**: `comment_added`
 - **Title**: "New comment on assigned complaint"
 - **Message**: "[Commenter Name] commented on complaint: [Complaint Title]"
 - **Related ID**: The complaint ID
 
 ### For Other Participants
+
 - **Type**: `comment_added`
 - **Title**: "New comment on complaint"
 - **Message**: "[Commenter Name] commented on complaint: [Complaint Title]"
@@ -63,7 +66,7 @@ BEGIN
   -- Notify student (if not commenter)
   -- Notify assigned lecturer (if not commenter)
   -- Notify other participants (lecturers/admins who commented)
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -103,6 +106,7 @@ node scripts/test-comment-notification-trigger.js
 ## Acceptance Criteria
 
 This implementation satisfies:
+
 - **AC15**: Discussion/comment system with notifications
 - **P19**: Comment notifications for relevant users
 

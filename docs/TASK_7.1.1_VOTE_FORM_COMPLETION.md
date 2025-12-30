@@ -14,6 +14,7 @@
 A comprehensive form component for creating and editing voting polls with the following features:
 
 **Core Fields:**
+
 - Title input (5-200 characters, required)
 - Description textarea (10-1000 characters, required)
 - Dynamic vote options (minimum 2, unlimited maximum)
@@ -22,6 +23,7 @@ A comprehensive form component for creating and editing voting polls with the fo
 - Active status toggle
 
 **Features:**
+
 - ✅ Real-time character counters
 - ✅ Comprehensive validation
 - ✅ Dynamic option management (add/remove)
@@ -32,6 +34,7 @@ A comprehensive form component for creating and editing voting polls with the fo
 - ✅ Accessibility features
 
 **Validation Rules:**
+
 - Title: 5-200 characters, required
 - Description: 10-1000 characters, required
 - Options: Minimum 2, unique, max 200 chars each
@@ -41,6 +44,7 @@ A comprehensive form component for creating and editing voting polls with the fo
 ### 2. Create Vote Page (`src/app/admin/votes/new/page.tsx`)
 
 A dedicated page for creating new votes with:
+
 - Form integration
 - Success/error handling
 - Auto-redirect after creation
@@ -51,6 +55,7 @@ A dedicated page for creating new votes with:
 ### 3. Votes List Page (`src/app/admin/votes/page.tsx`)
 
 A listing page with:
+
 - Empty state with call-to-action
 - Navigation to create page
 - Placeholder for future vote list
@@ -59,15 +64,18 @@ A listing page with:
 ### 4. Supporting Files
 
 **Component Index** (`src/components/votes/index.ts`)
+
 - Clean exports for vote components
 
 **Documentation** (`src/components/votes/README.md`)
+
 - Component usage guide
 - Props documentation
 - Validation rules
 - Data structure examples
 
 **Visual Guide** (`docs/VOTE_FORM_VISUAL_GUIDE.md`)
+
 - Comprehensive feature walkthrough
 - Validation examples
 - User flow documentation
@@ -76,18 +84,21 @@ A listing page with:
 ## Design Patterns Used
 
 ### 1. Consistent with Existing Forms
+
 - Follows same structure as `TemplateForm` and `ComplaintForm`
 - Uses established UI components (Button, Input, Label, Alert, Card)
 - Maintains consistent validation patterns
 - Similar error handling approach
 
 ### 2. UI-First Development
+
 - Mock data implementation
 - Console logging for debugging
 - Simulated API delays
 - Ready for Phase 12 API integration
 
 ### 3. Component Architecture
+
 - Controlled form inputs
 - React hooks for state management
 - Proper TypeScript typing
@@ -119,13 +130,14 @@ docs/
 ## Technical Details
 
 ### TypeScript Types Used
+
 ```typescript
 interface Vote {
   id: string;
   created_by: string;
   title: string;
   description: string;
-  options: Record<string, any>;  // Array of strings
+  options: Record<string, any>; // Array of strings
   is_active: boolean;
   related_complaint_id: string | null;
   created_at: string;
@@ -134,6 +146,7 @@ interface Vote {
 ```
 
 ### Form Data Output
+
 ```typescript
 {
   title: string;
@@ -147,12 +160,12 @@ interface Vote {
 
 ## Validation Summary
 
-| Field | Rules | Error Messages |
-|-------|-------|----------------|
-| Title | 5-200 chars, required | "Title is required", "Title must be at least 5 characters", "Title must be less than 200 characters" |
-| Description | 10-1000 chars, required | "Description is required", "Description must be at least 10 characters", "Description must be less than 1000 characters" |
-| Options | Min 2, unique, max 200 each | "A vote must have at least 2 options", "At least 2 options must have text", "Options must be unique", "Option text must be less than 200 characters" |
-| Closing Date | Future date (optional) | "Closing date must be in the future" |
+| Field        | Rules                       | Error Messages                                                                                                                                       |
+| ------------ | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Title        | 5-200 chars, required       | "Title is required", "Title must be at least 5 characters", "Title must be less than 200 characters"                                                 |
+| Description  | 10-1000 chars, required     | "Description is required", "Description must be at least 10 characters", "Description must be less than 1000 characters"                             |
+| Options      | Min 2, unique, max 200 each | "A vote must have at least 2 options", "At least 2 options must have text", "Options must be unique", "Option text must be less than 200 characters" |
+| Closing Date | Future date (optional)      | "Closing date must be in the future"                                                                                                                 |
 
 ## Testing Results
 
@@ -164,11 +177,12 @@ interface Vote {
 ✅ **Error Display**: Clear and helpful  
 ✅ **Loading States**: Properly implemented  
 ✅ **Responsive Design**: Mobile-friendly  
-✅ **Dark Mode**: Fully supported  
+✅ **Dark Mode**: Fully supported
 
 ## Requirements Satisfied
 
 From **AC6: Voting System**:
+
 - ✅ Lecturers can create voting polls
 - ✅ Polls have title and description
 - ✅ Polls have multiple options
@@ -177,6 +191,7 @@ From **AC6: Voting System**:
 - ✅ Polls can have closing dates
 
 From **Design Document**:
+
 - ✅ Vote form follows established patterns
 - ✅ Proper validation implemented
 - ✅ User-friendly interface
@@ -207,6 +222,7 @@ The following sub-tasks in Task 7.1 remain to be implemented:
 ## Screenshots Locations
 
 Visual examples can be found at:
+
 - `/admin/votes` - Empty state and list page
 - `/admin/votes/new` - Vote creation form
 

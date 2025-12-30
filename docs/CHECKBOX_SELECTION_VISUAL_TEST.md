@@ -1,6 +1,7 @@
 # Checkbox Selection - Visual Test Guide
 
 ## 🎯 Purpose
+
 This guide provides step-by-step instructions to visually test the checkbox selection functionality in the complaint list.
 
 ---
@@ -8,6 +9,7 @@ This guide provides step-by-step instructions to visually test the checkbox sele
 ## 🚀 Getting Started
 
 ### Prerequisites:
+
 1. Application is running (`npm run dev`)
 2. Navigate to `/complaints` page
 3. Ensure you have some complaints visible (mock data is available)
@@ -19,11 +21,13 @@ This guide provides step-by-step instructions to visually test the checkbox sele
 ### Test 1: Enter Selection Mode
 
 **Steps:**
+
 1. Navigate to `/complaints` page
 2. Look for the "Select" button in the top-right corner
 3. Click the "Select" button
 
 **Expected Results:**
+
 - ✅ Button changes from "Select" to "Cancel"
 - ✅ Button style changes from outline to secondary
 - ✅ Icon changes from CheckSquare to X
@@ -32,6 +36,7 @@ This guide provides step-by-step instructions to visually test the checkbox sele
 - ✅ All checkboxes are initially unchecked
 
 **Visual Reference:**
+
 ```
 Before:
 ┌─────────────────────────────────────────────┐
@@ -57,12 +62,14 @@ Complaint Cards:
 ### Test 2: Select Individual Complaints
 
 **Steps:**
+
 1. Ensure selection mode is active
 2. Click the checkbox on the first complaint
 3. Click the checkbox on the second complaint
 4. Click the checkbox on the third complaint
 
 **Expected Results:**
+
 - ✅ Each clicked checkbox becomes checked
 - ✅ Selected complaint cards show visual feedback:
   - Border color changes to primary color
@@ -72,6 +79,7 @@ Complaint Cards:
 - ✅ "Select all" link appears if not all complaints are selected
 
 **Visual Reference:**
+
 ```
 Selected Complaint Card:
 ┌─────────────────────────────────────────────┐
@@ -92,16 +100,19 @@ Bulk Action Bar (bottom of screen):
 ### Test 3: Deselect Individual Complaints
 
 **Steps:**
+
 1. With some complaints selected, click a checked checkbox
 2. Observe the changes
 
 **Expected Results:**
+
 - ✅ Checkbox becomes unchecked
 - ✅ Visual feedback removed (border and background return to normal)
 - ✅ BulkActionBar count decreases
 - ✅ If all deselected, BulkActionBar disappears
 
 **Visual Reference:**
+
 ```
 Before: [✓] 3 complaints selected
 After:  [✓] 2 complaints selected
@@ -115,17 +126,20 @@ BulkActionBar disappears completely
 ### Test 4: Select All Functionality
 
 **Steps:**
+
 1. Select 1-2 complaints (not all)
 2. Look for "Select all X" link in BulkActionBar
 3. Click the "Select all" link
 
 **Expected Results:**
+
 - ✅ All complaint checkboxes become checked
 - ✅ All complaint cards show selection visual feedback
 - ✅ BulkActionBar count shows total: "8 complaints selected"
 - ✅ "Select all" link disappears (since all are selected)
 
 **Visual Reference:**
+
 ```
 Before:
 ┌─────────────────────────────────────────────┐
@@ -145,11 +159,13 @@ After:
 ### Test 5: Bulk Export
 
 **Steps:**
+
 1. Select 2-3 complaints
 2. Click "Export CSV" button in BulkActionBar
 3. Observe the export process
 
 **Expected Results:**
+
 - ✅ Progress bar appears in BulkActionBar
 - ✅ Progress message shows: "Preparing export..."
 - ✅ Progress updates: "Preparing X complaints for export..."
@@ -164,6 +180,7 @@ After:
   - Checkboxes hidden
 
 **Visual Reference:**
+
 ```
 During Export:
 ┌─────────────────────────────────────────────┐
@@ -186,10 +203,12 @@ After Export:
 ### Test 6: Clear Selection
 
 **Steps:**
+
 1. Select several complaints
 2. Click "Clear" button in BulkActionBar
 
 **Expected Results:**
+
 - ✅ All checkboxes become unchecked
 - ✅ Visual feedback removed from all cards
 - ✅ BulkActionBar disappears
@@ -198,6 +217,7 @@ After Export:
 - ✅ "Select" button appears in header
 
 **Visual Reference:**
+
 ```
 Before:
 - Checkboxes visible
@@ -215,11 +235,13 @@ After:
 ### Test 7: Cancel Selection Mode
 
 **Steps:**
+
 1. Enter selection mode
 2. Select some complaints
 3. Click "Cancel" button in header
 
 **Expected Results:**
+
 - ✅ All selections cleared
 - ✅ Checkboxes hidden
 - ✅ BulkActionBar disappears
@@ -228,6 +250,7 @@ After:
 - ✅ All visual feedback removed
 
 **Visual Reference:**
+
 ```
 Same as Test 6 - complete reset to normal view
 ```
@@ -237,12 +260,14 @@ Same as Test 6 - complete reset to normal view
 ### Test 8: Selection with Filters
 
 **Steps:**
+
 1. Apply a status filter (e.g., "New")
 2. Enter selection mode
 3. Select all visible complaints
 4. Change filter (e.g., to "In Progress")
 
 **Expected Results:**
+
 - ✅ Selection persists for previously selected items
 - ✅ New filtered items are not selected
 - ✅ BulkActionBar count remains accurate
@@ -255,6 +280,7 @@ Same as Test 6 - complete reset to normal view
 ### Test 9: Selection with Pagination
 
 **Steps:**
+
 1. Ensure you have multiple pages of complaints
 2. Enter selection mode
 3. Select complaints on page 1
@@ -263,6 +289,7 @@ Same as Test 6 - complete reset to normal view
 6. Navigate back to page 1
 
 **Expected Results:**
+
 - ✅ Selections on page 1 are preserved
 - ✅ BulkActionBar shows total count across all pages
 - ✅ "Select all" selects all complaints (not just current page)
@@ -272,6 +299,7 @@ Same as Test 6 - complete reset to normal view
 ### Test 10: Responsive Design
 
 **Steps:**
+
 1. Test on desktop (wide screen)
 2. Test on tablet (medium screen)
 3. Test on mobile (narrow screen)
@@ -279,16 +307,19 @@ Same as Test 6 - complete reset to normal view
 **Expected Results:**
 
 **Desktop:**
+
 - ✅ BulkActionBar centered at bottom
 - ✅ All buttons visible in one row
 - ✅ Progress bar full width
 
 **Tablet:**
+
 - ✅ BulkActionBar adapts to width
 - ✅ Buttons may wrap if needed
 - ✅ Still easily accessible
 
 **Mobile:**
+
 - ✅ BulkActionBar full width
 - ✅ Buttons stack vertically if needed
 - ✅ Touch-friendly checkbox size
@@ -299,11 +330,13 @@ Same as Test 6 - complete reset to normal view
 ### Test 11: Accessibility
 
 **Steps:**
+
 1. Use keyboard navigation (Tab key)
 2. Use screen reader (if available)
 3. Check focus indicators
 
 **Expected Results:**
+
 - ✅ Can tab to "Select" button
 - ✅ Can tab to each checkbox
 - ✅ Can tab to BulkActionBar buttons
@@ -318,31 +351,41 @@ Same as Test 6 - complete reset to normal view
 ## 🐛 Common Issues to Check
 
 ### Issue 1: Checkboxes Not Appearing
+
 **Check:**
+
 - Selection mode is active
 - `selectionMode` prop is true
 - ComplaintList component receives prop
 
 ### Issue 2: Selection Not Working
+
 **Check:**
+
 - `onSelectionChange` callback is provided
 - State updates are triggering re-renders
 - Set is being updated immutably
 
 ### Issue 3: BulkActionBar Not Showing
+
 **Check:**
+
 - At least one item is selected
 - `selectedIds.size > 0`
 - Component is rendered in page
 
 ### Issue 4: Visual Feedback Not Showing
+
 **Check:**
+
 - CSS classes are applied correctly
 - `isSelected` prop is true for selected items
 - Tailwind classes are not being purged
 
 ### Issue 5: Export Not Working
+
 **Check:**
+
 - Export function is called
 - Selected complaints are filtered correctly
 - CSV generation is working
@@ -396,6 +439,7 @@ Issues Found: _______________
 ## 🎉 Success Criteria
 
 All tests should pass with:
+
 - ✅ Smooth transitions and animations
 - ✅ Clear visual feedback
 - ✅ Intuitive user experience

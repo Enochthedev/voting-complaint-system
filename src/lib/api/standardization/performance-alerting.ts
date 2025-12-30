@@ -164,7 +164,10 @@ export class PerformanceAlertingSystem {
         diagnostics: context.diagnostics,
       };
 
-      (console[logLevel as keyof Console] as any)(`Performance Alert: ${alert.message}`, logMessage);
+      (console[logLevel as keyof Console] as any)(
+        `Performance Alert: ${alert.message}`,
+        logMessage
+      );
     });
   }
 

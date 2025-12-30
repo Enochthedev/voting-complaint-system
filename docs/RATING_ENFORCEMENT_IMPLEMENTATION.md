@@ -24,16 +24,17 @@ CREATE TABLE IF NOT EXISTS public.complaint_ratings (
   rating INTEGER NOT NULL,
   feedback_text TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   -- Constraint: ensure one rating per complaint
   CONSTRAINT unique_complaint_rating UNIQUE(complaint_id),
-  
+
   -- Constraint: rating must be between 1 and 5
   CONSTRAINT rating_range_check CHECK (rating >= 1 AND rating <= 5)
 );
 ```
 
 **Benefits**:
+
 - ✅ Guarantees data integrity at the database level
 - ✅ Prevents duplicate ratings even if application logic fails
 - ✅ Atomic enforcement - no race conditions possible
@@ -103,16 +104,14 @@ export async function submitRating(
   if (insertError) throw insertError;
 
   // 5. Log rating in history
-  await supabase
-    .from('complaint_history')
-    .insert({
-      complaint_id: complaintId,
-      action: 'rated',
-      old_value: null,
-      new_value: rating.toString(),
-      performed_by: studentId,
-      details: feedbackText ? { feedback: feedbackText } : null,
-    });
+  await supabase.from('complaint_history').insert({
+    complaint_id: complaintId,
+    action: 'rated',
+    old_value: null,
+    new_value: rating.toString(),
+    performed_by: studentId,
+    details: feedbackText ? { feedback: feedbackText } : null,
+  });
 
   return newRating;
 }
@@ -121,10 +120,7 @@ export async function submitRating(
 **Helper Function**: `hasRatedComplaint`
 
 ```typescript
-export async function hasRatedComplaint(
-  complaintId: string, 
-  studentId: string
-): Promise<boolean> {
+export async function hasRatedComplaint(complaintId: string, studentId: string): Promise<boolean> {
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
@@ -144,6 +140,7 @@ export async function hasRatedComplaint(
 ```
 
 **Benefits**:
+
 - ✅ Provides clear error messages to users
 - ✅ Validates business rules before database interaction
 - ✅ Prevents unnecessary database operations
@@ -209,7 +206,7 @@ const handleRatingSubmit = async (rating: number, feedbackText: string) => {
 
   try {
     const { submitRating } = await import('@/lib/api/complaints');
-    
+
     // Submit rating to database
     // This will throw an error if the user has already rated
     await submitRating(complaintId, currentUserId, rating, feedbackText);
@@ -222,19 +219,20 @@ const handleRatingSubmit = async (rating: number, feedbackText: string) => {
     // ... (history update code)
   } catch (err) {
     console.error('Error submitting rating:', err);
-    
+
     // If the error is about already rating, update the UI state
     if (err instanceof Error && err.message.includes('already rated')) {
       setHasRated(true);
       setShowRatingPrompt(false);
     }
-    
+
     throw err;
   }
 };
 ```
 
 **Benefits**:
+
 - ✅ Prevents showing rating prompt if already rated
 - ✅ Gracefully handles duplicate rating attempts
 - ✅ Updates UI state when duplicate detected
@@ -289,13 +287,13 @@ CREATE POLICY "Students view own ratings"
 
 The system provides clear error messages for different scenarios:
 
-| Scenario | Error Message |
-|----------|---------------|
-| Already rated | "You have already rated this complaint" |
-| Invalid rating | "Rating must be between 1 and 5" |
-| Not resolved | "Can only rate resolved complaints" |
-| Not owner | "Only the complaint owner can rate" |
-| Complaint not found | "Complaint not found" |
+| Scenario            | Error Message                           |
+| ------------------- | --------------------------------------- |
+| Already rated       | "You have already rated this complaint" |
+| Invalid rating      | "Rating must be between 1 and 5"        |
+| Not resolved        | "Can only rate resolved complaints"     |
+| Not owner           | "Only the complaint owner can rate"     |
+| Complaint not found | "Complaint not found"                   |
 
 ## Testing
 

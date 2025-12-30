@@ -7,9 +7,11 @@ The cleanup functionality for Supabase Realtime channel subscriptions is **alrea
 ## Implementation Details
 
 ### Location
+
 File: `src/hooks/use-notifications.ts` (Lines 187-193)
 
 ### Code Implementation
+
 ```typescript
 // Cleanup function to unsubscribe when component unmounts
 return () => {
@@ -44,9 +46,11 @@ return () => {
 ## Why This Approach is Correct
 
 ### According to Supabase Documentation
+
 The recommended way to clean up Realtime subscriptions is:
+
 ```typescript
-supabase.removeChannel(channel)
+supabase.removeChannel(channel);
 ```
 
 This is exactly what our implementation does.

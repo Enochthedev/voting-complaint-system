@@ -16,6 +16,7 @@ Created a PostgreSQL trigger that automatically notifies all students when a new
 **File:** `supabase/migrations/033_create_new_vote_notification_trigger.sql`
 
 **Components:**
+
 - **Function:** `notify_students_on_new_vote()`
 - **Trigger:** `notify_on_new_vote`
 - **Condition:** Only fires when `is_active = true`
@@ -23,6 +24,7 @@ Created a PostgreSQL trigger that automatically notifies all students when a new
 ### 2. Notification Details
 
 When a lecturer creates a new active vote:
+
 - **Type:** `new_vote`
 - **Title:** "New vote available"
 - **Message:** "A new vote has been created: [Vote Title]"
@@ -36,6 +38,7 @@ Created comprehensive test script to verify trigger functionality.
 **File:** `scripts/test-new-vote-notification-trigger.js`
 
 **Tests:**
+
 - ✅ Notifications created for all students
 - ✅ Correct notification count (one per student)
 - ✅ Notification content is accurate
@@ -72,7 +75,7 @@ BEGIN
     INSERT INTO public.notifications (
       user_id, type, title, message, related_id, is_read
     )
-    SELECT 
+    SELECT
       u.id,
       'new_vote',
       'New vote available',
@@ -82,7 +85,7 @@ BEGIN
     FROM public.users u
     WHERE u.role = 'student';
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -166,6 +169,7 @@ The notification system was already configured to handle `new_vote` notification
 ## Files Created/Modified
 
 ### Created Files
+
 1. `supabase/migrations/033_create_new_vote_notification_trigger.sql`
 2. `scripts/test-new-vote-notification-trigger.js`
 3. `docs/NEW_VOTE_NOTIFICATION_TRIGGER.md`
@@ -173,6 +177,7 @@ The notification system was already configured to handle `new_vote` notification
 5. `docs/TASK_7.1_NEW_VOTE_NOTIFICATION_COMPLETION.md`
 
 ### Modified Files
+
 1. `docs/NOTIFICATION_TRIGGERS_COMPLETE.md` - Added new vote trigger
 2. `.kiro/specs/tasks.md` - Marked task as completed
 
@@ -181,6 +186,7 @@ The notification system was already configured to handle `new_vote` notification
 ### Database Schema
 
 **Notifications Table:**
+
 ```sql
 CREATE TABLE public.notifications (
   id UUID PRIMARY KEY,
@@ -195,6 +201,7 @@ CREATE TABLE public.notifications (
 ```
 
 **Votes Table:**
+
 ```sql
 CREATE TABLE public.votes (
   id UUID PRIMARY KEY,
@@ -237,6 +244,7 @@ Potential improvements for future iterations:
 ### Monitoring
 
 Check trigger status:
+
 ```sql
 SELECT * FROM pg_trigger WHERE tgname = 'notify_on_new_vote';
 ```
@@ -244,11 +252,13 @@ SELECT * FROM pg_trigger WHERE tgname = 'notify_on_new_vote';
 ### Disabling/Enabling
 
 Disable temporarily:
+
 ```sql
 ALTER TABLE public.votes DISABLE TRIGGER notify_on_new_vote;
 ```
 
 Re-enable:
+
 ```sql
 ALTER TABLE public.votes ENABLE TRIGGER notify_on_new_vote;
 ```

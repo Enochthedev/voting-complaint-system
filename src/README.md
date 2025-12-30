@@ -76,7 +76,7 @@ The lib directory contains:
 - **utils/**: Helper functions (date formatting, string manipulation, etc.)
 - **validations/**: Form validation schemas using Zod or similar
 - **constants.ts**: Application-wide constants (categories, statuses, etc.)
-- **supabase*.ts**: Supabase client configurations
+- **supabase\*.ts**: Supabase client configurations
 
 ## Types
 

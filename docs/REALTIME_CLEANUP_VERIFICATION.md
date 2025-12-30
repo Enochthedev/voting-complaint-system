@@ -13,6 +13,7 @@ The cleanup functionality is implemented in `src/hooks/use-notifications.ts` and
 ### Method 1: Browser Console Verification
 
 1. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -61,11 +62,13 @@ The cleanup functionality is implemented in `src/hooks/use-notifications.ts` and
 ## Expected Console Output
 
 ### On Component Mount
+
 ```
 Successfully subscribed to notifications channel
 ```
 
 ### On Component Unmount
+
 ```
 Unsubscribing from notifications channel
 Notifications channel closed
@@ -74,6 +77,7 @@ Notifications channel closed
 ## Code Reference
 
 ### Cleanup Implementation
+
 ```typescript
 // src/hooks/use-notifications.ts (lines 187-193)
 
@@ -88,12 +92,19 @@ return () => {
 ```
 
 ### Channel Setup
+
 ```typescript
 // src/hooks/use-notifications.ts (lines 115-177)
 
 const channel = supabase
   .channel('notifications-channel')
-  .on('postgres_changes', { /* ... */ }, callback)
+  .on(
+    'postgres_changes',
+    {
+      /* ... */
+    },
+    callback
+  )
   .subscribe((status) => {
     if (status === 'SUBSCRIBED') {
       console.log('Successfully subscribed to notifications channel');
@@ -119,11 +130,13 @@ channelRef.current = channel;
 ### Issue: "Unsubscribing" message not appearing
 
 **Possible Causes:**
+
 - Component is still mounted (check React DevTools)
 - Console is filtered (check console filter settings)
 - Logging is disabled in production build
 
 **Solution:**
+
 - Verify component unmounts using React DevTools
 - Check console filter settings
 - Use development build for testing
@@ -131,11 +144,13 @@ channelRef.current = channel;
 ### Issue: Multiple subscriptions created
 
 **Possible Causes:**
+
 - Component is mounting multiple times
 - Dependency array is not empty
 - Strict Mode is enabled (causes double mounting in development)
 
 **Solution:**
+
 - Check that useEffect has empty dependency array `[]`
 - This is expected behavior in React Strict Mode (development only)
 - Verify cleanup still runs for each mount
@@ -143,11 +158,13 @@ channelRef.current = channel;
 ### Issue: Memory leaks detected
 
 **Possible Causes:**
+
 - Cleanup function not running
 - Channel reference not cleared
 - Other subscriptions not cleaned up
 
 **Solution:**
+
 - Verify cleanup function is defined and runs
 - Check that `channelRef.current = null` is executed
 - Use browser memory profiler to identify leak source

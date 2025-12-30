@@ -5,11 +5,12 @@
  * with real-time subscription support and enhanced error handling.
  */
 
-import { StandardApiResponse, PaginatedApiResponse, ErrorType } from './standardization/types';
+import { StandardApiResponse, PaginatedApiResponse } from './standardization/types';
 import { createMigrationWrapper } from './standardization/migration-wrapper';
 import { withMonitoring } from './standardization/monitoring-wrapper';
 import * as legacyNotifications from './notifications';
 import { supabase } from '@/lib/supabase';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 import type { Notification } from '@/types/database.types';
 
 // Create migration wrapper instance
@@ -25,36 +26,38 @@ export const fetchNotificationsStandardized = withMonitoring(
     baseUrl?: string;
   }): Promise<PaginatedApiResponse<Notification>> => {
     try {
-      const limit = options?.limit || 50;
-      const page = options?.page || 1;
-      const offset = (page - 1) * limit;
+      return await withTokenRefresh(async () => {
+        const limit = options?.limit || 50;
+        const page = options?.page || 1;
+        const offset = (page - 1) * limit;
 
-      // Get user for authentication
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Not authenticated');
-      }
+        // Get user for authentication
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+        if (authError || !user) {
+          throw new Error('Not authenticated');
+        }
 
-      // Fetch notifications with pagination
-      const { data, error, count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
+        // Fetch notifications with pagination
+        const { data, error, count } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact' })
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .range(offset, offset + limit - 1);
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return migrationWrapper.createPaginatedResponse(data || [], {
-        page,
-        limit,
-        total: count || 0,
-        baseUrl: options?.baseUrl || '/api/notifications',
+        return migrationWrapper.createPaginatedResponse(data || [], {
+          page,
+          limit,
+          total: count || 0,
+          baseUrl: options?.baseUrl || '/api/notifications',
+        });
       });
     } catch (error) {
       return migrationWrapper.wrapSupabaseResponse({
@@ -101,32 +104,34 @@ export const markNotificationAsReadStandardized = withMonitoring(
 export const markAllNotificationsAsReadStandardized = withMonitoring(
   async (): Promise<StandardApiResponse<{ updated: number }>> => {
     try {
-      // Get user for authentication
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Not authenticated');
-      }
+      return await withTokenRefresh(async () => {
+        // Get user for authentication
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+        if (authError || !user) {
+          throw new Error('Not authenticated');
+        }
 
-      // Count unread notifications first
-      const { count: unreadCount, error: countError } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
+        // Count unread notifications first
+        const { count: unreadCount, error: countError } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_read', false);
 
-      if (countError) {
-        throw countError;
-      }
+        if (countError) {
+          throw countError;
+        }
 
-      // Mark all as read
-      await legacyNotifications.markAllNotificationsAsRead();
+        // Mark all as read
+        await legacyNotifications.markAllNotificationsAsRead();
 
-      return migrationWrapper.wrapSupabaseResponse({
-        data: { updated: unreadCount || 0 },
-        error: null,
+        return migrationWrapper.wrapSupabaseResponse({
+          data: { updated: unreadCount || 0 },
+          error: null,
+        });
       });
     } catch (error) {
       return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;

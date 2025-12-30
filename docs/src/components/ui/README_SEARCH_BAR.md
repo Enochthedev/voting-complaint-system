@@ -53,7 +53,7 @@ function MyComponent() {
 
   const handleChange = (value: string) => {
     setSearchValue(value);
-    
+
     // Fetch suggestions based on input
     // This would typically be an API call
     const newSuggestions = [
@@ -112,26 +112,26 @@ function MyComponent() {
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `string` | `''` | Current search input value |
-| `onChange` | `(value: string) => void` | - | Callback when input value changes |
-| `onSearch` | `(query: string) => void` | - | Callback when search is submitted (Enter key or suggestion click) |
-| `onClear` | `() => void` | - | Callback when clear button is clicked |
-| `placeholder` | `string` | `'Search complaints...'` | Input placeholder text |
-| `suggestions` | `SearchSuggestion[]` | `[]` | Array of autocomplete suggestions |
-| `isLoading` | `boolean` | `false` | Shows loading spinner when true |
-| `showSuggestions` | `boolean` | `false` | Controls whether to show suggestions dropdown |
-| `className` | `string` | - | Additional CSS classes for the container |
-| `disabled` | `boolean` | `false` | Disables the search input |
+| Prop              | Type                      | Default                  | Description                                                       |
+| ----------------- | ------------------------- | ------------------------ | ----------------------------------------------------------------- |
+| `value`           | `string`                  | `''`                     | Current search input value                                        |
+| `onChange`        | `(value: string) => void` | -                        | Callback when input value changes                                 |
+| `onSearch`        | `(query: string) => void` | -                        | Callback when search is submitted (Enter key or suggestion click) |
+| `onClear`         | `() => void`              | -                        | Callback when clear button is clicked                             |
+| `placeholder`     | `string`                  | `'Search complaints...'` | Input placeholder text                                            |
+| `suggestions`     | `SearchSuggestion[]`      | `[]`                     | Array of autocomplete suggestions                                 |
+| `isLoading`       | `boolean`                 | `false`                  | Shows loading spinner when true                                   |
+| `showSuggestions` | `boolean`                 | `false`                  | Controls whether to show suggestions dropdown                     |
+| `className`       | `string`                  | -                        | Additional CSS classes for the container                          |
+| `disabled`        | `boolean`                 | `false`                  | Disables the search input                                         |
 
 ## SearchSuggestion Type
 
 ```typescript
 interface SearchSuggestion {
-  id: string;           // Unique identifier
-  text: string;         // Suggestion text to display
-  type?: 'recent' | 'suggestion';  // Optional type indicator
+  id: string; // Unique identifier
+  text: string; // Suggestion text to display
+  type?: 'recent' | 'suggestion'; // Optional type indicator
 }
 ```
 
@@ -174,11 +174,8 @@ function ComplaintsPage() {
         onSearch={handleSearch}
         isLoading={isLoading}
       />
-      
-      <ComplaintList
-        complaints={complaints}
-        isLoading={isLoading}
-      />
+
+      <ComplaintList complaints={complaints} isLoading={isLoading} />
     </div>
   );
 }

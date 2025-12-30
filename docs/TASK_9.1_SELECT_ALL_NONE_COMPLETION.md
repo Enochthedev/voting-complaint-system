@@ -18,6 +18,7 @@ Successfully implemented the "Select All" and "Select None" functionality for th
 **File:** `src/components/complaints/bulk-action-bar.tsx`
 
 **Key Changes:**
+
 - Added "Select none" link alongside "Select all" link
 - Both links are displayed inline with a bullet separator (•)
 - "Select all" link only appears when not all items are selected
@@ -27,11 +28,13 @@ Successfully implemented the "Select All" and "Select None" functionality for th
 - Maintained the existing "Clear" button for additional UX flexibility
 
 **UI Pattern:**
+
 ```
 [X complaints selected] [Select all Y • Select none] | [Export CSV] [Clear]
 ```
 
 When all items are selected:
+
 ```
 [X complaints selected] [Select none] | [Export CSV] [Clear]
 ```
@@ -41,16 +44,19 @@ When all items are selected:
 **File:** `src/app/complaints/page.tsx`
 
 The page already had the necessary handlers:
+
 - `handleSelectAll()` - Selects all filtered complaints
 - `handleClearSelection()` - Clears selection and exits selection mode
 
 These handlers are properly connected to the BulkActionBar component via props:
+
 - `onSelectAll={handleSelectAll}`
 - `onClearSelection={handleClearSelection}`
 
 ## User Experience Flow
 
 ### Scenario 1: Partial Selection
+
 1. User enables selection mode
 2. User selects 3 out of 10 complaints
 3. BulkActionBar shows: "3 complaints selected [Select all 10 • Select none]"
@@ -59,6 +65,7 @@ These handlers are properly connected to the BulkActionBar component via props:
 6. BulkActionBar updates: "10 complaints selected [Select none]"
 
 ### Scenario 2: Deselecting All
+
 1. User has some complaints selected
 2. User clicks "Select none" link
 3. All selections are cleared
@@ -66,6 +73,7 @@ These handlers are properly connected to the BulkActionBar component via props:
 5. Selection mode remains active for further selections
 
 ### Scenario 3: Using Clear Button
+
 1. User has some complaints selected
 2. User clicks "Clear" button (with X icon)
 3. All selections are cleared
@@ -78,13 +86,13 @@ These handlers are properly connected to the BulkActionBar component via props:
 
 ```typescript
 interface BulkActionBarProps {
-  selectedCount: number;        // Number of selected items
-  totalCount: number;           // Total number of items available
-  isExporting?: boolean;        // Whether export is in progress
-  exportProgress?: number;      // Export progress (0-100)
-  exportMessage?: string;       // Export status message
-  onExport: () => void;         // Callback for export
-  onSelectAll: () => void;      // Callback for select all
+  selectedCount: number; // Number of selected items
+  totalCount: number; // Total number of items available
+  isExporting?: boolean; // Whether export is in progress
+  exportProgress?: number; // Export progress (0-100)
+  exportMessage?: string; // Export status message
+  onExport: () => void; // Callback for export
+  onSelectAll: () => void; // Callback for select all
   onClearSelection: () => void; // Callback for select none/clear
   // ... other props
 }
@@ -93,6 +101,7 @@ interface BulkActionBarProps {
 ### State Management
 
 The selection state is managed in the complaints page:
+
 ```typescript
 const [selectionMode, setSelectionMode] = useState(false);
 const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -101,6 +110,7 @@ const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 ### Selection Logic
 
 **Select All:**
+
 ```typescript
 const handleSelectAll = () => {
   const allIds = new Set(filteredComplaints.map((c) => c.id));
@@ -109,6 +119,7 @@ const handleSelectAll = () => {
 ```
 
 **Select None / Clear:**
+
 ```typescript
 const handleClearSelection = () => {
   setSelectedIds(new Set());
@@ -123,6 +134,7 @@ const handleClearSelection = () => {
 **File:** `src/components/complaints/__tests__/bulk-action-bar.test.tsx`
 
 **Test Coverage:**
+
 - ✅ Component doesn't render when no items selected
 - ✅ Shows correct selection count
 - ✅ Shows "Select all" link when not all selected
@@ -151,11 +163,13 @@ const handleClearSelection = () => {
 ## UI/UX Improvements
 
 ### Before Implementation:
+
 - Only "Select all" link available (conditionally)
 - Users had to use "Clear" button to deselect all
 - Less intuitive for users who wanted to quickly deselect
 
 ### After Implementation:
+
 - Both "Select all" and "Select none" links available
 - Clear visual hierarchy with bullet separator
 - Consistent link styling
@@ -190,6 +204,7 @@ const handleClearSelection = () => {
 ## Integration with Other Features
 
 This functionality integrates seamlessly with:
+
 - ✅ Checkbox selection (Task 9.1 - previous subtask)
 - ⏳ Bulk action bar (current task)
 - ⏳ Bulk status change (next task)
@@ -200,6 +215,7 @@ This functionality integrates seamlessly with:
 ## Next Steps
 
 The next subtask in Task 9.1 is:
+
 - **Build bulk action bar** - This is already implemented, so we can move to:
 - **Implement bulk status change**
 - **Implement bulk assignment**
@@ -231,6 +247,7 @@ The next subtask in Task 9.1 is:
 ## Visual Reference
 
 ### Partial Selection State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 3 complaints selected [Select all 10 • Select none]        │
@@ -240,6 +257,7 @@ The next subtask in Task 9.1 is:
 ```
 
 ### All Selected State
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 10 complaints selected [Select none]                       │
@@ -249,6 +267,7 @@ The next subtask in Task 9.1 is:
 ```
 
 ### During Export
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 5 complaints selected [Select all 10 • Select none]        │

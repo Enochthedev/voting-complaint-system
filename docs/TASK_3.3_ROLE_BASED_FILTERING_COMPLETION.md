@@ -1,11 +1,13 @@
 # Task 3.3: Role-Based Filtering - Completion Summary
 
 ## Task Description
+
 Implement role-based filtering so that students see only their own complaints while lecturers and admins see all complaints.
 
 ## Implementation Details
 
 ### Files Modified
+
 1. **`src/app/complaints/page.tsx`**
    - Added import for `getMockUser` from mock auth
    - Implemented role-based filtering logic using `React.useMemo()`
@@ -14,6 +16,7 @@ Implement role-based filtering so that students see only their own complaints wh
    - Updated empty message based on user role
 
 ### Files Created
+
 1. **`src/app/complaints/__tests__/role-based-filtering.test.ts`**
    - Comprehensive test suite for role-based filtering
    - Tests for student, lecturer, and admin roles
@@ -26,6 +29,7 @@ Implement role-based filtering so that students see only their own complaints wh
 ## Key Features
 
 ### Filtering Logic
+
 ```typescript
 const filteredComplaints = React.useMemo(() => {
   if (userRole === 'lecturer' || userRole === 'admin') {
@@ -33,9 +37,7 @@ const filteredComplaints = React.useMemo(() => {
     return MOCK_COMPLAINTS;
   } else {
     // Students see only their own complaints
-    return MOCK_COMPLAINTS.filter(
-      (complaint) => complaint.student_id === userId
-    );
+    return MOCK_COMPLAINTS.filter((complaint) => complaint.student_id === userId);
   }
 }, [userRole, userId]);
 ```
@@ -43,12 +45,14 @@ const filteredComplaints = React.useMemo(() => {
 ### Role-Specific UI
 
 #### Student View
+
 - Title: "My Complaints"
 - Description: "View and manage your submitted complaints"
 - Shows "New Complaint" button
 - Only sees complaints where `student_id` matches their user ID
 
 #### Lecturer/Admin View
+
 - Title: "All Complaints"
 - Description: "View and manage all student complaints"
 - No "New Complaint" button
@@ -162,5 +166,6 @@ To verify the implementation:
 ## Next Steps
 
 Continue with remaining tasks in Phase 3:
+
 - Task 3.4: Build Complaint Detail View
 - Task 3.5: Implement Draft Management

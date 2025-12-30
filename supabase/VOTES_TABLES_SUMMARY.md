@@ -1,14 +1,17 @@
 # Votes and Vote Responses Tables Summary
 
 ## Overview
+
 This document summarizes the votes and vote_responses tables created for the Student Complaint Resolution System voting feature.
 
 ## Tables Created
 
 ### 1. votes table (Migration 012)
+
 Stores voting polls created by lecturers/admins for gathering student feedback.
 
 **Key Features:**
+
 - Lecturers and admins can create voting polls
 - Polls can be associated with specific complaints (optional)
 - Polls can have closing dates
@@ -16,6 +19,7 @@ Stores voting polls created by lecturers/admins for gathering student feedback.
 - Active/inactive status for poll management
 
 **Columns:**
+
 - `id` - UUID primary key
 - `created_by` - UUID reference to users (lecturer/admin)
 - `title` - Text (required, non-empty)
@@ -27,26 +31,31 @@ Stores voting polls created by lecturers/admins for gathering student feedback.
 - `closes_at` - Timestamp (optional, must be in future)
 
 **Constraints:**
+
 - Title cannot be empty
 - Options must be a non-empty JSONB array
 - closes_at must be after created_at (if set)
 - Foreign keys to users and complaints tables
 
 **RLS Policies:**
+
 - All authenticated users can view votes
 - Only lecturers/admins can create votes
 - Lecturers/admins can update/delete their own votes
 
 ### 2. vote_responses table (Migration 013)
+
 Stores individual student responses to voting polls with one-vote-per-student enforcement.
 
 **Key Features:**
+
 - Students can vote on active polls
 - One vote per student per poll (enforced by UNIQUE constraint)
 - Students can update their vote (change selection)
 - Lecturers can view all responses for analytics
 
 **Columns:**
+
 - `id` - UUID primary key
 - `vote_id` - UUID reference to votes (required)
 - `student_id` - UUID reference to users (required)
@@ -54,11 +63,13 @@ Stores individual student responses to voting polls with one-vote-per-student en
 - `created_at` - Timestamp
 
 **Constraints:**
+
 - selected_option cannot be empty
 - UNIQUE constraint on (vote_id, student_id) - ensures one vote per student per poll
 - Foreign keys to votes and users tables
 
 **RLS Policies:**
+
 - Students can view their own responses
 - Lecturers/admins can view all responses
 - Students can insert their own responses
@@ -67,6 +78,7 @@ Stores individual student responses to voting polls with one-vote-per-student en
 ## Indexes Created
 
 ### votes table indexes:
+
 - `idx_votes_created_by` - On created_by column
 - `idx_votes_is_active` - On is_active column
 - `idx_votes_created_at` - On created_at (descending)
@@ -75,6 +87,7 @@ Stores individual student responses to voting polls with one-vote-per-student en
 - `idx_votes_active_created` - Composite on (is_active, created_at)
 
 ### vote_responses table indexes:
+
 - `idx_vote_responses_vote_id` - On vote_id column
 - `idx_vote_responses_student_id` - On student_id column
 - `idx_vote_responses_created_at` - On created_at (descending)
@@ -93,6 +106,7 @@ Stores individual student responses to voting polls with one-vote-per-student en
 ## How to Apply
 
 ### Using Supabase CLI (Recommended)
+
 ```bash
 # Navigate to project directory
 cd student-complaint-system
@@ -106,6 +120,7 @@ psql $DATABASE_URL -f supabase/migrations/013_create_vote_responses_table.sql
 ```
 
 ### Verify Installation
+
 ```bash
 # Run verification scripts
 psql $DATABASE_URL -f supabase/verify-votes-table.sql
@@ -115,58 +130,58 @@ psql $DATABASE_URL -f supabase/verify-vote-responses-table.sql
 ## Usage Examples
 
 ### Creating a Vote (Lecturer)
+
 ```javascript
-const { data, error } = await supabase
-  .from('votes')
-  .insert({
-    created_by: lecturerId,
-    title: 'Preferred Lab Session Time',
-    description: 'Help us schedule lab sessions',
-    options: [
-      { id: 1, text: 'Morning (8-10 AM)' },
-      { id: 2, text: 'Afternoon (2-4 PM)' },
-      { id: 3, text: 'Evening (6-8 PM)' }
-    ],
-    is_active: true,
-    closes_at: '2024-12-31T23:59:59Z'
-  })
+const { data, error } = await supabase.from('votes').insert({
+  created_by: lecturerId,
+  title: 'Preferred Lab Session Time',
+  description: 'Help us schedule lab sessions',
+  options: [
+    { id: 1, text: 'Morning (8-10 AM)' },
+    { id: 2, text: 'Afternoon (2-4 PM)' },
+    { id: 3, text: 'Evening (6-8 PM)' },
+  ],
+  is_active: true,
+  closes_at: '2024-12-31T23:59:59Z',
+});
 ```
 
 ### Casting a Vote (Student)
+
 ```javascript
-const { data, error } = await supabase
-  .from('vote_responses')
-  .insert({
-    vote_id: voteId,
-    student_id: studentId,
-    selected_option: 'Morning (8-10 AM)'
-  })
+const { data, error } = await supabase.from('vote_responses').insert({
+  vote_id: voteId,
+  student_id: studentId,
+  selected_option: 'Morning (8-10 AM)',
+});
 ```
 
 ### Getting Vote Results (Lecturer)
+
 ```javascript
 const { data, error } = await supabase
   .from('vote_responses')
   .select('selected_option')
-  .eq('vote_id', voteId)
+  .eq('vote_id', voteId);
 
 // Aggregate results
 const results = data.reduce((acc, response) => {
-  acc[response.selected_option] = (acc[response.selected_option] || 0) + 1
-  return acc
-}, {})
+  acc[response.selected_option] = (acc[response.selected_option] || 0) + 1;
+  return acc;
+}, {});
 ```
 
 ### Checking if Student Has Voted
+
 ```javascript
 const { data, error } = await supabase
   .from('vote_responses')
   .select('id')
   .eq('vote_id', voteId)
   .eq('student_id', studentId)
-  .single()
+  .single();
 
-const hasVoted = !!data
+const hasVoted = !!data;
 ```
 
 ## Related Requirements
@@ -197,6 +212,7 @@ These tables implement the following acceptance criteria from the requirements d
 ## Next Steps
 
 After applying these migrations, you can:
+
 1. Implement the voting UI components
 2. Create API endpoints for vote management
 3. Build analytics dashboard for vote results

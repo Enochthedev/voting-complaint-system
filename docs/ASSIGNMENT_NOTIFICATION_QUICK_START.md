@@ -49,18 +49,22 @@ Subscribe to receive notifications in real-time:
 ```javascript
 const channel = supabase
   .channel('notifications')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`
-  }, (payload) => {
-    if (payload.new.type === 'assignment') {
-      // Handle new assignment notification
-      console.log('New complaint assigned:', payload.new.message);
-      showToast(payload.new.title);
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`,
+    },
+    (payload) => {
+      if (payload.new.type === 'assignment') {
+        // Handle new assignment notification
+        console.log('New complaint assigned:', payload.new.message);
+        showToast(payload.new.title);
+      }
     }
-  })
+  )
   .subscribe();
 
 // Don't forget to unsubscribe when done
@@ -72,13 +76,13 @@ channel.unsubscribe();
 ```typescript
 interface AssignmentNotification {
   id: string;
-  user_id: string;           // Assigned lecturer ID
+  user_id: string; // Assigned lecturer ID
   type: 'assignment';
-  title: string;             // "A complaint has been assigned to you"
-  message: string;           // "You have been assigned complaint: [title]"
-  related_id: string;        // Complaint ID
-  is_read: boolean;          // false by default
-  created_at: string;        // ISO timestamp
+  title: string; // "A complaint has been assigned to you"
+  message: string; // "You have been assigned complaint: [title]"
+  related_id: string; // Complaint ID
+  is_read: boolean; // false by default
+  created_at: string; // ISO timestamp
 }
 ```
 
@@ -89,9 +93,9 @@ interface AssignmentHistory {
   id: string;
   complaint_id: string;
   action: 'assigned';
-  old_value: string | null;  // Previous assignee ID (null for first assignment)
-  new_value: string;         // New assignee ID
-  performed_by: string;      // User who made the assignment
+  old_value: string | null; // Previous assignee ID (null for first assignment)
+  new_value: string; // New assignee ID
+  performed_by: string; // User who made the assignment
   details: {
     previous_assignee: string | null;
     new_assignee: string;
@@ -111,6 +115,7 @@ node scripts/verify-assignment-notification.js
 ```
 
 Expected output:
+
 ```
 ✅ Assignment notification verification PASSED
 ```
@@ -120,16 +125,19 @@ Expected output:
 ### Notification not created?
 
 1. Check if the trigger exists:
+
 ```sql
 SELECT tgname FROM pg_trigger WHERE tgname = 'notify_on_complaint_status_change';
 ```
 
 2. Check if the function exists:
+
 ```sql
 SELECT proname FROM pg_proc WHERE proname = 'notify_student_on_status_change';
 ```
 
 3. Verify the notification type enum:
+
 ```sql
 SELECT unnest(enum_range(NULL::notification_type))::text;
 ```
@@ -137,11 +145,13 @@ SELECT unnest(enum_range(NULL::notification_type))::text;
 ### History not logged?
 
 1. Check if the trigger exists:
+
 ```sql
 SELECT tgname FROM pg_trigger WHERE tgname = 'log_complaint_assignment_trigger';
 ```
 
 2. Check if the function exists:
+
 ```sql
 SELECT proname FROM pg_proc WHERE proname = 'log_complaint_assignment';
 ```
@@ -159,7 +169,7 @@ SELECT proname FROM pg_proc WHERE proname = 'log_complaint_assignment';
 ✅ **Real-time**: Delivered instantly via Supabase Realtime  
 ✅ **Logged**: All assignments are logged in complaint history  
 ✅ **Tested**: Comprehensive verification script included  
-✅ **Secure**: Protected by RLS policies  
+✅ **Secure**: Protected by RLS policies
 
 ## Next Steps
 

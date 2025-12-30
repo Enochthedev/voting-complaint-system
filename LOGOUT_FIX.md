@@ -10,9 +10,11 @@ User reported: **"log out might not be working"**
 ## Root Causes Identified
 
 ### 1. Race Condition - Double Redirect
+
 **Problem:** Both the `signOut()` function and the auth state change listener tried to redirect to `/login`, causing potential conflicts.
 
 **Flow Before Fix:**
+
 ```
 User clicks logout
   ↓
@@ -24,18 +26,23 @@ Auth listener: router.push('/login')  ← Double redirect!
 ```
 
 ### 2. Error Handling Issues
+
 **Problem:** If `supabase.auth.signOut()` failed, the function would throw an error, leaving the user in a broken state:
+
 - Local user state not cleared
 - React Query cache not cleared
 - User stuck in authenticated UI but without valid session
 
 ### 3. Inconsistent Logout Implementation
+
 **Problem:** Two different logout implementations:
+
 - `app-header.tsx`: Used `useAuth().signOut`
 - `app-sidebar.tsx`: Imported `signOut` from `@/lib/auth` directly
-This inconsistency could cause different behavior in different parts of the app.
+  This inconsistency could cause different behavior in different parts of the app.
 
 ### 4. No Optimistic Logout
+
 **Problem:** The logout waited for server response before clearing local state, causing delay in UI update.
 
 ---
@@ -47,29 +54,32 @@ This inconsistency could cause different behavior in different parts of the app.
 **File:** `src/hooks/useAuth.ts`
 
 **Changes:**
+
 1. Clear user state and cache **immediately** (optimistic)
 2. Don't throw errors - always redirect even if server signout fails
 3. Use `window.location.href` for reliable redirect (full page reload clears all state)
 
 **Before:**
+
 ```typescript
 const signOut = async () => {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Error signing out:', error);
-      throw error;  // ❌ Throws error, leaving user stuck
+      throw error; // ❌ Throws error, leaving user stuck
     }
     setUser(null);
     queryClient.clear();
   } catch (err) {
     console.error('Sign out failed:', err);
-    throw err;  // ❌ Throws error
+    throw err; // ❌ Throws error
   }
 };
 ```
 
 **After:**
+
 ```typescript
 const signOut = async () => {
   try {
@@ -88,7 +98,7 @@ const signOut = async () => {
     // Redirect to login (don't rely on auth state change listener)
     // The listener also redirects, but this ensures immediate redirect
     if (typeof window !== 'undefined') {
-      window.location.href = '/login';  // ✅ Full page reload
+      window.location.href = '/login'; // ✅ Full page reload
     }
   } catch (err) {
     console.error('Sign out failed:', err);
@@ -96,7 +106,7 @@ const signOut = async () => {
     setUser(null);
     queryClient.clear();
     if (typeof window !== 'undefined') {
-      window.location.href = '/login';  // ✅ Always redirect
+      window.location.href = '/login'; // ✅ Always redirect
     }
   }
 };
@@ -110,6 +120,7 @@ const signOut = async () => {
 Only redirect if not already on auth pages (login, register, reset-password).
 
 **Before:**
+
 ```typescript
 } else if (event === 'SIGNED_OUT') {
   setUser(null);
@@ -119,6 +130,7 @@ Only redirect if not already on auth pages (login, register, reset-password).
 ```
 
 **After:**
+
 ```typescript
 } else if (event === 'SIGNED_OUT') {
   setUser(null);
@@ -143,18 +155,20 @@ Only redirect if not already on auth pages (login, register, reset-password).
 Removed redundant `router.push('/login')` since `signOut()` handles it.
 
 **Before:**
+
 ```typescript
 const handleLogout = async () => {
   await signOut();
-  router.push('/login');  // ❌ Redundant redirect
+  router.push('/login'); // ❌ Redundant redirect
 };
 ```
 
 **After:**
+
 ```typescript
 const handleLogout = async () => {
   // signOut handles redirect to /login
-  await signOut();  // ✅ Single source of truth
+  await signOut(); // ✅ Single source of truth
 };
 ```
 
@@ -163,31 +177,34 @@ const handleLogout = async () => {
 **File:** `src/components/layout/app-sidebar.tsx`
 
 **Changes:**
+
 1. Use `signOut` from `useAuth` hook instead of importing from `@/lib/auth`
 2. Remove error handling and redundant redirect
 
 **Before:**
+
 ```typescript
 const handleLogout = async () => {
   try {
     // Use real auth logout
-    const { signOut } = await import('@/lib/auth');  // ❌ Different implementation
+    const { signOut } = await import('@/lib/auth'); // ❌ Different implementation
     await signOut();
-    router.push('/login');  // ❌ Redundant redirect
+    router.push('/login'); // ❌ Redundant redirect
   } catch (error) {
     console.error('Logout error:', error);
-    router.push('/login');  // ❌ Error handling
+    router.push('/login'); // ❌ Error handling
   }
 };
 ```
 
 **After:**
+
 ```typescript
-const { user, signOut } = useAuth();  // ✅ Use hook
+const { user, signOut } = useAuth(); // ✅ Use hook
 
 const handleLogout = async () => {
   // signOut handles redirect to /login
-  await signOut();  // ✅ Consistent with header
+  await signOut(); // ✅ Consistent with header
 };
 ```
 
@@ -196,6 +213,7 @@ const handleLogout = async () => {
 ## Benefits
 
 ### Before Fixes
+
 - ❌ Logout could fail silently or throw errors
 - ❌ Double redirects causing race conditions
 - ❌ Inconsistent logout behavior in different components
@@ -203,6 +221,7 @@ const handleLogout = async () => {
 - ❌ Slow logout (waited for server response)
 
 ### After Fixes
+
 - ✅ Logout always works, even if server fails
 - ✅ Immediate UI update (optimistic)
 - ✅ Single source of truth for logout logic
@@ -298,6 +317,7 @@ Route (app)
 ## Related Improvements
 
 This logout fix complements the earlier session corruption fixes:
+
 - Session no longer corrupted by failed requests (DatabaseError fix)
 - Auth error detection is accurate (prevents false logouts)
 - Logout always works reliably (this fix)

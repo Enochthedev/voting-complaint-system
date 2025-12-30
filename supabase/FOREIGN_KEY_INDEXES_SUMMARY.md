@@ -13,55 +13,69 @@ After reviewing all 14 tables in the database schema, **all foreign keys have in
 ## Foreign Key Index Inventory
 
 ### Complaints Table
+
 - ✅ `student_id` → `idx_complaints_student_id` (migration 002)
 - ✅ `assigned_to` → `idx_complaints_assigned_to` (migration 002)
 - ✅ `opened_by` → `idx_complaints_opened_by` (migration 016) ⭐ **Added in this task**
 
 ### Complaint Tags Table
+
 - ✅ `complaint_id` → `idx_complaint_tags_complaint_id` (migration 003)
 
 ### Complaint Attachments Table
+
 - ✅ `complaint_id` → `idx_complaint_attachments_complaint_id` (migration 004)
 - ✅ `uploaded_by` → `idx_complaint_attachments_uploaded_by` (migration 004)
 
 ### Complaint History Table
+
 - ✅ `complaint_id` → `idx_complaint_history_complaint_id` (migration 005)
 - ✅ `performed_by` → `idx_complaint_history_performed_by` (migration 005)
 
 ### Complaint Comments Table
+
 - ✅ `complaint_id` → `idx_complaint_comments_complaint_id` (migration 006)
 - ✅ `user_id` → `idx_complaint_comments_user_id` (migration 006)
 
 ### Complaint Ratings Table
+
 - ✅ `complaint_id` → `idx_complaint_ratings_complaint_id` (migration 007)
 - ✅ `student_id` → `idx_complaint_ratings_student_id` (migration 007)
 
 ### Complaint Templates Table
+
 - ✅ `created_by` → `idx_complaint_templates_created_by` (migration 008)
 
 ### Escalation Rules Table
+
 - ✅ `escalate_to` → `idx_escalation_rules_escalate_to` (migration 009)
 
 ### Feedback Table
+
 - ✅ `complaint_id` → `idx_feedback_complaint_id` (migration 010)
 - ✅ `lecturer_id` → `idx_feedback_lecturer_id` (migration 010)
 
 ### Notifications Table
+
 - ✅ `user_id` → `idx_notifications_user_id` (migration 011)
 - ✅ `related_id` → `idx_notifications_related_id` (migration 011)
 
 ### Votes Table
+
 - ✅ `created_by` → `idx_votes_created_by` (migration 012)
 - ✅ `related_complaint_id` → `idx_votes_related_complaint_id` (migration 012)
 
 ### Vote Responses Table
+
 - ✅ `vote_id` → `idx_vote_responses_vote_id` (migration 013)
 - ✅ `student_id` → `idx_vote_responses_student_id` (migration 013)
 
 ### Announcements Table
+
 - ✅ `created_by` → `idx_announcements_created_by` (migration 014)
 
 ## Total Foreign Keys: 24
+
 ## Total Indexed: 24 (100%)
 
 ## Migration File
@@ -69,6 +83,7 @@ After reviewing all 14 tables in the database schema, **all foreign keys have in
 **File**: `supabase/migrations/016_add_foreign_key_indexes.sql`
 
 This migration file:
+
 1. Documents all existing foreign key indexes
 2. Adds the missing index on `complaints.opened_by`
 3. Includes comprehensive comments explaining the audit results
@@ -103,35 +118,35 @@ Or manually check:
 
 ```sql
 -- Query to find all foreign keys and their indexes
-SELECT 
+SELECT
     tc.table_name,
     kcu.column_name AS fk_column,
     ccu.table_name AS referenced_table,
     ccu.column_name AS referenced_column,
-    CASE 
+    CASE
         WHEN i.indexname IS NOT NULL THEN '✓ Indexed'
         ELSE '✗ Missing Index'
     END AS index_status,
     i.indexname AS index_name
-FROM 
-    information_schema.table_constraints AS tc 
+FROM
+    information_schema.table_constraints AS tc
     JOIN information_schema.key_column_usage AS kcu
       ON tc.constraint_name = kcu.constraint_name
       AND tc.table_schema = kcu.table_schema
     JOIN information_schema.constraint_column_usage AS ccu
       ON ccu.constraint_name = tc.constraint_name
       AND ccu.table_schema = tc.table_schema
-    LEFT JOIN pg_indexes i 
-      ON i.tablename = tc.table_name 
+    LEFT JOIN pg_indexes i
+      ON i.tablename = tc.table_name
       AND i.schemaname = tc.table_schema
       AND (
           i.indexdef LIKE '%(' || kcu.column_name || ')%'
           OR i.indexdef LIKE '%(' || kcu.column_name || ',%'
       )
-WHERE 
+WHERE
     tc.constraint_type = 'FOREIGN KEY'
     AND tc.table_schema = 'public'
-ORDER BY 
+ORDER BY
     tc.table_name,
     kcu.column_name;
 ```

@@ -1,9 +1,11 @@
 # Analytics Tab Visual Test Guide
 
 ## Purpose
+
 This guide helps verify that the analytics tab in the lecturer dashboard is displaying correctly with all features working as expected.
 
 ## Prerequisites
+
 - Development server running (`npm run dev`)
 - Logged in as a lecturer or admin user
 - Navigate to `/dashboard`
@@ -11,6 +13,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Test Steps
 
 ### 1. Access Analytics Tab
+
 1. Open the dashboard page
 2. Click on the "Analytics" tab (third tab with BarChart3 icon)
 3. **Expected**: Tab switches to analytics view with no errors
@@ -18,6 +21,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ### 2. Verify Key Metrics Cards
 
 #### Card 1: Total Complaints
+
 - **Location**: Top row, first card
 - **Icon**: FileText icon
 - **Value**: "245"
@@ -25,6 +29,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Card displays with proper styling and alignment
 
 #### Card 2: Avg Response Time
+
 - **Location**: Top row, second card
 - **Icon**: Clock icon
 - **Value**: "2.4h"
@@ -32,6 +37,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Card displays with proper styling
 
 #### Card 3: Resolution Rate
+
 - **Location**: Top row, third card
 - **Icon**: CheckCircle2 icon
 - **Value**: "87%"
@@ -39,6 +45,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Card displays with proper styling
 
 #### Card 4: Satisfaction Rating
+
 - **Location**: Top row, fourth card
 - **Icon**: Star icon
 - **Value**: "4.2/5.0"
@@ -48,22 +55,24 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ### 3. Verify Charts Section
 
 #### Complaints Over Time Chart
+
 - **Location**: Second row, left side
 - **Title**: "Complaints Over Time" with Activity icon
 - **Description**: "Daily complaint submission trends"
 - **Chart Type**: Bar chart with 13 data points
 - **Interactive**: Hover over bars to see tooltips
 - **Tooltip Content**: Date label and count
-- **Summary Stats**: 
+- **Summary Stats**:
   - Peak Day: 24
   - Daily Average: ~17
   - Period Change: percentage
-- **Expected**: 
+- **Expected**:
   - Bars display with varying heights
   - Hover shows tooltip with date and count
   - Summary statistics display correctly
 
 #### Complaints by Status Chart
+
 - **Location**: Second row, right side
 - **Title**: "Complaints by Status" with Target icon
 - **Description**: "Current status distribution"
@@ -78,6 +87,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
   - Summary shows correct totals
 
 #### Complaints by Category Chart
+
 - **Location**: Third row, left side
 - **Title**: "Complaints by Category" with BarChart3 icon
 - **Description**: "Distribution across categories"
@@ -95,6 +105,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
   - Summary displays correctly
 
 #### Complaints by Priority Chart
+
 - **Location**: Third row, right side
 - **Title**: "Complaints by Priority" with AlertCircle icon
 - **Description**: "Priority level breakdown"
@@ -135,6 +146,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Description**: "Student satisfaction with complaint resolution"
 
 #### Overall Rating Display
+
 - **Background**: Gradient from yellow to orange
 - **Rating**: "4.2" in large text with "/5.0"
 - **Stars**: 5 stars with 4 filled (yellow)
@@ -143,6 +155,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Prominent display with gradient background
 
 #### Rating Distribution
+
 - **Title**: "Rating Distribution"
 - **Bars**: 5 rows (5-star to 1-star)
 - **Each Row**:
@@ -173,6 +186,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ### 7. Verify Additional Insights Cards
 
 #### Active Cases Card
+
 - **Location**: Bottom row, left
 - **Title**: "Active Cases"
 - **Icon**: Timer icon in blue circle
@@ -181,6 +195,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Card displays with blue accent
 
 #### Avg Resolution Time Card
+
 - **Location**: Bottom row, center
 - **Title**: "Avg Resolution Time"
 - **Icon**: Clock icon in purple circle
@@ -189,6 +204,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 - **Expected**: Card displays with purple accent
 
 #### Escalated Cases Card
+
 - **Location**: Bottom row, right
 - **Title**: "Escalated Cases"
 - **Icon**: AlertCircle icon in orange circle
@@ -199,18 +215,21 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Responsive Design Tests
 
 ### Desktop (1920x1080)
+
 - ✅ All cards display in proper grid layout
 - ✅ Charts are readable and properly sized
 - ✅ Table fits without horizontal scroll
 - ✅ No layout issues or overlapping elements
 
 ### Tablet (768x1024)
+
 - ✅ Cards stack appropriately
 - ✅ Charts remain readable
 - ✅ Table may scroll horizontally (acceptable)
 - ✅ Touch interactions work
 
 ### Mobile (375x667)
+
 - ✅ Single column layout
 - ✅ Charts scale down appropriately
 - ✅ Table scrolls horizontally
@@ -219,6 +238,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Interaction Tests
 
 ### Hover Effects
+
 1. Hover over chart bars
    - **Expected**: Tooltip appears with data
 2. Hover over table rows
@@ -227,6 +247,7 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
    - **Expected**: Smooth transitions
 
 ### Tab Switching
+
 1. Switch from Analytics to Overview
    - **Expected**: Smooth transition, no errors
 2. Switch back to Analytics
@@ -239,11 +260,13 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Performance Tests
 
 ### Load Time
+
 - **Expected**: Tab content loads within 1 second
 - **No**: Excessive re-renders
 - **No**: Memory leaks
 
 ### Smooth Scrolling
+
 - **Expected**: Smooth scroll through all content
 - **No**: Janky animations
 - **No**: Layout shifts
@@ -251,16 +274,19 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Accessibility Tests
 
 ### Keyboard Navigation
+
 - ✅ Tab key navigates through interactive elements
 - ✅ Enter/Space activates buttons
 - ✅ Focus indicators visible
 
 ### Screen Reader
+
 - ✅ All content has proper labels
 - ✅ Charts have descriptive text
 - ✅ Tables have proper headers
 
 ### Color Contrast
+
 - ✅ Text meets WCAG AA standards
 - ✅ Icons are distinguishable
 - ✅ Charts use accessible colors
@@ -268,18 +294,22 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 ## Common Issues and Solutions
 
 ### Issue: Charts not displaying
+
 - **Solution**: Check if mock data is properly loaded
 - **Check**: Browser console for errors
 
 ### Issue: Tooltips not appearing
+
 - **Solution**: Verify hover events are working
 - **Check**: CSS z-index conflicts
 
 ### Issue: Layout broken on mobile
+
 - **Solution**: Check responsive grid classes
 - **Check**: Viewport meta tag
 
 ### Issue: Performance lag
+
 - **Solution**: Check for unnecessary re-renders
 - **Check**: React DevTools profiler
 
@@ -300,21 +330,25 @@ This guide helps verify that the analytics tab in the lecturer dashboard is disp
 
 ## Test Results
 
-**Date**: _____________
-**Tester**: _____________
-**Browser**: _____________
-**Screen Size**: _____________
+**Date**: **\*\***\_**\*\***
+**Tester**: **\*\***\_**\*\***
+**Browser**: **\*\***\_**\*\***
+**Screen Size**: **\*\***\_**\*\***
 
 **Overall Result**: ☐ PASS ☐ FAIL
 
 **Notes**:
-_____________________________________________
-_____________________________________________
-_____________________________________________
+
+---
+
+---
+
+---
 
 ## Screenshots
 
 Attach screenshots showing:
+
 1. Full analytics tab view (desktop)
 2. Key metrics cards
 3. Charts section

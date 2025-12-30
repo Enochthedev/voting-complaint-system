@@ -1,6 +1,7 @@
 # Task 10.2 Sub-task: Update Complaint Status and Assignment - COMPLETE ✅
 
 ## Task Overview
+
 **Task**: Update complaint status and assignment during auto-escalation
 **Parent Task**: Task 10.2 - Implement Auto-Escalation Logic
 **Status**: ✅ COMPLETE
@@ -19,34 +20,38 @@ The edge function correctly updates complaints during escalation by modifying th
 await supabase
   .from('complaints')
   .update({
-    escalated_at: now,              // ✅ Timestamp when escalated
-    escalation_level: newEscalationLevel,  // ✅ Incremented level (0 → 1 → 2...)
-    assigned_to: rule.escalate_to,  // ✅ Assign to user from escalation rule
-    updated_at: now                 // ✅ Update timestamp
+    escalated_at: now, // ✅ Timestamp when escalated
+    escalation_level: newEscalationLevel, // ✅ Incremented level (0 → 1 → 2...)
+    assigned_to: rule.escalate_to, // ✅ Assign to user from escalation rule
+    updated_at: now, // ✅ Update timestamp
   })
-  .eq('id', complaint.id)
+  .eq('id', complaint.id);
 ```
 
 #### 2. Fields Updated Explained
 
-| Field | Purpose | Implementation |
-|-------|---------|----------------|
-| `escalated_at` | Records when the complaint was escalated | Set to current timestamp |
-| `escalation_level` | Tracks how many times escalated | Incremented from previous value (or 0) |
-| `assigned_to` | Assigns complaint to responsible user | Set to `escalate_to` from the escalation rule |
-| `updated_at` | Tracks last modification time | Set to current timestamp |
+| Field              | Purpose                                  | Implementation                                |
+| ------------------ | ---------------------------------------- | --------------------------------------------- |
+| `escalated_at`     | Records when the complaint was escalated | Set to current timestamp                      |
+| `escalation_level` | Tracks how many times escalated          | Incremented from previous value (or 0)        |
+| `assigned_to`      | Assigns complaint to responsible user    | Set to `escalate_to` from the escalation rule |
+| `updated_at`       | Tracks last modification time            | Set to current timestamp                      |
 
 ### Verification Against Requirements
 
 #### Acceptance Criteria AC21: Auto-Escalation System
+
 ✅ **"Update complaint status and assignment"** - Implemented
+
 - Complaints are assigned to the designated user from the escalation rule
 - Escalation timestamp is recorded
 - Escalation level is tracked and incremented
 - Update timestamp is maintained
 
 #### Design Document Property P16: Escalation Timing
+
 ✅ **"Complaints are auto-escalated only after threshold time has passed"**
+
 - Edge function checks `created_at` against `hours_threshold`
 - Only escalates complaints older than the threshold
 - Respects escalation rules configuration
@@ -93,6 +98,7 @@ CREATE TABLE public.complaints (
 ### Testing
 
 A comprehensive test script exists at `scripts/test-auto-escalation.js` that:
+
 1. Creates test escalation rule
 2. Creates old complaint that should be escalated
 3. Invokes the edge function
@@ -126,6 +132,7 @@ A comprehensive test script exists at `scripts/test-auto-escalation.js` that:
 ### Example Escalation
 
 **Before Escalation:**
+
 ```json
 {
   "id": "abc-123",
@@ -141,6 +148,7 @@ A comprehensive test script exists at `scripts/test-auto-escalation.js` that:
 ```
 
 **After Escalation:**
+
 ```json
 {
   "id": "abc-123",
@@ -149,27 +157,30 @@ A comprehensive test script exists at `scripts/test-auto-escalation.js` that:
   "priority": "high",
   "status": "new",
   "created_at": "2025-11-23T10:00:00Z",
-  "escalated_at": "2025-11-26T23:47:30Z",  // ✅ Set
-  "escalation_level": 1,                     // ✅ Incremented
-  "assigned_to": "admin-user-id",            // ✅ Assigned
-  "updated_at": "2025-11-26T23:47:30Z"       // ✅ Updated
+  "escalated_at": "2025-11-26T23:47:30Z", // ✅ Set
+  "escalation_level": 1, // ✅ Incremented
+  "assigned_to": "admin-user-id", // ✅ Assigned
+  "updated_at": "2025-11-26T23:47:30Z" // ✅ Updated
 }
 ```
 
 ## Files Modified/Created
 
 ### Implementation Files
+
 - ✅ `supabase/functions/auto-escalate-complaints/index.ts` - Main edge function
 - ✅ `supabase/functions/_shared/cors.ts` - CORS headers
 - ✅ `supabase/functions/deno.json` - Deno configuration
 
 ### Documentation Files
+
 - ✅ `supabase/functions/auto-escalate-complaints/README.md` - Function docs
 - ✅ `docs/AUTO_ESCALATION_SYSTEM.md` - System documentation
 - ✅ `docs/TASK_10.2_AUTO_ESCALATION_EDGE_FUNCTION.md` - Task guide
 - ✅ `TASK_10.2_EDGE_FUNCTION_SUMMARY.md` - Implementation summary
 
 ### Test Files
+
 - ✅ `scripts/test-auto-escalation.js` - Automated test script
 
 ## Next Steps
@@ -189,6 +200,7 @@ The following sub-tasks remain for Task 10.2:
 To make this functionality active in production:
 
 1. Deploy the edge function:
+
    ```bash
    supabase functions deploy auto-escalate-complaints
    ```

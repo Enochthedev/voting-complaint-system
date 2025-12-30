@@ -1,6 +1,7 @@
 # Rating Submission Implementation
 
 ## Overview
+
 Implemented the rating submission functionality for the Student Complaint Resolution System, allowing students to rate their satisfaction after a complaint is resolved.
 
 **Validates**: Requirements AC16 (Satisfaction Rating)
@@ -12,6 +13,7 @@ Implemented the rating submission functionality for the Student Complaint Resolu
 Added three new functions to handle rating operations:
 
 #### `submitRating(complaintId, studentId, rating, feedbackText?)`
+
 - Submits a satisfaction rating for a resolved complaint
 - **Validation**:
   - Rating must be between 1-5
@@ -24,6 +26,7 @@ Added three new functions to handle rating operations:
   - Returns the created rating record
 
 #### `hasRatedComplaint(complaintId, studentId)`
+
 - Checks if a complaint has already been rated by a student
 - Returns boolean indicating rating status
 - Used to prevent duplicate rating prompts
@@ -33,6 +36,7 @@ Added three new functions to handle rating operations:
 Updated the complaint detail view to use the real API:
 
 #### `handleRatingSubmit(rating, feedbackText)`
+
 - Replaced mock implementation with actual API call
 - Calls `submitRating()` to persist rating to database
 - Updates local state for immediate UI feedback
@@ -43,6 +47,7 @@ Updated the complaint detail view to use the real API:
 The following components were already in place and work with the new API:
 
 #### `RatingPrompt` Component
+
 - Displays after complaint resolution
 - 1-5 star rating system with hover effects
 - Optional text feedback (up to 500 characters)
@@ -50,6 +55,7 @@ The following components were already in place and work with the new API:
 - Anonymous submission
 
 #### `RatingForm` Component
+
 - Reusable form component for collecting ratings
 - Interactive star selection
 - Form validation
@@ -73,6 +79,7 @@ CREATE TABLE complaint_ratings (
 ```
 
 ### Key Features:
+
 - **One rating per complaint**: UNIQUE constraint on `complaint_id`
 - **Rating validation**: CHECK constraint ensures rating is 1-5
 - **Cascade deletion**: Ratings deleted if complaint is deleted
@@ -90,17 +97,20 @@ CREATE TABLE complaint_ratings (
 ## Validation & Error Handling
 
 ### Client-Side Validation
+
 - Rating selection required before submission
 - Feedback text limited to 500 characters
 - Form disabled during submission
 
 ### Server-Side Validation
+
 - Rating must be 1-5 (enforced by database constraint)
 - Complaint must exist and be resolved
 - Only complaint owner can rate
 - Duplicate ratings prevented by UNIQUE constraint
 
 ### Error Messages
+
 - "Rating must be between 1 and 5"
 - "Can only rate resolved complaints"
 - "Only the complaint owner can rate"
@@ -112,6 +122,7 @@ CREATE TABLE complaint_ratings (
 ### Row Level Security (RLS) Policies
 
 **Insert Policy**: Students can rate their own resolved complaints
+
 ```sql
 CREATE POLICY "Students rate own resolved complaints"
 ON complaint_ratings FOR INSERT
@@ -127,6 +138,7 @@ WITH CHECK (
 ```
 
 **Select Policy**: Students view own ratings, lecturers view all
+
 ```sql
 CREATE POLICY "Students view own ratings"
 ON complaint_ratings FOR SELECT
@@ -143,6 +155,7 @@ USING (
 ## Testing Considerations
 
 ### Manual Testing Checklist
+
 - [ ] Submit rating with all star values (1-5)
 - [ ] Submit rating with feedback text
 - [ ] Submit rating without feedback text
@@ -154,6 +167,7 @@ USING (
 - [ ] Test error handling for network failures
 
 ### Edge Cases Handled
+
 - Empty feedback text (allowed)
 - Very long feedback text (truncated at 500 chars)
 - Rating prompt dismissed (stored in localStorage)
@@ -187,6 +201,7 @@ Potential improvements for future iterations:
 ✅ **Task Complete**: Rating submission functionality is fully implemented and integrated with the database.
 
 ### What Works:
+
 - Students can submit ratings for resolved complaints
 - Ratings are validated and stored in database
 - One rating per complaint is enforced
@@ -195,6 +210,7 @@ Potential improvements for future iterations:
 - UI components are already in place
 
 ### What's Next:
+
 - Task 8.2: Display ratings in analytics dashboard
 - Task 8.2: Show average rating on dashboard
 - Task 8.2: Enforce one rating per complaint (already done at DB level)

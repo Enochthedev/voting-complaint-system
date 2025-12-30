@@ -17,28 +17,33 @@ Added a new quick filters section to the complaints page (`src/app/complaints/pa
 ### 2. Key Features
 
 #### Toggle Behavior
+
 - Clicking an active filter button deactivates it
 - Clicking an inactive filter button activates it
 - Visual feedback with button variant changes (outline vs solid)
 
 #### Smart Integration
+
 - Automatically resets to page 1 when filter is applied
 - Clears search results when quick filter is activated
 - Works seamlessly with other filter panel options
 - Syncs with the filter panel's "Assigned To" dropdown
 
 #### Role-Based Visibility
+
 - Quick filters are only visible to lecturers and admins
 - Students do not see these buttons (they only see their own complaints)
 
 ### 3. User Experience
 
 #### Visual States
+
 - **Inactive**: Outline button with gray border
 - **Active**: Solid button with dark background and white text
 - **Hover**: Smooth transition effects
 
 #### Behavior Flow
+
 1. Lecturer clicks "Assigned to Me"
 2. Filter state updates to set `assignedTo` to current user ID
 3. Complaint list refreshes to show only assigned complaints
@@ -53,6 +58,7 @@ Created comprehensive test suite:
 **File**: `src/components/complaints/__tests__/assigned-to-me-filter.test.tsx`
 
 **Test Coverage**:
+
 - ✅ Filters complaints assigned to current user
 - ✅ Includes complaints with different statuses
 - ✅ Includes complaints with different priorities
@@ -74,6 +80,7 @@ Created visual demo document:
 **File**: `src/components/complaints/__tests__/assigned-to-me-filter-demo.md`
 
 **Contents**:
+
 - Overview and location
 - Visual states and behavior
 - Example scenarios
@@ -131,19 +138,23 @@ if (filters.assignedTo === userId) {
 ## Acceptance Criteria Met
 
 ✅ **AC17**: Complaint Assignment
+
 - Lecturers can filter complaints by assigned lecturer
 - "Assigned to Me" provides quick access to own assignments
 
 ✅ **P15**: Assignment Validity
+
 - Filter correctly identifies complaints assigned to current user
 - Excludes unassigned and other users' complaints
 
 ## Design Document Reference
 
 From the design document:
+
 > Quick filters: "Assigned to Me", "High Priority", "Escalated", "Unresolved"
 
 Implemented 3 of 4 quick filters:
+
 - ✅ Assigned to Me
 - ✅ High Priority
 - ✅ Unresolved
@@ -152,6 +163,7 @@ Implemented 3 of 4 quick filters:
 ## Testing Status
 
 Following the project's testing guidelines:
+
 - ✅ Tests written for filter logic
 - ✅ Visual demo document created
 - ⏳ Tests not executed (per testing-guidelines.md)
@@ -160,6 +172,7 @@ Following the project's testing guidelines:
 ## Next Steps
 
 The remaining sub-task in Task 4.4 is:
+
 - [ ] Show assigned lecturer in complaint list
 
 This will display the assigned lecturer's name on each complaint card in the list view.

@@ -196,10 +196,12 @@ Notice: Students do NOT see the "Add Internal Note" button!
 ### Component: CommentInput
 
 **Props:**
+
 - `showInternalToggle: boolean` - Shows/hides the internal checkbox
 - `onSubmit: (comment: string, isInternal: boolean) => Promise<void>` - Callback with internal flag
 
 **Features:**
+
 - Checkbox to mark comment as internal
 - Info alert when internal is selected
 - Validation and character count
@@ -208,10 +210,11 @@ Notice: Students do NOT see the "Add Internal Note" button!
 ### Component: CommentsSection
 
 **Filtering Logic:**
+
 ```typescript
 const visibleComments = React.useMemo(() => {
   if (!localComments) return [];
-  
+
   // Filter out internal notes for students
   const filtered = localComments.filter((comment) => {
     // Lecturers and admins can see all comments
@@ -221,7 +224,7 @@ const visibleComments = React.useMemo(() => {
     // Students can only see non-internal comments
     return !comment.is_internal;
   });
-  
+
   // Sort in chronological order (oldest first)
   return filtered.sort((a, b) => {
     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -230,6 +233,7 @@ const visibleComments = React.useMemo(() => {
 ```
 
 **Display:**
+
 - Shows "Internal" badge for internal notes
 - Filters comments based on user role
 - Maintains chronological order
@@ -237,6 +241,7 @@ const visibleComments = React.useMemo(() => {
 ### Database Schema
 
 **Table: complaint_comments**
+
 ```sql
 CREATE TABLE complaint_comments (
   id uuid PRIMARY KEY,
@@ -252,6 +257,7 @@ CREATE TABLE complaint_comments (
 ### RLS Policies (Phase 12)
 
 **Policy: View Comments**
+
 ```sql
 -- Students can view non-internal comments on their complaints
 -- Lecturers and admins can view all comments
@@ -263,13 +269,14 @@ USING (
     SELECT id FROM complaints
     WHERE student_id = auth.uid() OR auth.jwt()->>'role' IN ('lecturer', 'admin')
   ) AND (
-    is_internal = false OR 
+    is_internal = false OR
     auth.jwt()->>'role' IN ('lecturer', 'admin')
   )
 );
 ```
 
 **Policy: Add Comments**
+
 ```sql
 -- Users can add comments to accessible complaints
 -- Only lecturers/admins can create internal notes
@@ -281,7 +288,7 @@ WITH CHECK (
     SELECT id FROM complaints
     WHERE student_id = auth.uid() OR auth.jwt()->>'role' IN ('lecturer', 'admin')
   ) AND (
-    is_internal = false OR 
+    is_internal = false OR
     auth.jwt()->>'role' IN ('lecturer', 'admin')
   )
 );
@@ -350,18 +357,23 @@ In Phase 12, the following will be implemented:
 ## Use Cases
 
 ### Use Case 1: Coordinating Response
+
 Lecturer adds internal note: "Need to check with department head before responding. Will update by EOD."
 
 ### Use Case 2: Escalation Discussion
+
 Admin adds internal note: "This complaint requires legal review. Holding response until cleared."
 
 ### Use Case 3: Resource Allocation
+
 Lecturer adds internal note: "Budget approved for this repair. Can proceed with solution."
 
 ### Use Case 4: Pattern Recognition
+
 Lecturer adds internal note: "Third complaint about this issue this month. Need systemic fix."
 
 ### Use Case 5: Sensitive Information
+
 Lecturer adds internal note: "Student has documented disability accommodation. Handle with care."
 
 ## Conclusion

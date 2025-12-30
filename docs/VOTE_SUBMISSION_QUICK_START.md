@@ -11,6 +11,7 @@ The vote submission functionality allows lecturers to create voting polls and st
 **Navigate to**: `/admin/votes/new`
 
 **Steps**:
+
 1. Fill in the vote title (e.g., "Preferred Study Hours")
 2. Add a description (e.g., "Help us understand when students prefer to study")
 3. Add at least 2 options (e.g., "Morning", "Afternoon", "Evening", "Night")
@@ -19,6 +20,7 @@ The vote submission functionality allows lecturers to create voting polls and st
 6. You should see a success message and be redirected to `/admin/votes`
 
 **Validation to Test**:
+
 - Try submitting with empty title → Should show error
 - Try submitting with only 1 option → Should show error
 - Try adding duplicate options → Should show error
@@ -29,6 +31,7 @@ The vote submission functionality allows lecturers to create voting polls and st
 **Navigate to**: `/admin/votes`
 
 **What You'll See**:
+
 - List of all created votes (including 2 pre-populated mock votes)
 - Each vote shows:
   - Title and description
@@ -44,6 +47,7 @@ The vote submission functionality allows lecturers to create voting polls and st
 **Navigate to**: `/votes`
 
 **Steps**:
+
 1. You'll see active voting polls
 2. Select an option by clicking the radio button
 3. Click "Submit Vote"
@@ -52,6 +56,7 @@ The vote submission functionality allows lecturers to create voting polls and st
 6. You cannot vote again on the same poll
 
 **What to Test**:
+
 - Try submitting without selecting an option → Button should be disabled
 - After voting, try to vote again → Should show "already voted" message
 - Closed polls appear in a separate "Closed Polls" section
@@ -73,6 +78,7 @@ The system comes with 2 pre-populated mock votes:
 ## Key Features
 
 ### Vote Creation
+
 - ✅ Form validation for all fields
 - ✅ Dynamic option management (add/remove)
 - ✅ Optional closing date
@@ -81,6 +87,7 @@ The system comes with 2 pre-populated mock votes:
 - ✅ Success feedback and redirect
 
 ### Vote Listing
+
 - ✅ View all votes
 - ✅ Status badges (Active/Closed)
 - ✅ Metadata display
@@ -88,6 +95,7 @@ The system comes with 2 pre-populated mock votes:
 - ✅ Empty states
 
 ### Vote Participation
+
 - ✅ View active polls
 - ✅ Submit vote responses
 - ✅ One vote per poll enforcement
@@ -100,6 +108,7 @@ The system comes with 2 pre-populated mock votes:
 Located in `src/lib/api/votes.ts`:
 
 **Vote Management**:
+
 - `createVote()` - Create new vote
 - `getVotes()` - Get all votes (with filtering)
 - `getVoteById()` - Get single vote
@@ -109,6 +118,7 @@ Located in `src/lib/api/votes.ts`:
 - `reopenVote()` - Reopen a vote
 
 **Vote Responses**:
+
 - `submitVoteResponse()` - Submit a vote
 - `getVoteResponses()` - Get all responses
 - `hasStudentVoted()` - Check if voted
@@ -116,11 +126,11 @@ Located in `src/lib/api/votes.ts`:
 
 ## Routes
 
-| Route | Role | Description |
-|-------|------|-------------|
-| `/admin/votes` | Lecturer/Admin | View all votes |
-| `/admin/votes/new` | Lecturer/Admin | Create new vote |
-| `/votes` | Student | View and participate in votes |
+| Route              | Role           | Description                   |
+| ------------------ | -------------- | ----------------------------- |
+| `/admin/votes`     | Lecturer/Admin | View all votes                |
+| `/admin/votes/new` | Lecturer/Admin | Create new vote               |
+| `/votes`           | Student        | View and participate in votes |
 
 ## Next Steps
 
@@ -145,17 +155,21 @@ In Phase 12, the following will be updated:
 ## Troubleshooting
 
 **Issue**: Can't see the votes I created
+
 - **Solution**: Votes are stored in-memory, so they'll be lost on page refresh. This is expected behavior until Phase 12.
 
 **Issue**: Getting "already voted" error immediately
+
 - **Solution**: Clear your browser's local storage or use incognito mode.
 
 **Issue**: Validation errors not showing
+
 - **Solution**: Check browser console for errors. Ensure all required fields are filled.
 
 ## Files Modified/Created
 
 ### Created Files
+
 - `src/app/admin/votes/new/page.tsx` - Vote creation page
 - `src/app/votes/page.tsx` - Student voting page
 - `src/lib/api/votes.ts` - Vote API functions
@@ -163,12 +177,14 @@ In Phase 12, the following will be updated:
 - `docs/VOTE_SUBMISSION_QUICK_START.md` - This file
 
 ### Modified Files
+
 - `src/app/admin/votes/page.tsx` - Updated to show vote list
 - `.kiro/specs/tasks.md` - Marked task as completed
 
 ## Acceptance Criteria Met
 
 From AC6 (Voting System):
+
 - ✅ Lecturers can create voting polls with multiple options
 - ✅ Polls can be associated with specific topics or complaints
 - ✅ Students can cast votes on active polls
@@ -179,6 +195,7 @@ From AC6 (Voting System):
 ## Questions?
 
 If you encounter any issues or have questions about the implementation, please refer to:
+
 - `docs/VOTE_SUBMISSION_IMPLEMENTATION.md` for detailed technical documentation
 - `.kiro/specs/requirements.md` for requirements (AC6)
 - `.kiro/specs/design.md` for design specifications

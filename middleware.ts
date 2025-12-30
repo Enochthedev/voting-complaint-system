@@ -163,7 +163,9 @@ export async function middleware(request: NextRequest) {
           if (userError || !userData) {
             console.error('Error fetching user role:', userError);
             // Redirect to login if we can't verify role
-            return NextResponse.redirect(new URL('/login?error=role_verification_failed', request.url));
+            return NextResponse.redirect(
+              new URL('/login?error=role_verification_failed', request.url)
+            );
           }
 
           userRole = userData.role;

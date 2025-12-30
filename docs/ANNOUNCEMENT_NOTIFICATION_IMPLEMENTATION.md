@@ -27,7 +27,7 @@ BEGIN
     related_id,
     is_read
   )
-  SELECT 
+  SELECT
     u.id,
     'new_announcement',
     'A new announcement has been posted',
@@ -36,7 +36,7 @@ BEGIN
     false
   FROM public.users u
   WHERE u.role = 'student';
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -65,13 +65,13 @@ CREATE TRIGGER notify_on_new_announcement
 
 ### Notification Properties
 
-| Property | Value | Description |
-|----------|-------|-------------|
-| `type` | `new_announcement` | Identifies this as an announcement notification |
-| `title` | "A new announcement has been posted" | Fixed notification title |
-| `message` | "A new announcement has been posted: {announcement_title}" | Includes the announcement title |
-| `related_id` | Announcement UUID | Links to the specific announcement |
-| `is_read` | `false` | Notification starts as unread |
+| Property     | Value                                                      | Description                                     |
+| ------------ | ---------------------------------------------------------- | ----------------------------------------------- |
+| `type`       | `new_announcement`                                         | Identifies this as an announcement notification |
+| `title`      | "A new announcement has been posted"                       | Fixed notification title                        |
+| `message`    | "A new announcement has been posted: {announcement_title}" | Includes the announcement title                 |
+| `related_id` | Announcement UUID                                          | Links to the specific announcement              |
+| `is_read`    | `false`                                                    | Notification starts as unread                   |
 
 ### Frontend Integration
 
@@ -95,6 +95,7 @@ The notification system is already integrated in the frontend through:
 **Test Script**: `scripts/test-announcement-notification-trigger.js`
 
 The test script verifies:
+
 - ✅ All students receive a notification when an announcement is created
 - ✅ Notification has correct type (`new_announcement`)
 - ✅ Notification message includes the announcement title
@@ -119,6 +120,7 @@ The announcement notification trigger is working correctly!
 ### For Lecturers/Admins
 
 When creating an announcement:
+
 1. Fill out the announcement form with title and content
 2. Click "Create Announcement"
 3. The announcement is saved to the database
@@ -127,6 +129,7 @@ When creating an announcement:
 ### For Students
 
 When a new announcement is created:
+
 1. **Real-time**: Notification bell badge updates with new count
 2. **Notification Center**: New notification appears in the dropdown
 3. **Click**: Student can click the notification to view the announcement
@@ -173,6 +176,7 @@ CREATE TYPE notification_type AS ENUM (
 The trigger uses a single `INSERT ... SELECT` statement to create all notifications in one operation, which is efficient even with many students.
 
 **Performance Characteristics**:
+
 - **Time Complexity**: O(n) where n = number of students
 - **Database Operations**: 1 INSERT with multiple rows
 - **Network Overhead**: Minimal (single query)
@@ -180,6 +184,7 @@ The trigger uses a single `INSERT ... SELECT` statement to create all notificati
 ### Optimization
 
 For systems with a very large number of students (>10,000), consider:
+
 1. **Batch Processing**: Create notifications in batches
 2. **Background Jobs**: Move notification creation to a background worker
 3. **Pagination**: Limit notifications per query
@@ -200,26 +205,30 @@ This notification trigger complements other notification triggers in the system:
 ### Notifications Not Appearing
 
 1. **Check Trigger Status**:
+
    ```sql
    SELECT * FROM pg_trigger WHERE tgname = 'notify_on_new_announcement';
    ```
 
 2. **Verify Function Exists**:
+
    ```sql
    SELECT * FROM pg_proc WHERE proname = 'notify_students_on_new_announcement';
    ```
 
 3. **Check Student Users**:
+
    ```sql
    SELECT COUNT(*) FROM users WHERE role = 'student';
    ```
 
 4. **Test Manually**:
+
    ```sql
    -- Create a test announcement
    INSERT INTO announcements (created_by, title, content)
    VALUES ('lecturer-uuid', 'Test', 'Test content');
-   
+
    -- Check notifications
    SELECT * FROM notifications WHERE type = 'new_announcement' ORDER BY created_at DESC LIMIT 10;
    ```

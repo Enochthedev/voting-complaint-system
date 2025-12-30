@@ -25,8 +25,8 @@ The assignment notification trigger was implemented in two migrations:
 
 ```sql
 -- Notify assigned lecturer when complaint is assigned
-IF NEW.assigned_to IS NOT NULL 
-   AND (OLD.assigned_to IS NULL OR OLD.assigned_to != NEW.assigned_to) 
+IF NEW.assigned_to IS NOT NULL
+   AND (OLD.assigned_to IS NULL OR OLD.assigned_to != NEW.assigned_to)
 THEN
   INSERT INTO public.notifications (
     user_id,
@@ -60,13 +60,13 @@ node scripts/verify-assignment-notification-trigger.js
 
 ✅ **All Tests Passed**
 
-| Test Case | Result | Details |
-|-----------|--------|---------|
-| Initial Assignment | ✅ PASS | Notification created when complaint assigned to lecturer |
-| Reassignment | ✅ PASS | Notification created when complaint reassigned to different lecturer |
-| History Logging | ✅ PASS | Assignment logged in complaint_history table |
-| Notification Content | ✅ PASS | Correct type, title, message, and related_id |
-| Trigger Enabled | ✅ PASS | Trigger is active in database |
+| Test Case            | Result  | Details                                                              |
+| -------------------- | ------- | -------------------------------------------------------------------- |
+| Initial Assignment   | ✅ PASS | Notification created when complaint assigned to lecturer             |
+| Reassignment         | ✅ PASS | Notification created when complaint reassigned to different lecturer |
+| History Logging      | ✅ PASS | Assignment logged in complaint_history table                         |
+| Notification Content | ✅ PASS | Correct type, title, message, and related_id                         |
+| Trigger Enabled      | ✅ PASS | Trigger is active in database                                        |
 
 ### Sample Notification Output
 
@@ -88,8 +88,8 @@ node scripts/verify-assignment-notification-trigger.js
 ### Trigger Status
 
 ```sql
-SELECT tgname, tgenabled 
-FROM pg_trigger 
+SELECT tgname, tgenabled
+FROM pg_trigger
 WHERE tgname = 'notify_on_complaint_status_change';
 ```
 
@@ -98,9 +98,9 @@ Result: **Enabled** (status: 'O')
 ### Notification Type Enum
 
 ```sql
-SELECT enumlabel 
-FROM pg_enum 
-JOIN pg_type ON pg_enum.enumtypid = pg_type.oid 
+SELECT enumlabel
+FROM pg_enum
+JOIN pg_type ON pg_enum.enumtypid = pg_type.oid
 WHERE pg_type.typname = 'notification_type';
 ```
 
@@ -120,6 +120,7 @@ The assignment is also logged via `log_complaint_assignment_trigger`:
 ### RLS Policies
 
 Notifications table has proper RLS policies:
+
 - Users can view their own notifications
 - Users can update their own notifications (mark as read)
 - System can insert notifications via triggers

@@ -16,6 +16,7 @@ New API module with the following functions:
 - **`getUnreadNotificationCount()`**: Gets the count of unread notifications
 
 All functions include:
+
 - Proper authentication checks
 - User-specific queries (users can only access their own notifications)
 - Error handling with descriptive messages
@@ -43,6 +44,7 @@ The following UI components were already in place and now work with real data:
 ## Features
 
 ### Individual Mark as Read
+
 - Hover over any unread notification to see a checkmark button
 - Click the checkmark to mark that notification as read
 - UI updates immediately (optimistic update)
@@ -50,12 +52,14 @@ The following UI components were already in place and now work with real data:
 - Unread count decreases
 
 ### Mark All as Read
+
 - "Mark all read" button in the dropdown header
 - Only visible when there are unread notifications
 - Marks all unread notifications as read at once
 - UI updates immediately for all notifications
 
 ### Error Handling
+
 - If marking as read fails, the UI reverts to the previous state
 - Error messages are logged to console
 - User experience remains smooth with optimistic updates
@@ -63,6 +67,7 @@ The following UI components were already in place and now work with real data:
 ## Database Integration
 
 ### RLS Policies
+
 The notifications table already has proper Row Level Security policies:
 
 - Users can only view their own notifications
@@ -70,13 +75,16 @@ The notifications table already has proper Row Level Security policies:
 - Prevents unauthorized access
 
 ### Indexes
+
 Optimized queries with existing indexes:
+
 - `idx_notifications_user_unread`: Fast queries for unread notifications by user
 - `idx_notifications_user_id`: Fast user-specific queries
 
 ## Technical Details
 
 ### Optimistic Updates
+
 The implementation uses optimistic UI updates for better user experience:
 
 1. Update local state immediately
@@ -86,7 +94,9 @@ The implementation uses optimistic UI updates for better user experience:
 This ensures the UI feels responsive while maintaining data consistency.
 
 ### Type Safety
+
 All functions are fully typed with TypeScript:
+
 - Notification type from database.types.ts
 - Proper return types for all functions
 - Error handling with typed errors
@@ -123,14 +133,14 @@ You can verify the changes in the database:
 
 ```sql
 -- Check notifications for a user
-SELECT id, title, is_read, created_at 
-FROM notifications 
+SELECT id, title, is_read, created_at
+FROM notifications
 WHERE user_id = 'your-user-id'
 ORDER BY created_at DESC;
 
 -- Check unread count
-SELECT COUNT(*) 
-FROM notifications 
+SELECT COUNT(*)
+FROM notifications
 WHERE user_id = 'your-user-id' AND is_read = false;
 ```
 

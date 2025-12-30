@@ -12,11 +12,13 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
 ## What Was Implemented
 
 ### 1. Database Layer ✅
+
 - **File**: `supabase/migrations/007_create_complaint_ratings_table.sql`
 - **Implementation**: UNIQUE constraint on `complaint_id` column
 - **Benefit**: Guarantees data integrity at the database level, prevents race conditions
 
 ### 2. API Layer ✅
+
 - **File**: `src/lib/api/complaints.ts`
 - **Functions Added/Updated**:
   - `submitRating()` - Enhanced with duplicate check before insert
@@ -29,6 +31,7 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
   - ✅ Clear error messages for all failure cases
 
 ### 3. UI Layer ✅
+
 - **File**: `src/components/complaints/complaint-detail/index.tsx`
 - **Implementation**:
   - Uses `hasRatedComplaint()` to check rating status on load
@@ -37,6 +40,7 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
   - Updates UI state when duplicate detected
 
 ### 4. Testing ✅
+
 - **File**: `src/lib/api/__tests__/complaints-rating.test.ts`
 - **Test Coverage**:
   - ✅ First-time rating submission
@@ -48,6 +52,7 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
   - ✅ Error handling
 
 ### 5. Documentation ✅
+
 - **Files Created**:
   - `docs/RATING_ENFORCEMENT_IMPLEMENTATION.md` - Full technical documentation
   - `docs/RATING_ENFORCEMENT_QUICK_REFERENCE.md` - Developer quick reference
@@ -74,22 +79,22 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
 
 ### Validation Rules
 
-| Rule | Enforcement Point |
-|------|-------------------|
+| Rule                     | Enforcement Point   |
+| ------------------------ | ------------------- |
 | One rating per complaint | Database + API + UI |
-| Rating range (1-5) | Database + API |
-| Only resolved complaints | API + UI |
-| Only complaint owner | API + RLS + UI |
-| Only students can rate | RLS + UI |
+| Rating range (1-5)       | Database + API      |
+| Only resolved complaints | API + UI            |
+| Only complaint owner     | API + RLS + UI      |
+| Only students can rate   | RLS + UI            |
 
 ### Error Messages
 
 ```typescript
-"You have already rated this complaint"
-"Rating must be between 1 and 5"
-"Can only rate resolved complaints"
-"Only the complaint owner can rate"
-"Complaint not found"
+'You have already rated this complaint';
+'Rating must be between 1 and 5';
+'Can only rate resolved complaints';
+'Only the complaint owner can rate';
+'Complaint not found';
 ```
 
 ## Code Changes
@@ -108,7 +113,7 @@ Successfully implemented enforcement of "one rating per complaint" rule across a
 
 ### New Files
 
-1. **src/lib/api/__tests__/complaints-rating.test.ts**
+1. **src/lib/api/**tests**/complaints-rating.test.ts**
    - Comprehensive test suite for rating functionality
    - Covers all validation scenarios
    - Tests error handling
@@ -140,7 +145,7 @@ CREATE TABLE public.complaint_ratings (
   rating INTEGER NOT NULL,
   feedback_text TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   CONSTRAINT unique_complaint_rating UNIQUE(complaint_id),
   CONSTRAINT rating_range_check CHECK (rating >= 1 AND rating <= 5)
 );
@@ -154,12 +159,9 @@ async function submitRating(
   studentId: string,
   rating: number,
   feedbackText?: string
-): Promise<Rating>
+): Promise<Rating>;
 
-async function hasRatedComplaint(
-  complaintId: string,
-  studentId: string
-): Promise<boolean>
+async function hasRatedComplaint(complaintId: string, studentId: string): Promise<boolean>;
 ```
 
 ### UI Integration
@@ -169,7 +171,7 @@ async function hasRatedComplaint(
 const hasRated = await hasRatedComplaint(complaintId, userId);
 
 // Show prompt only if not rated
-const shouldShowPrompt = 
+const shouldShowPrompt =
   userRole === 'student' &&
   complaint.status === 'resolved' &&
   complaint.student_id === userId &&
@@ -193,16 +195,19 @@ try {
 ## Testing Strategy
 
 ### Unit Tests
+
 - API validation logic
 - Error handling
 - Edge cases
 
 ### Integration Tests
+
 - Database constraint enforcement
 - API + Database interaction
 - UI + API interaction
 
 ### Manual Tests
+
 - Visual testing guide provided
 - User flow scenarios
 - Error state verification
@@ -218,15 +223,17 @@ try {
 ## Verification
 
 ### Database Level
+
 ```sql
 -- Verify constraint exists
-SELECT constraint_name, constraint_type 
-FROM information_schema.table_constraints 
-WHERE table_name = 'complaint_ratings' 
+SELECT constraint_name, constraint_type
+FROM information_schema.table_constraints
+WHERE table_name = 'complaint_ratings'
 AND constraint_name = 'unique_complaint_rating';
 ```
 
 ### API Level
+
 ```typescript
 // Test duplicate prevention
 const result1 = await submitRating('id', 'student', 5);
@@ -234,6 +241,7 @@ const result2 = await submitRating('id', 'student', 4); // Should throw
 ```
 
 ### UI Level
+
 - Rating prompt only shows once
 - Disappears after rating
 - Doesn't reappear on refresh

@@ -22,7 +22,7 @@ const { data, error } = await supabase.auth.signUp({
   options: {
     data: {
       full_name: fullName,
-      role: role,  // ← Role stored in user_metadata
+      role: role, // ← Role stored in user_metadata
     },
   },
 });
@@ -135,7 +135,9 @@ After configuring the hook:
 2. In your browser console, check the JWT:
 
 ```javascript
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 console.log(session.access_token);
 
 // Decode the JWT at https://jwt.io
@@ -148,9 +150,7 @@ Try accessing data that requires role-based permissions:
 
 ```javascript
 // This should work for lecturers/admins, fail for students
-const { data, error } = await supabase
-  .from('complaints')
-  .select('*');
+const { data, error } = await supabase.from('complaints').select('*');
 ```
 
 ## Troubleshooting
@@ -167,11 +167,13 @@ await supabase.auth.signOut();
 ### Issue: RLS policies failing with "permission denied"
 
 **Possible causes**:
+
 1. Hook not configured in Supabase Dashboard
 2. User hasn't signed in again after hook configuration
 3. Function not granted proper permissions
 
 **Check**:
+
 ```sql
 -- Verify function exists and has correct permissions
 SELECT routine_name, routine_schema
@@ -213,7 +215,7 @@ CREATE POLICY "Students view own complaints"
 ON complaints FOR SELECT
 TO authenticated
 USING (
-  student_id = auth.uid() OR 
+  student_id = auth.uid() OR
   (SELECT role FROM public.users WHERE id = auth.uid()) IN ('lecturer', 'admin')
 );
 ```

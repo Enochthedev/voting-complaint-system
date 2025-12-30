@@ -1,17 +1,21 @@
 # Task 2.2: Notifications Table RLS Policies - Completion Summary
 
 ## Overview
+
 This document summarizes the implementation and verification of Row Level Security (RLS) policies for the `notifications` table in the Student Complaint Resolution System.
 
 ## Implementation Status
+
 ✅ **COMPLETED** - All RLS policies for the notifications table have been implemented and verified.
 
 ## RLS Policies Implemented
 
 ### 1. SELECT Policy: "Users view own notifications"
+
 **Purpose**: Ensures users can only view their own notifications
 
 **Policy Definition**:
+
 ```sql
 CREATE POLICY "Users view own notifications"
   ON public.notifications
@@ -22,16 +26,19 @@ CREATE POLICY "Users view own notifications"
 
 **Security Property**: Users cannot view notifications belonging to other users.
 
-**Validates**: 
+**Validates**:
+
 - Design Property P7 (Role-Based Access)
 - Requirement AC4 (Real-time Notifications)
 
 ---
 
 ### 2. UPDATE Policy: "Users update own notifications"
+
 **Purpose**: Allows users to update their own notifications (e.g., mark as read)
 
 **Policy Definition**:
+
 ```sql
 CREATE POLICY "Users update own notifications"
   ON public.notifications
@@ -43,16 +50,19 @@ CREATE POLICY "Users update own notifications"
 
 **Security Property**: Users can only update their own notifications and cannot change the user_id.
 
-**Validates**: 
+**Validates**:
+
 - Design Property P7 (Role-Based Access)
 - Requirement AC4 (Real-time Notifications)
 
 ---
 
 ### 3. INSERT Policy: "System insert notifications"
+
 **Purpose**: Allows the system to create notifications for any user
 
 **Policy Definition**:
+
 ```sql
 CREATE POLICY "System insert notifications"
   ON public.notifications
@@ -64,20 +74,24 @@ CREATE POLICY "System insert notifications"
 **Security Property**: Authenticated users/system can create notifications. This is necessary for triggers and application logic to create notifications for users.
 
 **Note**: While this policy allows any authenticated user to insert notifications, in practice, notifications are created by:
+
 - Database triggers (e.g., when a complaint is opened)
 - Backend functions (e.g., when feedback is added)
 - System processes (e.g., escalation notifications)
 
-**Validates**: 
+**Validates**:
+
 - Design Property P4 (Notification Delivery)
 - Requirement AC4 (Real-time Notifications)
 
 ---
 
 ### 4. DELETE Policy: "Users delete own notifications"
+
 **Purpose**: Allows users to delete their own notifications
 
 **Policy Definition**:
+
 ```sql
 CREATE POLICY "Users delete own notifications"
   ON public.notifications
@@ -88,7 +102,8 @@ CREATE POLICY "Users delete own notifications"
 
 **Security Property**: Users can only delete their own notifications.
 
-**Validates**: 
+**Validates**:
+
 - Design Property P7 (Role-Based Access)
 - User experience requirement (notification management)
 
@@ -107,6 +122,7 @@ The following indexes were created to optimize notification queries:
 7. **idx_notifications_user_type**: Composite index on `(user_id, type, created_at DESC)`
 
 These indexes support common query patterns:
+
 - Fetching all notifications for a user
 - Fetching unread notifications for a user
 - Fetching notifications by type for a user
@@ -117,21 +133,27 @@ These indexes support common query patterns:
 ## Data Integrity Constraints
 
 ### 1. Non-empty Title Constraint
+
 ```sql
 CONSTRAINT non_empty_title CHECK (LENGTH(TRIM(title)) > 0)
 ```
+
 Ensures all notifications have a meaningful title.
 
 ### 2. Non-empty Message Constraint
+
 ```sql
 CONSTRAINT non_empty_message CHECK (LENGTH(TRIM(message)) > 0)
 ```
+
 Ensures all notifications have a meaningful message.
 
 ### 3. Foreign Key Constraint
+
 ```sql
 user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE
 ```
+
 Ensures referential integrity and cascades deletion when a user is deleted.
 
 ---
@@ -156,19 +178,24 @@ The following notification types are supported:
 ## Security Properties Verified
 
 ✅ **Property 1**: Users can only SELECT their own notifications
+
 - Enforced by: `USING (user_id = auth.uid())` in SELECT policy
 
 ✅ **Property 2**: Users can only UPDATE their own notifications
+
 - Enforced by: `USING (user_id = auth.uid())` and `WITH CHECK (user_id = auth.uid())` in UPDATE policy
 
 ✅ **Property 3**: Users can only DELETE their own notifications
+
 - Enforced by: `USING (user_id = auth.uid())` in DELETE policy
 
 ✅ **Property 4**: System can create notifications for any user
+
 - Enforced by: `WITH CHECK (true)` in INSERT policy
 - Necessary for automated notification creation
 
 ✅ **Property 5**: All operations require authentication
+
 - Enforced by: `TO authenticated` in all policies
 
 ---
@@ -176,9 +203,11 @@ The following notification types are supported:
 ## Testing
 
 ### Test Script
+
 A comprehensive test script has been created: `scripts/test-notifications-rls.js`
 
 ### Test Results
+
 ```
 ✅ Notifications table exists
 ✅ RLS is enabled on notifications table
@@ -214,6 +243,7 @@ To fully verify the RLS policies work as expected, perform the following manual 
 ---
 
 ## Migration File
+
 **Location**: `supabase/migrations/011_create_notifications_table.sql`
 
 **Applied**: ✅ Yes
@@ -225,19 +255,19 @@ To fully verify the RLS policies work as expected, perform the following manual 
 ## Related Requirements
 
 ### Acceptance Criteria
+
 - **AC4**: Real-time Notifications
   - Students receive notification when a lecturer opens their complaint
   - Lecturers receive notification when a new complaint is submitted
   - Notifications are delivered in real-time using Supabase Realtime
 
 ### Design Properties
+
 - **P4**: Notification Delivery
   - When a lecturer opens a complaint, the student receives a notification within 1 second
-  
 - **P7**: Role-Based Access
   - Students can only view their own notifications
   - Lecturers can view their own notifications
-  
 - **P8**: Real-time Synchronization
   - All notifications are delivered in real-time to connected clients
 

@@ -29,7 +29,7 @@ export default function ComplaintsPageWithSearch() {
   // Handle search input change - fetch suggestions
   const handleSearchChange = async (value: string) => {
     setSearchQuery(value);
-    
+
     if (value.trim().length < 2) {
       setSuggestions([]);
       return;
@@ -43,11 +43,9 @@ export default function ComplaintsPageWithSearch() {
       { id: '2', text: 'lecture hall facilities', type: 'suggestion' },
       { id: '3', text: 'wifi connectivity', type: 'recent' },
     ];
-    
+
     setSuggestions(
-      mockSuggestions.filter(s => 
-        s.text.toLowerCase().includes(value.toLowerCase())
-      )
+      mockSuggestions.filter((s) => s.text.toLowerCase().includes(value.toLowerCase()))
     );
   };
 
@@ -59,7 +57,7 @@ export default function ComplaintsPageWithSearch() {
     try {
       // TODO (Phase 12): Implement full-text search with Supabase
       // This will use the search_vector column and PostgreSQL full-text search
-      
+
       // Example Supabase query:
       // const { data, error } = await supabase
       //   .from('complaints')
@@ -69,13 +67,12 @@ export default function ComplaintsPageWithSearch() {
       //     config: 'english'
       //   })
       //   .order('created_at', { ascending: false });
-      
+
       // For now, using mock filtered data
       console.log('Searching for:', query);
-      
+
       // Mock: Filter complaints by search query
       // In production, this would be handled by the database
-      
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -97,9 +94,7 @@ export default function ComplaintsPageWithSearch() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-              Complaints
-            </h1>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Complaints</h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               Search and manage complaints
             </p>
@@ -170,17 +165,19 @@ import { createClient } from '@/lib/supabase';
 
 export async function searchComplaints(query: string, userId: string, userRole: string) {
   const supabase = createClient();
-  
+
   let queryBuilder = supabase
     .from('complaints')
-    .select(`
+    .select(
+      `
       *,
       complaint_tags(*),
       complaint_attachments(*)
-    `)
+    `
+    )
     .textSearch('search_vector', query, {
       type: 'websearch',
-      config: 'english'
+      config: 'english',
     });
 
   // Apply role-based filtering
@@ -188,9 +185,7 @@ export async function searchComplaints(query: string, userId: string, userRole: 
     queryBuilder = queryBuilder.eq('student_id', userId);
   }
 
-  const { data, error } = await queryBuilder
-    .order('created_at', { ascending: false })
-    .limit(100);
+  const { data, error } = await queryBuilder.order('created_at', { ascending: false }).limit(100);
 
   if (error) throw error;
   return data;
@@ -200,6 +195,7 @@ export async function searchComplaints(query: string, userId: string, userRole: 
 ### 2. Search Suggestions
 
 Implement autocomplete suggestions based on:
+
 - Recent searches (stored in user preferences)
 - Popular search terms
 - Tag names
@@ -209,7 +205,7 @@ Implement autocomplete suggestions based on:
 // lib/api/search-suggestions.ts
 export async function getSearchSuggestions(query: string, userId: string) {
   const supabase = createClient();
-  
+
   // Get matching tags
   const { data: tags } = await supabase
     .from('complaint_tags')
@@ -222,11 +218,11 @@ export async function getSearchSuggestions(query: string, userId: string) {
 
   // Combine and format suggestions
   const suggestions: SearchSuggestion[] = [
-    ...(tags || []).map(t => ({
+    ...(tags || []).map((t) => ({
       id: `tag-${t.tag_name}`,
       text: t.tag_name,
-      type: 'suggestion' as const
-    }))
+      type: 'suggestion' as const,
+    })),
   ];
 
   return suggestions;
@@ -241,18 +237,18 @@ Highlight matching terms in search results:
 // lib/utils/highlight-search.ts
 export function highlightSearchTerms(text: string, query: string): string {
   if (!query.trim()) return text;
-  
-  const terms = query.split(' ').filter(t => t.length > 0);
+
+  const terms = query.split(' ').filter((t) => t.length > 0);
   let highlighted = text;
-  
-  terms.forEach(term => {
+
+  terms.forEach((term) => {
     const regex = new RegExp(`(${term})`, 'gi');
     highlighted = highlighted.replace(
       regex,
       '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>'
     );
   });
-  
+
   return highlighted;
 }
 ```
@@ -277,6 +273,7 @@ export function highlightSearchTerms(text: string, query: string): string {
 ## Testing
 
 The search bar component includes:
+
 - Keyboard navigation
 - Accessibility features
 - Loading states
@@ -295,6 +292,7 @@ Test the component using the demo file before integrating with real data.
 ## Accessibility
 
 The search bar includes:
+
 - ARIA labels and roles
 - Keyboard navigation
 - Screen reader support

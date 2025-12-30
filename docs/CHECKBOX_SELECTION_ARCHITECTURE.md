@@ -377,7 +377,7 @@ interface ComplaintListProps {
   selectionMode?: boolean;
   selectedIds?: Set<string>;
   onSelectionChange?: (ids: Set<string>) => void;
-  
+
   // Other props
   complaints?: Complaint[];
   isLoading?: boolean;
@@ -393,7 +393,7 @@ interface ComplaintsHeaderProps {
   // Selection props
   selectionMode?: boolean;
   onToggleSelectionMode?: () => void;
-  
+
   // Other props
   userRole: 'student' | 'lecturer' | 'admin';
   onNewComplaint: () => void;
@@ -412,7 +412,7 @@ interface BulkActionBarProps {
   onExport: () => void;
   onSelectAll: () => void;
   onClearSelection: () => void;
-  
+
   // Optional
   isExporting?: boolean;
   exportProgress?: number;
@@ -427,26 +427,31 @@ interface BulkActionBarProps {
 ## 🎯 Key Design Patterns
 
 ### 1. Controlled Component Pattern
+
 - Parent (ComplaintsPage) owns state
 - Children receive props and callbacks
 - Unidirectional data flow
 
 ### 2. Conditional Rendering
+
 - Checkboxes only when selectionMode=true
 - BulkActionBar only when selectedIds.size > 0
 - Different buttons based on state
 
 ### 3. Immutable State Updates
+
 - Always create new Set for updates
 - Never mutate existing Set
 - Triggers proper React re-renders
 
 ### 4. Event Propagation Control
+
 - Stop propagation on checkbox clicks
 - Prevent navigation in selection mode
 - Separate click handlers for different modes
 
 ### 5. Cleanup Pattern
+
 - Clear selection on mode exit
 - Clear selection after export
 - Reset progress indicators
@@ -456,6 +461,7 @@ interface BulkActionBarProps {
 ## 🚀 Performance Considerations
 
 ### Efficient Lookups
+
 ```typescript
 // O(1) lookup with Set
 const isSelected = selectedIds.has(complaint.id);
@@ -465,6 +471,7 @@ const isSelected = selectedIds.includes(complaint.id); // ❌ Slower
 ```
 
 ### Memoization
+
 ```typescript
 // Memoize filtered complaints
 const filteredComplaints = useMemo(() => {
@@ -473,10 +480,11 @@ const filteredComplaints = useMemo(() => {
 ```
 
 ### Batch Updates
+
 ```typescript
 // Single state update for multiple selections
 const newSelection = new Set(selectedIds);
-items.forEach(id => newSelection.add(id));
+items.forEach((id) => newSelection.add(id));
 setSelectedIds(newSelection); // One update
 ```
 

@@ -1,11 +1,13 @@
 # Complaint Form Validation Implementation
 
 ## Overview
+
 The complaint submission form includes comprehensive client-side validation to ensure data quality and user experience. This document describes the validation rules implemented.
 
 ## Validation Rules
 
 ### 1. Title Validation
+
 - **Required**: Yes (for submission, optional for drafts)
 - **Max Length**: 200 characters
 - **Rules**:
@@ -15,10 +17,12 @@ The complaint submission form includes comprehensive client-side validation to e
   - Whitespace is trimmed before validation
 
 **Error Messages**:
+
 - "Title is required" - when empty on submission
 - "Title must be 200 characters or less" - when exceeding limit
 
 ### 2. Description Validation
+
 - **Required**: Yes (for submission, optional for drafts)
 - **Max Length**: 5000 characters (text content, not HTML)
 - **Rules**:
@@ -28,15 +32,18 @@ The complaint submission form includes comprehensive client-side validation to e
   - Rich text editor provides formatting options
 
 **Error Messages**:
+
 - "Description is required" - when empty on submission
 - "Description must be 5000 characters or less" - when exceeding limit
 
 **Special Handling**:
+
 - HTML markup is not counted toward character limit
 - Only visible text content is validated
 - Empty HTML elements (e.g., `<p></p>`) are treated as empty
 
 ### 3. Category Validation
+
 - **Required**: Yes (for submission, optional for drafts)
 - **Valid Options**:
   - Academic
@@ -47,9 +54,11 @@ The complaint submission form includes comprehensive client-side validation to e
   - Other
 
 **Error Messages**:
+
 - "Please select a category" - when not selected on submission
 
 ### 4. Priority Validation
+
 - **Required**: Yes (for submission, optional for drafts)
 - **Valid Options**:
   - Low
@@ -58,9 +67,11 @@ The complaint submission form includes comprehensive client-side validation to e
   - Critical
 
 **Error Messages**:
+
 - "Please select a priority level" - when not selected on submission
 
 ### 5. Tags Validation
+
 - **Required**: No (optional field)
 - **Rules**:
   - Tags are normalized to lowercase
@@ -70,11 +81,13 @@ The complaint submission form includes comprehensive client-side validation to e
   - No limit on number of tags
 
 **Features**:
+
 - Autocomplete suggestions from popular tags
 - Ability to create custom tags
 - Visual tag chips with remove functionality
 
 ### 6. Anonymous Submission
+
 - **Required**: No (optional checkbox)
 - **Rules**:
   - Boolean flag, no validation needed
@@ -84,6 +97,7 @@ The complaint submission form includes comprehensive client-side validation to e
 ## Draft Mode Validation
 
 When saving as a draft (`isDraft: true`):
+
 - **Title**: Optional, but if provided must not exceed 200 characters
 - **Description**: Optional, but if provided must not exceed 5000 characters
 - **Category**: Optional
@@ -95,17 +109,20 @@ This allows users to save incomplete complaints and return to them later.
 ## Validation Behavior
 
 ### Real-time Validation
+
 - Errors are cleared immediately when user corrects the field
 - Character counters update in real-time
 - Visual feedback with red borders on invalid fields
 
 ### Submission Validation
+
 - All validation runs when user clicks "Submit Complaint"
 - Form submission is prevented if validation fails
 - Error messages are displayed for all invalid fields
 - Focus remains on the form to allow corrections
 
 ### Draft Validation
+
 - Minimal validation when saving as draft
 - Only length limits are enforced if content exists
 - Allows partial completion
@@ -113,12 +130,14 @@ This allows users to save incomplete complaints and return to them later.
 ## Error Display
 
 ### Visual Indicators
+
 - **Invalid Fields**: Red border on input/select elements
 - **Error Messages**: Red text below each invalid field
 - **General Errors**: Alert banner at top of form
 - **Character Counters**: Show current/max length
 
 ### Error Message Format
+
 ```typescript
 interface FormErrors {
   title?: string;
@@ -132,7 +151,7 @@ interface FormErrors {
 ## Accessibility
 
 - Error messages are associated with form fields
-- Required fields marked with asterisk (*)
+- Required fields marked with asterisk (\*)
 - Clear visual indicators for validation state
 - Keyboard navigation supported
 - Screen reader friendly error announcements
@@ -140,9 +159,11 @@ interface FormErrors {
 ## Testing
 
 Comprehensive unit tests are provided in:
+
 - `src/components/complaints/__tests__/complaint-form-validation.test.ts`
 
 Tests cover:
+
 - All validation rules
 - Boundary conditions (max lengths)
 - Edge cases (empty, whitespace-only, HTML-only)
@@ -152,6 +173,7 @@ Tests cover:
 ## Implementation Details
 
 ### Validation Function
+
 ```typescript
 const validateForm = (isDraft: boolean = false): boolean => {
   const newErrors: FormErrors = {};
@@ -170,6 +192,7 @@ const validateForm = (isDraft: boolean = false): boolean => {
 ```
 
 ### HTML Content Validation
+
 ```typescript
 const getTextContent = (html: string): string => {
   const div = document.createElement('div');
@@ -183,6 +206,7 @@ This ensures that HTML markup doesn't count toward character limits.
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 - Server-side validation (currently client-side only)
 - Custom validation messages per category
 - Profanity filtering for titles/descriptions
@@ -194,6 +218,7 @@ Potential improvements for future iterations:
 ## Related Requirements
 
 This implementation satisfies:
+
 - **AC2**: Complaint Submission - validates required fields
 - **AC9**: Categories, Tags, and Priority - validates all options
 - **AC10**: Draft Complaints - supports partial validation

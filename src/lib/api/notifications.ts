@@ -12,6 +12,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Notification } from '@/types/database.types';
 import { withRateLimit } from '@/lib/rate-limiter';
+import { withTokenRefresh } from '@/lib/api-wrapper';
 
 /**
  * Fetch notifications for the current user
@@ -20,27 +21,29 @@ import { withRateLimit } from '@/lib/rate-limiter';
  * @returns Array of notifications ordered by creation date (newest first)
  */
 async function fetchNotificationsImpl(limit: number = 50): Promise<Notification[]> {
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  return withTokenRefresh(async () => {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    throw new Error('Not authenticated');
-  }
+    if (authError || !user) {
+      throw new Error('Not authenticated');
+    }
 
-  const { data, error } = await supabase
-    .from('notifications')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(limit);
 
-  if (error) {
-    throw new Error(`Failed to fetch notifications: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Failed to fetch notifications: ${error.message}`);
+    }
 
-  return data || [];
+    return data || [];
+  });
 }
 
 export const fetchNotifications = withRateLimit(fetchNotificationsImpl, 'read');
@@ -51,24 +54,26 @@ export const fetchNotifications = withRateLimit(fetchNotificationsImpl, 'read');
  * @param notificationId - ID of the notification to mark as read
  */
 async function markNotificationAsReadImpl(notificationId: string): Promise<void> {
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  return withTokenRefresh(async () => {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    throw new Error('Not authenticated');
-  }
+    if (authError || !user) {
+      throw new Error('Not authenticated');
+    }
 
-  const { error } = await supabase
-    .from('notifications')
-    .update({ is_read: true })
-    .eq('id', notificationId)
-    .eq('user_id', user.id); // Ensure user can only update their own notifications
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId)
+      .eq('user_id', user.id); // Ensure user can only update their own notifications
 
-  if (error) {
-    throw new Error(`Failed to mark notification as read: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Failed to mark notification as read: ${error.message}`);
+    }
+  });
 }
 
 export const markNotificationAsRead = withRateLimit(markNotificationAsReadImpl, 'write');
@@ -77,24 +82,26 @@ export const markNotificationAsRead = withRateLimit(markNotificationAsReadImpl, 
  * Mark all unread notifications as read for the current user
  */
 async function markAllNotificationsAsReadImpl(): Promise<void> {
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  return withTokenRefresh(async () => {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    throw new Error('Not authenticated');
-  }
+    if (authError || !user) {
+      throw new Error('Not authenticated');
+    }
 
-  const { error } = await supabase
-    .from('notifications')
-    .update({ is_read: true })
-    .eq('user_id', user.id)
-    .eq('is_read', false); // Only update unread notifications
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false); // Only update unread notifications
 
-  if (error) {
-    throw new Error(`Failed to mark all notifications as read: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Failed to mark all notifications as read: ${error.message}`);
+    }
+  });
 }
 
 export const markAllNotificationsAsRead = withRateLimit(markAllNotificationsAsReadImpl, 'write');

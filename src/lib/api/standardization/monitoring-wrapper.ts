@@ -445,9 +445,7 @@ export class MonitoringDashboard {
     const stats = apiMonitor.getStats(timeRangeMs);
 
     // Get metrics from the last 5 seconds for real-time view
-    const recentMetrics = metrics.filter(
-      (m) => Date.now() - m.timestamp.getTime() < 5000
-    );
+    const recentMetrics = metrics.filter((m) => Date.now() - m.timestamp.getTime() < 5000);
 
     return {
       currentThroughput: (recentMetrics.length / 5) * 1000, // Requests per second

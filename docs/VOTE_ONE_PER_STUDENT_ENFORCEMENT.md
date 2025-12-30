@@ -19,6 +19,7 @@ CONSTRAINT unique_vote_per_student UNIQUE (vote_id, student_id)
 ```
 
 This constraint is defined in migration `013_create_vote_responses_table.sql` and ensures that:
+
 - A student can only have ONE vote response per poll
 - Any attempt to insert a duplicate will fail with error code `23505`
 - The constraint is enforced at the database level, making it impossible to bypass
@@ -26,6 +27,7 @@ This constraint is defined in migration `013_create_vote_responses_table.sql` an
 ### Constraint Name
 
 The actual constraint name in the database is:
+
 ```
 vote_responses_vote_id_student_id_key
 ```
@@ -35,24 +37,29 @@ vote_responses_vote_id_student_id_key
 Database constraint testing confirmed:
 
 ✅ **Test 1: First vote succeeds**
+
 - Student A votes for "Option A" on Poll 1
 - Result: SUCCESS - Vote recorded
 
 ✅ **Test 2: Duplicate vote fails**
+
 - Student A tries to vote for "Option B" on Poll 1
 - Result: FAILURE - Error: `duplicate key value violates unique constraint "vote_responses_vote_id_student_id_key"`
 
 ✅ **Test 3: Different student succeeds**
+
 - Student B votes for "Option B" on Poll 1
 - Result: SUCCESS - Vote recorded
 
 ✅ **Test 4: Vote results are accurate**
+
 - Poll 1 results: Option A (1 vote), Option B (1 vote)
 - Total: 2 votes from 2 different students
 
 ## API Layer Validation
 
 ### Location
+
 `src/lib/api/votes.ts` - `submitVoteResponse()` function
 
 ### Implementation
@@ -68,7 +75,7 @@ export async function submitVoteResponse(
   // When using Supabase (Phase 12):
   // The database constraint will automatically prevent duplicates
   // Error code 23505 indicates unique constraint violation
-  
+
   // Current mock implementation:
   // Check if student already voted
   const existingResponse = mockVoteResponses.find(
@@ -78,7 +85,7 @@ export async function submitVoteResponse(
   if (existingResponse) {
     throw new Error('You have already voted on this poll');
   }
-  
+
   // ... rest of validation and insert logic
 }
 ```
@@ -90,8 +97,7 @@ When the database constraint is violated (Phase 12 with real Supabase):
 ```typescript
 if (error) {
   // Check if error is due to unique constraint violation
-  if (error.code === '23505' && 
-      error.message.includes('vote_responses_vote_id_student_id_key')) {
+  if (error.code === '23505' && error.message.includes('vote_responses_vote_id_student_id_key')) {
     throw new Error('You have already voted on this poll');
   }
   throw new Error(error.message || 'Failed to submit vote');
@@ -101,6 +107,7 @@ if (error) {
 ## UI Layer Prevention
 
 ### Location
+
 `src/app/votes/[id]/page.tsx`
 
 ### Implementation
@@ -108,15 +115,17 @@ if (error) {
 The UI prevents duplicate voting through:
 
 1. **Pre-check before rendering**
+
    ```typescript
    const voted = await hasStudentVoted(voteId, mockStudentId);
    setHasVoted(voted);
    ```
 
 2. **Conditional rendering**
+
    ```typescript
    const canVote = vote && !hasVoted && !isVoteClosed(vote) && vote.is_active;
-   
+
    {canVote ? (
      // Show voting form
    ) : (
@@ -132,16 +141,19 @@ The UI prevents duplicate voting through:
 ### User Experience Flow
 
 **Before Voting:**
+
 - Student sees voting options with radio buttons
 - "Submit Vote" button is enabled when an option is selected
 
 **After Voting:**
+
 - Success message: "Your vote has been submitted successfully!"
 - Voting form is replaced with results visualization
 - "Voted" badge appears next to the poll title
 - Student can see how others voted (aggregated results)
 
 **Attempting to Vote Again:**
+
 - Not possible through UI (form is hidden)
 - If attempted via API: Error message displayed
 - Original vote remains unchanged
@@ -168,6 +180,7 @@ CREATE POLICY "Students insert responses"
 ```
 
 This ensures:
+
 - Only authenticated users can vote
 - Only students (not lecturers) can cast votes
 - Students can only vote as themselves (cannot impersonate)
@@ -184,6 +197,7 @@ The `submitVoteResponse` function also validates:
 ## Testing Scenarios
 
 ### Scenario 1: Normal Voting Flow
+
 1. Student A opens Poll 1
 2. Student A selects "Option A"
 3. Student A clicks "Submit Vote"
@@ -191,24 +205,28 @@ The `submitVoteResponse` function also validates:
 5. Student A sees results
 
 ### Scenario 2: Duplicate Vote Attempt (UI)
+
 1. Student A has already voted on Poll 1
 2. Student A navigates to Poll 1 again
 3. ✅ UI shows results instead of voting form
 4. ✅ "Voted" badge is displayed
 
 ### Scenario 3: Duplicate Vote Attempt (API)
+
 1. Student A has already voted on Poll 1
 2. Malicious attempt to call API directly
 3. ✅ Database constraint rejects the insert
 4. ✅ Error returned: "You have already voted on this poll"
 
 ### Scenario 4: Multiple Students, Same Poll
+
 1. Student A votes "Option A" on Poll 1 ✅
 2. Student B votes "Option B" on Poll 1 ✅
 3. Student C votes "Option A" on Poll 1 ✅
 4. Results: Option A (2), Option B (1)
 
 ### Scenario 5: Same Student, Multiple Polls
+
 1. Student A votes on Poll 1 ✅
 2. Student A votes on Poll 2 ✅
 3. Student A votes on Poll 3 ✅
@@ -219,6 +237,7 @@ The `submitVoteResponse` function also validates:
 **Migration File**: `supabase/migrations/013_create_vote_responses_table.sql`
 
 **Key Components**:
+
 - Table creation with `vote_id` and `student_id` columns
 - UNIQUE constraint: `CONSTRAINT unique_vote_per_student UNIQUE (vote_id, student_id)`
 - Foreign key constraints with CASCADE delete
@@ -228,8 +247,9 @@ The `submitVoteResponse` function also validates:
 ## Verification Commands
 
 ### Check Constraint Exists
+
 ```sql
-SELECT 
+SELECT
   conname as constraint_name,
   pg_get_constraintdef(oid) as constraint_definition
 FROM pg_constraint
@@ -238,14 +258,16 @@ WHERE conrelid = 'public.vote_responses'::regclass
 ```
 
 Expected result:
+
 ```
 constraint_name: vote_responses_vote_id_student_id_key
 constraint_definition: UNIQUE (vote_id, student_id)
 ```
 
 ### Check Vote Counts
+
 ```sql
-SELECT 
+SELECT
   v.title,
   COUNT(DISTINCT vr.student_id) as unique_voters,
   COUNT(vr.id) as total_votes
@@ -257,8 +279,9 @@ GROUP BY v.id, v.title;
 The `unique_voters` and `total_votes` should always be equal, confirming one vote per student.
 
 ### Find Duplicate Attempts (Should be empty)
+
 ```sql
-SELECT 
+SELECT
   vote_id,
   student_id,
   COUNT(*) as vote_count
@@ -302,6 +325,7 @@ Expected result: Empty (no duplicates possible)
 From requirements.md:
 
 > **AC6: Voting System**
+>
 > - Lecturers can create voting polls with multiple options
 > - Polls can be associated with specific topics or complaints
 > - Students can cast votes on active polls
@@ -314,6 +338,7 @@ From requirements.md:
 From design.md:
 
 > **P6: Vote Uniqueness (AC6)**
+>
 > - **Property**: A student can vote only once per poll
 > - **Verification**: UNIQUE constraint on (vote_id, student_id) in vote_responses
 > - **Implementation**: Database UNIQUE constraint prevents duplicate votes ✅

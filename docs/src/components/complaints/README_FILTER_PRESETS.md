@@ -5,12 +5,12 @@
 ### Basic Usage
 
 ```typescript
-import { 
-  FilterPanel, 
+import {
+  FilterPanel,
   FilterPresetManager,
   saveFilterPreset,
   type FilterState,
-  type FilterPreset 
+  type FilterPreset
 } from '@/components/complaints';
 
 function MyComponent() {
@@ -42,7 +42,7 @@ function MyComponent() {
         onFiltersChange={setFilters}
         onSavePreset={handleSavePreset}
       />
-      
+
       <FilterPresetManager
         onLoadPreset={handleLoadPreset}
       />
@@ -60,10 +60,12 @@ function MyComponent() {
 Displays and manages saved filter presets.
 
 **Props:**
+
 - `onLoadPreset: (preset: FilterPreset) => void` - Callback when preset is loaded
 - `className?: string` - Optional CSS classes
 
 **Features:**
+
 - Automatically loads presets from localStorage
 - Displays list of saved presets
 - Highlights active preset
@@ -75,9 +77,11 @@ Displays and manages saved filter presets.
 The filter panel now includes preset save functionality.
 
 **New Props:**
+
 - `onSavePreset?: (name: string, filters: FilterState) => void` - Callback to save preset
 
 **Behavior:**
+
 - Shows "Save Filter Preset" button when filters are active
 - Provides input field for preset name
 - Validates name before saving
@@ -90,23 +94,24 @@ The filter panel now includes preset save functionality.
 Save a new filter preset to localStorage.
 
 ```typescript
-function saveFilterPreset(
-  name: string, 
-  filters: FilterState
-): FilterPreset
+function saveFilterPreset(name: string, filters: FilterState): FilterPreset;
 ```
 
 **Parameters:**
+
 - `name` - Preset name (required, non-empty)
 - `filters` - Complete filter state to save
 
 **Returns:**
+
 - `FilterPreset` object with generated ID and timestamp
 
 **Throws:**
+
 - Error if localStorage operation fails
 
 **Example:**
+
 ```typescript
 const preset = saveFilterPreset('High Priority', {
   status: ['new'],
@@ -121,14 +126,16 @@ console.log(preset.id); // "preset-1732123456789"
 Load all saved presets from localStorage.
 
 ```typescript
-function loadFilterPresets(): FilterPreset[]
+function loadFilterPresets(): FilterPreset[];
 ```
 
 **Returns:**
+
 - Array of FilterPreset objects
 - Empty array if no presets or on error
 
 **Example:**
+
 ```typescript
 const presets = loadFilterPresets();
 console.log(`Found ${presets.length} presets`);
@@ -139,16 +146,19 @@ console.log(`Found ${presets.length} presets`);
 Delete a preset by ID.
 
 ```typescript
-function deleteFilterPreset(presetId: string): void
+function deleteFilterPreset(presetId: string): void;
 ```
 
 **Parameters:**
+
 - `presetId` - ID of preset to delete
 
 **Throws:**
+
 - Error if localStorage operation fails
 
 **Example:**
+
 ```typescript
 deleteFilterPreset('preset-1732123456789');
 ```
@@ -159,10 +169,10 @@ deleteFilterPreset('preset-1732123456789');
 
 ```typescript
 interface FilterPreset {
-  id: string;              // Unique ID (e.g., "preset-1732123456789")
-  name: string;            // User-provided name
-  filters: FilterState;    // Complete filter configuration
-  createdAt: string;       // ISO timestamp
+  id: string; // Unique ID (e.g., "preset-1732123456789")
+  name: string; // User-provided name
+  filters: FilterState; // Complete filter configuration
+  createdAt: string; // ISO timestamp
 }
 ```
 
@@ -334,9 +344,11 @@ describe('Filter Presets', () => {
   });
 
   it('should save and load presets', () => {
-    const filters = { /* ... */ };
+    const filters = {
+      /* ... */
+    };
     const preset = saveFilterPreset('Test', filters);
-    
+
     const loaded = loadFilterPresets();
     expect(loaded).toHaveLength(1);
     expect(loaded[0].name).toBe('Test');
@@ -353,10 +365,10 @@ import { FilterPresetManager } from './filter-preset-manager';
 it('should load preset on click', () => {
   const onLoadPreset = vi.fn();
   render(<FilterPresetManager onLoadPreset={onLoadPreset} />);
-  
+
   const preset = screen.getByText('Test Preset');
   fireEvent.click(preset);
-  
+
   expect(onLoadPreset).toHaveBeenCalled();
 });
 ```

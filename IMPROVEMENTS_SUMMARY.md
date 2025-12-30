@@ -78,14 +78,14 @@ Implemented a comprehensive timeout system to prevent requests from hanging inde
 
 ```typescript
 TIMEOUT_CONFIG = {
-  read: 15000,      // 15 seconds
-  write: 30000,     // 30 seconds
-  bulk: 60000,      // 60 seconds
-  auth: 10000,      // 10 seconds
-  search: 20000,    // 20 seconds
-  upload: 120000,   // 120 seconds (2 minutes)
-  default: 30000,   // 30 seconds
-}
+  read: 15000, // 15 seconds
+  write: 30000, // 30 seconds
+  bulk: 60000, // 60 seconds
+  auth: 10000, // 10 seconds
+  search: 20000, // 20 seconds
+  upload: 120000, // 120 seconds (2 minutes)
+  default: 30000, // 30 seconds
+};
 ```
 
 ### Key Features
@@ -173,16 +173,19 @@ Added comprehensive error handling to all mutation hooks with user-friendly toas
 ### Toast Messages
 
 **Create Errors:**
+
 - Validation: Shows specific validation error
 - Timeout: "Request timed out. Please check your connection and try again."
 - Generic: "Failed to create complaint. Please try again."
 
 **Update Errors:**
+
 - Validation: Shows specific validation error
 - Timeout: "Request timed out. Please check your connection and try again."
 - Generic: "Failed to update complaint. Please try again."
 
 **Delete Errors:**
+
 - Timeout: "Request timed out. Please check your connection and try again."
 - Generic: "Failed to delete complaint. Please try again."
 
@@ -211,18 +214,21 @@ Route (app)
 ## Impact Summary
 
 ### User Experience
+
 - **Instant feedback:** Optimistic updates provide immediate UI response
 - **Clear errors:** User-friendly error messages instead of technical jargon
 - **No hanging:** Requests timeout after reasonable duration
 - **Data integrity:** Validation prevents invalid data submission
 
 ### Code Quality
+
 - **Type safety:** Zod schemas provide runtime type validation
 - **Error resilience:** Comprehensive error handling at all layers
 - **Cache consistency:** Proper rollback and invalidation strategies
 - **Maintainability:** Centralized validation and timeout configuration
 
 ### Performance
+
 - **Reduced latency:** Optimistic updates eliminate perceived wait time
 - **Prevented deadlocks:** Timeouts prevent indefinite hanging
 - **Efficient caching:** Smart invalidation reduces unnecessary fetches
@@ -232,10 +238,12 @@ Route (app)
 ## Files Summary
 
 ### Created Files (2)
+
 1. `src/lib/validation.ts` - Zod validation schemas
 2. `src/lib/timeout.ts` - Timeout utilities
 
 ### Modified Files (3)
+
 1. `src/lib/api/complaints.ts` - Added validation to create/update
 2. `src/lib/api-wrapper.ts` - Integrated timeout handling
 3. `src/hooks/use-complaints.ts` - Added optimistic updates and error handling

@@ -183,11 +183,13 @@ export function useEnhancedVirtualScrolling<T>({
   const enhancedVirtualItems = useMemo((): EnhancedVirtualItem[] => {
     const visibleRange = virtualizer.getVirtualItems();
     const bufferSize = Math.floor(visibleRange.length * fullConfig.buffering.multiplier);
-    
+
     return visibleRange.map((item, index) => {
       const isInBuffer = index < bufferSize || index >= visibleRange.length - bufferSize;
-      const priority = isInBuffer ? 1 : Math.max(0, 1 - Math.abs(index - visibleRange.length / 2) / visibleRange.length);
-      
+      const priority = isInBuffer
+        ? 1
+        : Math.max(0, 1 - Math.abs(index - visibleRange.length / 2) / visibleRange.length);
+
       return {
         ...item,
         isBuffered: isInBuffer,
@@ -211,21 +213,24 @@ export function useEnhancedVirtualScrolling<T>({
       // Sample performance data
       if (Math.random() < fullConfig.monitoring.sampleRate) {
         performanceRef.current.renderTimes.push(frameTime);
-        
+
         // Keep only recent measurements
         if (performanceRef.current.renderTimes.length > 100) {
           performanceRef.current.renderTimes.shift();
         }
 
         // Update metrics
-        const avgRenderTime = performanceRef.current.renderTimes.reduce((a, b) => a + b, 0) / 
+        const avgRenderTime =
+          performanceRef.current.renderTimes.reduce((a, b) => a + b, 0) /
           performanceRef.current.renderTimes.length;
-        
-        const frameRate = 1000 / avgRenderTime;
-        const bufferHitRate = performanceRef.current.bufferHits / 
-          (performanceRef.current.bufferHits + performanceRef.current.bufferMisses) * 100;
 
-        setMetrics(prev => ({
+        const frameRate = 1000 / avgRenderTime;
+        const bufferHitRate =
+          (performanceRef.current.bufferHits /
+            (performanceRef.current.bufferHits + performanceRef.current.bufferMisses)) *
+          100;
+
+        setMetrics((prev) => ({
           ...prev,
           averageRenderTime: avgRenderTime,
           frameRate: Math.min(frameRate, 60),
@@ -241,18 +246,23 @@ export function useEnhancedVirtualScrolling<T>({
 
     const animationId = requestAnimationFrame(measurePerformance);
     return () => cancelAnimationFrame(animationId);
-  }, [fullConfig.monitoring.enabled, fullConfig.monitoring.sampleRate, enhancedVirtualItems.length, items.length]);
+  }, [
+    fullConfig.monitoring.enabled,
+    fullConfig.monitoring.sampleRate,
+    enhancedVirtualItems.length,
+    items.length,
+  ]);
 
   // Notify about visible items changes
   useEffect(() => {
     if (onItemsChange) {
       const visibleItems = enhancedVirtualItems
-        .filter(item => !item.isBuffered)
-        .map(item => items[item.index]);
-      
+        .filter((item) => !item.isBuffered)
+        .map((item) => items[item.index]);
+
       const bufferedItems = enhancedVirtualItems
-        .filter(item => item.isBuffered)
-        .map(item => items[item.index]);
+        .filter((item) => item.isBuffered)
+        .map((item) => items[item.index]);
 
       onItemsChange(visibleItems, bufferedItems);
     }
@@ -300,7 +310,7 @@ export function useEnhancedVirtualScrolling<T>({
   const scrollToItem = useCallback(
     (index: number, options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean }) => {
       const { align = 'start', smooth = fullConfig.scrollBehavior.smooth } = options || {};
-      
+
       virtualizer.scrollToIndex(index, {
         align,
         behavior: smooth ? 'smooth' : 'auto',
@@ -313,17 +323,15 @@ export function useEnhancedVirtualScrolling<T>({
   const getItemAtPosition = useCallback(
     (y: number): { item: T; index: number } | null => {
       const virtualItems = virtualizer.getVirtualItems();
-      const foundItem = virtualItems.find(
-        item => y >= item.start && y <= item.end
-      );
-      
+      const foundItem = virtualItems.find((item) => y >= item.start && y <= item.end);
+
       if (foundItem) {
         return {
           item: items[foundItem.index],
           index: foundItem.index,
         };
       }
-      
+
       return null;
     },
     [virtualizer, items]
@@ -352,20 +360,20 @@ export function useEnhancedVirtualScrolling<T>({
     scrollToItem,
     getItemAtPosition,
     optimizeForLargeDataset,
-    
+
     // Utility methods
     getTotalSize: () => virtualizer.getTotalSize(),
     getVirtualItems: () => virtualizer.getVirtualItems(),
-    scrollToOffset: (offset: number, options?: { align?: 'start' | 'center' | 'end' }) => 
+    scrollToOffset: (offset: number, options?: { align?: 'start' | 'center' | 'end' }) =>
       virtualizer.scrollToOffset(offset, options),
-    
+
     // Performance helpers
     clearSizeCache: () => itemSizeCache.current.clear(),
     resetMetrics: () => {
       performanceRef.current.renderTimes = [];
       performanceRef.current.bufferHits = 0;
       performanceRef.current.bufferMisses = 0;
-      setMetrics(prev => ({
+      setMetrics((prev) => ({
         ...prev,
         averageRenderTime: 0,
         frameRate: 60,
@@ -400,11 +408,7 @@ export function VirtualScrollContainer<T>({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const {
-    virtualizer,
-    virtualItems,
-    metrics,
-  } = useEnhancedVirtualScrolling({
+  const { virtualizer, virtualItems, metrics } = useEnhancedVirtualScrolling({
     items,
     containerRef: containerRef as React.RefObject<HTMLElement | null>,
     config: config || {},
@@ -456,21 +460,26 @@ export function VirtualScrollContainer<T>({
  */
 export function VirtualScrollingMonitor({ metrics }: { metrics: VirtualScrollingMetrics }) {
   return (
-    <div className="virtual-scrolling-monitor" style={{ 
-      position: 'fixed', 
-      top: 10, 
-      right: 10, 
-      background: 'rgba(0,0,0,0.8)', 
-      color: 'white', 
-      padding: '10px', 
-      borderRadius: '5px',
-      fontSize: '12px',
-      fontFamily: 'monospace',
-      zIndex: 9999,
-    }}>
+    <div
+      className="virtual-scrolling-monitor"
+      style={{
+        position: 'fixed',
+        top: 10,
+        right: 10,
+        background: 'rgba(0,0,0,0.8)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        fontFamily: 'monospace',
+        zIndex: 9999,
+      }}
+    >
       <div>FPS: {metrics.frameRate.toFixed(1)}</div>
       <div>Render Time: {metrics.averageRenderTime.toFixed(2)}ms</div>
-      <div>Items: {metrics.renderedItems}/{metrics.totalItems}</div>
+      <div>
+        Items: {metrics.renderedItems}/{metrics.totalItems}
+      </div>
       <div>Performance: {metrics.performanceScore.toFixed(0)}/100</div>
       <div>Buffer Hit Rate: {metrics.bufferHitRate.toFixed(1)}%</div>
     </div>

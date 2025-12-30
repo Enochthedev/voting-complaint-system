@@ -1,9 +1,11 @@
 # Escalation Rules - Quick Reference
 
 ## Overview
+
 The Escalation Rules page allows administrators to configure automatic escalation of complaints that remain unaddressed for a specified time period.
 
 ## Access
+
 - **URL**: `/admin/escalation-rules`
 - **Role**: Admin only
 - **Navigation**: Sidebar → "Escalation Rules"
@@ -11,7 +13,9 @@ The Escalation Rules page allows administrators to configure automatic escalatio
 ## Key Features
 
 ### 1. Rule Configuration
+
 Each escalation rule defines:
+
 - **Category**: Type of complaint (Academic, Facilities, Harassment, etc.)
 - **Priority**: Urgency level (Low, Medium, High, Critical)
 - **Time Threshold**: Hours before escalation (displayed as hours or days)
@@ -19,18 +23,21 @@ Each escalation rule defines:
 - **Status**: Active or Inactive
 
 ### 2. Search and Filtering
+
 - **Search**: By category name or assigned user name
 - **Category Filter**: Filter by complaint category
 - **Priority Filter**: Filter by priority level
 - **Status Filter**: Show active, inactive, or all rules
 
 ### 3. Rule Management
+
 - **Create**: Add new escalation rules (form to be implemented)
 - **Edit**: Modify existing rules (form to be implemented)
 - **Delete**: Remove rules with confirmation
 - **Toggle**: Enable/disable rules without deleting
 
 ### 4. Visual Indicators
+
 - **Active Badge**: Green badge for active rules
 - **Inactive Badge**: Gray badge for inactive rules
 - **Priority Badges**: Color-coded (Blue=Low, Yellow=Medium, Orange=High, Red=Critical)
@@ -47,16 +54,19 @@ Each escalation rule defines:
 ## Example Rules
 
 ### Critical Harassment (2 hours)
+
 - Harassment complaints with critical priority
 - Escalates after 2 hours
 - Assigned to senior admin for immediate attention
 
 ### High Priority Facilities (24 hours)
+
 - Facilities complaints with high priority
 - Escalates after 1 day
 - Assigned to facilities manager
 
 ### Academic Issues (48 hours)
+
 - Academic complaints with high priority
 - Escalates after 2 days
 - Assigned to academic dean
@@ -64,11 +74,11 @@ Each escalation rule defines:
 ## Time Threshold Guidelines
 
 | Priority | Recommended Threshold |
-|----------|----------------------|
-| Critical | 2-4 hours |
-| High | 24-48 hours |
-| Medium | 3-7 days |
-| Low | 7-14 days |
+| -------- | --------------------- |
+| Critical | 2-4 hours             |
+| High     | 24-48 hours           |
+| Medium   | 3-7 days              |
+| Low      | 7-14 days             |
 
 ## Best Practices
 
@@ -82,24 +92,28 @@ Each escalation rule defines:
 ## Common Use Cases
 
 ### Urgent Safety Issues
+
 - Category: Harassment
 - Priority: Critical
 - Threshold: 2 hours
 - Escalate To: Safety Officer
 
 ### Facility Emergencies
+
 - Category: Facilities
 - Priority: High
 - Threshold: 4 hours
 - Escalate To: Facilities Director
 
 ### Academic Disputes
+
 - Category: Academic
 - Priority: High
 - Threshold: 48 hours
 - Escalate To: Academic Dean
 
 ### General Administrative
+
 - Category: Administrative
 - Priority: Medium
 - Threshold: 7 days
@@ -108,6 +122,7 @@ Each escalation rule defines:
 ## UI Components
 
 ### Rule Card
+
 ```
 ┌─────────────────────────────────────────────┐
 │ Category - Priority Badge        Status     │
@@ -122,11 +137,13 @@ Each escalation rule defines:
 ```
 
 ### Action Buttons
+
 - **Eye/EyeOff**: Toggle active/inactive status
 - **Edit**: Open edit modal (to be implemented)
 - **Trash**: Delete with confirmation
 
 ### Success Messages
+
 - Auto-dismiss after 3 seconds
 - Green background with checkmark icon
 - Clear action confirmation
@@ -169,6 +186,7 @@ interface EscalationRule {
 ## Support
 
 For issues or questions:
+
 1. Check the visual test guide: `ESCALATION_RULES_VISUAL_TEST.md`
 2. Review implementation details: `TASK_10.1_ESCALATION_RULES_PAGE_COMPLETION.md`
 3. Test with mock data before API integration

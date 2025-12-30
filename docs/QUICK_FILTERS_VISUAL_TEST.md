@@ -1,6 +1,7 @@
 # Quick Filters Visual Test Guide
 
 ## Test Environment
+
 - **Page**: Lecturer Dashboard (`/dashboard`)
 - **User Role**: Lecturer
 - **Component**: Quick Filters section
@@ -8,6 +9,7 @@
 ## Visual Test Steps
 
 ### Test 1: Quick Filters Visibility
+
 **Expected Result**: Quick Filters section appears between the search bar and tabs
 
 1. Log in as a lecturer
@@ -21,6 +23,7 @@
 ---
 
 ### Test 2: Filter Button States
+
 **Expected Result**: Buttons show correct visual states
 
 1. Verify all 7 filter buttons are visible:
@@ -40,6 +43,7 @@
 ---
 
 ### Test 3: Single Filter Activation
+
 **Expected Result**: Clicking a filter activates it and shows results
 
 1. Click "New" filter button
@@ -54,6 +58,7 @@
 ---
 
 ### Test 4: Filter Toggle
+
 **Expected Result**: Clicking an active filter deactivates it
 
 1. With "New" filter active, click "New" again
@@ -67,6 +72,7 @@
 ---
 
 ### Test 5: Multiple Filters
+
 **Expected Result**: Multiple filters can be active simultaneously
 
 1. Click "Assigned to Me" filter
@@ -82,6 +88,7 @@
 ---
 
 ### Test 6: Count Badge Accuracy
+
 **Expected Result**: Count badges show accurate numbers
 
 1. Activate "High Priority" filter
@@ -95,6 +102,7 @@
 ---
 
 ### Test 7: Clear All Functionality
+
 **Expected Result**: Clear All resets all filters
 
 1. Activate multiple filters (e.g., "New" + "High Priority")
@@ -110,6 +118,7 @@
 ---
 
 ### Test 8: Assigned to Me Filter
+
 **Expected Result**: Shows only complaints assigned to current lecturer
 
 1. Click "Assigned to Me" filter
@@ -124,6 +133,7 @@
 ---
 
 ### Test 9: High Priority Filter
+
 **Expected Result**: Shows high and critical priority complaints
 
 1. Click "High Priority" filter
@@ -138,15 +148,18 @@
 ---
 
 ### Test 10: Status Filters
+
 **Expected Result**: Each status filter works independently
 
 Test each status filter:
+
 - New
 - In Progress
 - Opened
 - Resolved
 
 For each:
+
 1. Click the filter button
 2. Verify only complaints with that status are shown
 3. Verify count badge is accurate
@@ -157,6 +170,7 @@ For each:
 ---
 
 ### Test 11: Urgent Categories Filter
+
 **Expected Result**: Shows facilities, academic, and harassment complaints
 
 1. Click "Urgent Categories" filter
@@ -174,6 +188,7 @@ For each:
 ---
 
 ### Test 12: Filter + Search Interaction
+
 **Expected Result**: Activating a filter clears active search
 
 1. Perform a search in the search bar
@@ -188,6 +203,7 @@ For each:
 ---
 
 ### Test 13: Responsive Design
+
 **Expected Result**: Filters wrap properly on smaller screens
 
 1. Resize browser window to mobile width (375px)
@@ -202,6 +218,7 @@ For each:
 ---
 
 ### Test 14: Help Text
+
 **Expected Result**: Help text is visible and informative
 
 1. Scroll to Quick Filters section
@@ -213,6 +230,7 @@ For each:
 ---
 
 ### Test 15: Filter Persistence
+
 **Expected Result**: Filters persist when switching tabs
 
 1. Activate "Assigned to Me" filter
@@ -246,10 +264,13 @@ For each:
 - [ ] Help text is visible
 
 ## Known Issues
+
 None identified during implementation.
 
 ## Browser Compatibility
+
 Test in:
+
 - [ ] Chrome/Edge (Chromium)
 - [ ] Firefox
 - [ ] Safari
@@ -257,6 +278,7 @@ Test in:
 - [ ] Chrome Mobile (Android)
 
 ## Accessibility Notes
+
 - All buttons have proper labels
 - Icons have semantic meaning
 - Keyboard navigation works
@@ -264,6 +286,7 @@ Test in:
 - Color is not the only indicator of state (filled vs outline)
 
 ## Performance Notes
+
 - Filter calculations use memoized `filteredComplaints`
 - No unnecessary re-renders
 - Count badges calculate efficiently

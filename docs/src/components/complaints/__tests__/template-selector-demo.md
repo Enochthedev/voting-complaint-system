@@ -1,11 +1,13 @@
 # Template Selector Implementation Demo
 
 ## Overview
+
 The template selector has been successfully added to the complaint form, allowing students to quickly fill out complaints using pre-defined templates.
 
 ## Features Implemented
 
 ### 1. Template Selector UI
+
 - **Location**: Top of the complaint form (before anonymous toggle)
 - **Visibility**: Only shown when creating new complaints (not when editing drafts)
 - **Design**: Clean dropdown interface with template browsing
@@ -13,6 +15,7 @@ The template selector has been successfully added to the complaint form, allowin
 ### 2. Template Selection Flow
 
 #### Initial State
+
 ```
 ┌─────────────────────────────────────────────┐
 │ Use a Template (Optional)                   │
@@ -26,6 +29,7 @@ The template selector has been successfully added to the complaint form, allowin
 ```
 
 #### Dropdown Open
+
 ```
 ┌─────────────────────────────────────────────┐
 │ 📄 Browse Templates                          │
@@ -45,6 +49,7 @@ The template selector has been successfully added to the complaint form, allowin
 ```
 
 #### Template Selected
+
 ```
 ┌─────────────────────────────────────────────┐
 │ 📄 Broken Equipment in Lab              [X] │
@@ -56,6 +61,7 @@ The template selector has been successfully added to the complaint form, allowin
 ### 3. Auto-Fill Behavior
 
 When a template is selected:
+
 1. **Title**: Pre-filled with template title
 2. **Category**: Auto-selected based on template
 3. **Priority**: Auto-selected based on template's suggested priority
@@ -63,29 +69,42 @@ When a template is selected:
 5. **Tags**: Auto-suggested based on template category and title keywords
 
 Example description after selecting "Broken Equipment in Lab":
+
 ```html
-<p><strong>Template for reporting broken or malfunctioning equipment in laboratory facilities</strong></p><br/>
-<p><strong>Please provide the following information:</strong></p><br/>
+<p>
+  <strong
+    >Template for reporting broken or malfunctioning equipment in laboratory facilities</strong
+  >
+</p>
+<br />
+<p><strong>Please provide the following information:</strong></p>
+<br />
 <p><strong>Equipment Name (Required):</strong></p>
-<p><em>e.g., Microscope, Computer</em></p><br/>
+<p><em>e.g., Microscope, Computer</em></p>
+<br />
 <p><strong>Lab Room (Required):</strong></p>
-<p><em>e.g., Lab 301</em></p><br/>
+<p><em>e.g., Lab 301</em></p>
+<br />
 <p><strong>Issue Description (Required):</strong></p>
-<p><em>Describe the problem</em></p><br/>
+<p><em>Describe the problem</em></p>
+<br />
 ```
 
 Example tags after selecting "Broken Equipment in Lab":
+
 - `facilities` (from category)
 - `equipment` (from title keyword)
 
 ### 4. Template Management
 
 #### Clear Template
+
 - Click the "X" button to clear the selected template
 - Resets all form fields to empty state
 - Returns to template selection mode
 
 #### Available Templates (Mock Data)
+
 1. **Broken Equipment in Lab** - Facilities, High Priority
 2. **Assignment Grading Issue** - Academic, Medium Priority
 3. **Classroom AC Not Working** - Facilities, Medium Priority
@@ -95,6 +114,7 @@ Example tags after selecting "Broken Equipment in Lab":
 ## User Experience
 
 ### For Students
+
 1. Navigate to "Submit a Complaint" page
 2. See template selector at the top of the form
 3. Click "Browse Templates" to see available options
@@ -104,6 +124,7 @@ Example tags after selecting "Broken Equipment in Lab":
 7. Submit or save as draft as usual
 
 ### Benefits
+
 - ✅ Faster complaint submission
 - ✅ Consistent complaint formatting
 - ✅ Guided field completion
@@ -113,6 +134,7 @@ Example tags after selecting "Broken Equipment in Lab":
 ## Technical Details
 
 ### Props Added
+
 ```typescript
 interface ComplaintFormProps {
   // ... existing props
@@ -121,6 +143,7 @@ interface ComplaintFormProps {
 ```
 
 ### State Management
+
 ```typescript
 const [selectedTemplate, setSelectedTemplate] = React.useState<ComplaintTemplate | null>(null);
 const [showTemplateDropdown, setShowTemplateDropdown] = React.useState(false);
@@ -128,6 +151,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ```
 
 ### Key Functions
+
 - `handleTemplateSelect(template)`: Applies template to form
 - `buildDescriptionFromTemplate(template)`: Generates description with field placeholders
 - `handleClearTemplate()`: Resets form to empty state
@@ -135,11 +159,13 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ## Integration Points
 
 ### Current Implementation (Phase 3-11)
+
 - Uses mock template data
 - No API calls
 - Pure UI functionality
 
 ### Future Integration (Phase 12)
+
 - Fetch templates from Supabase: `supabase.from('complaint_templates').select('*').eq('is_active', true)`
 - Filter templates by user role if needed
 - Real-time template updates
@@ -147,6 +173,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ## Testing Scenarios
 
 ### Manual Testing Checklist
+
 - [ ] Template selector appears on new complaint page
 - [ ] Template selector hidden when editing drafts
 - [ ] Dropdown opens/closes correctly
@@ -159,6 +186,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 - [ ] Can save as draft after using template
 
 ## Accessibility
+
 - ✅ Keyboard navigation supported
 - ✅ Click outside to close dropdown
 - ✅ Clear visual feedback for selected template
@@ -166,6 +194,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 - ✅ Screen reader friendly
 
 ## Next Steps (Task 4.3 Continuation)
+
 - [x] Pre-fill form fields from template (COMPLETED ✓)
   - ✅ Title pre-filling
   - ✅ Category pre-filling
@@ -175,6 +204,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 - [ ] Allow template editing and deletion (Admin page - separate task)
 
 ## Related Files
+
 - `src/components/complaints/complaint-form.tsx` - Main implementation
 - `src/app/complaints/new/page.tsx` - Usage in new complaint page
 - `src/app/admin/templates/page.tsx` - Template management (lecturers)
@@ -183,6 +213,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ## Screenshots/Visual Guide
 
 ### Desktop View
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ Submit a Complaint                                          │
@@ -209,6 +240,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ```
 
 ### Mobile View
+
 ```
 ┌──────────────────────────┐
 │ Submit a Complaint        │
@@ -233,6 +265,7 @@ const [loadingTemplates, setLoadingTemplates] = React.useState(false);
 ## Validation
 
 The template selector integrates seamlessly with existing form validation:
+
 - Template-filled fields can be edited
 - All validation rules still apply
 - Required fields must be completed

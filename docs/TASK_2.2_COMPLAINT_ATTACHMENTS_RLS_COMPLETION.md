@@ -1,6 +1,7 @@
 # Task 2.2: Complaint Attachments RLS Policies - Completion Summary
 
 ## Overview
+
 This document summarizes the implementation of Row Level Security (RLS) policies for the `complaint_attachments` table.
 
 ## Status: ✅ COMPLETED
@@ -12,6 +13,7 @@ This document summarizes the implementation of Row Level Security (RLS) policies
 The following RLS policies have been created for the `complaint_attachments` table:
 
 #### SELECT Policy: "Users view attachments on accessible complaints"
+
 - **Purpose**: Control who can view attachment records
 - **Rules**:
   - Lecturers and admins can view all attachments
@@ -19,6 +21,7 @@ The following RLS policies have been created for the `complaint_attachments` tab
 - **Implementation**: Uses JWT claims to check user role
 
 #### INSERT Policies:
+
 1. **"Students upload attachments to own complaints"**
    - Students can only upload attachments to complaints they own
    - Must match the `uploaded_by` field with their user ID
@@ -28,6 +31,7 @@ The following RLS policies have been created for the `complaint_attachments` tab
    - Must match the `uploaded_by` field with their user ID
 
 #### DELETE Policies:
+
 1. **"Students delete attachments from own complaints"**
    - Students can only delete attachments from their own complaints
 
@@ -54,17 +58,21 @@ The implementation validates the following correctness properties from the desig
 ## Files Created/Modified
 
 ### Migration Files
+
 1. `supabase/migrations/004_create_complaint_attachments_table.sql` - Original table creation with RLS
 2. `supabase/migrations/019_fix_complaint_attachments_rls.sql` - Fixed RLS policies using JWT claims
 3. `supabase/migrations/020_fix_users_table_rls.sql` - Fixed users table RLS to prevent infinite recursion
 
 ### Test Files
+
 1. `scripts/test-complaint-attachments-rls.js` - Comprehensive RLS policy test suite
 
 ### Verification Files
+
 1. `supabase/verify-complaint-attachments-table.sql` - Verification script for table structure and policies
 
 ### Documentation
+
 1. `docs/TASK_2.2_COMPLAINT_ATTACHMENTS_RLS_COMPLETION.md` - This file
 
 ## How to Apply the Migrations
@@ -76,12 +84,14 @@ The implementation validates the following correctness properties from the desig
 3. Apply the migrations in order:
 
 #### Step 1: Fix Users Table RLS
+
 ```sql
 -- Copy and paste contents from:
 -- supabase/migrations/020_fix_users_table_rls.sql
 ```
 
 #### Step 2: Fix Complaint Attachments RLS
+
 ```sql
 -- Copy and paste contents from:
 -- supabase/migrations/019_fix_complaint_attachments_rls.sql
@@ -135,6 +145,7 @@ Expected output: All 10 tests should pass (100% success rate)
 ## Important Notes
 
 ### JWT Claims Requirement
+
 The RLS policies rely on JWT claims containing the user's role. Ensure that:
 
 1. The `custom_access_token_hook` function is configured (migration 018)
@@ -142,12 +153,14 @@ The RLS policies rely on JWT claims containing the user's role. Ensure that:
 3. The JWT hook is enabled in Supabase Auth settings
 
 ### Infinite Recursion Fix
+
 The original RLS policies caused infinite recursion by querying the `users` table within RLS policies. This was fixed by:
 
 1. Using `auth.jwt()->>'role'` instead of querying the users table
 2. Applying the same fix to the users table RLS policies
 
 ### Storage Bucket Policies
+
 In addition to database RLS policies, you should also configure Supabase Storage bucket policies for the `complaint-attachments` bucket:
 
 ```sql
@@ -180,6 +193,7 @@ USING (
 ## Acceptance Criteria Met
 
 ✅ **AC11: File Attachments**
+
 - Students can attach files (images, PDFs, documents) to complaints
 - Maximum file size limit enforced (10MB per file)
 - Files are stored securely in Supabase Storage
@@ -187,6 +201,7 @@ USING (
 - Supported file types: images (jpg, png, gif), PDFs, documents (doc, docx)
 
 ✅ **NFR2: Security**
+
 - Role-based access control enforced
 - Anonymous complaints maintain student privacy
 - All user data encrypted in transit and at rest
@@ -211,15 +226,19 @@ USING (
 ## Troubleshooting
 
 ### Issue: "infinite recursion detected in policy for relation 'users'"
+
 **Solution**: Apply migration 020_fix_users_table_rls.sql to fix the users table RLS policies
 
 ### Issue: Tests fail with permission errors
-**Solution**: 
+
+**Solution**:
+
 1. Ensure JWT claims are configured (migration 018)
 2. Users need to sign out and sign back in
 3. Verify RLS policies are applied correctly
 
 ### Issue: File size limit not enforced
+
 **Solution**: Check that the `file_size_limit` constraint exists on the table
 
 ## References

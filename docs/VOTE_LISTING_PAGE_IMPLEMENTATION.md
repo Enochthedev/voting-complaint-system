@@ -67,6 +67,7 @@ const mockLecturerId = 'lecturer-1';
 ```
 
 All API calls use the mock functions from `src/lib/api/votes.ts`:
+
 - `getVotes()` - Fetch votes with filtering
 - `deleteVote()` - Remove a vote
 - `closeVote()` - Mark vote as inactive
@@ -94,12 +95,14 @@ AdminVotesPage
 ## Actions Available
 
 ### For Active Votes:
+
 - **Edit**: Opens the VoteForm with pre-filled data
 - **Close Vote**: Marks the vote as inactive
 - **Delete**: Removes the vote permanently (with confirmation)
 - **Show/Hide Details**: Toggles detailed results view
 
 ### For Closed Votes:
+
 - **Reopen Vote**: Reactivates the vote
 - **Delete**: Removes the vote permanently (with confirmation)
 - **Show/Hide Details**: Toggles detailed results view
@@ -114,6 +117,7 @@ Results are displayed with:
 4. Color-coded bars using the primary theme color
 
 Example:
+
 ```
 Morning (6am-12pm)        15 (45%)
 ████████████████░░░░░░░░░░░░░░░░
@@ -196,13 +200,17 @@ The following tasks from Phase 7.1 still need implementation:
 ## Screenshots
 
 ### Active Polls View
+
 Shows all active voting polls with vote counts and quick actions.
 
 ### Expanded Results
+
 Detailed breakdown with percentages and visual progress bars.
 
 ### Empty State
+
 Helpful message encouraging creation of first vote.
 
 ### Create/Edit Form
+
 Full-featured form with validation and all vote options.

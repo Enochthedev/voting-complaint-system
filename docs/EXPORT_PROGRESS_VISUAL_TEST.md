@@ -7,6 +7,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 ## Test Environment Setup
 
 1. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -20,11 +21,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 1: Single Complaint PDF Export
 
 **Steps**:
+
 1. Navigate to any complaint detail page
 2. Click the "Export" dropdown button
 3. Select "Export as PDF"
 
 **Expected Results**:
+
 - ✅ Progress dialog appears immediately
 - ✅ Dialog shows "Exporting" title with spinning loader icon
 - ✅ Progress bar displays at 0%
@@ -36,6 +39,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ PDF file downloads to browser
 
 **Visual Checks**:
+
 - Progress bar is smooth and animated
 - Colors match theme (primary blue)
 - Icons are properly sized and colored
@@ -48,11 +52,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 **Prerequisites**: Use a complaint with multiple attachments
 
 **Steps**:
+
 1. Navigate to complaint detail page with attachments
 2. Click "Export" dropdown
 3. Select "Export Attachments (X)"
 
 **Expected Results**:
+
 - ✅ Progress dialog appears
 - ✅ Shows "Downloading attachments..." message
 - ✅ Progress updates incrementally (e.g., "Downloading 1/3 attachments...")
@@ -63,6 +69,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ ZIP file downloads
 
 **Visual Checks**:
+
 - Progress updates are smooth
 - File count updates correctly
 - Progress bar matches percentage
@@ -73,11 +80,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 **Prerequisites**: Complaint with attachments
 
 **Steps**:
+
 1. Navigate to complaint detail page
 2. Click "Export" dropdown
 3. Select "Export Complete Package"
 
 **Expected Results**:
+
 - ✅ Progress dialog appears
 - ✅ Shows detailed progress messages:
   - "Preparing complete export package..."
@@ -91,6 +100,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ ZIP file with PDF and attachments downloads
 
 **Visual Checks**:
+
 - Multiple progress stages visible
 - Messages are descriptive
 - Progress is continuous (no jumps)
@@ -99,12 +109,14 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 4: Bulk Export with Inline Progress
 
 **Steps**:
+
 1. Navigate to complaints list page
 2. Click "Select" button to enter selection mode
 3. Select 3-5 complaints using checkboxes
 4. Click "Export CSV" in bulk action bar
 
 **Expected Results**:
+
 - ✅ Bulk action bar expands vertically
 - ✅ Progress bar appears below action buttons
 - ✅ Progress shows: "Preparing export..." (0%)
@@ -117,6 +129,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ CSV file downloads
 
 **Visual Checks**:
+
 - Bulk action bar expands smoothly
 - Progress bar is visible and properly sized
 - Label and percentage are readable
@@ -128,11 +141,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 **Prerequisites**: Select complaints with attachments
 
 **Steps**:
+
 1. Enter selection mode
 2. Select complaints that have attachments
 3. Click "Export with Attachments" button
 
 **Expected Results**:
+
 - ✅ Bulk action bar shows progress
 - ✅ Detailed progress messages for each stage
 - ✅ Progress updates smoothly
@@ -140,6 +155,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ ZIP file downloads with all data
 
 **Visual Checks**:
+
 - Progress is detailed and informative
 - Bar fills smoothly
 - Messages update appropriately
@@ -147,10 +163,12 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 6: Error Handling
 
 **Steps**:
+
 1. Simulate an export error (disconnect network or use browser dev tools)
 2. Attempt any export operation
 
 **Expected Results**:
+
 - ✅ Progress dialog shows error state
 - ✅ Red X icon appears
 - ✅ Error message displayed: "Export failed" or similar
@@ -159,6 +177,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ Close button is visible and functional
 
 **Visual Checks**:
+
 - Error state is clearly distinguishable
 - Red color indicates error
 - Error message is readable
@@ -167,11 +186,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 7: Progress Dialog Interactions
 
 **Steps**:
+
 1. Start any export operation
 2. Try to close dialog during export (click backdrop, press ESC, click X)
 3. Wait for export to complete
 
 **Expected Results**:
+
 - ✅ Dialog CANNOT be closed during export
 - ✅ Clicking backdrop does nothing
 - ✅ Pressing ESC does nothing
@@ -180,6 +201,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ Success state auto-closes after 2 seconds
 
 **Visual Checks**:
+
 - No visual feedback when trying to close during export
 - User understands they must wait
 - Auto-close timing feels natural
@@ -187,11 +209,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 8: Mobile Responsiveness
 
 **Steps**:
+
 1. Open browser dev tools
 2. Switch to mobile view (iPhone, Android)
 3. Test all export operations
 
 **Expected Results**:
+
 - ✅ Progress dialog fits on mobile screen
 - ✅ Progress bar is visible and readable
 - ✅ Text doesn't overflow
@@ -200,6 +224,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ Progress bar scales appropriately
 
 **Visual Checks**:
+
 - Dialog is properly sized for mobile
 - Text is readable at mobile sizes
 - Touch targets are adequate (44x44px minimum)
@@ -208,10 +233,12 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 9: Dark Mode
 
 **Steps**:
+
 1. Switch to dark mode (if available)
 2. Test all export operations
 
 **Expected Results**:
+
 - ✅ Progress bar uses theme colors
 - ✅ Dialog background is dark
 - ✅ Text is readable (light on dark)
@@ -220,6 +247,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ Success/error states are clear
 
 **Visual Checks**:
+
 - Colors have sufficient contrast
 - Progress bar is visible
 - No color clashing
@@ -228,11 +256,13 @@ This guide provides step-by-step instructions for visually testing the export pr
 ### Test 10: Accessibility
 
 **Steps**:
+
 1. Use keyboard only (Tab, Enter, ESC)
 2. Use screen reader (if available)
 3. Check focus indicators
 
 **Expected Results**:
+
 - ✅ Dialog can be navigated with keyboard
 - ✅ Focus is trapped in dialog during export
 - ✅ ESC closes dialog (when allowed)
@@ -241,6 +271,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - ✅ ARIA labels are present
 
 **Visual Checks**:
+
 - Focus outline is visible
 - Tab order is logical
 - Focus doesn't escape dialog
@@ -248,6 +279,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 ## Visual Checklist
 
 ### Progress Bar
+
 - [ ] Smooth animation (300ms transition)
 - [ ] Correct height (sm: 4px, default: 8px, lg: 12px)
 - [ ] Proper color (primary theme color)
@@ -257,6 +289,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - [ ] Percentage text is aligned
 
 ### Progress Dialog
+
 - [ ] Centered on screen
 - [ ] Max width 448px
 - [ ] Backdrop is semi-transparent (80% opacity)
@@ -268,6 +301,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - [ ] Text is readable
 
 ### Bulk Action Bar
+
 - [ ] Fixed at bottom of screen
 - [ ] Centered horizontally
 - [ ] Expands smoothly when showing progress
@@ -278,6 +312,7 @@ This guide provides step-by-step instructions for visually testing the export pr
 - [ ] Buttons are properly spaced
 
 ### Status Icons
+
 - [ ] Loader spins smoothly
 - [ ] Checkmark is green (#22c55e)
 - [ ] X is red (#ef4444)
@@ -306,18 +341,23 @@ Test in the following browsers:
 ## Common Issues and Solutions
 
 ### Issue: Progress bar not visible
+
 **Solution**: Check parent container width, ensure value prop is set
 
 ### Issue: Dialog doesn't close
+
 **Solution**: Verify status is not 'exporting', check onOpenChange callback
 
 ### Issue: Progress jumps instead of smooth
+
 **Solution**: Ensure CSS transitions are applied, check for rapid state updates
 
 ### Issue: Auto-close doesn't work
+
 **Solution**: Verify setTimeout is called, check for cleanup issues
 
 ### Issue: Colors don't match theme
+
 **Solution**: Check CSS variable usage, verify theme is loaded
 
 ## Sign-off
@@ -332,10 +372,10 @@ After completing all tests:
 - [ ] Dark mode works
 - [ ] Browser compatibility confirmed
 
-**Tester**: _______________  
-**Date**: _______________  
+**Tester**: **\*\***\_\_\_**\*\***  
+**Date**: **\*\***\_\_\_**\*\***  
 **Status**: ⬜ Pass / ⬜ Fail  
-**Notes**: _______________
+**Notes**: **\*\***\_\_\_**\*\***
 
 ---
 

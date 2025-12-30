@@ -21,6 +21,7 @@ The notification bell appears in the **top-right corner** of the header, next to
 ## Visual Appearance
 
 ### Current State (Mock Data)
+
 ```
 Header Layout:
 ┌─────────────────────────────────────────────────────────────┐
@@ -71,6 +72,7 @@ The bell icon (🔔) has a **red badge** with the number **3** in the top-right 
 ### 5. Accessibility Test
 
 Using a screen reader:
+
 1. Navigate to the bell icon
 2. Screen reader should announce: "View notifications (3 unread)"
 3. The badge should also be announced: "3 unread notifications"
@@ -78,6 +80,7 @@ Using a screen reader:
 ## Expected Behavior
 
 ### Current (Mock Data)
+
 - ✅ Shows badge with count "3"
 - ✅ Badge is red (destructive variant)
 - ✅ Clicking navigates to `/notifications`
@@ -85,6 +88,7 @@ Using a screen reader:
 - ✅ Proper ARIA labels
 
 ### Future (Phase 12 - Real Data)
+
 - [ ] Shows actual unread count from database
 - [ ] Updates in real-time when new notifications arrive
 - [ ] Badge disappears when count is 0
@@ -130,6 +134,7 @@ const mockNotifications = [
 **Problem**: Can't see the bell icon in the header
 
 **Solutions**:
+
 1. Make sure you're on an authenticated page (logged in)
 2. Check that the AppHeader component is rendering
 3. Verify the NotificationBell component is imported correctly
@@ -140,6 +145,7 @@ const mockNotifications = [
 **Problem**: Bell icon visible but no badge
 
 **Solutions**:
+
 1. Check that `useNotifications` hook is returning `unreadCount > 0`
 2. Verify mock data is set up correctly
 3. Check browser console for errors in the hook
@@ -149,6 +155,7 @@ const mockNotifications = [
 **Problem**: Clicking bell doesn't navigate to notifications page
 
 **Solutions**:
+
 1. Check browser console for navigation errors
 2. Verify `/notifications` route exists
 3. Check that `useRouter` is working correctly
@@ -158,6 +165,7 @@ const mockNotifications = [
 **Problem**: TypeScript errors in components
 
 **Solutions**:
+
 1. Run `npm run build` to check for type errors
 2. Verify all imports are correct
 3. Check that types are properly defined

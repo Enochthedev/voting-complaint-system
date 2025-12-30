@@ -11,6 +11,7 @@ This document describes the implementation of the vote submission functionality 
 **Location**: `/admin/votes/new`
 
 **Features**:
+
 - Create new voting polls with title and description
 - Add multiple voting options (minimum 2)
 - Set optional closing date/time
@@ -19,6 +20,7 @@ This document describes the implementation of the vote submission functionality 
 - Form validation for all fields
 
 **Components**:
+
 - `src/app/admin/votes/new/page.tsx` - Vote creation page
 - `src/components/votes/vote-form.tsx` - Reusable vote form component
 
@@ -27,6 +29,7 @@ This document describes the implementation of the vote submission functionality 
 **Location**: `/admin/votes`
 
 **Features**:
+
 - View all created votes
 - See vote status (Active/Closed)
 - View vote options and metadata
@@ -35,6 +38,7 @@ This document describes the implementation of the vote submission functionality 
 - Loading states and empty states
 
 **Components**:
+
 - `src/app/admin/votes/page.tsx` - Vote listing page
 
 ### 3. Vote Participation (Student)
@@ -42,6 +46,7 @@ This document describes the implementation of the vote submission functionality 
 **Location**: `/votes`
 
 **Features**:
+
 - View all active voting polls
 - Submit vote responses
 - See which polls the student has already voted on
@@ -51,6 +56,7 @@ This document describes the implementation of the vote submission functionality 
 - Loading states
 
 **Components**:
+
 - `src/app/votes/page.tsx` - Student voting page
 
 ## API Functions
@@ -105,7 +111,7 @@ const mockVotes = [
     options: ['Morning', 'Afternoon', 'Evening', 'Night'],
     is_active: true,
     // ... other fields
-  }
+  },
 ];
 ```
 
@@ -133,6 +139,7 @@ All API functions include TODO comments indicating where Supabase calls should b
 ## Database Schema
 
 ### votes table
+
 ```sql
 - id: uuid (PK)
 - created_by: uuid (FK to users - lecturer)
@@ -146,6 +153,7 @@ All API functions include TODO comments indicating where Supabase calls should b
 ```
 
 ### vote_responses table
+
 ```sql
 - id: uuid (PK)
 - vote_id: uuid (FK to votes)
@@ -205,6 +213,7 @@ This implementation addresses the following acceptance criteria from AC6:
 ### Manual Testing Checklist
 
 **Lecturer (Vote Creation)**:
+
 - [ ] Can create a vote with valid data
 - [ ] Form validation works for all fields
 - [ ] Can add/remove options
@@ -215,6 +224,7 @@ This implementation addresses the following acceptance criteria from AC6:
 - [ ] Redirects to votes list after creation
 
 **Lecturer (Vote Listing)**:
+
 - [ ] Can view all created votes
 - [ ] Active votes show "Active" badge
 - [ ] Closed votes show "Closed" badge
@@ -223,6 +233,7 @@ This implementation addresses the following acceptance criteria from AC6:
 - [ ] Empty state shows when no votes exist
 
 **Student (Vote Participation)**:
+
 - [ ] Can view active votes
 - [ ] Can select an option
 - [ ] Can submit vote

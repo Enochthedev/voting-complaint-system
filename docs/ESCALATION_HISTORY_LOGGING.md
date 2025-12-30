@@ -7,6 +7,7 @@ The auto-escalation system now properly logs all escalation events in the `compl
 ## Implementation Details
 
 ### Location
+
 - **Edge Function**: `supabase/functions/auto-escalate-complaints/index.ts`
 - **Lines**: 173-189
 
@@ -32,40 +33,38 @@ When a complaint is escalated, the following information is recorded in `complai
 
 ### Fields Explained
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| `complaint_id` | ID of the escalated complaint | `"a31a4fa7-2383-47a0-9f1b-1c757ee28d70"` |
-| `action` | Type of action performed | `"escalated"` |
-| `old_value` | Previous escalation level (null for first escalation) | `null` or `"Level 1"` |
-| `new_value` | New escalation level | `"Level 1"`, `"Level 2"`, etc. |
-| `performed_by` | User ID of the person the complaint was escalated to | UUID of admin/lecturer |
-| `details.escalation_level` | Numeric escalation level | `1`, `2`, `3`, etc. |
-| `details.rule_id` | ID of the escalation rule that triggered this | UUID of escalation rule |
-| `details.hours_threshold` | Hours threshold from the rule | `24`, `48`, etc. |
-| `details.auto_escalated` | Flag indicating automatic escalation | `true` |
+| Field                      | Description                                           | Example                                  |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `complaint_id`             | ID of the escalated complaint                         | `"a31a4fa7-2383-47a0-9f1b-1c757ee28d70"` |
+| `action`                   | Type of action performed                              | `"escalated"`                            |
+| `old_value`                | Previous escalation level (null for first escalation) | `null` or `"Level 1"`                    |
+| `new_value`                | New escalation level                                  | `"Level 1"`, `"Level 2"`, etc.           |
+| `performed_by`             | User ID of the person the complaint was escalated to  | UUID of admin/lecturer                   |
+| `details.escalation_level` | Numeric escalation level                              | `1`, `2`, `3`, etc.                      |
+| `details.rule_id`          | ID of the escalation rule that triggered this         | UUID of escalation rule                  |
+| `details.hours_threshold`  | Hours threshold from the rule                         | `24`, `48`, etc.                         |
+| `details.auto_escalated`   | Flag indicating automatic escalation                  | `true`                                   |
 
 ## Code Implementation
 
 ```typescript
 // Log escalation in complaint history
-const { error: historyError } = await supabase
-  .from('complaint_history')
-  .insert({
-    complaint_id: complaint.id,
-    action: 'escalated',
-    old_value: null,
-    new_value: `Level ${newEscalationLevel}`,
-    performed_by: rule.escalate_to,
-    details: {
-      escalation_level: newEscalationLevel,
-      rule_id: rule.id,
-      hours_threshold: rule.hours_threshold,
-      auto_escalated: true
-    }
-  })
+const { error: historyError } = await supabase.from('complaint_history').insert({
+  complaint_id: complaint.id,
+  action: 'escalated',
+  old_value: null,
+  new_value: `Level ${newEscalationLevel}`,
+  performed_by: rule.escalate_to,
+  details: {
+    escalation_level: newEscalationLevel,
+    rule_id: rule.id,
+    hours_threshold: rule.hours_threshold,
+    auto_escalated: true,
+  },
+});
 
 if (historyError) {
-  console.error(`Error logging history for complaint ${complaint.id}:`, historyError)
+  console.error(`Error logging history for complaint ${complaint.id}:`, historyError);
 }
 ```
 

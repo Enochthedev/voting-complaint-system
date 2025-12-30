@@ -18,6 +18,7 @@ The assignment notification trigger automatically creates notifications when a c
 **Updated:** `supabase/migrations/029_fix_assignment_notification_type.sql`
 
 The function handles multiple notification scenarios:
+
 1. Student notification when complaint is opened
 2. Student notification when status changes
 3. **Lecturer notification when complaint is assigned** ✅
@@ -37,14 +38,15 @@ The function handles multiple notification scenarios:
 The trigger creates an assignment notification when:
 
 ```sql
-IF NEW.assigned_to IS NOT NULL 
-   AND (OLD.assigned_to IS NULL OR OLD.assigned_to != NEW.assigned_to) 
+IF NEW.assigned_to IS NOT NULL
+   AND (OLD.assigned_to IS NULL OR OLD.assigned_to != NEW.assigned_to)
 THEN
   -- Create notification
 END IF;
 ```
 
 This covers two scenarios:
+
 1. **Initial Assignment:** When `assigned_to` changes from NULL to a lecturer ID
 2. **Reassignment:** When `assigned_to` changes from one lecturer to another
 
@@ -52,14 +54,14 @@ This covers two scenarios:
 
 When a complaint is assigned, the following notification is created:
 
-| Field | Value |
-|-------|-------|
-| `user_id` | The ID of the assigned lecturer |
-| `type` | `'assignment'` |
-| `title` | "A complaint has been assigned to you" |
-| `message` | "You have been assigned complaint: {complaint_title}" |
-| `related_id` | The complaint ID |
-| `is_read` | `false` |
+| Field        | Value                                                 |
+| ------------ | ----------------------------------------------------- |
+| `user_id`    | The ID of the assigned lecturer                       |
+| `type`       | `'assignment'`                                        |
+| `title`      | "A complaint has been assigned to you"                |
+| `message`    | "You have been assigned complaint: {complaint_title}" |
+| `related_id` | The complaint ID                                      |
+| `is_read`    | `false`                                               |
 
 ## Related Components
 
@@ -77,7 +79,7 @@ INSERT INTO complaint_history (
   details
 ) VALUES (
   NEW.id,
-  CASE 
+  CASE
     WHEN OLD.assigned_to IS NULL THEN 'assigned'
     ELSE 'reassigned'
   END,
@@ -101,7 +103,7 @@ node scripts/verify-assignment-notification-trigger.js
 ✅ **Initial Assignment:** Notification created successfully  
 ✅ **Reassignment:** Notification created successfully  
 ✅ **History Logging:** Assignment logged in complaint_history  
-✅ **Notification Content:** Correct title, message, and type  
+✅ **Notification Content:** Correct title, message, and type
 
 ## Usage Example
 
@@ -147,7 +149,7 @@ const { data: notifications } = await supabase
 ## Acceptance Criteria
 
 ✅ **AC17:** Complaint assignment system implemented  
-✅ **P15:** Notifications created on assignment  
+✅ **P15:** Notifications created on assignment
 
 ## Next Steps
 
@@ -164,17 +166,19 @@ The trigger is complete and working. The next phase is to:
 If notifications aren't being created:
 
 1. Check that the trigger is enabled:
+
    ```sql
-   SELECT tgname, tgenabled 
-   FROM pg_trigger 
+   SELECT tgname, tgenabled
+   FROM pg_trigger
    WHERE tgname = 'notify_on_complaint_status_change';
    ```
 
 2. Verify the notification type exists:
+
    ```sql
-   SELECT enumlabel 
-   FROM pg_enum 
-   JOIN pg_type ON pg_enum.enumtypid = pg_type.oid 
+   SELECT enumlabel
+   FROM pg_enum
+   JOIN pg_type ON pg_enum.enumtypid = pg_type.oid
    WHERE pg_type.typname = 'notification_type';
    ```
 
@@ -187,15 +191,15 @@ If notifications aren't being created:
 
 ```sql
 -- Create a test assignment
-UPDATE complaints 
+UPDATE complaints
 SET assigned_to = 'lecturer-uuid-here'
 WHERE id = 'complaint-uuid-here';
 
 -- Check if notification was created
-SELECT * FROM notifications 
-WHERE user_id = 'lecturer-uuid-here' 
+SELECT * FROM notifications
+WHERE user_id = 'lecturer-uuid-here'
   AND type = 'assignment'
-ORDER BY created_at DESC 
+ORDER BY created_at DESC
 LIMIT 1;
 ```
 

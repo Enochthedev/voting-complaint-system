@@ -11,6 +11,7 @@ The template creation form has been successfully implemented as part of Task 4.3
 A comprehensive form component that allows lecturers to create and edit complaint templates with the following features:
 
 #### Basic Template Information
+
 - **Title Field**: Required, 3-200 characters with real-time counter
 - **Description Field**: Required, 10-1000 characters with real-time counter
 - **Category Selector**: Dropdown with all complaint categories
@@ -18,6 +19,7 @@ A comprehensive form component that allows lecturers to create and edit complain
 - **Active Status Toggle**: Control template visibility to students
 
 #### Dynamic Custom Fields
+
 - **Add/Remove Fields**: Dynamically manage template fields
 - **Field Configuration**:
   - Field Name (internal identifier, lowercase_with_underscores)
@@ -27,6 +29,7 @@ A comprehensive form component that allows lecturers to create and edit complain
   - Required checkbox
 
 #### Validation
+
 - Title: Required, 3-200 chars
 - Description: Required, 10-1000 chars
 - Field names: Required, lowercase with underscores, unique
@@ -36,6 +39,7 @@ A comprehensive form component that allows lecturers to create and edit complain
 ### 2. Integration with Template Management Page
 
 The form is integrated into `/admin/templates` page:
+
 - Opens in a modal overlay
 - Supports both create and edit modes
 - Handles form submission with mock data
@@ -129,12 +133,14 @@ student-complaint-system/
 ## Validation Examples
 
 ### Valid Field Names
+
 ✅ `equipment_name`
 ✅ `lab_room`
 ✅ `issue_date`
 ✅ `room_number`
 
 ### Invalid Field Names
+
 ❌ `Equipment Name` (uppercase, spaces)
 ❌ `room-number` (hyphen)
 ❌ `room number` (space)
@@ -143,25 +149,31 @@ student-complaint-system/
 ## Visual Features
 
 ### Form Layout
+
 - Clean, organized layout with clear sections
 - Responsive grid for category/priority selectors
 - Collapsible field cards with remove buttons
 - Prominent action buttons at bottom
 
 ### Field Cards
+
 Each custom field is displayed in a card with:
+
 - Field number indicator
 - Remove button (trash icon)
 - Grid layout for field properties
 - Required checkbox at bottom
 
 ### Empty State
+
 When no fields are added:
+
 - Dashed border placeholder
 - Helpful message
 - Encourages adding first field
 
 ### Error Display
+
 - Red text below invalid fields
 - Clear error messages
 - Prevents submission until fixed
@@ -169,6 +181,7 @@ When no fields are added:
 ## Mock Data Integration
 
 Currently using mock data for:
+
 - Template creation (generates mock ID)
 - Template updates (updates in-memory state)
 - User ID (mock-lecturer-id)
@@ -179,6 +192,7 @@ Currently using mock data for:
 ## Acceptance Criteria Met
 
 ✅ **AC19**: Complaint Templates
+
 - System provides template creation interface
 - Templates include all required fields
 - Lecturers can create and manage templates
@@ -187,6 +201,7 @@ Currently using mock data for:
 ## Next Steps
 
 The following sub-tasks remain in Task 4.3:
+
 1. ✅ Build template creation form (COMPLETED)
 2. ⏳ Implement template listing (Already exists in page.tsx)
 3. ⏳ Add template selector to complaint form
@@ -196,11 +211,13 @@ The following sub-tasks remain in Task 4.3:
 ## Testing Notes
 
 Following the testing guidelines:
+
 - Tests should be written but not run during implementation
 - Test infrastructure not yet configured
 - Tests will be executed in Phase 12
 
 Suggested test cases for future:
+
 - Form validation (required fields, character limits)
 - Field name format validation
 - Duplicate field name detection
@@ -211,9 +228,10 @@ Suggested test cases for future:
 ## Technical Details
 
 ### Component Props
+
 ```typescript
 interface TemplateFormProps {
-  template?: ComplaintTemplate | null;  // For editing
+  template?: ComplaintTemplate | null; // For editing
   onSave: (template: Partial<ComplaintTemplate>) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -221,12 +239,14 @@ interface TemplateFormProps {
 ```
 
 ### State Management
+
 - Local state for form fields
 - Validation errors tracked separately
 - Dynamic field array with unique IDs
 - Character counters computed in real-time
 
 ### Field Type Support
+
 - **text**: Single-line input
 - **textarea**: Multi-line input
 - **number**: Numeric input
@@ -244,6 +264,7 @@ interface TemplateFormProps {
 ## Browser Compatibility
 
 Tested and working in:
+
 - Chrome/Edge (Chromium)
 - Firefox
 - Safari

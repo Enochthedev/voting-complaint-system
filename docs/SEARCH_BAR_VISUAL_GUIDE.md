@@ -51,6 +51,7 @@ This guide shows how the search bar component integrates into the Student Compla
 ## Search Bar States
 
 ### 1. Empty State (Default)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔍  Search complaints by title, description, or tags...     │
@@ -58,6 +59,7 @@ This guide shows how the search bar component integrates into the Student Compla
 ```
 
 ### 2. User Typing
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔍  wifi                                                  ✕ │
@@ -65,6 +67,7 @@ This guide shows how the search bar component integrates into the Student Compla
 ```
 
 ### 3. With Suggestions
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔍  wifi                                                  ✕ │
@@ -77,6 +80,7 @@ This guide shows how the search bar component integrates into the Student Compla
 ```
 
 ### 4. Searching (Loading)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ ⟳  wifi connectivity                                      ✕ │
@@ -86,6 +90,7 @@ Searching...
 ```
 
 ### 5. Search Results
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔍  wifi connectivity                                     ✕ │
@@ -104,6 +109,7 @@ Showing results for "wifi connectivity"
 ```
 
 ### 6. No Results
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔍  broken elevator                                       ✕ │
@@ -166,6 +172,7 @@ Showing results for "broken elevator"
 ## Interaction Flow
 
 ### Flow 1: Basic Search
+
 ```
 1. User clicks search bar
    ↓
@@ -185,6 +192,7 @@ Showing results for "broken elevator"
 ```
 
 ### Flow 2: Autocomplete Search
+
 ```
 1. User clicks search bar
    ↓
@@ -203,6 +211,7 @@ Showing results for "broken elevator"
 ```
 
 ### Flow 3: Clear Search
+
 ```
 1. User has active search
    ↓
@@ -220,12 +229,14 @@ Showing results for "broken elevator"
 ## Color Coding
 
 ### Priority Indicators
+
 - 🔴 **Critical**: Red dot
 - 🟠 **High**: Orange dot
 - 🟡 **Medium**: Yellow dot
 - 🔵 **Low**: Blue dot
 
 ### Status Badges
+
 - **New**: Blue background
 - **Opened**: Purple background
 - **In Progress**: Yellow background
@@ -236,16 +247,19 @@ Showing results for "broken elevator"
 ## Responsive Breakpoints
 
 ### Desktop (≥1024px)
+
 - Search bar: Full width with max-width constraint
 - Suggestions: Full width of search bar
 - Comfortable spacing and padding
 
 ### Tablet (≥768px, <1024px)
+
 - Search bar: Full width
 - Suggestions: Full width
 - Slightly reduced padding
 
 ### Mobile (<768px)
+
 - Search bar: Full width
 - Suggestions: Full width
 - Larger touch targets
@@ -254,6 +268,7 @@ Showing results for "broken elevator"
 ## Accessibility Features
 
 ### Keyboard Navigation
+
 1. **Tab** to focus search bar
 2. **Type** to enter search query
 3. **Arrow Down** to navigate suggestions
@@ -262,6 +277,7 @@ Showing results for "broken elevator"
 6. **Escape** to close suggestions
 
 ### Screen Reader Announcements
+
 - "Search complaints" (input label)
 - "Showing results for [query]" (results announcement)
 - "No complaints found matching [query]" (empty state)

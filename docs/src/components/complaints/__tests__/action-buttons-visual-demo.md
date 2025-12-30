@@ -5,6 +5,7 @@ This document demonstrates how action buttons appear for different user roles in
 ## Overview
 
 The action buttons are displayed in a bordered container below the complaint header. The buttons shown depend on:
+
 1. **User Role** (Student, Lecturer, or Admin)
 2. **Complaint Status** (new, opened, in_progress, resolved, closed, reopened)
 
@@ -21,6 +22,7 @@ The action buttons are displayed in a bordered container below the complaint hea
 ```
 
 **Available Actions:**
+
 - **Add Comment**: Scrolls to the comments section and focuses the textarea
 
 ### Resolved Complaint (Status: resolved)
@@ -34,6 +36,7 @@ The action buttons are displayed in a bordered container below the complaint hea
 ```
 
 **Available Actions:**
+
 - **Add Comment**: Scrolls to the comments section
 - **Reopen Complaint**: Allows student to reopen if issue persists (AC15)
 - **Rate Resolution**: Allows student to rate satisfaction (AC16)
@@ -51,6 +54,7 @@ The action buttons are displayed in a bordered container below the complaint hea
 ```
 
 **Available Actions:**
+
 - **Change Status**: Dropdown to change complaint status
   - Options: Opened, In Progress, Resolved, Closed
 - **Assign**: Assign complaint to a specific lecturer/department (AC17)
@@ -69,18 +73,21 @@ The action buttons are displayed in a bordered container below the complaint hea
 ```
 
 **No Actions Available:**
+
 - Resolved and closed complaints cannot be modified by lecturers
 - Informational message is displayed instead
 
 ## Button Styling
 
 ### Primary Button (Student: Add Comment)
+
 - Background: Primary color (blue)
 - Text: White
 - Icon: MessageSquare icon on the left
 - Hover: Darker shade
 
 ### Outline Buttons (All other actions)
+
 - Background: Transparent
 - Border: Gray
 - Text: Dark gray
@@ -88,6 +95,7 @@ The action buttons are displayed in a bordered container below the complaint hea
 - Hover: Light gray background
 
 ### Status Dropdown
+
 - Background: White
 - Border: Gray
 - Text: Dark gray
@@ -97,14 +105,17 @@ The action buttons are displayed in a bordered container below the complaint hea
 ## Responsive Behavior
 
 ### Desktop (≥1024px)
+
 - All buttons displayed in a single row
 - Adequate spacing between buttons (gap-3)
 
 ### Tablet (768px - 1023px)
+
 - Buttons wrap to multiple rows if needed
 - Maintains spacing
 
 ### Mobile (<768px)
+
 - Buttons stack vertically or wrap
 - Full width on very small screens
 - Touch-friendly sizing
@@ -149,11 +160,13 @@ The action buttons are displayed in a bordered container below the complaint hea
 ## Implementation Notes
 
 ### Current Phase (UI Development)
+
 - All buttons are rendered with mock handlers
 - Clicking buttons shows alert messages
 - Actual functionality will be implemented in Phase 12
 
 ### Phase 12 (API Integration)
+
 - Replace mock handlers with real API calls
 - Implement actual status change logic
 - Connect to Supabase for data updates
@@ -177,6 +190,7 @@ Comprehensive tests are available in:
 `__tests__/complaint-detail-action-buttons.test.tsx`
 
 Tests cover:
+
 - Role-based button visibility
 - Status-based button visibility
 - Button interactions

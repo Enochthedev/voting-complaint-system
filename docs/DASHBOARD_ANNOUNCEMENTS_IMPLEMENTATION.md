@@ -1,6 +1,7 @@
 # Dashboard Announcements Implementation
 
 ## Task Completed
+
 ✅ Display announcements on dashboard
 
 ## Implementation Summary
@@ -10,16 +11,19 @@
 #### 1. Updated Dashboard Page (`src/app/dashboard/page.tsx`)
 
 **Added Imports:**
+
 - `getRecentAnnouncements` from `@/lib/api/announcements`
 - `Announcement` type from `@/types/database.types`
 - `Megaphone` icon from `lucide-react`
 
 **Added State:**
+
 ```typescript
 const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 ```
 
 **Updated Data Loading:**
+
 ```typescript
 const [statsData, complaintsData, draftsData, announcementsData] = await Promise.all([
   getUserComplaintStats(userId),
@@ -32,6 +36,7 @@ setAnnouncements(announcementsData);
 ```
 
 **Added Announcements Section:**
+
 - Displays up to 3 most recent announcements
 - Shows announcement title, content preview (truncated to 2 lines), and timestamp
 - Includes a "View All" button that navigates to `/announcements`
@@ -52,6 +57,7 @@ setAnnouncements(announcementsData);
 ### Mock Data
 
 The implementation uses mock data from `src/lib/api/announcements.ts`:
+
 - System Maintenance Scheduled
 - New Feature: Draft Complaints
 - Holiday Schedule

@@ -13,17 +13,21 @@ Successfully verified and documented the Row Level Security (RLS) policies for t
 Verified that all 5 required RLS policies are properly implemented:
 
 #### SELECT Policies
+
 - ✅ **Students view own complaints**: Students can view their own non-anonymous complaints
 - ✅ **Lecturers/Admins view all**: Lecturers and admins can view all complaints (including anonymous)
 
 #### INSERT Policies
+
 - ✅ **Students insert complaints**: Only students can create new complaints
 
 #### UPDATE Policies
+
 - ✅ **Students update own drafts**: Students can edit their draft complaints only
 - ✅ **Lecturers update complaints**: Lecturers and admins can update all complaints
 
 #### DELETE Policies
+
 - ✅ **Students delete own drafts**: Students can delete their draft complaints only
 
 ### 2. Data Integrity Constraints ✅
@@ -45,6 +49,7 @@ Verified two critical database constraints:
 Created comprehensive testing tools:
 
 #### Test Scripts
+
 1. **`scripts/test-complaints-rls.js`**
    - Node.js script for automated RLS policy verification
    - Tests all policies and constraints
@@ -58,6 +63,7 @@ Created comprehensive testing tools:
    - Can be run directly in Supabase SQL Editor
 
 #### Test Results
+
 ```
 === RLS Policy Test Summary ===
 
@@ -81,6 +87,7 @@ Data Integrity Constraints:
 Created comprehensive documentation:
 
 **`docs/COMPLAINTS_RLS_POLICIES.md`**
+
 - Complete policy definitions with SQL code
 - Detailed explanation of each policy
 - Security considerations
@@ -92,7 +99,7 @@ Created comprehensive documentation:
 ## Policy Coverage Matrix
 
 | User Role | View Own | View All | Create | Update Own Draft | Update Any | Delete Own Draft |
-|-----------|----------|----------|--------|------------------|------------|------------------|
+| --------- | -------- | -------- | ------ | ---------------- | ---------- | ---------------- |
 | Student   | ✅       | ❌       | ✅     | ✅               | ❌         | ✅               |
 | Lecturer  | ✅       | ✅       | ❌     | ❌               | ✅         | ❌               |
 | Admin     | ✅       | ✅       | ❌     | ❌               | ✅         | ❌               |
@@ -100,12 +107,14 @@ Created comprehensive documentation:
 ## Requirements Validated
 
 ### Acceptance Criteria
+
 - ✅ **AC2**: Complaint Submission - Students can submit complaints
 - ✅ **AC3**: Complaint Viewing - Role-based access to complaints
 - ✅ **AC10**: Draft Complaints - Students can save and manage drafts
 - ✅ **AC17**: Complaint Assignment - Lecturers can assign complaints
 
 ### Correctness Properties
+
 - ✅ **P2**: Anonymous Complaint Privacy - Identity protection enforced
 - ✅ **P3**: Complaint Submission Integrity - Required fields validated
 - ✅ **P7**: Role-Based Access - Proper access control by user role
@@ -113,29 +122,34 @@ Created comprehensive documentation:
 - ✅ **P11**: Draft Complaint Isolation - Drafts only visible to owner
 
 ### Non-Functional Requirements
+
 - ✅ **NFR2**: Security - RLS enforces data access control at database level
 
 ## Files Created/Modified
 
 ### Created Files
+
 1. ✅ `scripts/test-complaints-rls.js` - Automated test script
 2. ✅ `supabase/test-complaints-rls.sql` - SQL verification script
 3. ✅ `docs/COMPLAINTS_RLS_POLICIES.md` - Comprehensive documentation
 4. ✅ `docs/TASK_2.2.1_COMPLAINTS_RLS_COMPLETION.md` - This summary
 
 ### Existing Files (Verified)
+
 1. ✅ `supabase/migrations/002_create_complaints_table.sql` - Contains all RLS policies
 2. ✅ `supabase/verify-complaints-table.sql` - Existing verification script
 
 ## How to Test
 
 ### Run Automated Tests
+
 ```bash
 cd student-complaint-system
 node scripts/test-complaints-rls.js
 ```
 
 ### Run SQL Verification
+
 ```bash
 # Using psql
 psql $DATABASE_URL -f supabase/test-complaints-rls.sql
@@ -145,6 +159,7 @@ psql $DATABASE_URL -f supabase/test-complaints-rls.sql
 ```
 
 ### Verify in Supabase Dashboard
+
 1. Go to Supabase Dashboard → Database → Policies
 2. Select `complaints` table
 3. Verify all 5 policies are listed and enabled
@@ -152,21 +167,25 @@ psql $DATABASE_URL -f supabase/test-complaints-rls.sql
 ## Security Highlights
 
 ### 1. Anonymous Complaint Privacy ✅
+
 - Database constraint ensures `student_id = NULL` for anonymous complaints
 - RLS policies allow lecturers to view but not identify anonymous students
 - Application layer must not expose identifying information
 
 ### 2. Role-Based Access Control ✅
+
 - Students: Limited to own complaints and drafts
 - Lecturers: Full access to all complaints
 - Admins: Same access as lecturers
 
 ### 3. Draft Protection ✅
+
 - Drafts only visible to the student who created them
 - Drafts can be edited and deleted by owner
 - Submitted complaints become immutable to students
 
 ### 4. Audit Trail ✅
+
 - Students cannot delete submitted complaints
 - Lecturers cannot delete any complaints
 - All changes logged in `complaint_history` table

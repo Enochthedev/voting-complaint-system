@@ -7,37 +7,44 @@ This document provides a visual guide to the SearchBar component and its various
 ## Component States
 
 ### 1. Default State
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🔍  Search complaints...                              │
 └─────────────────────────────────────────────────────────┘
 ```
+
 - Empty input field
 - Search icon on the left
 - Placeholder text visible
 - No suggestions shown
 
 ### 2. Typing State
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🔍  broken air                                      ✕  │
 └─────────────────────────────────────────────────────────┘
 ```
+
 - User has typed text
 - Clear button (✕) appears on the right
 - Suggestions dropdown may appear below
 
 ### 3. Loading State
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ ⟳  broken air conditioning                          ✕  │
 └─────────────────────────────────────────────────────────┘
 ```
+
 - Spinning loader icon replaces search icon
 - Indicates search is in progress
 - Clear button still available
 
 ### 4. With Suggestions Dropdown
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🔍  broken air                                      ✕  │
@@ -48,6 +55,7 @@ This document provides a visual guide to the SearchBar component and its various
 │ 🔍 air conditioning repair                              │
 └─────────────────────────────────────────────────────────┘
 ```
+
 - Dropdown appears below input
 - Shows matching suggestions
 - Each suggestion has a search icon
@@ -55,6 +63,7 @@ This document provides a visual guide to the SearchBar component and its various
 - Hover state highlights suggestions
 
 ### 5. Keyboard Navigation
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🔍  broken air                                      ✕  │
@@ -65,17 +74,20 @@ This document provides a visual guide to the SearchBar component and its various
 │ 🔍 air conditioning repair                              │
 └─────────────────────────────────────────────────────────┘
 ```
+
 - Arrow keys navigate through suggestions
 - Selected suggestion is highlighted
 - Enter key selects highlighted suggestion
 - Escape key closes dropdown
 
 ### 6. Disabled State
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🔍  Search complaints...                              │ (grayed out)
 └─────────────────────────────────────────────────────────┘
 ```
+
 - Input is disabled
 - Grayed out appearance
 - No interaction possible
@@ -83,6 +95,7 @@ This document provides a visual guide to the SearchBar component and its various
 ## Integration Examples
 
 ### Example 1: Basic Search
+
 ```tsx
 <SearchBar
   value={searchValue}
@@ -93,6 +106,7 @@ This document provides a visual guide to the SearchBar component and its various
 ```
 
 ### Example 2: With Autocomplete
+
 ```tsx
 <SearchBar
   value={searchValue}
@@ -105,6 +119,7 @@ This document provides a visual guide to the SearchBar component and its various
 ```
 
 ### Example 3: With Loading
+
 ```tsx
 <SearchBar
   value={searchValue}
@@ -118,6 +133,7 @@ This document provides a visual guide to the SearchBar component and its various
 ## User Interactions
 
 ### Typing
+
 1. User clicks on search bar
 2. Input field receives focus
 3. User types search query
@@ -125,6 +141,7 @@ This document provides a visual guide to the SearchBar component and its various
 5. Suggestions appear if `showSuggestions={true}`
 
 ### Selecting Suggestion
+
 1. User sees suggestions dropdown
 2. User clicks on a suggestion OR uses arrow keys + Enter
 3. Input value updates to selected suggestion
@@ -132,12 +149,14 @@ This document provides a visual guide to the SearchBar component and its various
 5. Dropdown closes
 
 ### Submitting Search
+
 1. User types search query
 2. User presses Enter key
 3. `onSearch` callback fires with current input value
 4. Dropdown closes (if open)
 
 ### Clearing Search
+
 1. User clicks the clear button (✕)
 2. Input value clears
 3. `onChange` callback fires with empty string
@@ -147,16 +166,19 @@ This document provides a visual guide to the SearchBar component and its various
 ## Responsive Behavior
 
 ### Desktop (≥768px)
+
 - Full width search bar
 - Suggestions dropdown full width
 - Comfortable padding and spacing
 
 ### Tablet (≥640px, <768px)
+
 - Slightly reduced padding
 - Suggestions dropdown adapts to width
 - Touch-friendly tap targets
 
 ### Mobile (<640px)
+
 - Full width search bar
 - Larger touch targets
 - Suggestions dropdown full width
@@ -165,6 +187,7 @@ This document provides a visual guide to the SearchBar component and its various
 ## Accessibility Features
 
 ### Keyboard Support
+
 - **Tab**: Focus search input
 - **Arrow Down**: Navigate to next suggestion
 - **Arrow Up**: Navigate to previous suggestion
@@ -172,6 +195,7 @@ This document provides a visual guide to the SearchBar component and its various
 - **Escape**: Close suggestions and blur input
 
 ### Screen Reader Support
+
 - Input has `aria-label="Search complaints"`
 - Suggestions have `role="listbox"`
 - Each suggestion has `role="option"`
@@ -179,6 +203,7 @@ This document provides a visual guide to the SearchBar component and its various
 - `aria-controls` links input to suggestions
 
 ### Focus Management
+
 - Clear focus indicators
 - Focus trap within suggestions when navigating
 - Focus returns to input after selection
@@ -186,6 +211,7 @@ This document provides a visual guide to the SearchBar component and its various
 ## Color Scheme
 
 ### Light Mode
+
 - Background: White (#FFFFFF)
 - Border: Zinc-200 (#E4E4E7)
 - Text: Zinc-900 (#18181B)
@@ -194,6 +220,7 @@ This document provides a visual guide to the SearchBar component and its various
 - Selected: Zinc-100 (#F4F4F5)
 
 ### Dark Mode
+
 - Background: Zinc-950 (#09090B)
 - Border: Zinc-800 (#27272A)
 - Text: Zinc-50 (#FAFAFA)

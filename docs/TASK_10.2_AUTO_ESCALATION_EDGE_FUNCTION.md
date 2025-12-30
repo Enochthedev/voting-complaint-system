@@ -9,6 +9,7 @@ Successfully implemented the Supabase Edge Function for automatic complaint esca
 ### 1. Edge Function (`supabase/functions/auto-escalate-complaints/index.ts`)
 
 **Key Features:**
+
 - ✅ Fetches all active escalation rules from the database
 - ✅ Finds complaints matching each rule's criteria (category, priority, age)
 - ✅ Updates complaints with escalation details
@@ -18,6 +19,7 @@ Successfully implemented the Supabase Edge Function for automatic complaint esca
 - ✅ CORS support for web requests
 
 **Escalation Logic:**
+
 ```typescript
 For each active escalation rule:
   1. Calculate threshold time (now - hours_threshold)
@@ -46,6 +48,7 @@ Configures TypeScript compiler options and imports for Deno runtime.
 ### 4. Documentation
 
 **Function README** (`supabase/functions/auto-escalate-complaints/README.md`):
+
 - Deployment instructions
 - Scheduling options (cron, GitHub Actions, external services)
 - Testing procedures
@@ -53,6 +56,7 @@ Configures TypeScript compiler options and imports for Deno runtime.
 - Security considerations
 
 **System Documentation** (`docs/AUTO_ESCALATION_SYSTEM.md`):
+
 - Complete architecture overview
 - Database schema details
 - Configuration best practices
@@ -63,6 +67,7 @@ Configures TypeScript compiler options and imports for Deno runtime.
 ### 5. Test Script (`scripts/test-auto-escalation.js`)
 
 Automated test that:
+
 - Creates test escalation rule
 - Creates test complaint (backdated)
 - Invokes the edge function
@@ -94,6 +99,7 @@ docs/
 ### Prerequisites
 
 1. **Install Supabase CLI** (if not already installed):
+
    ```bash
    npm install -g supabase
    ```
@@ -124,8 +130,8 @@ name: Auto-Escalate Complaints
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Every hour at minute 0
-  workflow_dispatch:      # Allow manual trigger
+    - cron: '0 * * * *' # Every hour at minute 0
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   escalate:
@@ -140,6 +146,7 @@ jobs:
 ```
 
 **Required Secret:**
+
 - `SUPABASE_SERVICE_KEY`: Your Supabase service role key
 
 #### Option 2: Supabase Cron (If Available)
@@ -151,6 +158,7 @@ supabase functions schedule auto-escalate-complaints --cron "0 * * * *"
 #### Option 3: External Cron Service
 
 Use services like:
+
 - Vercel Cron Jobs
 - AWS EventBridge
 - Google Cloud Scheduler
@@ -161,11 +169,13 @@ Use services like:
 ### Local Testing
 
 1. **Start Supabase locally**:
+
    ```bash
    supabase start
    ```
 
 2. **Serve the function**:
+
    ```bash
    supabase functions serve auto-escalate-complaints
    ```
@@ -184,6 +194,7 @@ node scripts/test-auto-escalation.js
 ```
 
 This will:
+
 1. ✅ Create test escalation rule
 2. ✅ Create test complaint (3 hours old)
 3. ✅ Invoke the edge function
@@ -195,6 +206,7 @@ This will:
 ### Manual Test
 
 1. **Create a test escalation rule**:
+
    ```sql
    INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
    VALUES (
@@ -207,6 +219,7 @@ This will:
    ```
 
 2. **Create a test complaint** (backdated):
+
    ```sql
    INSERT INTO complaints (
      student_id,
@@ -229,6 +242,7 @@ This will:
    ```
 
 3. **Invoke the function**:
+
    ```bash
    curl -X POST \
      -H "Authorization: Bearer YOUR_SERVICE_KEY" \
@@ -237,7 +251,7 @@ This will:
 
 4. **Verify escalation**:
    ```sql
-   SELECT 
+   SELECT
      id, title, escalated_at, escalation_level, assigned_to
    FROM complaints
    WHERE title = 'Test Complaint';
@@ -258,7 +272,7 @@ supabase functions logs auto-escalate-complaints --follow
 ### Check Escalated Complaints
 
 ```sql
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -277,7 +291,7 @@ LIMIT 20;
 ### Check Escalation History
 
 ```sql
-SELECT 
+SELECT
   ch.created_at,
   c.title,
   ch.new_value as escalation_level,
@@ -296,7 +310,7 @@ LIMIT 20;
 Check what would be escalated if the function ran now:
 
 ```sql
-SELECT 
+SELECT
   c.id,
   c.title,
   c.category,
@@ -306,8 +320,8 @@ SELECT
   er.hours_threshold,
   u.full_name as would_escalate_to
 FROM complaints c
-JOIN escalation_rules er ON 
-  c.category = er.category AND 
+JOIN escalation_rules er ON
+  c.category = er.category AND
   c.priority = er.priority AND
   er.is_active = true
 LEFT JOIN users u ON er.escalate_to = u.id
@@ -363,32 +377,32 @@ ORDER BY c.created_at;
 
 ### Recommended Thresholds
 
-| Priority | Category | Recommended Threshold |
-|----------|----------|----------------------|
-| Critical | Any | 2-4 hours |
-| High | Harassment | 4-8 hours |
-| High | Academic | 24 hours |
-| High | Facilities | 24-48 hours |
-| Medium | Any | 48-72 hours |
-| Low | Any | 7 days |
+| Priority | Category   | Recommended Threshold |
+| -------- | ---------- | --------------------- |
+| Critical | Any        | 2-4 hours             |
+| High     | Harassment | 4-8 hours             |
+| High     | Academic   | 24 hours              |
+| High     | Facilities | 24-48 hours           |
+| Medium   | Any        | 48-72 hours           |
+| Low      | Any        | 7 days                |
 
 ### Example Rules
 
 ```sql
 -- Critical complaints: escalate after 2 hours
 INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
-VALUES 
+VALUES
   ('harassment', 'critical', 2, (SELECT id FROM users WHERE email = 'admin@university.edu'), true),
   ('academic', 'critical', 2, (SELECT id FROM users WHERE email = 'admin@university.edu'), true);
 
 -- High priority harassment: escalate after 4 hours
 INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
-VALUES 
+VALUES
   ('harassment', 'high', 4, (SELECT id FROM users WHERE email = 'senior-lecturer@university.edu'), true);
 
 -- High priority academic: escalate after 24 hours
 INSERT INTO escalation_rules (category, priority, hours_threshold, escalate_to, is_active)
-VALUES 
+VALUES
   ('academic', 'high', 24, (SELECT id FROM users WHERE email = 'academic-head@university.edu'), true);
 ```
 
@@ -406,6 +420,7 @@ VALUES
 - **Large System** (> 1000 complaints/day): 5-30 seconds
 
 The function is optimized with:
+
 - Proper database indexes
 - Batch processing of rules
 - Individual error handling (one failure doesn't stop others)
@@ -416,12 +431,15 @@ The function is optimized with:
 ### Function Not Escalating
 
 **Check:**
+
 1. Are there active escalation rules?
+
    ```sql
    SELECT * FROM escalation_rules WHERE is_active = true;
    ```
 
 2. Are there eligible complaints?
+
    ```sql
    SELECT COUNT(*) FROM complaints
    WHERE status IN ('new', 'opened')

@@ -44,7 +44,7 @@ The page currently uses mock template data for UI development:
   description: string;
   category: ComplaintCategory;
   suggested_priority: ComplaintPriority;
-  fields: Record<string, any>;  // Custom fields for the template
+  fields: Record<string, any>; // Custom fields for the template
   created_by: string;
   is_active: boolean;
   created_at: string;
@@ -163,10 +163,7 @@ const { data: updatedTemplate } = await supabase
   .single();
 
 // Delete template
-const { error } = await supabase
-  .from('complaint_templates')
-  .delete()
-  .eq('id', templateId);
+const { error } = await supabase.from('complaint_templates').delete().eq('id', templateId);
 
 // Toggle active status
 const { data } = await supabase

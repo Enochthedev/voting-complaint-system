@@ -8,13 +8,9 @@
 import { exportComplaintAttachments } from '@/lib/export';
 
 // Export all attachments for a complaint
-await exportComplaintAttachments(
-  complaintId,
-  attachments,
-  (current, total) => {
-    console.log(`Downloading ${current}/${total}`);
-  }
-);
+await exportComplaintAttachments(complaintId, attachments, (current, total) => {
+  console.log(`Downloading ${current}/${total}`);
+});
 ```
 
 ### Export Complete Package (PDF + Attachments)
@@ -40,7 +36,7 @@ await bulkExportComplaints(complaints, {
   includeCSV: true,
   onProgress: (current, total, message) => {
     setProgress(message);
-  }
+  },
 });
 ```
 
@@ -55,9 +51,9 @@ import { ExportComplaintButton } from '@/components/complaints/export-complaint-
 <ExportComplaintButton complaint={complaint} />
 
 // Simple button (PDF only)
-<ExportComplaintButton 
-  complaint={complaint} 
-  showDropdown={false} 
+<ExportComplaintButton
+  complaint={complaint}
+  showDropdown={false}
 />
 ```
 
@@ -75,7 +71,7 @@ import { BulkActionBar } from '@/components/complaints/bulk-action-bar';
   hasAttachments={hasAttachments}
   onSelectAll={handleSelectAll}
   onClearSelection={handleClearSelection}
-/>
+/>;
 ```
 
 ## Export Options
@@ -84,9 +80,9 @@ import { BulkActionBar } from '@/components/complaints/bulk-action-bar';
 
 ```typescript
 interface BulkExportOptions {
-  includeAttachments?: boolean;  // Include attachment files
-  includePDFs?: boolean;         // Include PDF reports
-  includeCSV?: boolean;          // Include CSV summary
+  includeAttachments?: boolean; // Include attachment files
+  includePDFs?: boolean; // Include PDF reports
+  includeCSV?: boolean; // Include CSV summary
   onProgress?: (current: number, total: number, message: string) => void;
 }
 ```
@@ -141,7 +137,7 @@ await bulkExportComplaints(complaints, {
   includeAttachments: true,
   onProgress: (current, total, message) => {
     setProgress(`${current}/${total}: ${message}`);
-  }
+  },
 });
 ```
 
@@ -159,8 +155,7 @@ try {
 ### Check for Attachments
 
 ```typescript
-const hasAttachments = complaint.attachments && 
-                       complaint.attachments.length > 0;
+const hasAttachments = complaint.attachments && complaint.attachments.length > 0;
 
 if (hasAttachments) {
   // Show attachment export options
@@ -174,6 +169,7 @@ if (hasAttachments) {
 Downloads all attachments for a complaint as ZIP.
 
 **Parameters:**
+
 - `complaintId: string` - The complaint ID
 - `attachments: ComplaintAttachment[]` - Array of attachments
 - `onProgress?: (current: number, total: number) => void` - Progress callback
@@ -185,6 +181,7 @@ Downloads all attachments for a complaint as ZIP.
 Exports a complaint with PDF and attachments.
 
 **Parameters:**
+
 - `complaint: ComplaintWithDetails` - The complaint data
 - `options: BulkExportOptions` - Export options
 
@@ -195,6 +192,7 @@ Exports a complaint with PDF and attachments.
 Exports multiple complaints with optional attachments.
 
 **Parameters:**
+
 - `complaints: ComplaintWithDetails[]` - Array of complaints
 - `options: BulkExportOptions` - Export options
 
@@ -205,6 +203,7 @@ Exports multiple complaints with optional attachments.
 Downloads a single attachment as blob.
 
 **Parameters:**
+
 - `attachment: ComplaintAttachment` - The attachment metadata
 
 **Returns:** `Promise<Blob | null>`
@@ -278,6 +277,7 @@ Downloads a single attachment as blob.
 ## Support
 
 For issues or questions:
+
 1. Check implementation documentation
 2. Review code examples
 3. Check browser console for errors

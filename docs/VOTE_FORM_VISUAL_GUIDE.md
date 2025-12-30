@@ -14,12 +14,14 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ### 1. Basic Information
 
 **Title Field**
+
 - Required field
 - 5-200 characters
 - Character counter displayed
 - Example: "Should we extend library hours?"
 
 **Description Field**
+
 - Required field
 - 10-1000 characters
 - Multi-line textarea
@@ -29,6 +31,7 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ### 2. Vote Options
 
 **Dynamic Options List**
+
 - Minimum 2 options required
 - Can add unlimited options
 - Each option max 200 characters
@@ -37,6 +40,7 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 - Remove button for options (when more than 2)
 
 **Example Options:**
+
 1. "Yes, extend to 10 PM"
 2. "Yes, extend to midnight"
 3. "No, keep current hours"
@@ -45,18 +49,21 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ### 3. Optional Settings
 
 **Related Complaint ID**
+
 - Optional text field
 - Links vote to a specific complaint
 - Provides context for the vote
 - Example: "abc123-def456-ghi789"
 
 **Closing Date & Time**
+
 - Optional datetime picker
 - Must be in the future if provided
 - Leave empty for indefinite voting
 - Format: YYYY-MM-DD HH:mm
 
 **Active Status**
+
 - Checkbox toggle
 - Controls visibility to students
 - Default: checked (active)
@@ -65,11 +72,13 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ### 4. Form Actions
 
 **Cancel Button**
+
 - Returns to votes list page
 - No data is saved
 - Outline style button
 
 **Create/Update Button**
+
 - Primary action button
 - Validates all fields before submission
 - Shows loading spinner during save
@@ -78,18 +87,21 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ## Validation Rules
 
 ### Title Validation
+
 - ❌ Empty: "Title is required"
 - ❌ Too short (< 5 chars): "Title must be at least 5 characters"
 - ❌ Too long (> 200 chars): "Title must be less than 200 characters"
 - ✅ Valid: 5-200 characters
 
 ### Description Validation
+
 - ❌ Empty: "Description is required"
 - ❌ Too short (< 10 chars): "Description must be at least 10 characters"
 - ❌ Too long (> 1000 chars): "Description must be less than 1000 characters"
 - ✅ Valid: 10-1000 characters
 
 ### Options Validation
+
 - ❌ Less than 2 options: "A vote must have at least 2 options"
 - ❌ Less than 2 filled options: "At least 2 options must have text"
 - ❌ Duplicate options: "Options must be unique"
@@ -97,6 +109,7 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 - ✅ Valid: At least 2 unique options, each ≤ 200 characters
 
 ### Closing Date Validation
+
 - ❌ Past date: "Closing date must be in the future"
 - ✅ Valid: Future date or empty
 
@@ -132,16 +145,19 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ### Error Handling
 
 **Validation Errors**
+
 - Displayed below each field in red
 - Form submission blocked until fixed
 - Clear error messages guide user
 
 **Submission Errors**
+
 - Alert banner at top of page
 - Error message explains the issue
 - Form remains filled for retry
 
 **Success State**
+
 - Green success alert appears
 - "Vote created successfully! Redirecting..."
 - Automatic redirect after 1.5 seconds
@@ -149,6 +165,7 @@ The vote creation form allows lecturers to create voting polls for students. Thi
 ## Empty State
 
 When no votes exist:
+
 - Large vote icon displayed
 - "No votes yet" heading
 - Descriptive text
@@ -158,19 +175,22 @@ When no votes exist:
 ## Design Features
 
 ### Responsive Design
+
 - Mobile-friendly layout
 - Stacked fields on small screens
 - Grid layout on larger screens
 - Touch-friendly buttons and inputs
 
 ### Accessibility
+
 - Proper label associations
-- Required field indicators (*)
+- Required field indicators (\*)
 - Error messages linked to fields
 - Keyboard navigation support
 - Focus states on all interactive elements
 
 ### Visual Feedback
+
 - Character counters update in real-time
 - Loading spinner during submission
 - Disabled state during loading
@@ -178,6 +198,7 @@ When no votes exist:
 - Hover states on buttons
 
 ### Dark Mode Support
+
 - All colors use CSS variables
 - Proper contrast in both modes
 - Consistent appearance across themes
@@ -185,6 +206,7 @@ When no votes exist:
 ## Technical Details
 
 ### Component Structure
+
 ```
 VoteForm (src/components/votes/vote-form.tsx)
 ├── Title field
@@ -204,6 +226,7 @@ VoteForm (src/components/votes/vote-form.tsx)
 ```
 
 ### Data Flow
+
 1. User fills form
 2. Form validates on submit
 3. Data formatted as Vote object
@@ -212,6 +235,7 @@ VoteForm (src/components/votes/vote-form.tsx)
 6. Success/error state displayed
 
 ### Mock Implementation
+
 - Currently uses mock data (UI-first approach)
 - Console logs vote data
 - Simulates 1-second API delay
@@ -238,6 +262,7 @@ VoteForm (src/components/votes/vote-form.tsx)
 ## Future Enhancements
 
 The following features will be added in subsequent tasks:
+
 - Real API integration with Supabase
 - Vote editing functionality
 - Vote preview before submission

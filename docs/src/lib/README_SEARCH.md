@@ -25,7 +25,7 @@ ALTER TABLE complaints ADD COLUMN search_vector tsvector;
 CREATE OR REPLACE FUNCTION update_complaint_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B');
   RETURN NEW;
@@ -49,13 +49,11 @@ CREATE INDEX complaints_search_idx ON complaints USING GIN(search_vector);
 Performs full-text search on complaints with filtering, sorting, and pagination.
 
 ```typescript
-async function searchComplaints(
-  query: string,
-  options?: SearchOptions
-): Promise<SearchResult>
+async function searchComplaints(query: string, options?: SearchOptions): Promise<SearchResult>;
 ```
 
 **Parameters:**
+
 - `query` - Search query string
 - `options` - Optional search configuration:
   - `filters` - Filter by status, category, priority, date range, tags, assignedTo
@@ -65,6 +63,7 @@ async function searchComplaints(
   - `pageSize` - Results per page
 
 **Returns:**
+
 - `SearchResult` object containing:
   - `complaints` - Array of matching complaints
   - `total` - Total number of results
@@ -73,6 +72,7 @@ async function searchComplaints(
   - `totalPages` - Total number of pages
 
 **Example:**
+
 ```typescript
 const results = await searchComplaints('wifi library', {
   filters: {
@@ -92,25 +92,26 @@ const results = await searchComplaints('wifi library', {
 Gets intelligent search suggestions for autocomplete functionality.
 
 ```typescript
-async function getSearchSuggestions(
-  partialQuery: string,
-  limit?: number
-): Promise<string[]>
+async function getSearchSuggestions(partialQuery: string, limit?: number): Promise<string[]>;
 ```
 
 **Parameters:**
+
 - `partialQuery` - Partial search query (minimum 2 characters)
 - `limit` - Maximum number of suggestions (default: 5)
 
 **Returns:**
+
 - Array of suggestion strings, prioritized by relevance
 
 **Suggestion Sources:**
+
 1. Complaint titles (prioritized if they start with the query)
 2. Common search terms (wifi, grading, parking, etc.)
 3. Tags from existing complaints
 
 **Example:**
+
 ```typescript
 const suggestions = await getSearchSuggestions('air', 5);
 // Returns: [
@@ -121,6 +122,7 @@ const suggestions = await getSearchSuggestions('air', 5);
 ```
 
 **Prioritization:**
+
 - Titles starting with the query appear first
 - Titles containing the query appear next
 - Common search terms follow
@@ -132,22 +134,22 @@ const suggestions = await getSearchSuggestions('air', 5);
 Highlights search terms in text for display.
 
 ```typescript
-function highlightSearchTerms(text: string, query: string): string
+function highlightSearchTerms(text: string, query: string): string;
 ```
 
 **Parameters:**
+
 - `text` - Text to highlight
 - `query` - Search query
 
 **Returns:**
+
 - HTML string with `<mark>` tags around matches
 
 **Example:**
+
 ```typescript
-const highlighted = highlightSearchTerms(
-  'The air conditioning is broken',
-  'air conditioning'
-);
+const highlighted = highlightSearchTerms('The air conditioning is broken', 'air conditioning');
 // Returns: 'The <mark>air</mark> <mark>conditioning</mark> is broken'
 ```
 
@@ -159,7 +161,7 @@ Validates a search query.
 function validateSearchQuery(query: string): {
   valid: boolean;
   error?: string;
-}
+};
 ```
 
 ## React Hook Usage
@@ -189,12 +191,14 @@ const {
 ```
 
 **Options:**
+
 - `debounceMs` - Debounce delay in milliseconds (default: 300)
 - `autoSearch` - Automatically search on query change (default: false)
 - `pageSize` - Results per page (default: 20)
 - Plus all `SearchOptions` from `searchComplaints()`
 
 **Returns:**
+
 - `query` - Current search query
 - `results` - Search results
 - `isLoading` - Loading state
@@ -212,6 +216,7 @@ const {
 ### SearchBar Component
 
 The `SearchBar` component provides a complete search UI with:
+
 - Real-time input
 - Autocomplete suggestions
 - Loading indicator
@@ -262,7 +267,7 @@ export default function ComplaintsPage() {
         isLoading={isLoading}
         showSuggestions={query.length >= 2}
       />
-      
+
       {results && (
         <ComplaintList complaints={results.complaints} />
       )}
@@ -281,6 +286,7 @@ const USE_MOCK_DATA = true; // Set to false in Phase 12
 ```
 
 The mock implementation (`search-mock.ts`) provides:
+
 - Simple text matching on title and description
 - Simulated network delays
 - Basic filtering and sorting
@@ -301,12 +307,14 @@ In Phase 12, switch to real database search:
 ## Search Features
 
 ### Full-Text Search
+
 - Searches both title and description fields
 - Uses PostgreSQL's `websearch` type for natural query syntax
 - Supports multiple search terms
 - Relevance ranking (title matches weighted higher)
 
 ### Filtering
+
 - Status (new, opened, in_progress, resolved, closed, reopened)
 - Category (academic, facilities, harassment, course_content, administrative, other)
 - Priority (low, medium, high, critical)
@@ -315,17 +323,20 @@ In Phase 12, switch to real database search:
 - Assigned lecturer
 
 ### Sorting
+
 - Created date (newest/oldest)
 - Updated date
 - Priority level
 - Status
 
 ### Pagination
+
 - Configurable page size
 - Total count
 - Page navigation
 
 ### Autocomplete
+
 - Real-time intelligent suggestions
 - Based on complaint titles, common terms, and tags
 - Prioritized by relevance (titles starting with query first)
@@ -345,20 +356,26 @@ In Phase 12, switch to real database search:
 ## Testing
 
 ### Unit Tests
+
 Test individual search functions:
+
 - Query validation
 - Text highlighting
 - Filter application
 
 ### Integration Tests
+
 Test search with database:
+
 - Full-text search accuracy
 - Filter combinations
 - Pagination
 - Sorting
 
 ### UI Tests
+
 Test search component:
+
 - Input handling
 - Suggestion display
 - Loading states
@@ -395,18 +412,21 @@ Test search component:
 ## Troubleshooting
 
 ### Search returns no results
+
 - Verify search_vector column exists
 - Check if trigger is active
 - Ensure GIN index is created
 - Test with simple queries first
 
 ### Slow search performance
+
 - Verify GIN index is being used (EXPLAIN ANALYZE)
 - Check index statistics
 - Consider increasing work_mem for complex queries
 - Monitor query execution time
 
 ### Suggestions not working
+
 - Check if complaints table has data
 - Verify ILIKE query syntax
 - Test with different query lengths

@@ -1,9 +1,11 @@
 # PDF Export Implementation
 
 ## Overview
+
 This document describes the implementation of the PDF export functionality for individual complaints, completing Task 8.3 (first sub-task) from the implementation plan.
 
 ## Requirements
+
 - **Acceptance Criteria**: AC20 (Export Functionality)
 - **Property**: P20 (Export Data Integrity)
 
@@ -14,6 +16,7 @@ This document describes the implementation of the PDF export functionality for i
 Created a comprehensive PDF export utility using `jspdf` and `jspdf-autotable` libraries.
 
 **Features:**
+
 - Professional PDF formatting with headers, sections, and tables
 - Complete complaint details including:
   - Title, description, and metadata
@@ -30,6 +33,7 @@ Created a comprehensive PDF export utility using `jspdf` and `jspdf-autotable` l
 - HTML tag stripping from rich text descriptions
 
 **Key Functions:**
+
 - `exportComplaintToPDF(complaint: ComplaintWithDetails): Promise<void>` - Main export function
 - Helper functions for formatting dates, file sizes, and text capitalization
 - Color coding functions for status and priority badges
@@ -39,6 +43,7 @@ Created a comprehensive PDF export utility using `jspdf` and `jspdf-autotable` l
 Created a reusable export button component that can be integrated into any complaint view.
 
 **Features:**
+
 - Loading state during export
 - Error handling with user-friendly messages
 - Configurable button variants (default, outline, ghost)
@@ -48,6 +53,7 @@ Created a reusable export button component that can be integrated into any compl
 ### 3. Integration with Complaint Detail View
 
 Updated the `ActionButtons` component in the complaint detail view to include the export button:
+
 - Added export button for both student and lecturer/admin views
 - Integrated with existing action buttons layout
 - Proper loading state management
@@ -60,6 +66,7 @@ Updated the `ActionButtons` component in the complaint detail view to include th
 Created a comprehensive demo page for testing the PDF export functionality with realistic sample data.
 
 **Features:**
+
 - Mock complaint with complete data (tags, attachments, comments, feedback, history, rating)
 - Visual preview of complaint details
 - Export button with status feedback
@@ -79,9 +86,11 @@ Created a comprehensive demo page for testing the PDF export functionality with 
 ## Usage
 
 ### In Complaint Detail View
+
 The export button is automatically available in the complaint detail view for all users (students, lecturers, and admins).
 
 ### Programmatic Usage
+
 ```typescript
 import { exportComplaintToPDF } from '@/lib/export/pdf-export';
 
@@ -90,10 +99,11 @@ await exportComplaintToPDF(complaintWithDetails);
 ```
 
 ### Using the Export Button Component
+
 ```typescript
 import { ExportComplaintButton } from '@/components/complaints';
 
-<ExportComplaintButton 
+<ExportComplaintButton
   complaint={complaintData}
   variant="outline"
   size="default"
@@ -148,12 +158,14 @@ The generated PDF includes the following sections (in order):
 ## Testing
 
 ### Manual Testing
+
 1. Navigate to `/demo/pdf-export`
 2. Click "Export Sample Complaint to PDF"
 3. Verify the PDF downloads and contains all expected sections
 4. Check formatting, page breaks, and data accuracy
 
 ### Test Cases Covered
+
 - ✅ Complete complaint with all fields populated
 - ✅ Anonymous complaints (student info hidden)
 - ✅ Complaints without optional fields (attachments, feedback, etc.)
@@ -166,6 +178,7 @@ The generated PDF includes the following sections (in order):
 ## Data Integrity (Property P20)
 
 The export functionality ensures data integrity by:
+
 - Using a single transaction/read for data retrieval
 - Exporting the exact state of the complaint at export time
 - No data transformation or modification during export
@@ -175,6 +188,7 @@ The export functionality ensures data integrity by:
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 - [ ] Include actual attachment files in PDF (embed images, link to files)
 - [ ] Custom PDF templates/themes
 - [ ] Export multiple complaints in a single PDF
@@ -186,6 +200,7 @@ Potential improvements for future iterations:
 ## Files Modified/Created
 
 ### Created:
+
 - `src/lib/export/pdf-export.ts` - Main PDF export utility
 - `src/components/complaints/export-complaint-button.tsx` - Export button component
 - `src/app/demo/pdf-export/page.tsx` - Demo/test page
@@ -193,6 +208,7 @@ Potential improvements for future iterations:
 - `docs/PDF_EXPORT_IMPLEMENTATION.md` - This documentation
 
 ### Modified:
+
 - `src/components/complaints/index.ts` - Added export button to exports
 - `src/components/complaints/complaint-detail/ActionButtons.tsx` - Integrated export button
 - `.kiro/specs/tasks.md` - Marked task as complete

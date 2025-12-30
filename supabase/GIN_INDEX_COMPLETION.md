@@ -11,46 +11,54 @@ The GIN (Generalized Inverted Index) for full-text search has been successfully 
 ### Components Implemented
 
 #### 1. Search Vector Column
+
 ```sql
 search_vector tsvector
 ```
+
 - Added to the `complaints` table
 - Stores the full-text search vector for efficient searching
 
 #### 2. GIN Index
+
 ```sql
-CREATE INDEX IF NOT EXISTS idx_complaints_search_vector 
+CREATE INDEX IF NOT EXISTS idx_complaints_search_vector
 ON public.complaints USING GIN(search_vector);
 ```
+
 - Index name: `idx_complaints_search_vector`
 - Index type: GIN (Generalized Inverted Index)
 - Target column: `search_vector`
 - Purpose: Enables fast full-text search across complaint titles and descriptions
 
 #### 3. Trigger Function
+
 ```sql
 CREATE OR REPLACE FUNCTION public.update_complaint_search_vector()
 RETURNS TRIGGER AS $
 BEGIN
-  NEW.search_vector := 
+  NEW.search_vector :=
     setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B');
   RETURN NEW;
 END;
 $ LANGUAGE plpgsql;
 ```
+
 - Function name: `update_complaint_search_vector()`
 - Purpose: Automatically updates the search vector when complaints are created or modified
 - Weighting: Title (weight 'A') has higher priority than description (weight 'B')
 - Language: English text search configuration
 
 #### 4. Trigger
+
 ```sql
 CREATE TRIGGER update_complaints_search_vector
   BEFORE INSERT OR UPDATE ON public.complaints
   FOR EACH ROW
   EXECUTE FUNCTION public.update_complaint_search_vector();
 ```
+
 - Trigger name: `update_complaints_search_vector`
 - Events: BEFORE INSERT OR UPDATE
 - Purpose: Ensures search vector is always up-to-date
@@ -58,6 +66,7 @@ CREATE TRIGGER update_complaints_search_vector
 ## Usage Example
 
 ### Basic Search Query
+
 ```sql
 SELECT id, title, description
 FROM public.complaints
@@ -65,10 +74,11 @@ WHERE search_vector @@ to_tsquery('english', 'academic & issue');
 ```
 
 ### Search with Ranking
+
 ```sql
-SELECT 
-  id, 
-  title, 
+SELECT
+  id,
+  title,
   description,
   ts_rank(search_vector, to_tsquery('english', 'facilities')) as rank
 FROM public.complaints
@@ -77,9 +87,10 @@ ORDER BY rank DESC;
 ```
 
 ### Search with Highlighting
+
 ```sql
-SELECT 
-  id, 
+SELECT
+  id,
   title,
   ts_headline('english', description, to_tsquery('english', 'harassment')) as highlighted_description
 FROM public.complaints
@@ -96,15 +107,17 @@ WHERE search_vector @@ to_tsquery('english', 'harassment');
 ## Verification
 
 To verify the GIN index is properly configured, run:
+
 ```bash
 supabase db execute --file supabase/verify-fulltext-search.sql
 ```
 
 Or check in the Supabase SQL Editor:
+
 ```sql
 SELECT indexname, indexdef
 FROM pg_indexes
-WHERE tablename = 'complaints' 
+WHERE tablename = 'complaints'
 AND indexname = 'idx_complaints_search_vector';
 ```
 
