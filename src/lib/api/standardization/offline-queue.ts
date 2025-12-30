@@ -80,7 +80,7 @@ export class OfflineRequestQueue {
   private queue: Map<string, SerializableRequest> = new Map();
   private isProcessing = false;
   private networkStatus: NetworkStatus = {
-    online: navigator.onLine,
+    online: typeof navigator !== 'undefined' ? navigator.onLine : true,
     lastChanged: Date.now(),
   };
   private listeners: Set<(status: NetworkStatus) => void> = new Set();
@@ -89,9 +89,12 @@ export class OfflineRequestQueue {
   private processingInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.initializeNetworkMonitoring();
-    this.loadQueueFromStorage();
-    this.startPeriodicProcessing();
+    // Only initialize if we're in a browser environment
+    if (typeof window !== 'undefined') {
+      this.initializeNetworkMonitoring();
+      this.loadQueueFromStorage();
+      this.startPeriodicProcessing();
+    }
   }
 
   /**
@@ -329,6 +332,8 @@ export class OfflineRequestQueue {
    * Private: Initialize network monitoring
    */
   private initializeNetworkMonitoring(): void {
+    if (typeof window === 'undefined') return;
+
     // Basic online/offline detection
     window.addEventListener('online', () => {
       this.updateNetworkStatus({ online: true });
@@ -339,7 +344,7 @@ export class OfflineRequestQueue {
     });
 
     // Enhanced network information if available
-    if ('connection' in navigator) {
+    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
       const connection = (navigator as any).connection;
 
       const updateConnectionInfo = () => {
@@ -476,6 +481,7 @@ export class OfflineRequestQueue {
    * Private: Save queue to localStorage
    */
   private saveQueueToStorage(): void {
+    if (typeof localStorage === 'undefined') return;
     try {
       const queueData = Array.from(this.queue.entries());
       localStorage.setItem(this.storageKey, JSON.stringify(queueData));
@@ -488,6 +494,7 @@ export class OfflineRequestQueue {
    * Private: Load queue from localStorage
    */
   private loadQueueFromStorage(): void {
+    if (typeof localStorage === 'undefined') return;
     try {
       const stored = localStorage.getItem(this.storageKey);
       if (stored) {
@@ -606,6 +613,7 @@ export function enqueueOfflineRequest(
  * Utility function to check if we should queue a request
  */
 export function shouldQueueRequest(): boolean {
+  if (typeof navigator === 'undefined') return false;
   return !navigator.onLine;
 }
 
