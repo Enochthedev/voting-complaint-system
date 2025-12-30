@@ -96,11 +96,11 @@ export class PerformanceOptimizationManager {
   private config: PerformanceOptimizationConfig;
   private queryClient: QueryClient;
   private prefetcher?: IntelligentPrefetcher;
-  private compression: ResponseCompression;
-  private parallelizer: RequestParallelizer;
-  private scheduler: DependencyScheduler;
-  private validator: PerformanceValidator;
-  private cacheManager: EnhancedCacheManager;
+  private compression!: ResponseCompression;
+  private parallelizer!: RequestParallelizer;
+  private scheduler!: DependencyScheduler;
+  private validator!: PerformanceValidator;
+  private cacheManager!: EnhancedCacheManager;
   private monitoringInterval?: NodeJS.Timeout;
 
   constructor(queryClient: QueryClient, config: Partial<PerformanceOptimizationConfig> = {}) {
@@ -228,7 +228,7 @@ export class PerformanceOptimizationManager {
 
       const result = await this.scheduler.scheduleRequest(request);
       if (result.success) {
-        return result.data;
+        return result.data as T;
       } else {
         throw result.error;
       }
@@ -328,7 +328,7 @@ export class PerformanceOptimizationManager {
     const prefetchingStats = this.prefetcher?.getStats() || {
       totalPrefetches: 0,
       prefetchHits: 0,
-      timeSaved: 0,
+      averagePrefetchTime: 0,
     };
 
     const compressionStats = this.compression.getStats();
@@ -336,12 +336,16 @@ export class PerformanceOptimizationManager {
     const cacheStats = this.cacheManager.getStats();
     const validationResult = this.validator.validatePerformance();
 
+    // Calculate estimated time saved from prefetching
+    const estimatedTimeSaved =
+      prefetchingStats.prefetchHits * (prefetchingStats.averagePrefetchTime || 0);
+
     return {
       prefetching: {
         totalPrefetches: prefetchingStats.totalPrefetches,
         hitRate:
           (prefetchingStats.prefetchHits / Math.max(1, prefetchingStats.totalPrefetches)) * 100,
-        timeSaved: prefetchingStats.timeSaved || 0,
+        timeSaved: estimatedTimeSaved,
       },
       compression: {
         compressionRatio: compressionStats.compressionRatio,

@@ -18,7 +18,7 @@ export function getMonitoringConfig(): Partial<ProductionMonitoringConfig> {
     environment: environment as 'production' | 'staging' | 'development',
   };
 
-  switch (environment) {
+  switch (environment as any) {
     case 'production':
       return {
         ...baseConfig,

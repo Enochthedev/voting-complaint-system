@@ -9,6 +9,7 @@ import { createVersionedHandler, ApiVersion } from '@/lib/api/standardization/ve
 import { CompatibilityManager } from '@/lib/api/standardization/compatibility-layer';
 import { apiClient } from '@/lib/api/standardization/client';
 import type { StandardApiResponse } from '@/lib/api/standardization/types';
+import { ErrorType } from '@/lib/api/standardization/types';
 
 /**
  * V1 Complaints Handler
@@ -88,7 +89,7 @@ async function handleV1Complaints(request: NextRequest): Promise<NextResponse> {
     const errorResponse: StandardApiResponse<null> = {
       data: null,
       error: {
-        type: 'server_error',
+        type: ErrorType.SERVER_ERROR,
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An internal server error occurred',
         timestamp: new Date().toISOString(),
@@ -181,7 +182,7 @@ async function handleV2Complaints(request: NextRequest): Promise<NextResponse> {
     const errorResponse: StandardApiResponse<null> = {
       data: null,
       error: {
-        type: 'server_error',
+        type: ErrorType.SERVER_ERROR,
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An internal server error occurred',
         timestamp: new Date().toISOString(),

@@ -32,7 +32,7 @@ export const notificationKeys = {
  */
 export function useNotifications(limit?: number) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const toast = useToast();
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const [error, setError] = useState<Error | null>(null);
 

@@ -5,7 +5,7 @@
  * to the new standardized API response format.
  */
 
-import { StandardApiResponse, ErrorType, StandardApiError, ResponseMeta } from './types';
+import { StandardApiResponse, PaginatedApiResponse, ErrorType, StandardApiError, ResponseMeta } from './types';
 import { ApiResponseWrapper } from './response-wrapper';
 import { withMonitoring } from './monitoring-wrapper';
 import { StandardizedErrorHandler } from './error-handler';
@@ -28,7 +28,7 @@ export class MigrationWrapper {
     operationName: string
   ) {
     return withMonitoring(
-      async (...args: Args): Promise<StandardApiResponse<T>> => {
+      async (...args: Args) => {
         try {
           const data = await legacyFn(...args);
           return this.responseWrapper.success(data);
@@ -37,9 +37,12 @@ export class MigrationWrapper {
         }
       },
       {
-        operation: operationName,
-        category: 'migration',
-        tags: { legacy: true },
+        endpoint: `legacy/${operationName}`,
+        method: 'POST',
+        metadata: {
+          category: 'migration',
+          tags: { legacy: true },
+        },
       }
     );
   }
@@ -52,21 +55,13 @@ export class MigrationWrapper {
       requestId: this.responseWrapper.getRequestId()
     });
 
-    return {
-      data: null,
-      error: standardError,
-      meta: {
-        requestId: this.responseWrapper.getRequestId(),
-        timestamp: new Date().toISOString(),
-        version: 'v1',
-        timing: {
-          duration: 0,
-          timestamp: new Date().toISOString()
-        }
-      }
-    };
-  }
-    });
+    return this.responseWrapper.createErrorResponse(
+      standardError.type,
+      standardError.code,
+      standardError.message,
+      standardError.details,
+      standardError.context
+    );
   }
 
   /**
@@ -75,12 +70,12 @@ export class MigrationWrapper {
   wrapSupabaseResponse<T>(supabaseResponse: {
     data: T | null;
     error: any;
-  }): StandardApiResponse<T | null> {
+  }): StandardApiResponse<T> {
     if (supabaseResponse.error) {
-      return this.handleSupabaseError(supabaseResponse.error);
+      return this.handleSupabaseError(supabaseResponse.error) as StandardApiResponse<T>;
     }
 
-    return this.responseWrapper.success(supabaseResponse.data);
+    return this.responseWrapper.createSuccessResponse(supabaseResponse.data as T);
   }
 
   /**
@@ -91,19 +86,13 @@ export class MigrationWrapper {
       requestId: this.responseWrapper.getRequestId()
     });
 
-    return {
-      data: null,
-      error: standardError,
-      meta: {
-        requestId: this.responseWrapper.getRequestId(),
-        timestamp: new Date().toISOString(),
-        version: 'v1',
-        timing: {
-          duration: 0,
-          timestamp: new Date().toISOString()
-        }
-      }
-    };
+    return this.responseWrapper.createErrorResponse(
+      standardError.type,
+      standardError.code,
+      standardError.message,
+      standardError.details,
+      standardError.context
+    );
   }
 
   /**
@@ -118,8 +107,8 @@ export class MigrationWrapper {
       baseUrl: string;
       queryParams?: Record<string, string>;
     }
-  ) {
-    return this.responseWrapper.paginated(data, pagination);
+  ): PaginatedApiResponse<T> {
+    return this.responseWrapper.createPaginatedResponse(data, pagination);
   }
 }
 

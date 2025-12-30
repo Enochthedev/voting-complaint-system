@@ -67,7 +67,7 @@ export class StandardizedErrorHandler {
     context?: Partial<ErrorContext>
   ): StandardApiError {
     const fieldErrors =
-      error.errors?.map((err) => ({
+      (error as any).errors?.map((err: any) => ({
         field: err.path?.join('.') || 'unknown',
         code: err.code || 'VALIDATION_ERROR',
         message: err.message,
@@ -77,10 +77,10 @@ export class StandardizedErrorHandler {
     return {
       type: ErrorType.VALIDATION,
       code: 'VALIDATION_FAILED',
-      message: error.getUserMessage() || 'Validation failed',
+      message: (error as any).getUserMessage?.() || 'Validation failed',
       details: {
         fields: fieldErrors,
-        context: error.context,
+        context: (error as any).context,
         originalError: error.name,
       },
       context: {
@@ -100,15 +100,16 @@ export class StandardizedErrorHandler {
     timestamp: string,
     context?: Partial<ErrorContext>
   ): StandardApiError {
+    const dbError = error as any;
     return {
       type: ErrorType.SERVER_ERROR,
-      code: error.code || 'DATABASE_ERROR',
+      code: dbError.code || 'DATABASE_ERROR',
       message: error.message || 'Database operation failed',
       details: {
         context: {
-          details: error.details,
-          hint: error.hint,
-          table: error.table,
+          details: dbError.details,
+          hint: dbError.hint,
+          table: dbError.table,
         },
         originalError: error.name,
       },
@@ -129,14 +130,15 @@ export class StandardizedErrorHandler {
     timestamp: string,
     context?: Partial<ErrorContext>
   ): StandardApiError {
+    const timeoutError = error as any;
     return {
       type: ErrorType.TIMEOUT,
       code: 'REQUEST_TIMEOUT',
       message: 'Request timed out',
       details: {
         context: {
-          timeout: error.timeout,
-          operation: error.operation,
+          timeout: timeoutError.timeoutMs || timeoutError.timeout,
+          operation: timeoutError.operation,
         },
         originalError: error.name,
       },

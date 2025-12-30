@@ -24,7 +24,7 @@ import { supabase } from '@/lib/supabase';
 /**
  * Request execution options
  */
-export interface RequestOptions {
+export interface RequestManagerOptions {
   priority?: RequestPriority;
   maxRetries?: number;
   timeout?: number;
@@ -60,7 +60,7 @@ export class RequestManager {
       method: string;
       data?: any;
     },
-    options: RequestOptions = {}
+    options: RequestManagerOptions = {}
   ): Promise<RequestResult<T>> {
     const {
       priority = RequestPriority.NORMAL,
@@ -144,7 +144,7 @@ export class RequestManager {
       method: string;
       data?: any;
     },
-    options: RequestOptions = {}
+    options: RequestManagerOptions = {}
   ): Promise<RequestResult<T>> {
     return this.executeRequest(
       async (signal?: AbortSignal) => {
@@ -241,7 +241,7 @@ export const requestManager = new RequestManager();
  */
 export async function get<T>(
   endpoint: string,
-  options: RequestOptions = {}
+  options: RequestManagerOptions = {}
 ): Promise<RequestResult<T>> {
   return requestManager.executeSupabaseQuery(
     (client) => client.from(endpoint).select(),
@@ -256,7 +256,7 @@ export async function get<T>(
 export async function post<T>(
   endpoint: string,
   data: any,
-  options: RequestOptions = {}
+  options: RequestManagerOptions = {}
 ): Promise<RequestResult<T>> {
   return requestManager.executeSupabaseQuery(
     (client) => client.from(endpoint).insert(data),
@@ -272,7 +272,7 @@ export async function put<T>(
   endpoint: string,
   id: string,
   data: any,
-  options: RequestOptions = {}
+  options: RequestManagerOptions = {}
 ): Promise<RequestResult<T>> {
   return requestManager.executeSupabaseQuery(
     (client) => client.from(endpoint).update(data).eq('id', id),
@@ -287,7 +287,7 @@ export async function put<T>(
 export async function del<T>(
   endpoint: string,
   id: string,
-  options: RequestOptions = {}
+  options: RequestManagerOptions = {}
 ): Promise<RequestResult<T>> {
   return requestManager.executeSupabaseQuery(
     (client) => client.from(endpoint).delete().eq('id', id),
@@ -303,7 +303,7 @@ export function useRequestManager(componentId: string, route?: string) {
   const executeRequest = <T>(
     requestFn: (signal?: AbortSignal) => Promise<T>,
     metadata: { endpoint: string; method: string; data?: any },
-    options: Omit<RequestOptions, 'component' | 'route'> = {}
+    options: Omit<RequestManagerOptions, 'component' | 'route'> = {}
   ) => {
     return requestManager.executeRequest(requestFn, metadata, {
       ...options,
@@ -319,23 +319,23 @@ export function useRequestManager(componentId: string, route?: string) {
   return {
     executeRequest,
     cancelAllRequests,
-    get: <T>(endpoint: string, options: Omit<RequestOptions, 'component' | 'route'> = {}) =>
+    get: <T>(endpoint: string, options: Omit<RequestManagerOptions, 'component' | 'route'> = {}) =>
       get<T>(endpoint, { ...options, component: componentId, route }),
     post: <T>(
       endpoint: string,
       data: any,
-      options: Omit<RequestOptions, 'component' | 'route'> = {}
+      options: Omit<RequestManagerOptions, 'component' | 'route'> = {}
     ) => post<T>(endpoint, data, { ...options, component: componentId, route }),
     put: <T>(
       endpoint: string,
       id: string,
       data: any,
-      options: Omit<RequestOptions, 'component' | 'route'> = {}
+      options: Omit<RequestManagerOptions, 'component' | 'route'> = {}
     ) => put<T>(endpoint, id, data, { ...options, component: componentId, route }),
     del: <T>(
       endpoint: string,
       id: string,
-      options: Omit<RequestOptions, 'component' | 'route'> = {}
+      options: Omit<RequestManagerOptions, 'component' | 'route'> = {}
     ) => del<T>(endpoint, id, { ...options, component: componentId, route }),
   };
 }

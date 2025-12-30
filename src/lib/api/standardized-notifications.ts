@@ -64,9 +64,12 @@ export const fetchNotificationsStandardized = withMonitoring(
     }
   },
   {
-    operation: 'fetchNotifications',
-    category: 'notifications',
-    tags: { standardized: true, paginated: true },
+    endpoint: '/api/notifications',
+    method: 'GET',
+    metadata: {
+      category: 'notifications',
+      tags: { standardized: true, paginated: true },
+    },
   }
 );
 
@@ -79,13 +82,16 @@ export const markNotificationAsReadStandardized = withMonitoring(
       await legacyNotifications.markNotificationAsRead(notificationId);
       return migrationWrapper.wrapSupabaseResponse({ data: null, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'markNotificationAsRead',
-    category: 'notifications',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/notifications/:id/read',
+    method: 'PATCH',
+    metadata: {
+      category: 'notifications',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -123,13 +129,16 @@ export const markAllNotificationsAsReadStandardized = withMonitoring(
         error: null,
       });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'markAllNotificationsAsRead',
-    category: 'notifications',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/notifications/read-all',
+    method: 'PATCH',
+    metadata: {
+      category: 'notifications',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -145,13 +154,16 @@ export const getUnreadNotificationCountStandardized = withMonitoring(
         error: null,
       });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'getUnreadNotificationCount',
-    category: 'notifications',
-    tags: { standardized: true },
+    endpoint: '/api/notifications/unread/count',
+    method: 'GET',
+    metadata: {
+      category: 'notifications',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -183,7 +195,7 @@ export class StandardizedNotificationSubscription {
         const errorResponse = migrationWrapper.wrapSupabaseResponse({
           data: null,
           error: new Error('Not authenticated'),
-        });
+        }) as any;
         callbacks.onError?.(errorResponse);
         return errorResponse;
       }
@@ -228,11 +240,11 @@ export class StandardizedNotificationSubscription {
           }
         )
         .subscribe((status) => {
-          if (status === 'SUBSCRIPTION_ERROR') {
+          if ((status as any) === 'SUBSCRIPTION_ERROR') {
             const errorResponse = migrationWrapper.wrapSupabaseResponse({
               data: null,
               error: new Error('Subscription failed'),
-            });
+            }) as any;
             callbacks.onError?.(errorResponse);
           }
         });
@@ -244,7 +256,7 @@ export class StandardizedNotificationSubscription {
         error: null,
       });
     } catch (error) {
-      const errorResponse = migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      const errorResponse = migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
       callbacks.onError?.(errorResponse);
       return errorResponse;
     }
@@ -266,7 +278,7 @@ export class StandardizedNotificationSubscription {
         error: null,
       });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   }
 

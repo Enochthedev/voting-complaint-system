@@ -45,7 +45,7 @@ export interface ApiStats {
 export interface PerformanceAlert {
   id: string;
   type: 'response_time' | 'error_rate' | 'failure_spike';
-  severity: 'warning' | 'critical';
+  severity: 'info' | 'warning' | 'critical';
   message: string;
   threshold: number;
   actualValue: number;

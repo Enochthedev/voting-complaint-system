@@ -5,8 +5,8 @@
  * dynamic item sizing, and performance monitoring.
  */
 
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 
 /**
  * Enhanced virtual scrolling configuration
@@ -88,7 +88,7 @@ export function useEnhancedVirtualScrolling<T>({
   onItemsChange,
 }: {
   items: T[];
-  containerRef: React.RefObject<HTMLElement>;
+  containerRef: React.RefObject<HTMLElement | null>;
   config: Partial<EnhancedVirtualConfig>;
   getItemId?: (item: T, index: number) => string;
   onItemsChange?: (visibleItems: T[], bufferedItems: T[]) => void;
@@ -171,14 +171,10 @@ export function useEnhancedVirtualScrolling<T>({
     estimateSize,
     overscan: fullConfig.overscan,
     measureElement: fullConfig.dynamicSizing
-      ? (element, entry) => {
-          // Cache measured size
-          const index = entry.index;
-          const item = items[index];
-          const itemId = getItemId ? getItemId(item, index) : index.toString();
-          const size = element.getBoundingClientRect().height;
-          itemSizeCache.current.set(itemId, size);
-          return size;
+      ? (element) => {
+          // Simply measure and return the height
+          // The virtualizer will handle caching internally
+          return element.getBoundingClientRect().height;
         }
       : undefined,
   });
@@ -403,14 +399,14 @@ export function VirtualScrollContainer<T>({
   children?: React.ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     virtualizer,
     virtualItems,
     metrics,
   } = useEnhancedVirtualScrolling({
     items,
-    containerRef,
+    containerRef: containerRef as React.RefObject<HTMLElement | null>,
     config: config || {},
     getItemId,
     onItemsChange,

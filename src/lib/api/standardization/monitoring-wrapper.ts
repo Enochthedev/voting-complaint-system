@@ -325,6 +325,211 @@ export class MonitoringDashboard {
 
     return buckets;
   }
+
+  /**
+   * Get metrics with filtering options (compatibility method)
+   */
+  static async getMetrics(options: { timeRange?: string; categories?: string[] }) {
+    const timeRangeMs = this.parseTimeRange(options.timeRange || '1h');
+    const stats = apiMonitor.getStats(timeRangeMs);
+    const metrics = apiMonitor.exportMetrics(timeRangeMs);
+
+    return {
+      stats,
+      metrics: metrics.slice(0, 100), // Limit to recent 100
+      categories: options.categories || [],
+      timeRange: options.timeRange,
+    };
+  }
+
+  /**
+   * Get error metrics (compatibility method)
+   */
+  static async getErrorMetrics(options: { timeRange?: string; groupBy?: string[] }) {
+    const timeRangeMs = this.parseTimeRange(options.timeRange || '1h');
+    const metrics = apiMonitor.exportMetrics(timeRangeMs);
+    const errorMetrics = metrics.filter((m) => !m.success);
+
+    const errorsByType: Record<string, number> = {};
+    const errorsByEndpoint: Record<string, number> = {};
+
+    errorMetrics.forEach((m) => {
+      const errorType = m.error?.code || 'unknown';
+      errorsByType[errorType] = (errorsByType[errorType] || 0) + 1;
+      errorsByEndpoint[m.endpoint] = (errorsByEndpoint[m.endpoint] || 0) + 1;
+    });
+
+    return {
+      total: errorMetrics.length,
+      byType: errorsByType,
+      byEndpoint: errorsByEndpoint,
+      recent: errorMetrics.slice(0, 10),
+    };
+  }
+
+  /**
+   * Get performance metrics (compatibility method)
+   */
+  static async getPerformanceMetrics(options: { timeRange?: string; percentiles?: number[] }) {
+    const timeRangeMs = this.parseTimeRange(options.timeRange || '1h');
+    const stats = apiMonitor.getStats(timeRangeMs);
+
+    return {
+      p50: stats.medianDuration,
+      p95: stats.p95Duration,
+      p99: stats.p99Duration,
+      avg: stats.averageDuration,
+      percentiles: options.percentiles || [50, 95, 99],
+    };
+  }
+
+  /**
+   * Configure dashboard (placeholder for compatibility)
+   */
+  static configureDashboard(config: any): void {
+    console.log('Dashboard configured:', config.title);
+    // TODO: Implement actual dashboard configuration storage
+  }
+
+  /**
+   * Update dashboard data (placeholder for compatibility)
+   */
+  static updateDashboardData(data: any): void {
+    // TODO: Implement actual dashboard data updates
+  }
+
+  /**
+   * Record a metric (compatibility wrapper)
+   */
+  static recordMetric(config: any): void {
+    // This is a placeholder - actual metrics are recorded via apiMonitor
+    console.log('Metric recorded:', config.metric, config.value);
+  }
+
+  /**
+   * Get recent metrics by name (compatibility method)
+   */
+  static getRecentMetrics(metricNames: string[]): Record<string, number> {
+    const stats = apiMonitor.getStats(60 * 60 * 1000); // Last hour
+    const result: Record<string, number> = {};
+
+    metricNames.forEach((name) => {
+      if (name === 'api_error_rate') {
+        result[name] = 1 - stats.successRate;
+      } else if (name === 'api_response_time_avg') {
+        result[name] = stats.averageDuration;
+      } else if (name === 'api_throughput_rpm') {
+        result[name] = (stats.totalRequests / 60) * 60; // Requests per minute
+      } else {
+        result[name] = 0;
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Get active dashboards count (placeholder)
+   */
+  static getActiveDashboards(): any[] {
+    // TODO: Implement actual dashboard tracking
+    return [];
+  }
+
+  /**
+   * Get realtime metrics (compatibility method)
+   */
+  static async getRealtimeMetrics(options: { timeRange?: string }) {
+    const timeRangeMs = this.parseTimeRange(options.timeRange || '5m');
+    const metrics = apiMonitor.exportMetrics(timeRangeMs);
+    const stats = apiMonitor.getStats(timeRangeMs);
+
+    // Get metrics from the last 5 seconds for real-time view
+    const recentMetrics = metrics.filter(
+      (m) => Date.now() - m.timestamp.getTime() < 5000
+    );
+
+    return {
+      currentThroughput: (recentMetrics.length / 5) * 1000, // Requests per second
+      activeRequests: recentMetrics.length,
+      recentRequests: recentMetrics.slice(0, 20),
+      summary: {
+        totalRequests: stats.totalRequests,
+        successRate: stats.successRate,
+        avgResponseTime: stats.averageDuration,
+        errorRate: 1 - stats.successRate,
+      },
+      timestamp: Date.now(),
+    };
+  }
+
+  /**
+   * Refresh dashboard (compatibility method)
+   */
+  static async refreshDashboard(dashboardId?: string): Promise<void> {
+    console.log('Refreshing dashboard:', dashboardId || 'all');
+    // TODO: Implement actual dashboard refresh logic
+  }
+
+  /**
+   * Record an error (compatibility method)
+   */
+  static recordError(config: {
+    operation: string;
+    category: string;
+    error: Error;
+    duration?: number;
+    tags?: Record<string, any>;
+    context?: Record<string, any>;
+  }): void {
+    console.error(`Error in ${config.category}/${config.operation}:`, config.error, {
+      duration: config.duration,
+      tags: config.tags,
+      context: config.context,
+    });
+    // Errors are automatically recorded via apiMonitor when using withMonitoring wrapper
+  }
+
+  /**
+   * Record a successful operation (compatibility method)
+   */
+  static recordSuccess(config: {
+    operation: string;
+    category: string;
+    duration?: number;
+    tags?: Record<string, any>;
+    context?: Record<string, any>;
+  }): void {
+    // Success is automatically recorded via apiMonitor when using withMonitoring wrapper
+    console.debug(`Success in ${config.category}/${config.operation}`, {
+      duration: config.duration,
+      tags: config.tags,
+    });
+  }
+
+  /**
+   * Parse time range string to milliseconds
+   */
+  private static parseTimeRange(timeRange: string): number {
+    const match = timeRange.match(/^(\d+)([smhd])$/);
+    if (!match) return 60 * 60 * 1000; // Default 1 hour
+
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 60 * 60 * 1000;
+    }
+  }
 }
 
 /**

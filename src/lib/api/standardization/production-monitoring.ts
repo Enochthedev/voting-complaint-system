@@ -6,7 +6,7 @@
  */
 
 import { MonitoringDashboard } from './monitoring-wrapper';
-import { PerformanceAlerting } from './performance-alerting';
+import { PerformanceAlertingSystem } from './performance-alerting';
 
 /**
  * Production monitoring configuration
@@ -51,13 +51,13 @@ const DEFAULT_CONFIG: ProductionMonitoringConfig = {
  */
 export class ProductionMonitoringManager {
   private config: ProductionMonitoringConfig;
-  private alerting: PerformanceAlerting;
+  private alerting: PerformanceAlertingSystem;
   private dashboardInterval?: NodeJS.Timeout;
   private isInitialized = false;
 
   constructor(config: Partial<ProductionMonitoringConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    this.alerting = new PerformanceAlerting();
+    this.alerting = new PerformanceAlertingSystem();
   }
 
   /**

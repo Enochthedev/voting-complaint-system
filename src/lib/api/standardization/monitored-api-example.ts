@@ -136,7 +136,7 @@ export async function monitoredBatchOperation() {
   // This will monitor each operation individually
   const results = await Promise.all(
     operations.map(async ({ name, operation, context }) => {
-      const monitoredOp = withMonitoring(operation, context!);
+      const monitoredOp = withMonitoring(operation as any, context as any);
       try {
         const result = await monitoredOp();
         return { name, success: true, result };

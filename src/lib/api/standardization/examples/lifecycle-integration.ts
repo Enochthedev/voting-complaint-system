@@ -10,7 +10,7 @@ import {
   requestManager,
   useRequestManager,
   setupNavigationCancellation,
-  type RequestOptions,
+  type RequestManagerOptions,
 } from '../request-manager';
 import {
   requestLifecycleManager,
@@ -26,7 +26,7 @@ export class EnhancedComplaintsAPI {
   /**
    * Fetch complaints with automatic cancellation and offline support
    */
-  static async getComplaints(userId: string, options: RequestOptions = {}) {
+  static async getComplaints(userId: string, options: RequestManagerOptions = {}) {
     return requestManager.executeSupabaseQuery(
       (client) =>
         client
@@ -66,7 +66,7 @@ export class EnhancedComplaintsAPI {
   /**
    * Create complaint with offline queuing
    */
-  static async createComplaint(complaintData: any, options: RequestOptions = {}) {
+  static async createComplaint(complaintData: any, options: RequestManagerOptions = {}) {
     return requestManager.executeSupabaseQuery(
       (client) => client.from('complaints').insert(complaintData).select().single(),
       {
@@ -86,7 +86,7 @@ export class EnhancedComplaintsAPI {
   /**
    * Update complaint with lifecycle management
    */
-  static async updateComplaint(id: string, updates: any, options: RequestOptions = {}) {
+  static async updateComplaint(id: string, updates: any, options: RequestManagerOptions = {}) {
     return requestManager.executeSupabaseQuery(
       (client) => client.from('complaints').update(updates).eq('id', id).select().single(),
       {

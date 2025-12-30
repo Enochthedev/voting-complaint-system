@@ -195,6 +195,76 @@ export class ApiResponseWrapper {
   }
 
   /**
+   * Create plain successful response (without NextResponse wrapper)
+   */
+  createSuccessResponse<T>(
+    data: T,
+    additionalMeta?: Partial<ResponseMeta>
+  ): StandardApiResponse<T> {
+    return {
+      data,
+      error: null,
+      meta: this.createMeta(additionalMeta),
+    };
+  }
+
+  /**
+   * Create plain error response (without NextResponse wrapper)
+   */
+  createErrorResponse(
+    type: ErrorType,
+    code: string,
+    message: string,
+    details?: ErrorDetails,
+    context?: Partial<ErrorContext>
+  ): StandardApiResponse<null> {
+    const error: StandardApiError = {
+      type,
+      code,
+      message,
+      details,
+      context: context
+        ? {
+            requestId: this.requestId,
+            ...context,
+          }
+        : undefined,
+      timestamp: new Date().toISOString(),
+    };
+
+    return {
+      data: null,
+      error,
+      meta: this.createMeta(),
+    };
+  }
+
+  /**
+   * Create plain paginated response (without NextResponse wrapper)
+   */
+  createPaginatedResponse<T>(
+    data: T[],
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      baseUrl: string;
+      queryParams?: Record<string, string>;
+    }
+  ): PaginatedApiResponse<T> {
+    const paginationMeta = PaginationHelper.calculatePagination(pagination);
+
+    return {
+      data,
+      error: null,
+      meta: {
+        ...this.createMeta(),
+        pagination: paginationMeta,
+      },
+    };
+  }
+
+  /**
    * Get standard response headers including API version
    */
   private getResponseHeaders(): Record<string, string> {

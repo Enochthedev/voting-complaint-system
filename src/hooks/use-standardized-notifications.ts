@@ -21,8 +21,8 @@ import { StandardizedErrorHandler } from '@/lib/api/standardization/error-handle
 import type {
   StandardApiResponse,
   PaginatedApiResponse,
-  ErrorType,
 } from '@/lib/api/standardization/types';
+import { ErrorType } from '@/lib/api/standardization/types';
 import type { Notification } from '@/types/database.types';
 
 /**
@@ -50,7 +50,7 @@ export function useStandardizedNotifications(options?: {
   baseUrl?: string;
 }) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const toast = useToast();
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const [error, setError] = useState<Error | null>(null);
 

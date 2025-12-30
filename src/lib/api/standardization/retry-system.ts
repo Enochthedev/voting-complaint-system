@@ -92,7 +92,7 @@ export class RetrySystem {
         await this.ensureValidSession();
 
         // Execute operation with timeout
-        const result = await withTimeout(() => operation(), config.timeoutMs);
+        const result = await withTimeout(operation(), config.timeoutMs);
 
         return {
           success: true,

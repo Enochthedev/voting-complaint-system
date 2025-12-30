@@ -46,12 +46,16 @@ export const optimizedComplaintKeys = {
 export function useOptimizedUserComplaints(userId: string) {
   const queryClient = useQueryClient();
 
-  return useQuery({
+  const result = useQuery({
     queryKey: optimizedComplaintKeys.user(userId),
     queryFn: () => getUserComplaintsOptimized(userId),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes - longer than default due to prefetching
-    onSuccess: (data) => {
+  });
+
+  // Prefetch complaint details after successful data fetch
+  useEffect(() => {
+    if (result.data && result.data.length > 0) {
       // Record access pattern for future prefetching
       try {
         const manager = getOptimizationManager();
@@ -61,17 +65,17 @@ export function useOptimizedUserComplaints(userId: string) {
       }
 
       // Prefetch complaint details for recently viewed complaints
-      if (data && data.length > 0) {
-        data.slice(0, 3).forEach((complaint, index) => {
-          queryClient.prefetchQuery({
-            queryKey: optimizedComplaintKeys.detail(complaint.id),
-            queryFn: () => getComplaintByIdOptimized(complaint.id),
-            staleTime: 5 * 60 * 1000, // 5 minutes
-          });
+      result.data.slice(0, 3).forEach((complaint) => {
+        queryClient.prefetchQuery({
+          queryKey: optimizedComplaintKeys.detail(complaint.id),
+          queryFn: () => getComplaintByIdOptimized(complaint.id),
+          staleTime: 5 * 60 * 1000, // 5 minutes
         });
-      }
-    },
-  });
+      });
+    }
+  }, [result.data, queryClient]);
+
+  return result;
 }
 
 /**

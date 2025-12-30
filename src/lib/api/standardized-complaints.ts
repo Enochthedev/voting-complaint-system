@@ -22,13 +22,16 @@ export const getUserComplaintsStandardized = withMonitoring(
       const data = await legacyComplaints.getUserComplaints(userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as unknown as StandardApiResponse<any[]>;
     }
   },
   {
-    operation: 'getUserComplaints',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/complaints/user',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -41,13 +44,16 @@ export const getUserDraftsStandardized = withMonitoring(
       const data = await legacyComplaints.getUserDrafts(userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'getUserDrafts',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/complaints/user/drafts',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -60,13 +66,16 @@ export const getUserComplaintStatsStandardized = withMonitoring(
       const data = await legacyComplaints.getUserComplaintStats(userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'getUserComplaintStats',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/complaints/user/stats',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -103,9 +112,12 @@ export const getAllComplaintsStandardized = withMonitoring(
     }
   },
   {
-    operation: 'getAllComplaints',
-    category: 'complaints',
-    tags: { standardized: true, paginated: true },
+    endpoint: '/api/complaints',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, paginated: true },
+    },
   }
 );
 
@@ -118,13 +130,16 @@ export const getComplaintByIdStandardized = withMonitoring(
       const data = await legacyComplaints.getComplaintById(id);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'getComplaintById',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/complaints/:id',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -137,13 +152,16 @@ export const createComplaintStandardized = withMonitoring(
       const data = await legacyComplaints.createComplaint(complaint);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'createComplaint',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/complaints',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -156,13 +174,16 @@ export const updateComplaintStandardized = withMonitoring(
       const data = await legacyComplaints.updateComplaint(id, updates);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'updateComplaint',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/complaints/:id',
+    method: 'PATCH',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -175,13 +196,16 @@ export const deleteComplaintStandardized = withMonitoring(
       await legacyComplaints.deleteComplaint(id);
       return migrationWrapper.wrapSupabaseResponse({ data: null, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'deleteComplaint',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/complaints/:id',
+    method: 'DELETE',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -194,13 +218,16 @@ export const reopenComplaintStandardized = withMonitoring(
       const data = await legacyComplaints.reopenComplaint(id, justification, userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'reopenComplaint',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/complaints/:id/reopen',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -223,13 +250,16 @@ export const submitRatingStandardized = withMonitoring(
       );
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'submitRating',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true },
+    endpoint: '/api/complaints/:id/rating',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true },
+    },
   }
 );
 
@@ -242,13 +272,16 @@ export const hasRatedComplaintStandardized = withMonitoring(
       const data = await legacyComplaints.hasRatedComplaint(complaintId, studentId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'hasRatedComplaint',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/complaints/:id/rating/check',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -261,13 +294,16 @@ export const getUserAverageRatingStandardized = withMonitoring(
       const data = await legacyComplaints.getUserAverageRating(userId);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'getUserAverageRating',
-    category: 'complaints',
-    tags: { standardized: true },
+    endpoint: '/api/users/:id/average-rating',
+    method: 'GET',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true },
+    },
   }
 );
 
@@ -288,13 +324,16 @@ export const bulkAssignComplaintsStandardized = withMonitoring(
       );
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'bulkAssignComplaints',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true, bulk: true },
+    endpoint: '/api/complaints/bulk/assign',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true, bulk: true },
+    },
   }
 );
 
@@ -311,13 +350,16 @@ export const bulkChangeStatusStandardized = withMonitoring(
       const data = await legacyComplaints.bulkChangeStatus(complaintIds, newStatus, performedBy);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'bulkChangeStatus',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true, bulk: true },
+    endpoint: '/api/complaints/bulk/status',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true, bulk: true },
+    },
   }
 );
 
@@ -334,12 +376,15 @@ export const bulkAddTagsStandardized = withMonitoring(
       const data = await legacyComplaints.bulkAddTags(complaintIds, tags, performedBy);
       return migrationWrapper.wrapSupabaseResponse({ data, error: null });
     } catch (error) {
-      return migrationWrapper.wrapSupabaseResponse({ data: null, error });
+      return migrationWrapper.wrapSupabaseResponse({ data: null, error }) as any;
     }
   },
   {
-    operation: 'bulkAddTags',
-    category: 'complaints',
-    tags: { standardized: true, mutation: true, bulk: true },
+    endpoint: '/api/complaints/bulk/tags',
+    method: 'POST',
+    metadata: {
+      category: 'complaints',
+      tags: { standardized: true, mutation: true, bulk: true },
+    },
   }
 );

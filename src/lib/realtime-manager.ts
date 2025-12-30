@@ -86,7 +86,7 @@ export class RealtimeManager {
 
       // Set up event listeners
       if (config.event && config.schema && config.table) {
-        channel.on(
+        (channel as any).on(
           'postgres_changes',
           {
             event: config.event,
@@ -94,7 +94,7 @@ export class RealtimeManager {
             table: config.table,
             filter: config.filter,
           },
-          (payload) => {
+          (payload: any) => {
             switch (payload.eventType) {
               case 'INSERT':
                 config.onInsert?.(payload);
@@ -148,7 +148,7 @@ export class RealtimeManager {
     const pollingInterval = this.pollingIntervals.get(channelName);
     if (pollingInterval) {
       clearInterval(pollingInterval);
-      this.pollingIntervals.delete(pollingInterval);
+      this.pollingIntervals.delete(channelName);
     }
   }
 

@@ -164,7 +164,7 @@ export class PerformanceAlertingSystem {
         diagnostics: context.diagnostics,
       };
 
-      console[logLevel as keyof Console](`Performance Alert: ${alert.message}`, logMessage);
+      (console[logLevel as keyof Console] as any)(`Performance Alert: ${alert.message}`, logMessage);
     });
   }
 
@@ -317,7 +317,7 @@ export class PerformanceAlertingSystem {
           : rule.conditions.metric === 'error_rate'
             ? 'error_rate'
             : 'failure_spike',
-      severity: rule.severity === 'critical' ? 'critical' : 'warning',
+      severity: rule.severity,
       message: this.generateAlertMessage(rule, metricValue),
       threshold: rule.conditions.threshold,
       actualValue: metricValue,
@@ -550,6 +550,177 @@ export class PerformanceAlertingSystem {
       alertsByEndpoint,
       topAlertingEndpoints,
     };
+  }
+
+  /**
+   * Get all active alerts (compatibility method for alerts API)
+   */
+  getActiveAlerts(): PerformanceAlert[] {
+    // Return all alerts from the last hour as "active"
+    return apiMonitor.getAlerts(60 * 60 * 1000);
+  }
+
+  /**
+   * Get resolved alerts (placeholder - not yet implemented)
+   */
+  getResolvedAlerts(timeRange: string): PerformanceAlert[] {
+    // TODO: Implement resolved alerts tracking
+    return [];
+  }
+
+  /**
+   * Get all alerts for a given time range
+   */
+  getAllAlerts(timeRange: string): PerformanceAlert[] {
+    const timeRangeMs = this.parseTimeRange(timeRange);
+    return apiMonitor.getAlerts(timeRangeMs);
+  }
+
+  /**
+   * Parse time range string to milliseconds
+   */
+  private parseTimeRange(timeRange: string): number {
+    const match = timeRange.match(/^(\d+)([smhd])$/);
+    if (!match) return 24 * 60 * 60 * 1000; // Default 24 hours
+
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 24 * 60 * 60 * 1000;
+    }
+  }
+
+  /**
+   * Acknowledge an alert (placeholder)
+   */
+  async acknowledgeAlert(alertId: string, userId?: string, comment?: string): Promise<void> {
+    console.log(`Alert ${alertId} acknowledged by ${userId || 'system'}`, { comment });
+    // TODO: Implement alert acknowledgment tracking
+  }
+
+  /**
+   * Resolve an alert (placeholder)
+   */
+  async resolveAlert(alertId: string, userId?: string, comment?: string): Promise<void> {
+    console.log(`Alert ${alertId} resolved by ${userId || 'system'}`, { comment });
+    // TODO: Implement alert resolution tracking
+  }
+
+  /**
+   * Snooze an alert (placeholder)
+   */
+  async snoozeAlert(alertId: string, duration: number, userId?: string): Promise<void> {
+    console.log(`Alert ${alertId} snoozed for ${duration}ms by ${userId || 'system'}`);
+    // TODO: Implement alert snooze functionality
+  }
+
+  /**
+   * Add alert (wrapper for addRule for compatibility)
+   */
+  async addAlert(config: any): Promise<string> {
+    // Map the alert config to a rule config
+    const rule: AlertRule = {
+      id: config.name || `alert-${Date.now()}`,
+      name: config.name || config.description || 'Custom Alert',
+      enabled: true,
+      conditions: {
+        metric: this.mapMetricName(config.metric),
+        operator: this.mapOperator(config.operator),
+        threshold: config.threshold,
+        timeWindow: this.parseTimeRange(config.duration || '5m'),
+        minSamples: config.minSamples || 1,
+      },
+      severity: config.severity || 'warning',
+      cooldown: 300000, // 5 minutes default
+      actions: config.notifications?.map((n: any) => ({
+        type: n.type || 'log',
+        config: n.config || {},
+      })) || [{ type: 'log', config: { level: 'warn' } }],
+    };
+
+    this.addRule(rule);
+    return rule.id;
+  }
+
+  /**
+   * Map metric names for compatibility
+   */
+  private mapMetricName(metric: string): 'response_time' | 'error_rate' | 'throughput' {
+    if (metric.includes('response') || metric.includes('time')) return 'response_time';
+    if (metric.includes('error')) return 'error_rate';
+    if (metric.includes('throughput') || metric.includes('rpm')) return 'throughput';
+    return 'response_time';
+  }
+
+  /**
+   * Map operator symbols
+   */
+  private mapOperator(operator: string): 'gt' | 'lt' | 'gte' | 'lte' | 'eq' {
+    switch (operator) {
+      case '>':
+        return 'gt';
+      case '<':
+        return 'lt';
+      case '>=':
+        return 'gte';
+      case '<=':
+        return 'lte';
+      case '=':
+      case '==':
+        return 'eq';
+      default:
+        return 'gt';
+    }
+  }
+
+  /**
+   * Update alert (wrapper for updateRule for compatibility)
+   */
+  async updateAlert(alertId: string, config: any): Promise<void> {
+    const updates: Partial<AlertRule> = {};
+
+    if (config.enabled !== undefined) updates.enabled = config.enabled;
+    if (config.threshold !== undefined) {
+      const rule = this.rules.get(alertId);
+      if (rule) {
+        updates.conditions = { ...rule.conditions, threshold: config.threshold };
+      }
+    }
+
+    this.updateRule(alertId, updates);
+  }
+
+  /**
+   * Remove alert (wrapper for removeRule for compatibility)
+   */
+  async removeAlert(alertId: string): Promise<void> {
+    this.removeRule(alertId);
+  }
+
+  /**
+   * Evaluate alerts (wrapper for checkAlerts for compatibility)
+   */
+  async evaluateAlerts(): Promise<void> {
+    await this.checkAlerts();
+  }
+
+  /**
+   * Shutdown the alerting system
+   */
+  async shutdown(): Promise<void> {
+    // Clear any intervals or timers
+    console.log('Performance alerting system shutting down');
+    // TODO: Clean up any resources
   }
 }
 

@@ -4,7 +4,7 @@
  * Provides system health status and monitoring information
  */
 
-import { NextResponse } from 'next/response';
+import { NextResponse } from 'next/server';
 import { getHealthCheckData } from '@/lib/api/standardization/production-monitoring';
 
 export async function GET() {

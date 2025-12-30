@@ -353,12 +353,9 @@ export async function batchNotificationQueries(
 export function createBatchExecutor<T extends { id: string }>(
   queryFn: (ids: string[]) => Promise<T[]>
 ): BatchExecutor<string, T | undefined> {
-  return async (batches: string[][]) => {
-    const allIds = batches.flat();
-    const results = await queryFn(allIds);
+  return async (requests: string[]) => {
+    const results = await queryFn(requests);
 
-    return batches
-      .map((batchIds) => batchIds.map((id) => results.find((result) => result.id === id)))
-      .flat();
+    return requests.map((id) => results.find((result) => result.id === id));
   };
 }

@@ -399,7 +399,7 @@ export class OfflineRequestQueue {
     const cancellableRequest = requestLifecycleManager.createCancellableRequest(
       async (signal: AbortSignal) => {
         // Build the Supabase request based on the queued request
-        let query = supabase.from(this.extractTableFromEndpoint(request.endpoint));
+        let query: any = supabase.from(this.extractTableFromEndpoint(request.endpoint));
 
         switch (request.method) {
           case 'GET':

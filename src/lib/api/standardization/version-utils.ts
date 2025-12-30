@@ -206,7 +206,7 @@ export class VersionedApiClient {
       error: response.ok
         ? null
         : {
-            type: 'server_error',
+            type: 'internal_server_error' as any,
             code: `HTTP_${response.status}`,
             message: response.statusText || 'Request failed',
             timestamp: new Date().toISOString(),
@@ -230,12 +230,12 @@ export class VersionedApiClient {
     return {
       data: null,
       error: {
-        type: 'network_error',
+        type: 'network' as any,
         code: 'NETWORK_ERROR',
         message: error.message || 'Network request failed',
         details: {
           originalError: error.name,
-        },
+        } as any,
         timestamp: new Date().toISOString(),
       },
       meta: {

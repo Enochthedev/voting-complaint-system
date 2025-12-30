@@ -385,7 +385,7 @@ export class ApiVersionManager {
         details: {
           requestedVersion,
           supportedVersions,
-        },
+        } as any,
         context: {
           requestId: crypto.randomUUID(),
         },

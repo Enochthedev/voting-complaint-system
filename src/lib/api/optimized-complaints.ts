@@ -68,7 +68,7 @@ async function getUserComplaintsOptimizedImpl(userId: string) {
           topComplaints.forEach((complaint, index) => {
             prefetchComplaintData(
               ['complaint', complaint.id],
-              () => getComplaintByIdOptimized(complaint.id),
+              () => getComplaintByIdOptimizedImpl(complaint.id),
               3 - index // Higher priority for first complaints
             );
           });
@@ -102,42 +102,42 @@ async function getUserComplaintStatsOptimizedImpl(userId: string) {
     async () => {
       // Use parallel execution for all count queries
       const operations = {
-        total: () =>
-          supabase
+        total: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
             .eq('is_draft', false),
-        new: () =>
-          supabase
+        new: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
             .eq('is_draft', false)
             .eq('status', 'new'),
-        opened: () =>
-          supabase
+        opened: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
             .eq('is_draft', false)
             .eq('status', 'opened'),
-        inProgress: () =>
-          supabase
+        inProgress: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
             .eq('is_draft', false)
             .eq('status', 'in_progress'),
-        resolved: () =>
-          supabase
+        resolved: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
             .eq('is_draft', false)
             .eq('status', 'resolved'),
-        closed: () =>
-          supabase
+        closed: async () =>
+          await supabase
             .from('complaints')
             .select('*', { count: 'exact', head: true })
             .eq('student_id', userId)
@@ -145,10 +145,10 @@ async function getUserComplaintStatsOptimizedImpl(userId: string) {
             .eq('status', 'closed'),
       };
 
-      const results = await optimizeComplaintOperations(operations);
+      const results = (await optimizeComplaintOperations(operations)) as any;
 
       // Check for errors
-      Object.values(results).forEach((result) => {
+      Object.values(results).forEach((result: any) => {
         if (result.error) throw result.error;
       });
 
@@ -176,14 +176,14 @@ export const getUserComplaintStatsOptimized = withRateLimit(
 /**
  * Optimized function to fetch complaint by ID with prefetched related data
  */
-async function getComplaintByIdOptimized(id: string) {
+async function getComplaintByIdOptimizedImpl(id: string) {
   return optimizeComplaintApiCall(
     `getComplaintById-${id}`,
     async () => {
       // Fetch main complaint data and related data in parallel
       const operations = {
-        complaint: () =>
-          supabase
+        complaint: async () =>
+          await supabase
             .from('complaints')
             .select(
               `
@@ -194,9 +194,9 @@ async function getComplaintByIdOptimized(id: string) {
             )
             .eq('id', id)
             .single(),
-        tags: () => supabase.from('complaint_tags').select('tag_name').eq('complaint_id', id),
-        comments: () =>
-          supabase
+        tags: async () => await supabase.from('complaint_tags').select('tag_name').eq('complaint_id', id),
+        comments: async () =>
+          await supabase
             .from('complaint_comments')
             .select(
               `
@@ -209,8 +209,8 @@ async function getComplaintByIdOptimized(id: string) {
             )
             .eq('complaint_id', id)
             .order('created_at', { ascending: true }),
-        attachments: () =>
-          supabase
+        attachments: async () =>
+          await supabase
             .from('complaint_attachments')
             .select(
               `
@@ -223,8 +223,8 @@ async function getComplaintByIdOptimized(id: string) {
           `
             )
             .eq('complaint_id', id),
-        history: () =>
-          supabase
+        history: async () =>
+          await supabase
             .from('complaint_history')
             .select(
               `
@@ -240,7 +240,7 @@ async function getComplaintByIdOptimized(id: string) {
             .order('created_at', { ascending: false }),
       };
 
-      const results = await optimizeComplaintOperations(operations);
+      const results = (await optimizeComplaintOperations(operations)) as any;
 
       // Check for errors
       if (results.complaint.error) {
@@ -268,6 +268,8 @@ async function getComplaintByIdOptimized(id: string) {
     }
   );
 }
+
+export const getComplaintByIdOptimized = withRateLimit(getComplaintByIdOptimizedImpl, 'read');
 
 /**
  * Optimized function to create complaint with intelligent caching
@@ -422,16 +424,16 @@ async function bulkAssignComplaintsOptimizedImpl(
 
         // Fetch lecturer and complaints data in parallel
         const operations = {
-          lecturer: () =>
-            supabase.from('users').select('id, full_name, email').eq('id', lecturerId).single(),
-          complaints: () =>
-            supabase
+          lecturer: async () =>
+            await supabase.from('users').select('id, full_name, email').eq('id', lecturerId).single(),
+          complaints: async () =>
+            await supabase
               .from('complaints')
               .select('id, title, assigned_to, student_id')
               .in('id', complaintIds),
         };
 
-        const { lecturer, complaints } = await optimizeComplaintOperations(operations);
+        const { lecturer, complaints } = (await optimizeComplaintOperations(operations)) as any;
 
         if (lecturer.error || !lecturer.data) {
           throw new Error('Invalid lecturer selected');
@@ -484,8 +486,8 @@ async function bulkAssignComplaintsOptimizedImpl(
 
         // Execute history and notifications in parallel
         const batchOperations = {
-          history: () => supabase.from('complaint_history').insert(historyInserts),
-          notifications: () => supabase.from('notifications').insert(notificationInserts),
+          history: async () => await supabase.from('complaint_history').insert(historyInserts),
+          notifications: async () => await supabase.from('notifications').insert(notificationInserts),
         };
 
         await optimizeComplaintOperations(batchOperations);

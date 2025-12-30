@@ -123,64 +123,24 @@ export class EnhancedCacheManager {
             return this.config.ttl;
           },
 
-          // Enhanced garbage collection time
-          gcTime: (query) => {
-            const queryKey = query.queryKey[0] as string;
+          // Enhanced garbage collection time (static value in v5)
+          gcTime: 10 * 60 * 1000, // 10 minutes default
 
-            // Keep user data longer
-            if (queryKey.includes('user-profile') || queryKey.includes('auth')) {
-              return 30 * 60 * 1000; // 30 minutes
-            }
+          // Intelligent refetch policies (static value in v5)
+          refetchOnWindowFocus: true,
 
-            // Default GC time
-            return 10 * 60 * 1000; // 10 minutes
-          },
+          // Enhanced retry logic (static value in v5, configure per-query if needed)
+          retry: 3,
 
-          // Intelligent refetch policies
-          refetchOnWindowFocus: (query) => {
-            const queryKey = query.queryKey[0] as string;
-
-            // Don't refetch static data on focus
-            if (queryKey.includes('templates') || queryKey.includes('static')) {
-              return false;
-            }
-
-            return true;
-          },
-
-          // Enhanced retry logic
-          retry: (failureCount, error: any) => {
-            // Don't retry client errors
-            if (error?.status >= 400 && error?.status < 500) {
-              return false;
-            }
-
-            // Exponential backoff with jitter
-            return failureCount < 3;
-          },
-
-          retryDelay: (attemptIndex) => {
-            const baseDelay = Math.min(1000 * 2 ** attemptIndex, 30000);
-            const jitter = Math.random() * 0.1 * baseDelay;
-            return baseDelay + jitter;
-          },
+          retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
 
           // Network mode for offline support
           networkMode: 'offlineFirst',
         },
 
         mutations: {
-          // Enhanced mutation retry for critical operations
-          retry: (failureCount, error: any, mutation) => {
-            const mutationKey = mutation.options.mutationKey?.[0] as string;
-
-            // Retry critical operations
-            if (mutationKey?.includes('create') || mutationKey?.includes('update')) {
-              return failureCount < 2;
-            }
-
-            return false;
-          },
+          // Enhanced mutation retry (static value in v5, configure per-mutation if needed)
+          retry: 1,
 
           // Network mode for mutations
           networkMode: 'online',

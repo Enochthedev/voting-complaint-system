@@ -263,7 +263,7 @@ export class ResponseCompression {
     const reader = stream.readable.getReader();
 
     // Write data to compression stream
-    await writer.write(data);
+    await writer.write(data as any);
     await writer.close();
 
     // Read compressed data

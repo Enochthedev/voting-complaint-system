@@ -6,10 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { productionMonitoring } from '@/lib/api/standardization/production-monitoring';
-import { PerformanceAlerting } from '@/lib/api/standardization/performance-alerting';
+import { PerformanceAlertingSystem } from '@/lib/api/standardization/performance-alerting';
 
 // Create alerting instance for API operations
-const alerting = new PerformanceAlerting();
+const alerting = new PerformanceAlertingSystem();
 
 export async function GET(request: NextRequest) {
   try {
@@ -82,8 +82,8 @@ export async function POST(request: NextRequest) {
         if (!config) {
           return NextResponse.json({ error: 'Alert configuration required' }, { status: 400 });
         }
-        const alertId = await alerting.addAlert(config);
-        return NextResponse.json({ success: true, alertId });
+        const newAlertId = await alerting.addAlert(config);
+        return NextResponse.json({ success: true, alertId: newAlertId });
 
       case 'update':
         if (!alertId || !config) {

@@ -338,7 +338,7 @@ export function errorHandlingExample() {
 
     // Handle the error in your application
     if (errorResponse.error?.code === 'UNSUPPORTED_API_VERSION') {
-      console.log('Supported versions:', errorResponse.error.details?.supportedVersions);
+      console.log('Supported versions:', (errorResponse.error.details as any)?.supportedVersions);
       // Redirect to supported version or show error message
     }
   } catch (error) {

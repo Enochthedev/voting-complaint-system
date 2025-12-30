@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createVersionedHandler, ApiVersion } from '@/lib/api/standardization/version-manager';
 import { apiClient } from '@/lib/api/standardization/client';
 import type { StandardApiResponse } from '@/lib/api/standardization/types';
+import { ErrorType } from '@/lib/api/standardization/types';
 
 /**
  * V2 Complaints Handler (Enhanced)
@@ -196,7 +197,7 @@ async function handleV2Complaints(request: NextRequest): Promise<NextResponse> {
     const errorResponse: StandardApiResponse<null> = {
       data: null,
       error: {
-        type: 'server_error',
+        type: ErrorType.SERVER_ERROR,
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An internal server error occurred',
         timestamp: new Date().toISOString(),
