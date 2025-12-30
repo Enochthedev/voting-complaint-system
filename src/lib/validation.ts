@@ -35,7 +35,7 @@ export const ComplaintPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent'
 export const ComplaintStatusSchema = z.enum([
   'draft',
   'new',
-  'opened',  // Database has 'opened' not 'open'
+  'opened', // Database has 'opened' not 'open'
   'in_progress',
   'resolved',
   'closed',
@@ -52,8 +52,8 @@ export const UserRoleSchema = z.enum(['student', 'lecturer', 'admin']);
  */
 export const CreateComplaintSchema = z
   .object({
-    title: z.string().max(200, 'Title must be 200 characters or less').trim(),
-    description: z.string().max(5000, 'Description must be 5000 characters or less').trim(),
+    title: z.string().trim(),
+    description: z.string().trim(),
     category: z.union([ComplaintCategorySchema, z.literal('')]),
     priority: z.union([ComplaintPrioritySchema, z.literal('')]),
     is_anonymous: z.boolean().default(false),
@@ -63,19 +63,29 @@ export const CreateComplaintSchema = z
   })
   .refine(
     (data) => {
-      // For non-drafts, require all fields
+      // For non-drafts, require all fields with proper validation
       if (!data.is_draft) {
         return (
           data.title.trim().length >= 1 &&
+          data.title.trim().length <= 200 &&
           data.description.trim().length >= 10 &&
+          data.description.trim().length <= 5000 &&
           data.category !== '' &&
           data.priority !== ''
         );
       }
+      // For drafts, only validate length limits if content exists
+      if (data.title.trim().length > 200) {
+        return false;
+      }
+      if (data.description.trim().length > 5000) {
+        return false;
+      }
       return true;
     },
     {
-      message: 'Title, description, category, and priority are required for submitted complaints',
+      message:
+        'For submitted complaints: Title (1-200 chars), description (10-5000 chars), category, and priority are required. For drafts: Title max 200 chars, description max 5000 chars.',
     }
   );
 

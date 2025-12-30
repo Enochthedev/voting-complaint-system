@@ -116,11 +116,11 @@ async function getAuthToken(role) {
   const credentials = {
     student: {
       email: 'student@test.com',
-      password: 'Test123!@#',
+      password: 'TestPass123!',
     },
     lecturer: {
       email: 'lecturer@test.com',
-      password: 'Test123!@#',
+      password: 'TestPass123!',
     },
   };
 
