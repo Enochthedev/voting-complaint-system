@@ -11,7 +11,8 @@
       "Bash(psql:*)",
       "Bash(pkill:*)",
       "Bash(curl:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git add:*)"
     ]
   }
 }

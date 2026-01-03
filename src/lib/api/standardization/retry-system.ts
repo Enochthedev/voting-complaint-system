@@ -277,17 +277,6 @@ export class RetrySystem {
       // The API call itself will fail with proper error handling if truly unauthorized
       if (error?.message?.includes('timeout')) {
         console.warn('Session validation timed out, proceeding with API call');
-        // Still validate that we have some kind of session in local storage
-        const localSession = typeof window !== 'undefined' ?
-          localStorage.getItem('sb-' + new URL(supabase.auth.getGoTrueClient().url).host + '-auth-token') :
-          null;
-        if (!localSession) {
-          console.error('No local session found after timeout');
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login?reason=session_not_found';
-          }
-          throw ErrorNormalizer.createAuthError('Session not found. Please log in again.');
-        }
         return; // Let the API call proceed - it will fail naturally if unauthorized
       }
       throw error;
