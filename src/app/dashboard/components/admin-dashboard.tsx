@@ -91,16 +91,16 @@ export function AdminDashboard({ userId, userName }: AdminDashboardProps) {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">Total Complaints</CardTitle>
-            <div className="p-2 rounded-lg bg-purple-500 text-white">
+            <CardTitle className="text-sm font-medium text-blue-800">Total Complaints</CardTitle>
+            <div className="p-2 rounded-lg bg-blue-500 text-white">
               <FileText className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">{stats.totalComplaints}</div>
-            <p className="text-xs text-purple-600 mt-1">All time submissions</p>
+            <div className="text-2xl font-bold text-blue-900">{stats.totalComplaints}</div>
+            <p className="text-xs text-blue-600 mt-1">All time submissions</p>
           </CardContent>
         </Card>
 
@@ -174,8 +174,8 @@ export function AdminDashboard({ userId, userName }: AdminDashboardProps) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
-                <Clock className="h-5 w-5 text-purple-500" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                <Clock className="h-5 w-5 text-blue-500" />
               </div>
               <div>
                 <p className="text-sm font-medium">Response Time</p>

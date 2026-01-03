@@ -97,7 +97,7 @@ const calculateAnalyticsFromComplaints = (complaints: any[]) => {
         status: 'Opened',
         count: statusCounts.opened,
         percentage: total > 0 ? Math.round((statusCounts.opened / total) * 100) : 0,
-        color: 'bg-purple-500',
+        color: 'bg-blue-500',
       },
       {
         status: 'In Progress',
@@ -182,7 +182,7 @@ const mockAnalyticsData = {
   },
   complaintsByStatus: [
     { status: 'New', count: 0, percentage: 0, color: 'bg-blue-500' },
-    { status: 'Opened', count: 0, percentage: 0, color: 'bg-purple-500' },
+    { status: 'Opened', count: 0, percentage: 0, color: 'bg-sky-500' },
     { status: 'In Progress', count: 0, percentage: 0, color: 'bg-yellow-500' },
     { status: 'Resolved', count: 0, percentage: 0, color: 'bg-green-500' },
     { status: 'Closed', count: 0, percentage: 0, color: 'bg-gray-500' },
@@ -284,7 +284,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
           <Button
             variant="outline"
             size="sm"
-            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+            className="border-blue-300 text-blue-700 hover:bg-blue-50"
           >
             <Filter className="mr-2 h-4 w-4" />
             Filters
@@ -292,7 +292,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
           <Button
             variant="outline"
             size="sm"
-            className="border-pink-300 text-pink-700 hover:bg-pink-50"
+            className="border-sky-300 text-sky-700 hover:bg-sky-50"
           >
             <Bell className="h-4 w-4" />
           </Button>
@@ -349,11 +349,11 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         <Button
           variant="outline"
           size="sm"
-          className="border-purple-300 text-purple-700 hover:bg-purple-50"
+          className="border-blue-300 text-blue-700 hover:bg-blue-50"
           onClick={() => router.push('/complaints?status=new,open,in_progress')}
         >
           Unresolved
-          <Badge className="ml-2 bg-purple-500 text-white">
+          <Badge className="ml-2 bg-blue-500 text-white">
             {stats.newComplaints + stats.inProgress}
           </Badge>
         </Button>
@@ -361,10 +361,10 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto bg-gradient-to-r from-purple-100 to-pink-100 border-purple-200">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto bg-gradient-to-r from-blue-100 to-sky-100 border-blue-200">
           <TabsTrigger
             value="overview"
-            className="data-[state=active]:bg-purple-500 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
           >
             <BarChart3 className="mr-2 h-4 w-4" />
             Overview
@@ -385,7 +385,7 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
           </TabsTrigger>
           <TabsTrigger
             value="management"
-            className="data-[state=active]:bg-pink-500 data-[state=active]:text-white"
+            className="data-[state=active]:bg-sky-500 data-[state=active]:text-white"
           >
             <Settings className="mr-2 h-4 w-4" />
             Management
@@ -396,18 +396,18 @@ export function LecturerDashboard({ userId, userName }: LecturerDashboardProps) 
         <TabsContent value="overview" className="space-y-6">
           {/* Key Metrics */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover-colorful">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover-colorful">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-800">
+                <CardTitle className="text-sm font-medium text-blue-800">
                   Total Complaints
                 </CardTitle>
-                <div className="p-2 rounded-lg bg-purple-500 text-white">
+                <div className="p-2 rounded-lg bg-blue-500 text-white">
                   <FileText className="h-4 w-4" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-purple-900">{stats.totalComplaints}</div>
-                <p className="text-xs text-purple-600">All complaints in system</p>
+                <div className="text-2xl font-bold text-blue-900">{stats.totalComplaints}</div>
+                <p className="text-xs text-blue-600">All complaints in system</p>
               </CardContent>
             </Card>
 

@@ -39,6 +39,7 @@ export default function AdminVotesPage() {
   const [deletingVoteId, setDeletingVoteId] = React.useState<string | null>(null);
   const [voteResults, setVoteResults] = React.useState<Record<string, Record<string, number>>>({});
   const [expandedVoteId, setExpandedVoteId] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
     if (!authLoading) {
@@ -82,6 +83,7 @@ export default function AdminVotesPage() {
 
   const handleCreateVote = async (voteData: Partial<Vote>) => {
     try {
+      setIsSubmitting(true);
       setError(null);
       if (!user?.id) {
         setError('User not authenticated');
@@ -106,11 +108,14 @@ export default function AdminVotesPage() {
     } catch (err) {
       console.error('Error creating vote:', err);
       setError(err instanceof Error ? err.message : 'Failed to create vote. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleUpdateVote = async (voteData: Partial<Vote>) => {
     try {
+      setIsSubmitting(true);
       setError(null);
       if (!editingVote) return;
 
@@ -131,6 +136,8 @@ export default function AdminVotesPage() {
     } catch (err) {
       console.error('Error updating vote:', err);
       setError(err instanceof Error ? err.message : 'Failed to update vote. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -235,7 +242,11 @@ export default function AdminVotesPage() {
           </div>
 
           <Card className="p-6">
-            <VoteForm onSave={handleCreateVote} onCancel={() => setShowCreateForm(false)} />
+            <VoteForm
+              onSave={handleCreateVote}
+              onCancel={() => setShowCreateForm(false)}
+              isLoading={isSubmitting}
+            />
           </Card>
         </div>
       </AppLayout>
@@ -256,6 +267,7 @@ export default function AdminVotesPage() {
               vote={editingVote}
               onSave={handleUpdateVote}
               onCancel={() => setEditingVote(null)}
+              isLoading={isSubmitting}
             />
           </Card>
         </div>

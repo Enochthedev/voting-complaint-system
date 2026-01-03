@@ -31,6 +31,9 @@ export function useVotes(filters?: { isActive?: boolean }) {
   return useQuery({
     queryKey: voteKeys.list(filters),
     queryFn: () => getVotes(filters),
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
@@ -57,6 +60,8 @@ export function useCreateVote() {
       // Invalidate all vote queries to refetch fresh data
       queryClient.invalidateQueries({ queryKey: voteKeys.all });
     },
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -78,6 +83,8 @@ export function useUpdateVote() {
       // Invalidate all vote queries
       queryClient.invalidateQueries({ queryKey: voteKeys.all });
     },
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -135,6 +142,8 @@ export function useCloseVote() {
       // Invalidate all vote queries
       queryClient.invalidateQueries({ queryKey: voteKeys.all });
     },
+    retry: 1,
+    retryDelay: 1000,
   });
 }
 
@@ -150,5 +159,7 @@ export function useReopenVote() {
       // Invalidate all vote queries
       queryClient.invalidateQueries({ queryKey: voteKeys.all });
     },
+    retry: 1,
+    retryDelay: 1000,
   });
 }

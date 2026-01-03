@@ -226,23 +226,71 @@ export class RetrySystem {
   }
 
   /**
-   * Ensure valid session exists
+   * Ensure valid session exists with timeout to prevent indefinite hangs
    */
   private async ensureValidSession(): Promise<void> {
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
+    const SESSION_TIMEOUT = 5000; // 5 seconds max for session validation
+    
+    try {
+      // Wrap the session check in a timeout to prevent hanging
+      const sessionCheck = Promise.race([
+        supabase.auth.getSession(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), SESSION_TIMEOUT)
+        )
+      ]);
 
-    if (sessionError || !session) {
-      const { data, error: refreshError } = await supabase.auth.refreshSession();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await sessionCheck;
+
+      // If we have a valid session, we're done
+      if (!sessionError && session) {
+        return;
+      }
+
+      // Log for debugging
+      if (sessionError) {
+        console.warn('Session error, attempting refresh:', sessionError.message);
+      }
+
+      // Try to refresh with timeout
+      const refreshCheck = Promise.race([
+        supabase.auth.refreshSession(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Session refresh timeout')), SESSION_TIMEOUT)
+        )
+      ]);
+
+      const { data, error: refreshError } = await refreshCheck;
 
       if (refreshError || !data.session) {
+        console.error('Session refresh failed:', refreshError?.message || 'No session returned');
         if (typeof window !== 'undefined') {
           window.location.href = '/login?reason=session_expired';
         }
         throw ErrorNormalizer.createAuthError('Session expired. Please log in again.');
       }
+    } catch (error: any) {
+      // Handle timeout errors gracefully - don't redirect on timeout, just log and continue
+      // The API call itself will fail with proper error handling if truly unauthorized
+      if (error?.message?.includes('timeout')) {
+        console.warn('Session validation timed out, proceeding with API call');
+        // Still validate that we have some kind of session in local storage
+        const localSession = typeof window !== 'undefined' ?
+          localStorage.getItem('sb-' + new URL(supabase.auth.getGoTrueClient().url).host + '-auth-token') :
+          null;
+        if (!localSession) {
+          console.error('No local session found after timeout');
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login?reason=session_not_found';
+          }
+          throw ErrorNormalizer.createAuthError('Session not found. Please log in again.');
+        }
+        return; // Let the API call proceed - it will fail naturally if unauthorized
+      }
+      throw error;
     }
   }
 

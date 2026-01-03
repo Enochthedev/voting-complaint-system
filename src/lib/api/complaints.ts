@@ -239,8 +239,10 @@ async function getComplaintByIdImpl(id: string) {
       feedback:feedback(
         id,
         content,
+        lecturer_id,
         created_at,
-        lecturer:users!feedback_lecturer_id_fkey(id, full_name, email)
+        updated_at,
+        lecturer:users!feedback_lecturer_id_fkey(id, full_name, email, role)
       ),
       rating:complaint_ratings(
         id,

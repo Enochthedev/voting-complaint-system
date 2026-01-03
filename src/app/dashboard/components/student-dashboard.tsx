@@ -162,15 +162,15 @@ export function StudentDashboard({ userId, userName }: StudentDashboardProps) {
       </div>
 
       {/* Statistics Widget */}
-      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+      <Card className="bg-gradient-to-br from-blue-50 to-sky-50 border-blue-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-purple-800">
-            <div className="p-2 rounded-lg bg-purple-500 text-white">
+          <CardTitle className="flex items-center gap-2 text-blue-800">
+            <div className="p-2 rounded-lg bg-blue-500 text-white">
               <TrendingUp className="h-5 w-5" />
             </div>
             Your Complaint Statistics
           </CardTitle>
-          <CardDescription className="text-purple-600">
+          <CardDescription className="text-blue-600">
             Overview of your complaint activity and resolution metrics
           </CardDescription>
         </CardHeader>
